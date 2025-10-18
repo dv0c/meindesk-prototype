@@ -5,7 +5,6 @@ import { Globe, Calendar, Package } from "lucide-react"
 export async function WebsiteInfo() {
   const site = await getSite()
   if (!site) return <div>Site not found</div>
-  // Mock data - replace with actual website data
   const websiteData = {
     name: "",
     url: "",
