@@ -3,8 +3,8 @@ import { getSite } from "@/lib/actions/helpers/site"
 import { Globe, Calendar, Package } from "lucide-react"
 
 export async function WebsiteInfo() {
-  const site = await getSite()
-  if (!site) return <div>Site not found</div>
+  const data = await getSite()
+  if (!data?.site) return <div>Site not found</div>
   const websiteData = {
     name: "",
     url: "",
@@ -13,10 +13,10 @@ export async function WebsiteInfo() {
     status: "Active",
   }
 
-  if (site){
-    websiteData.name = site.title
-    websiteData.url = site.url || "No URL provided"
-    websiteData.createdDate = site.createdAt.toDateString()
+  if (data.site) {
+    websiteData.name = data.site.title
+    websiteData.url = data.site.url || "No URL provided"
+    websiteData.createdDate = data.site.createdAt.toDateString()
   }
 
   return (

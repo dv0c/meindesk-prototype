@@ -1,19 +1,58 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, Smartphone, TrendingUp } from "lucide-react"
+import { getSite } from "@/lib/actions/helpers/site"
 
 export async function SubscriptionCard() {
-  // Mock data - replace with actual subscription data
-  const subscription = {
-    plan: "Custom",
+  const data = await getSite()
+  if (!data?.subscription) return null
+
+  // default mock
+  const sub = {
+    plan: "Enterprise",
     status: "active",
     price: 20,
     billingCycle: "monthly",
     nextBillingDate: "November 15, 2025",
-    daysUntilBilling: 29,
+    daysUntilBilling: 0,
   }
 
+  if (data?.subscription) {
+    // keep your original assignments
+    sub.billingCycle = data?.subscription.billing_cycle
+    sub.nextBillingDate = new Date(data?.subscription.next_billing_date).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    })
+    sub.price = data?.subscription.price
 
+    const nextBilling = new Date(data.subscription.next_billing_date)
+    const today = new Date()
+
+    // compute difference in milliseconds
+    const diffTime = nextBilling.getTime() - today.getTime() // notice no Math.abs
+    // convert to days
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+
+    sub.daysUntilBilling = diffDays > 0 ? diffDays : 0
+
+    if (data?.subscription.price === 0) {
+      sub.plan = "Free"
+      sub.status = "inactive"
+    }
+
+    if (data?.subscription.price > 0 && sub.daysUntilBilling > 0) {
+      sub.status = "active"
+    }
+    if (data?.subscription.price > 0 && sub.daysUntilBilling <= 0) {
+      sub.status = "past_due"
+    }
+
+    if (data?.subscription.price < 0) {
+      sub.status = "canceled"
+    }
+  }
 
   return (
     <Card className="col-span-full border-border">
@@ -24,10 +63,10 @@ export async function SubscriptionCard() {
             <CardDescription>Your active plan details</CardDescription>
           </div>
           <Badge
-            variant={subscription.status === "active" ? "default" : "secondary"}
+            variant={sub.status === "active" ? "default" : "secondary"}
             className="bg-accent text-accent-foreground"
           >
-            {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
+            {sub.status.charAt(0).toUpperCase() + sub.status.slice(1)}
           </Badge>
         </div>
       </CardHeader>
@@ -38,7 +77,7 @@ export async function SubscriptionCard() {
               <TrendingUp className="w-4 h-4" />
               <span>Plan</span>
             </div>
-            <p className="text-2xl font-bold">{subscription.plan}</p>
+            <p className="text-2xl font-bold">{sub.plan}</p>
           </div>
 
           <div className="space-y-2">
@@ -47,8 +86,8 @@ export async function SubscriptionCard() {
               <span>Price</span>
             </div>
             <p className="text-2xl font-bold">
-              ${subscription.price}
-              <span className="text-sm font-normal text-muted-foreground">/null</span>
+              ${sub.price}
+              <span className="text-sm font-normal text-muted-foreground">/Euro</span>
             </p>
           </div>
 
@@ -57,8 +96,8 @@ export async function SubscriptionCard() {
               <Calendar className="w-4 h-4" />
               <span>Next Payment</span>
             </div>
-            <p className="text-lg font-semibold">{subscription.nextBillingDate}</p>
-            <p className="text-sm text-muted-foreground">in {subscription.daysUntilBilling} days</p>
+            <p className="text-lg font-semibold">{sub.nextBillingDate}</p>
+            <p className="text-sm text-muted-foreground">in {sub.daysUntilBilling} days</p>
           </div>
         </div>
 

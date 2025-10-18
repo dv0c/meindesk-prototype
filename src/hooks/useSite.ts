@@ -13,29 +13,52 @@ export interface Site {
   limitViews: number
   createdAt: string
   updatedAt: string
+  userId?: string
+}
+
+export interface Subscription {
+  id: string
+  price: number
+  billing_cycle: string
+  next_billing_date: string
+  userId?: string
+  createdAt?: string
+}
+
+interface ApiResponse {
+  site: Site | null
+  subscription: Subscription | null
 }
 
 export function useSite() {
   const [site, setSite] = useState<Site | null>(null)
+  const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchSite = async () => {
+    const fetchData = async () => {
       setLoading(true)
       setError(null)
       try {
-        const res = await axios.get<Site | null>("/api/projects/website")
-        setSite(res.data)
+        const res = await axios.get<ApiResponse>("/api/projects/website")
+
+        if (res.data) {
+          setSite(res.data.site)
+          setSubscription(res.data.subscription)
+        } else {
+          setSite(null)
+          setSubscription(null)
+        }
       } catch (err: any) {
-        setError(err.message || "Failed to fetch site")
+        setError(err.message || "Failed to fetch site data")
       } finally {
         setLoading(false)
       }
     }
 
-    fetchSite()
+    fetchData()
   }, [])
 
-  return { site, loading, error }
+  return { site, subscription, loading, error }
 }

@@ -8,28 +8,28 @@ export function BillingHistory() {
     {
       id: "1",
       date: "October 15, 2025",
-      amount: 49.99,
+      amount: 20.00,
       status: "paid",
       reference: "IRIS-2025-10-001",
     },
     {
       id: "2",
       date: "September 15, 2025",
-      amount: 49.99,
+      amount: 20.00,
       status: "paid",
       reference: "IRIS-2025-09-001",
     },
     {
       id: "3",
       date: "August 15, 2025",
-      amount: 49.99,
+      amount: 20.00,
       status: "paid",
       reference: "IRIS-2025-08-001",
     },
     {
       id: "4",
       date: "July 15, 2025",
-      amount: 49.99,
+      amount: 20.00,
       status: "paid",
       reference: "IRIS-2025-07-001",
     },
@@ -41,7 +41,14 @@ export function BillingHistory() {
         <CardTitle>Billing History</CardTitle>
         <CardDescription>Your payment history via Iris</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="relative">
+        <div className="h-full w-full absolute top-0 left-0 blur-xl rounded-xl bg-accent" />
+        <div className="h-full w-full absolute top-0 left-0">
+          <div className="flex items-center h-full justify-center">
+
+            <h1 className="font-bold text-3xl">Coming soon...</h1>
+          </div>
+        </div>
         <div className="space-y-4">
           {billingHistory.map((transaction) => (
             <div

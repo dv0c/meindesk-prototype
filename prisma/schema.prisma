@@ -152,6 +152,8 @@ model Subscription {
   price             Float
   billing_cycle     String
   next_billing_date DateTime
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
