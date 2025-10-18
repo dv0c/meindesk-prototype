@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
+export const runtime = "nodejs"; // use Node.js instead of Edge
 
 export async function OPTIONS(req: NextRequest) {
   // Preflight response for CORS
