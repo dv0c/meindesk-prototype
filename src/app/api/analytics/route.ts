@@ -1,18 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { NextRequest, NextResponse } from "next/server";
+export const runtime = "nodejs";
 
-export const runtime = "nodejs"; // use Node.js for stable CORS
-
-// Handle OPTIONS preflight
+// OPTIONS preflight ONLY
 export async function OPTIONS(req: NextRequest) {
-  const res = NextResponse.json({}, { status: 204 });
-  res.headers.set("Access-Control-Allow-Origin", "*"); // allow all domains
+  const res = new NextResponse(null, { status: 204 });
+  res.headers.set("Access-Control-Allow-Origin", "*");
   res.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.headers.set("Access-Control-Allow-Headers", "Content-Type");
   return res;
 }
 
-// Handle POST request
+// POST request
 export async function POST(req: NextRequest) {
   try {
     const { siteId, path, referrer, userAgent } = await req.json();
@@ -25,24 +24,23 @@ export async function POST(req: NextRequest) {
 
     const ipAddress = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
 
-    // Save analytics event
+    // Only here touch Prisma
     await db.analyticsEvent.create({
       data: { siteId, path, referrer, userAgent, ipAddress },
     });
 
-    // Increment site views
     await db.site.update({
       where: { id: siteId },
       data: { views: { increment: 1 } },
     });
 
     const res = NextResponse.json({ success: true });
-    res.headers.set("Access-Control-Allow-Origin", "*"); // crucial for cross-domain
+    res.headers.set("Access-Control-Allow-Origin", "*");
     return res;
   } catch (err) {
     console.error(err);
     const res = NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-    res.headers.set("Access-Control-Allow-Origin", "*"); // important
+    res.headers.set("Access-Control-Allow-Origin", "*");
     return res;
   }
 }
