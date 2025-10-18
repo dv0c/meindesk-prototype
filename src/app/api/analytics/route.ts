@@ -1,9 +1,10 @@
-import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-export const runtime = "nodejs"; // use Node.js instead of Edge
+import { db } from "@/lib/db";
+
+export const runtime = "nodejs"; // safer for headers
 
 export async function OPTIONS(req: NextRequest) {
-  // Preflight response for CORS
+  // Handle preflight request
   const res = NextResponse.json({}, { status: 204 });
   res.headers.set("Access-Control-Allow-Origin", "*");
   res.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -33,7 +34,7 @@ export async function POST(req: NextRequest) {
     });
 
     const res = NextResponse.json({ success: true });
-    res.headers.set("Access-Control-Allow-Origin", "*"); // allow cross-domain
+    res.headers.set("Access-Control-Allow-Origin", "*");
     return res;
   } catch (err) {
     console.error(err);
