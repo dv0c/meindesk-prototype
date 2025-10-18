@@ -1,10 +1,20 @@
+'use client'
+import { redirect } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Home() {
+  useEffect(() => {
+  setTimeout(() => {
+    redirect('/dashboard/')
+  }, 2000)  
+  }, [])
+  
+
   return (
     <main>
       <div className="flex flex-1 h-screen w-screen items-center justify-center">
         <span className="text-6xl font-bold flex flex-col items-center">
-          Meindesk Payments
+          Meindesk Prototype
           <span className="ml-2 loading-dots" aria-label="Loading">
             <span className="dot">.</span>
             <span className="dot">.</span>
