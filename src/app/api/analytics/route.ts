@@ -1,5 +1,5 @@
+import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   // Handle preflight
@@ -23,11 +23,11 @@ export async function POST(req: NextRequest) {
 
     const ipAddress = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
 
-    await prisma.analyticsEvent.create({
+    await db.analyticsEvent.create({
       data: { siteId, path, referrer, userAgent, ipAddress },
     });
 
-    await prisma.site.update({
+    await db.site.update({
       where: { id: siteId },
       data: { views: { increment: 1 } },
     });
