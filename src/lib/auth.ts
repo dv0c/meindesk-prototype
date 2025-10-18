@@ -17,7 +17,9 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   pages: {
-    signIn: "/auth",
+    signIn: "/login",
+    error: "/login",
+    newUser: "/setup",
   },
   providers: [
     // --- Email/Password Provider ---

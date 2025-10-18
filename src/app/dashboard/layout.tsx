@@ -14,12 +14,17 @@ import {
     SidebarProvider,
     SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { getSite } from '@/lib/actions/helpers/site'
+import { redirect } from 'next/navigation'
 
 interface layoutProps {
     children: React.ReactNode
 }
 
 const layout: FC<layoutProps> = ({ children }) => {
+    const site = getSite()
+    if (!site) redirect('/setup')
+        
     return <SidebarProvider>
         <AppSidebar />
         <SidebarInset>

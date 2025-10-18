@@ -2,27 +2,17 @@
 
 import {
   AudioWaveform,
-  BookOpen,
-  Bot,
   ChartArea,
   Command,
-  Frame,
   GalleryVerticalEnd,
-  GitGraphIcon,
   Globe,
   Home,
   LifeBuoy,
-  Map,
-  PieChart,
-  Send,
-  Settings,
-  Settings2,
-  SquareTerminal,
+  Send
 } from "lucide-react"
 import * as React from "react"
 
 import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
 import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
 import {
@@ -32,24 +22,16 @@ import {
   SidebarHeader
 } from "@/components/ui/sidebar"
 import { TeamSwitcher } from "./team-switcher"
+import { useSite } from "@/hooks/useSite"
 
 const data = {
   teams: [
     {
-      name: "Acme Inc",
+      name: "Loading",
       logo: GalleryVerticalEnd,
       plan: "Enterprise",
     },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
+  
   ],
   navMain: [
     {
@@ -110,6 +92,15 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+
+  const {site, loading} = useSite()
+  
+  if (site && !loading) {
+    data.teams[0].name = site.title || "Your website"
+  }
+
+  console.log(site)
+
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>

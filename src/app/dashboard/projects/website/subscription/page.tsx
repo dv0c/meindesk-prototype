@@ -1,13 +1,16 @@
 import { BillingHistory } from "@/components/subscription/billing-history"
 import { SubscriptionCard } from "@/components/subscription/subscription-card"
 import { WebsiteInfo } from "@/components/subscription/website-info"
+import { getSite } from "@/lib/actions/helpers/site"
 
-const page = () => {
+const page = async () => {
+    const site = await getSite()
+    if (!site) return <div>Site not found</div>
   return <div>
     <div className="min-h-screen bg-background">
       <main className="container mx-auto px-4 py-8 max-w-5xl">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold tracking-tight mb-2">Sophia Platanisioti | Website</h2>
+          <h2 className="text-3xl font-bold tracking-tight mb-2">{site.title} | Website</h2>
           <p className="text-muted-foreground">Manage your subscription and billing</p>
         </div>
 

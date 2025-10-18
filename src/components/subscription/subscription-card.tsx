@@ -14,6 +14,7 @@ export async function SubscriptionCard() {
   }
 
 
+
   return (
     <Card className="col-span-full border-border">
       <CardHeader>

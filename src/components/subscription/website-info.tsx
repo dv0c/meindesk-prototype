@@ -1,14 +1,23 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { getSite } from "@/lib/actions/helpers/site"
 import { Globe, Calendar, Package } from "lucide-react"
 
-export function WebsiteInfo() {
+export async function WebsiteInfo() {
+  const site = await getSite()
+  if (!site) return <div>Site not found</div>
   // Mock data - replace with actual website data
   const websiteData = {
-    name: "Sophia Platanisioti",
-    url: "www.sophiaplatanisioti.gr",
-    plan: "Custom",
-    createdDate: "January 15, 2023",
+    name: "",
+    url: "",
+    plan: "Enterprise",
+    createdDate: "",
     status: "Active",
+  }
+
+  if (site){
+    websiteData.name = site.title
+    websiteData.url = site.url || "No URL provided"
+    websiteData.createdDate = site.createdAt.toDateString()
   }
 
   return (
