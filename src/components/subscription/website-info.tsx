@@ -1,10 +1,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { getSite } from "@/lib/actions/helpers/site"
+import { cn } from "@/lib/utils"
 import { Globe, Calendar, Package } from "lucide-react"
 
 export async function WebsiteInfo() {
   const data = await getSite()
-  if (!data?.site) return <div>Site not found</div>
+  if (!data) return <div>Site not found</div>
   const websiteData = {
     name: "",
     url: "",
@@ -13,12 +14,13 @@ export async function WebsiteInfo() {
     status: "Active",
   }
 
-  if (data.site) {
-    websiteData.name = data.site.title
-    websiteData.url = data.site.url || "No URL provided"
-    websiteData.createdDate = data.site.createdAt.toDateString()
+  if (data) {
+    websiteData.name = data.title
+    websiteData.url = data.url || "No URL provided"
+    websiteData.createdDate = data.createdAt.toDateString()
+    websiteData.plan = data.subscription?.plan || "Not Implemented"
+    websiteData.status = data.subscription?.status || "Error"
   }
-
   return (
     <Card className="border-border">
       <CardHeader>
@@ -42,7 +44,7 @@ export async function WebsiteInfo() {
               <span>Plan Type</span>
             </div>
             <p className="text-lg font-semibold">{websiteData.plan}</p>
-            <p className="text-sm text-green-300">{websiteData.status}</p>
+            <p className={cn("text-sm", websiteData.status === "Active" ? "text-green-500" : "text-red-500")}>{websiteData.status}</p>
           </div>
 
           <div className="space-y-2">

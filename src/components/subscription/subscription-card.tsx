@@ -26,6 +26,8 @@ export async function SubscriptionCard() {
       day: "numeric",
     })
     sub.price = data?.subscription.price
+    sub.plan = data?.subscription.plan
+    sub.status = data?.subscription.status
 
     const nextBilling = new Date(data.subscription.next_billing_date)
     const today = new Date()

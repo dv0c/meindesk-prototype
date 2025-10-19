@@ -132,7 +132,7 @@ model Site {
   title       String
   description String?
 
-  url String?
+  url String @unique
 
   logo String?
   Post Post[]
@@ -144,6 +144,8 @@ model Site {
   userId         String           @db.ObjectId
   Category       Category[]
   AnalyticsEvent AnalyticsEvent[]
+  subscription   Subscription?    @relation(fields: [subscriptionId], references: [id])
+  subscriptionId String?          @db.ObjectId
 }
 
 model Subscription {
@@ -151,11 +153,14 @@ model Subscription {
   userId            String   @db.ObjectId
   price             Float
   billing_cycle     String
+  status            String   @default("active")
+  plan              String   @default("Basic")
   next_billing_date DateTime
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Site Site[]
 }
 
 model AnalyticsEvent {
