@@ -14,23 +14,38 @@ export async function OPTIONS(req: NextRequest) {
 // POST request
 export async function POST(req: NextRequest) {
   try {
-    const { siteId, path, referrer, userAgent } = await req.json();
+    const { url, path, referrer, userAgent } = await req.json();
 
-    if (!siteId || !path) {
-      const res = NextResponse.json({ error: "siteId and path required" }, { status: 400 });
+    if (!url || !path) {
+      const res = NextResponse.json({ error: "url and path required" }, { status: 400 });
       res.headers.set("Access-Control-Allow-Origin", "*");
       return res;
     }
 
     const ipAddress = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
 
-    // Only here touch Prisma
+    // Find the site by URL
+    const site = await db.site.findUnique({ where: { url } });
+    if (!site) {
+      const res = NextResponse.json({ error: "Site not found" }, { status: 404 });
+      res.headers.set("Access-Control-Allow-Origin", "*");
+      return res;
+    }
+
+    // Create analytics event
     await db.analyticsEvent.create({
-      data: { siteId, path, referrer, userAgent, ipAddress },
+      data: {
+        siteId: site.id,
+        path,
+        referrer,
+        userAgent,
+        ipAddress,
+      },
     });
 
+    // Increment site views
     await db.site.update({
-      where: { id: siteId },
+      where: { url },
       data: { views: { increment: 1 } },
     });
 
