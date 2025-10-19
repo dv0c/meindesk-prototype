@@ -1,4 +1,3 @@
-import React, { FC } from 'react'
 import { AppSidebar } from "@/components/app-sidebar"
 import {
     Breadcrumb,
@@ -16,13 +15,14 @@ import {
 } from "@/components/ui/sidebar"
 import { getSite } from '@/lib/actions/helpers/site'
 import { redirect } from 'next/navigation'
+import React, { FC } from 'react'
 
 interface layoutProps {
     children: React.ReactNode
 }
 
-const layout: FC<layoutProps> = ({ children }) => {
-    const site = getSite()
+const layout: FC<layoutProps> = async ({ children }) => {
+    const site =await getSite()
     if (!site) redirect('/setup')
         
     return <SidebarProvider>

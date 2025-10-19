@@ -1,5 +1,3 @@
-import { AnalyticsCards } from "@/components/AnalyticsCards";
-import { AnalyticsCharts } from "@/components/AnalyticsChart";
 import { getSite } from "@/lib/actions/helpers/site";
 
 export default async function Page() {
@@ -10,7 +8,6 @@ export default async function Page() {
     </div>
   }
   return <div className="flex flex-1 flex-col gap-4 p-4">
-    <AnalyticsCards siteId={site.id} />
-    <AnalyticsCharts siteId={site.id} />
+    Welcome back
   </div>
 }

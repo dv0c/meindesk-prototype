@@ -1,14 +1,13 @@
 "use client"
 
 import {
-  AudioWaveform,
-  ChartArea,
-  Command,
+  Book,
   GalleryVerticalEnd,
   Globe,
   Home,
   LifeBuoy,
-  Send
+  Send,
+  WholeWord
 } from "lucide-react"
 import * as React from "react"
 
@@ -21,8 +20,9 @@ import {
   SidebarFooter,
   SidebarHeader
 } from "@/components/ui/sidebar"
-import { TeamSwitcher } from "./team-switcher"
 import { useSite } from "@/hooks/useSite"
+import { NavProjects } from "./nav-projects"
+import { TeamSwitcher } from "./team-switcher"
 
 const data = {
   teams: [
@@ -31,7 +31,7 @@ const data = {
       logo: GalleryVerticalEnd,
       plan: "Enterprise",
     },
-  
+
   ],
   navMain: [
     {
@@ -47,26 +47,20 @@ const data = {
       isActive: false,
       items: [
         {
-          title: "Pages",
-          url: "/dashboard/projects/website/pages",
+          title: "Features",
+          url: "/dashboard/projects/website/features",
         },
         {
-          title: "Articles",
-          url: "/dashboard/projects/website/articles",
+          title: "Analytics",
+          url: "/dashboard/projects/website/analytics",
         },
         {
           title: "Subscription",
           url: "/dashboard/projects/website/subscription",
         },
-
       ],
     },
-    {
-      title: "Analytics",
-      url: "/dashboard/analytics",
-      icon: ChartArea,
-      isActive: true,
-    },
+
 
   ],
   navSecondary: [
@@ -82,24 +76,27 @@ const data = {
     },
   ],
   projects: [
-    // {
-    //   name: "Your website",
-    //   url: "/dashboard/projects/website",
-    //   icon: Globe,
-    // },
+    {
+      name: "Articles",
+      url: "/dashboard/projects/website/articles",
+      icon: WholeWord,
+    },
+    {
+      name: "Pages",
+      url: "/dashboard/projects/website/pages",
+      icon:Book
+    }
 
   ],
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
-  const {site, loading} = useSite()
-  
+  const { site, loading } = useSite()
+
   if (site && !loading) {
     data.teams[0].name = site.title || "Your website"
   }
-
-  console.log(site)
 
   return (
     <Sidebar variant="inset" {...props}>
@@ -108,7 +105,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        {/* <NavProjects projects={data.projects} /> */}
+        <NavProjects projects={data.projects} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>

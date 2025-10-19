@@ -11,11 +11,15 @@ export async function createSite(formData: FormData) {
 
   const title = formData.get("title")?.toString().trim();
   const description = formData.get("description")?.toString().trim() || null;
-  const url = formData.get("url")?.toString().trim() || null;
+  const url = formData.get("url")?.toString().trim();
   const logo = formData.get("logo")?.toString().trim() || null;
 
   if (!title) {
     throw new Error("Title is required");
+  }
+
+  if (!url) {
+    throw new Error("Url is required")
   }
 
   try {
@@ -42,6 +46,16 @@ export async function createSite(formData: FormData) {
         plan: "Enterprise",
         status: "Active",
         next_billing_date: new Date(),
+      },
+    });
+
+    await db.features.create({
+      data: {
+        Site: {
+          connect: {
+            id: site.id,
+          },
+        },
       },
     });
 

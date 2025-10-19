@@ -13,6 +13,7 @@ export async function getSite() {
     },
     include: {
       subscription: true,
+      features: true,
     },
   });
 
