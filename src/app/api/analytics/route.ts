@@ -1,6 +1,5 @@
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import geoip from "geoip-lite"; // optional if you want country/city from IP
 
 export const runtime = "nodejs";
 
@@ -16,29 +15,7 @@ export async function OPTIONS(req: NextRequest) {
 // POST request
 export async function POST(req: NextRequest) {
   try {
-    const payload = await req.json();
-
-    const {
-      url,
-      path,
-      referrer,
-      userAgent,
-      sessionId,
-      landingPage,
-      eventType,
-      eventName,
-      eventProps,
-      deviceType,
-      browser,
-      os,
-      timezone,
-      utmSource,
-      utmMedium,
-      utmCampaign,
-      scrollDepth,
-      pageLoadMs,
-      timeOnPage,
-    } = payload;
+    const { url, path, referrer, userAgent, sessionId, timeOnPage } = await req.json();
 
     if (!url || !path) {
       const res = NextResponse.json({ error: "url and path required" }, { status: 400 });
@@ -46,13 +23,9 @@ export async function POST(req: NextRequest) {
       return res;
     }
 
-    // Determine IP and geo
     const ipAddress = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
-    const geo = geoip.lookup(ipAddress)
-    const country = geo?.country || null;
-    const city = geo?.city || null;
 
-    // Find the site
+    // Find the site by URL
     const site = await db.site.findUnique({ where: { url } });
     if (!site) {
       const res = NextResponse.json({ error: "Site not found" }, { status: 404 });
@@ -65,26 +38,11 @@ export async function POST(req: NextRequest) {
       data: {
         siteId: site.id,
         path,
-        referrer: referrer || null,
-        userAgent: userAgent || null,
+        referrer,
+        userAgent,
         ipAddress,
-        sessionId: sessionId || ipAddress,
-        landingPage: landingPage || path,
-        eventType: eventType || "PAGEVIEW",
-        eventName: eventName || null,
-        eventProps: eventProps || null,
-        deviceType: deviceType || null,
-        browser: browser || null,
-        os: os || null,
-        timezone: timezone || null,
-        country,
-        city,
-        utmSource: utmSource || null,
-        utmMedium: utmMedium || null,
-        utmCampaign: utmCampaign || null,
-        scrollDepth: scrollDepth || null,
-        pageLoadMs: pageLoadMs || null,
-        timeOnPage: timeOnPage || null,
+        sessionId: sessionId || ipAddress, // fallback to IP if no sessionId
+        timeOnPage: timeOnPage || null,   // optional, in seconds
       },
     });
 

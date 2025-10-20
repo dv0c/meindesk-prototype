@@ -11,6 +11,7 @@ export async function GET(
   const { siteId } = params;
 
   try {
+    // Fetch analytics events for last 60 days
     const since = subDays(new Date(), 60);
     const events = await db.analyticsEvent.findMany({
       where: { siteId, createdAt: { gte: since } },
@@ -48,6 +49,7 @@ export async function GET(
           ? "Social Media"
           : "Referral"
         : "Direct";
+
       refSources[ref] = (refSources[ref] || 0) + 1;
     }
     const colors = [
@@ -68,7 +70,7 @@ export async function GET(
     const uniqueVisitors = new Set(events.map((e) => e.sessionId || e.ipAddress || "unknown")).size;
     const totalPageViews = Object.values(pageViews).reduce((acc, v) => acc + v, 0);
 
-    // Compare to previous 30 days
+    // Changes compared to previous 30 days
     const previousSince = subDays(new Date(), 90);
     const prevEvents = await db.analyticsEvent.findMany({
       where: { siteId, createdAt: { gte: previousSince, lt: since } },
@@ -122,29 +124,29 @@ export async function GET(
       ? ((currentSession.seconds - previousSession.seconds) / previousSession.seconds) * 100
       : 0;
 
-    return NextResponse.json(
-      {
-        viewsOverTime,
-        topPages,
-        trafficSources,
-        cardMetrics: {
-          totalViews,
-          viewsChange,
-          uniqueVisitors,
-          visitorsChange,
-          pageViews: totalPageViews,
-          pageViewsChange,
-          avgSessionDuration,
-          durationChange,
-        },
+    const res = NextResponse.json({
+      viewsOverTime,
+      topPages,
+      trafficSources,
+      cardMetrics: {
+        totalViews,
+        viewsChange,
+        uniqueVisitors,
+        visitorsChange,
+        pageViews: totalPageViews,
+        pageViewsChange,
+        avgSessionDuration,
+        durationChange,
       },
-      { status: 200, headers: { "Access-Control-Allow-Origin": "*" } }
-    );
+    });
+
+    res.headers.set("Access-Control-Allow-Origin", "*");
+    return res;
+
   } catch (err) {
     console.error(err);
-    return NextResponse.json(
-      { error: "Failed to load analytics" },
-      { status: 500, headers: { "Access-Control-Allow-Origin": "*" } }
-    );
+    const res = NextResponse.json({ error: "Failed to load analytics" }, { status: 500 });
+    res.headers.set("Access-Control-Allow-Origin", "*");
+    return res;
   }
 }

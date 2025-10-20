@@ -178,52 +178,15 @@ model Subscription {
 }
 
 model AnalyticsEvent {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  siteId      String   @db.ObjectId
-  sessionId   String   // track a single user session
-  path        String
-  referrer    String? 
-  landingPage String?  // first page of session
-  eventType   EventType @default(PAGEVIEW)
-  eventName   String?   // optional custom event name, e.g., "signup", "purchase"
-  eventProps  Json?     // arbitrary extra metadata, e.g., formId, videoId
-  userAgent   String?
-  deviceType  DeviceType?
-  browser     String?
-  os          String?
-  ipAddress   String?
-  country     String?
-  city        String?
-  timezone    String?
-  utmSource   String?
-  utmMedium   String?
-  utmCampaign String?
-  scrollDepth Int?      // percent scrolled
-  pageLoadMs  Int?      // page load time in milliseconds
-  timeOnPage  Int?      // seconds spent on page
-  createdAt   DateTime  @default(now())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  siteId    String   @db.ObjectId
+  path      String
+  referrer  String?
+  userAgent String?
+  ipAddress String?
+  createdAt DateTime @default(now())
 
   Site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
   @@index([siteId, createdAt])
-  @@index([siteId, sessionId])
-  @@index([siteId, eventType])
 }
-
-// Enum for event types
-enum EventType {
-  PAGEVIEW
-  CLICK
-  FORM_SUBMIT
-  VIDEO_PLAY
-  CONVERSION
-  CUSTOM
-}
-
-// Enum for device types
-enum DeviceType {
-  DESKTOP
-  MOBILE
-  TABLET
-}
-
