@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { toast } from "sonner"
+// @ts-ignore
 import { CldUploadButton, type CldUploadWidgetResults, type CldErrorEvent } from "next-cloudinary"
 import {
   UploadCloud,
@@ -50,7 +51,7 @@ export function MediaGalleryClient() {
   const [searchTerm, setSearchTerm] = useState("")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  const [itemToDelete, setItemToDelete] = useState<Media | null>(null)
+  const [itemToDelete, setItemToDelete] = useState<any | null>(null)
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
 
   const fetchMedia = useCallback(async () => {
@@ -291,14 +292,14 @@ export function MediaGalleryClient() {
           <ScrollArea>
             <div className="grid max-h-screen grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
               {filteredItems.map((item) => (
-                <Card key={item.public_id} className="group overflow-hidden">
+                <Card key={item.public_id} className="group p-0 overflow-hidden">
                   <CardContent className="p-0">
                     <div className="relative aspect-square">
                       <NextImage
                         src={item.url}
                         alt={item.alt || item.name || "Image"}
                         fill
-                        className="object-cover transition-transform group-hover:scale-105"
+                        className="object-cover transition-transform "
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
                       <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -426,8 +427,8 @@ export function MediaGalleryClient() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setItemToDelete(null)}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-destructive hover:bg-destructive/90">
+            <AlertDialogCancel onClick={() => setItemToDelete(null)} className="cursor-pointer">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-white cursor-pointer hover:text-gray-300 hover:bg-destructive/90">
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>

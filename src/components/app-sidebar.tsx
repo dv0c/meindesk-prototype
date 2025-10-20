@@ -9,7 +9,6 @@ import {
   LifeBuoy,
   Send,
   WholeWord,
-  Menu,
   SidebarIcon,
   Image
 } from "lucide-react"
@@ -61,15 +60,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [toggled, setToggled] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const collapseTimer = useRef<NodeJS.Timeout | null>(null)
+  const sidebarRef = useRef<HTMLDivElement | null>(null)
 
   // Detect mobile
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768) // md breakpoint
+    const handleResize = () => setIsMobile(window.innerWidth < 768)
     handleResize()
     window.addEventListener("resize", handleResize)
     return () => window.removeEventListener("resize", handleResize)
   }, [])
 
+  // Load team data
   if (!loadingTeams && teams?.length) {
     data.teams = teams.map((t) => ({
       name: t.title || "Untitled Team",
@@ -80,38 +81,64 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }
 
   const handleMouseEnter = () => {
-    if (isMobile) return // disable hover on mobile
+    if (isMobile) return
     if (collapseTimer.current) clearTimeout(collapseTimer.current)
     setHovered(true)
   }
 
   const handleMouseLeave = () => {
     if (isMobile) return
-    collapseTimer.current = setTimeout(() => setHovered(false), 400)
+    if (collapseTimer.current) clearTimeout(collapseTimer.current)
+    collapseTimer.current = setTimeout(() => setHovered(false), 300)
   }
 
   const handleToggle = () => {
     setToggled((prev) => !prev)
   }
 
-  // open sidebar if hovered (desktop) or toggled (any device)
+  // When sidebar is open, keep it open as long as cursor is in the left half
+  useEffect(() => {
+    if (isMobile) return
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const halfScreen = window.innerWidth / 2.8
+      const isInLeftHalf = e.clientX <= halfScreen
+
+      if (hovered && !isInLeftHalf) {
+        // start closing only if user leaves both sidebar and left half
+        if (collapseTimer.current) clearTimeout(collapseTimer.current)
+        collapseTimer.current = setTimeout(() => setHovered(false), 400)
+      } else if (hovered && isInLeftHalf) {
+        // if user moves back to left half, reopen immediately
+        if (collapseTimer.current) clearTimeout(collapseTimer.current)
+        setHovered(true)
+      }
+    }
+
+    window.addEventListener("mousemove", handleMouseMove)
+    return () => window.removeEventListener("mousemove", handleMouseMove)
+  }, [hovered, isMobile])
+
   const isOpen = isMobile ? toggled : hovered || toggled
 
   return (
     <div className="relative h-full flex">
       <div
+        ref={sidebarRef}
         className="group relative h-full"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         <div
-          className={`transition-[width] duration-300 ease-in-out overflow-hidden h-full ${isOpen ? "w-64" : "w-0 md:w-0"
-            }`}
+          className={`transition-[width] duration-300 ease-in-out overflow-hidden h-full ${
+            isOpen ? "w-64" : "w-0 md:w-0"
+          }`}
         >
           <Sidebar
-            variant={toggled ? "sidebar" : 'floating'}
-            className={`h-full overflow-hidden transition-all duration-300 ${isOpen ? "opacity-100" : "opacity-0"
-              }`}
+            variant={toggled ? "sidebar" : "floating"}
+            className={`h-full overflow-hidden transition-all duration-300 ${
+              isOpen ? "opacity-100" : "opacity-0"
+            }`}
             {...props}
           >
             <SidebarHeader>
@@ -131,12 +158,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarFooter>
               <Button
                 onClick={handleToggle}
-                variant={'ghost'}
+                variant="ghost"
                 className="justify-start items-center"
-
               >
                 <SidebarIcon className="w-6 h-6" />
-                 Sidebar View
+                Sidebar View
               </Button>
               <NavUser />
             </SidebarFooter>
