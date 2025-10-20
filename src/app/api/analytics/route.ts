@@ -48,9 +48,9 @@ export async function POST(req: NextRequest) {
 
     // Determine IP and geo
     const ipAddress = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
-    const geo = geoip.lookup(ipAddress) || {};
-    const country = geo.country || null;
-    const city = geo.city || null;
+    const geo = geoip.lookup(ipAddress)
+    const country = geo?.country || null;
+    const city = geo?.city || null;
 
     // Find the site
     const site = await db.site.findUnique({ where: { url } });
