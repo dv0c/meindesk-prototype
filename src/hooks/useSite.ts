@@ -41,7 +41,7 @@ export function useSite() {
       setLoading(true)
       setError(null)
       try {
-        const res = await axios.get<ApiResponse>("/api/projects/website")
+        const res = await axios.get<ApiResponse>("/api/teams/projects/website")
 
         if (res.data) {
           setSite(res.data.site)

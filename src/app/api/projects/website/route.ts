@@ -1,6 +1,10 @@
 import { getAuthSession } from "@/lib/auth"
 import { db } from "@/lib/db"
 
+// ROUTE IS NOT USING ANY FUNCTION NOT A CALLABLE AT ALL
+// Probably remove in next updates. 
+// Used to be in useSite hook but hook is not used by anything atm in the code so recode it to use useTeam
+
 export async function GET(request: Request) {
   const user = await getAuthSession()
   if (!user)

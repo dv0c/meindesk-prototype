@@ -3,13 +3,16 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   trailingSlash: false, // avoid redirect /api/analytics/ -> /api/analytics
+  images: {
+    domains: ["res.cloudinary.com"], // Add Cloudinary domain here
+  },
 
   typescript: {
-    ignoreBuildErrors: true
+    ignoreBuildErrors: true,
   },
   eslint: {
-    ignoreDuringBuilds: true
-  }
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default nextConfig;

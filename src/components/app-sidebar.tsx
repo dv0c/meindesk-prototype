@@ -10,7 +10,8 @@ import {
   Send,
   WholeWord,
   Menu,
-  SidebarIcon
+  SidebarIcon,
+  Image
 } from "lucide-react"
 import { NavMain } from "@/components/nav-main"
 import { NavSecondary } from "@/components/nav-secondary"
@@ -50,6 +51,7 @@ const data = {
   projects: [
     { name: "Articles", url: "/projects/website/articles", icon: WholeWord },
     { name: "Pages", url: "/projects/website/pages", icon: Book },
+    { name: "Media Gallery", url: "/projects/website/media-gallery", icon: Image },
   ],
 }
 

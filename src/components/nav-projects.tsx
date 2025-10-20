@@ -23,7 +23,6 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { useSite } from "@/hooks/useSite"
 import { useTeam } from "@/hooks/useTeam"
 
 export function NavProjects({
