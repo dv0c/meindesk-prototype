@@ -26,7 +26,7 @@ import { TeamSwitcher } from "./team-switcher"
 import { NavProjects } from "./nav-projects"
 
 const data = {
-  teams: [],
+  teams: [] as any,
   navMain: [
     { title: "Home", url: "/", icon: Home, isActive: true },
     {
@@ -102,15 +102,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         onMouseLeave={handleMouseLeave}
       >
         <div
-          className={`transition-[width] duration-300 ease-in-out overflow-hidden h-full ${
-            isOpen ? "w-64" : "w-0 md:w-0"
-          }`}
+          className={`transition-[width] duration-300 ease-in-out overflow-hidden h-full ${isOpen ? "w-64" : "w-0 md:w-0"
+            }`}
         >
           <Sidebar
             variant="floating"
-            className={`h-full overflow-hidden transition-all duration-300 ${
-              isOpen ? "opacity-100" : "opacity-0"
-            }`}
+            className={`h-full overflow-hidden transition-all duration-300 ${isOpen ? "opacity-100" : "opacity-0"
+              }`}
             {...props}
           >
             <SidebarHeader>
