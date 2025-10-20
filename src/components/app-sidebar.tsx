@@ -127,6 +127,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarContent>
 
             <SidebarFooter>
+              <Button
+                onClick={handleToggle}
+                variant={'ghost'}
+                className="justify-start items-center"
+
+              >
+                <SidebarIcon className="w-6 h-6" />
+                 Sidebar View
+              </Button>
               <NavUser />
             </SidebarFooter>
           </Sidebar>

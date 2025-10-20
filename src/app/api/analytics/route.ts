@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import geoip from "geoip-lite";
+
 export const runtime = "nodejs";
 
 // OPTIONS preflight ONLY
@@ -10,6 +10,20 @@ export async function OPTIONS(req: NextRequest) {
   res.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.headers.set("Access-Control-Allow-Headers", "Content-Type");
   return res;
+}
+
+// Helper: get region from IP via ipapi.co
+async function getRegionFromIP(ip: string): Promise<string | null> {
+  if (!ip || ip === "unknown") return null;
+
+  try {
+    const res = await fetch(`https://ipapi.co/${ip}/json/`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return `${data.city || ""}${data.city ? ", " : ""}${data.country_name || ""}`.trim() || null;
+  } catch {
+    return null;
+  }
 }
 
 // POST request
@@ -25,7 +39,9 @@ export async function POST(req: NextRequest) {
 
     const ipAddress = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
 
-      const region = ipAddress ? geoip.lookup(ipAddress)?.city || geoip.lookup(ipAddress)?.country : null;
+    // Get region from IP (remote API)
+    const region = await getRegionFromIP(ipAddress);
+
     // Find the site by URL
     const site = await db.site.findUnique({ where: { url } });
     if (!site) {
