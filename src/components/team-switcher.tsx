@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ChevronsUpDown } from "lucide-react"
+import { ChevronsUpDown, Plus } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 
 import {
@@ -9,6 +9,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -18,6 +19,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import Link from "next/link"
 
 export function TeamSwitcher({
   teams,
@@ -91,11 +93,10 @@ export function TeamSwitcher({
                   setActiveTeam(team)
                   router.push(`/dashboard/${team.id}`)
                 }}
-                className={`gap-2 p-2 ${
-                  activeTeam.id === team.id
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : ""
-                }`}
+                className={`gap-2 cursor-pointer p-2 ${activeTeam.id === team.id
+                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                  : ""
+                  }`}
               >
                 <div className="flex size-6 items-center justify-center rounded-md border">
                   <team.logo className="size-3.5 shrink-0" />
@@ -104,6 +105,15 @@ export function TeamSwitcher({
                 <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
               </DropdownMenuItem>
             ))}
+            <DropdownMenuSeparator />
+            <Link href={'/setup'}>
+              <DropdownMenuItem className="gap-2 cursor-pointer p-2">
+                <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
+                  <Plus className="size-4" />
+                </div>
+                <div className="text-muted-foreground font-medium">Setup a team</div>
+              </DropdownMenuItem>
+            </Link>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

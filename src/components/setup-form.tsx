@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { redirect, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -49,9 +49,10 @@ export function SetupForm({ className, ...props }: React.ComponentProps<"div">) 
       formData.append("url", url)
       formData.append("logo", logo)
 
-      await createSite(formData)
+      await createSite(formData).then((res) => {
+        router.push("/dashboard/" + res.id)
+      })
 
-      router.push("/dashboard")
     } catch (err: any) {
       setError(err.message || "Setup failed")
       setLoading(false)

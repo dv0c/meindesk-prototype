@@ -1,7 +1,5 @@
 'use client'
 import { useTeam } from "@/hooks/useTeam";
-import { getSite } from "@/lib/actions/helpers/site";
-import { usePathname } from "next/navigation";
 
 export default function Page() {
   const { team, loading } = useTeam()

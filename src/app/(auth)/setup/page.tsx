@@ -11,8 +11,6 @@ export default async function LoginPage() {
     const session = await getAuthSession()
     if (!session) redirect("/login")
 
-    const site = await getSite()
-    if (site) redirect("/dashboard")
     return (
         <div className="bg-muted-foreground flex min-h-svh relative flex-col items-center justify-center gap-6 p-6 md:p-10">
             <div className="-z-0">
