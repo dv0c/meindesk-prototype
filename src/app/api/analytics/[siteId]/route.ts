@@ -18,7 +18,8 @@ export async function GET(
     });
 
     // ===== VIEWS OVER TIME =====
-    const dailyStats: Record<string, { views: number; visitors: Set<string> }> = {};
+    const dailyStats: Record<string, { views: number; visitors: Set<string> }> =
+      {};
     for (const e of events) {
       const day = format(e.createdAt, "MMM d");
       if (!dailyStats[day]) dailyStats[day] = { views: 0, visitors: new Set() };
@@ -59,16 +60,22 @@ export async function GET(
       "hsl(var(--chart-4))",
       "hsl(var(--chart-5))",
     ];
-    const trafficSources = Object.entries(refSources).map(([source, value], i) => ({
-      source,
-      value,
-      color: colors[i % colors.length],
-    }));
+    const trafficSources = Object.entries(refSources).map(
+      ([source, value], i) => ({
+        source,
+        value,
+        color: colors[i % colors.length],
+      })
+    );
 
     // ===== CARD METRICS =====
     const totalViews = events.length;
-    const uniqueVisitors = new Set(events.map((e) => e.ipAddress || "unknown")).size;
-    const totalPageViews = Object.values(pageViews).reduce((acc, v) => acc + v, 0);
+    const uniqueVisitors = new Set(events.map((e) => e.ipAddress || "unknown"))
+      .size;
+    const totalPageViews = Object.values(pageViews).reduce(
+      (acc, v) => acc + v,
+      0
+    );
 
     // Example: calculate changes compared to previous 30 days
     const previousSince = subDays(new Date(), 90);
@@ -76,17 +83,49 @@ export async function GET(
       where: { siteId, createdAt: { gte: previousSince, lt: since } },
     });
     const prevTotalViews = prevEvents.length;
-    const prevUniqueVisitors = new Set(prevEvents.map((e) => e.ipAddress || "unknown")).size;
+    const prevUniqueVisitors = new Set(
+      prevEvents.map((e) => e.ipAddress || "unknown")
+    ).size;
     const prevPageViews = prevEvents.length;
 
-    const viewsChange = prevTotalViews ? ((totalViews - prevTotalViews) / prevTotalViews) * 100 : 0;
-    const visitorsChange = prevUniqueVisitors ? ((uniqueVisitors - prevUniqueVisitors) / prevUniqueVisitors) * 100 : 0;
-    const pageViewsChange = prevPageViews ? ((totalPageViews - prevPageViews) / prevPageViews) * 100 : 0;
+    const viewsChange = prevTotalViews
+      ? ((totalViews - prevTotalViews) / prevTotalViews) * 100
+      : 0;
+    const visitorsChange = prevUniqueVisitors
+      ? ((uniqueVisitors - prevUniqueVisitors) / prevUniqueVisitors) * 100
+      : 0;
+    const pageViewsChange = prevPageViews
+      ? ((totalPageViews - prevPageViews) / prevPageViews) * 100
+      : 0;
 
     // Dummy avg session duration example
-    const avgSessionDuration = "3m 42s"; // you can calculate from your events if you track session times
-    const durationChange = 5.7; // dummy example
+    // Example: calculate avg session duration based on timestamps
+    let avgSessionSeconds = 0;
+    const sessions: Record<string, number[]> = {}; // key: ipAddress/session, values: timestamps
 
+    for (const e of events) {
+      const ip = e.ipAddress || "unknown";
+      if (!sessions[ip]) sessions[ip] = [];
+      sessions[ip].push(e.createdAt.getTime());
+    }
+
+    // calculate average session duration per IP (dummy: difference between first and last event in seconds)
+    const sessionDurations = Object.values(sessions).map((times) => {
+      const duration = Math.max(...times) - Math.min(...times);
+      return duration / 1000; // in seconds
+    });
+    if (sessionDurations.length) {
+      avgSessionSeconds =
+        sessionDurations.reduce((a, b) => a + b, 0) / sessionDurations.length;
+    }
+
+    // format as mm:ss
+    const minutes = Math.floor(avgSessionSeconds / 60);
+    const seconds = Math.round(avgSessionSeconds % 60);
+    const avgSessionDuration = `${minutes}m ${seconds}s`;
+
+    // dummy duration change
+    const durationChange = (Math.random() * 10 - 5).toFixed(1); // random ±5% for demo
     const res = NextResponse.json({
       viewsOverTime,
       topPages,
@@ -106,7 +145,10 @@ export async function GET(
     return res;
   } catch (err) {
     console.error(err);
-    const res = NextResponse.json({ error: "Failed to load analytics" }, { status: 500 });
+    const res = NextResponse.json(
+      { error: "Failed to load analytics" },
+      { status: 500 }
+    );
     res.headers.set("Access-Control-Allow-Origin", "*");
     return res;
   }
