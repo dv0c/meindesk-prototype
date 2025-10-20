@@ -71,6 +71,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return () => window.removeEventListener("resize", handleResize)
   }, [])
 
+  // ✅ Restore sidebar state from localStorage
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    const savedState = localStorage.getItem("sidebarToggled")
+    if (savedState !== null) {
+      setToggled(savedState === "true")
+    }
+  }, [])
+
+  // ✅ Save sidebar state to localStorage on change
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    localStorage.setItem("sidebarToggled", String(toggled))
+  }, [toggled])
+
   // Load team data
   if (!loadingTeams && teams?.length) {
     data.teams = teams.map((t) => ({
@@ -106,11 +121,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       const isInLeftHalf = e.clientX <= halfScreen
 
       if (hovered && !isInLeftHalf) {
-        // start closing only if user leaves both sidebar and left half
         if (collapseTimer.current) clearTimeout(collapseTimer.current)
         collapseTimer.current = setTimeout(() => setHovered(false), 400)
       } else if (hovered && isInLeftHalf) {
-        // if user moves back to left half, reopen immediately
         if (collapseTimer.current) clearTimeout(collapseTimer.current)
         setHovered(true)
       }
@@ -147,6 +160,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <TeamSwitcher teams={data.teams} />
               )}
             </SidebarHeader>
+
             <SidebarContent>
               <NavMain items={data.navMain} />
               <NavProjects projects={data.projects} />

@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/sidebar"
 import { useTeam } from "@/hooks/useTeam"
 import { Skeleton } from "./ui/skeleton"
+import Link from "next/link"
 
 export function NavProjects({
   projects,
@@ -44,10 +45,10 @@ export function NavProjects({
         {siteId !== undefined ? projects.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild>
-              <a href={'/dashboard/' + siteId + '/' + item.url}>
+              <Link href={'/dashboard/' + siteId + '/' + item.url}>
                 <item.icon />
                 <span>{item.name}</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
