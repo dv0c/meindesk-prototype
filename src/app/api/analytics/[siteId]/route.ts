@@ -8,7 +8,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { siteId: string } }
 ) {
-  const { siteId } = params;
+  const { siteId } = await params;
 
   try {
     // Fetch analytics events for last 60 days
