@@ -1,10 +1,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { getSite } from "@/lib/actions/helpers/site"
+import { getActiveTeam } from "@/lib/actions/helpers/team"
 import { cn } from "@/lib/utils"
 import { Globe, Calendar, Package } from "lucide-react"
 
-export async function WebsiteInfo() {
-  const data = await getSite()
+export async function WebsiteInfo({ siteId }: { siteId: string }) {
+  const data = await getActiveTeam(siteId)
   if (!data) return <div>Site not found</div>
   const websiteData = {
     name: "",

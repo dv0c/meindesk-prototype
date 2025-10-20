@@ -18,6 +18,8 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
+import { useSite } from "@/hooks/useSite"
+import { useTeam } from "@/hooks/useTeam"
 
 export function NavMain({
   items,
@@ -33,6 +35,7 @@ export function NavMain({
     }[]
   }[]
 }) {
+  const siteId = useTeam().team?.id
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
@@ -41,7 +44,7 @@ export function NavMain({
           <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip={item.title}>
-                <a href={item.url}>
+                <a href={'/dashboard/' + siteId + '/' + item.url}>
                   <item.icon />
                   <span>{item.title}</span>
                 </a>
@@ -59,7 +62,7 @@ export function NavMain({
                       {item.items?.map((subItem) => (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton asChild>
-                            <a href={subItem.url}>
+                           <a href={'/dashboard/' + siteId + '/' + subItem.url}>
                               <span>{subItem.title}</span>
                             </a>
                           </SidebarMenuSubButton>

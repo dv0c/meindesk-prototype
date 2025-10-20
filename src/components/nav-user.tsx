@@ -30,12 +30,21 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { signOut, useSession } from "next-auth/react"
+import { Skeleton } from "./ui/skeleton"
 
 export function NavUser({
 }: {
   }) {
   const { isMobile } = useSidebar()
-  const user = useSession().data?.user
+  const { data, status } = useSession()
+  const user = data?.user
+  if (status === 'loading') {
+    return (
+      <Skeleton className="h-12 w-full" />
+    )
+  }
+
+  
   return (
     <SidebarMenu>
       <SidebarMenuItem>

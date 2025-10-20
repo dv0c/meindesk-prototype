@@ -23,6 +23,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { useSite } from "@/hooks/useSite"
+import { useTeam } from "@/hooks/useTeam"
 
 export function NavProjects({
   projects,
@@ -34,7 +36,7 @@ export function NavProjects({
   }[]
 }) {
   const { isMobile } = useSidebar()
-
+  const siteId = useTeam().team?.id
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Content Managment</SidebarGroupLabel>
@@ -42,7 +44,7 @@ export function NavProjects({
         {projects.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild>
-              <a href={item.url}>
+              <a href={'/dashboard/' + siteId + '/' + item.url}>
                 <item.icon />
                 <span>{item.name}</span>
               </a>

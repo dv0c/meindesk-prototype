@@ -1,14 +1,14 @@
 "use client"
 
 import * as React from "react"
-import { ChevronsUpDown, Plus } from "lucide-react"
+import { ChevronsUpDown } from "lucide-react"
+import { usePathname, useRouter } from "next/navigation"
 
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -26,14 +26,33 @@ export function TeamSwitcher({
     name: string
     logo: React.ElementType
     plan: string
+    id: string
   }[]
 }) {
   const { isMobile } = useSidebar()
-  const [activeTeam, setActiveTeam] = React.useState(teams[0])
+  const pathname = usePathname()
+  const router = useRouter()
 
-  if (!activeTeam) {
-    return null
-  }
+  // Extract siteId from the URL: /dashboard/[siteId]
+  const currentId = React.useMemo(() => {
+    const parts = pathname.split("/")
+    return parts[2] || null
+  }, [pathname])
+
+  // Find active team by URL id
+  const initialTeam =
+    teams.find((team) => team.id === currentId) || teams[0] || null
+
+  const [activeTeam, setActiveTeam] = React.useState(initialTeam)
+
+  // Keep active team synced when navigating
+  React.useEffect(() => {
+    const newActive =
+      teams.find((team) => team.id === currentId) || teams[0] || null
+    setActiveTeam(newActive)
+  }, [currentId, teams])
+
+  if (!activeTeam) return null
 
   return (
     <SidebarMenu>
@@ -54,6 +73,7 @@ export function TeamSwitcher({
               <ChevronsUpDown className="ml-auto" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
+
           <DropdownMenuContent
             className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
             align="start"
@@ -63,11 +83,19 @@ export function TeamSwitcher({
             <DropdownMenuLabel className="text-muted-foreground text-xs">
               Teams
             </DropdownMenuLabel>
+
             {teams.map((team, index) => (
               <DropdownMenuItem
-                key={team.name}
-                onClick={() => setActiveTeam(team)}
-                className="gap-2 p-2"
+                key={team.id}
+                onClick={() => {
+                  setActiveTeam(team)
+                  router.push(`/dashboard/${team.id}`)
+                }}
+                className={`gap-2 p-2 ${
+                  activeTeam.id === team.id
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                    : ""
+                }`}
               >
                 <div className="flex size-6 items-center justify-center rounded-md border">
                   <team.logo className="size-3.5 shrink-0" />
@@ -76,13 +104,6 @@ export function TeamSwitcher({
                 <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
               </DropdownMenuItem>
             ))}
-            {/* <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
-              <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
-                <Plus className="size-4" />
-              </div>
-              <div className="text-muted-foreground font-medium">Add team</div>
-            </DropdownMenuItem> */}
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

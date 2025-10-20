@@ -8,6 +8,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { useSite } from "@/hooks/useSite"
+import { useTeam } from "@/hooks/useTeam"
 
 export function NavSecondary({
   items,
@@ -19,6 +21,7 @@ export function NavSecondary({
     icon: LucideIcon
   }[]
 } & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
+  const siteId = useTeam().team?.id
   return (
     <SidebarGroup {...props}>
       <SidebarGroupContent>
@@ -26,7 +29,7 @@ export function NavSecondary({
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton asChild size="sm">
-                <a href={item.url}>
+                <a href={'/dashboard/' + siteId + '/' + item.url}>
                   <item.icon />
                   <span>{item.title}</span>
                 </a>

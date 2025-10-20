@@ -2,9 +2,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Calendar, Smartphone, TrendingUp } from "lucide-react"
 import { getSite } from "@/lib/actions/helpers/site"
+import { getActiveTeam } from "@/lib/actions/helpers/team"
 
-export async function SubscriptionCard() {
-  const data = await getSite()
+export async function SubscriptionCard({ siteId }: { siteId: string }) {
+  const data = await getActiveTeam(siteId)
   if (!data?.subscription) return null
 
   // default mock

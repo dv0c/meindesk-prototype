@@ -23,40 +23,44 @@ import {
 import { useSite } from "@/hooks/useSite"
 import { NavProjects } from "./nav-projects"
 import { TeamSwitcher } from "./team-switcher"
+import { useTeam } from "@/hooks/useTeam"
+import { useTeams } from "@/hooks/useTeams"
+import { Skeleton } from "./ui/skeleton"
 
 const data = {
   teams: [
     {
-      name: "Loading",
+      name: "",
       logo: GalleryVerticalEnd,
-      plan: "Enterprise",
+      plan: "",
+      id: ""
     },
 
   ],
   navMain: [
     {
       title: "Home",
-      url: "/dashboard",
+      url: "/",
       icon: Home,
       isActive: true,
     },
     {
       title: "Website Overview",
-      url: "/dashboard/projects/website",
+      url: "/projects/website",
       icon: Globe,
       isActive: false,
       items: [
         {
           title: "Features",
-          url: "/dashboard/projects/website/features",
+          url: "/projects/website/features",
         },
         {
           title: "Analytics",
-          url: "/dashboard/projects/website/analytics",
+          url: "/projects/website/analytics",
         },
         {
           title: "Subscription",
-          url: "/dashboard/projects/website/subscription",
+          url: "/projects/website/subscription",
         },
       ],
     },
@@ -78,13 +82,13 @@ const data = {
   projects: [
     {
       name: "Articles",
-      url: "/dashboard/projects/website/articles",
+      url: "/projects/website/articles",
       icon: WholeWord,
     },
     {
       name: "Pages",
-      url: "/dashboard/projects/website/pages",
-      icon:Book
+      url: "/projects/website/pages",
+      icon: Book
     }
 
   ],
@@ -92,16 +96,28 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
-  const { site, loading } = useSite()
+  const { teams, loading: loadingTeams } = useTeams()
 
-  if (site && !loading) {
-    data.teams[0].name = site.title || "Your website"
+  if (!loadingTeams && teams?.length) {
+    data.teams = [
+      // ...data.teams, // keep your default entry
+      ...teams.map((t) => ({
+        name: t.title || "Untitled Team",
+        logo: GalleryVerticalEnd, // fallback icon
+        plan: t.subscription?.billing_cycle || "Free", // or "Enterprise"
+        id: t.id
+      })),
+    ]
   }
 
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        {!teams.length ?
+          <Skeleton className="h-12 w-full" />
+          : (
+            <TeamSwitcher teams={data.teams} />
+          )}
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />

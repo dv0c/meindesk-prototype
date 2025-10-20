@@ -11,9 +11,10 @@ import {
     EmptyTitle,
 } from "@/components/ui/empty";
 import { X } from "lucide-react";
+import { getActiveTeam } from "@/lib/actions/helpers/team";
 
-export default async function Page() {
-    const site = await getSite()
+export default async function Page({ params }: { params: { siteId: string } }) {
+    const site = await getActiveTeam(params.siteId, "analytics")
     if (site?.features?.analytics === false) return <EmptyCard />
     if (!site) {
         return <div className="flex flex-1 items-center justify-center p-4">

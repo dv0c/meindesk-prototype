@@ -22,9 +22,9 @@ interface layoutProps {
 }
 
 const layout: FC<layoutProps> = async ({ children }) => {
-    const site =await getSite()
+    const site = await getSite()
     if (!site) redirect('/setup')
-        
+
     return <SidebarProvider>
         <AppSidebar />
         <SidebarInset>
