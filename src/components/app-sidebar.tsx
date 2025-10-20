@@ -53,7 +53,7 @@ const data = {
   projects: [
     { name: "Articles", url: "/projects/website/articles", icon: WholeWord },
     { name: "Pages", url: "/projects/website/pages", icon: Book },
-    { name: "Categories", url: "/projects/website/pages", icon: List },
+    { name: "Categories", url: "/projects/website/categories", icon: List },
     { name: "Media Gallery", url: "/projects/website/media-gallery", icon: Image },
   ],
 }
