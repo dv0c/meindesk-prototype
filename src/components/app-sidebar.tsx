@@ -9,7 +9,8 @@ import {
   LifeBuoy,
   Send,
   WholeWord,
-  Menu
+  Menu,
+  SidebarIcon
 } from "lucide-react"
 import { NavMain } from "@/components/nav-main"
 import { NavSecondary } from "@/components/nav-secondary"
@@ -24,6 +25,7 @@ import { useTeams } from "@/hooks/useTeams"
 import { Skeleton } from "./ui/skeleton"
 import { TeamSwitcher } from "./team-switcher"
 import { NavProjects } from "./nav-projects"
+import { Button } from "./ui/button"
 
 const data = {
   teams: [] as any,
@@ -95,7 +97,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <div className="relative h-full flex">
-
       <div
         className="group relative h-full"
         onMouseEnter={handleMouseEnter}
@@ -106,7 +107,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             }`}
         >
           <Sidebar
-            variant="floating"
+            variant={toggled ? "sidebar" : 'floating'}
             className={`h-full overflow-hidden transition-all duration-300 ${isOpen ? "opacity-100" : "opacity-0"
               }`}
             {...props}

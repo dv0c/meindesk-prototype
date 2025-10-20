@@ -5,7 +5,8 @@ import { getSite } from "@/lib/actions/helpers/site"
 import { getActiveTeam } from "@/lib/actions/helpers/team"
 
 const page = async ({ params }: { params: { siteId: string } }) => {
-  const data = await getActiveTeam(params.siteId)
+  const {siteId} = await params
+  const data = await getActiveTeam(siteId)
   if (!data) return <div>Site not found</div>
   return <div>
     <div className="min-h-screen bg-background">
@@ -16,11 +17,11 @@ const page = async ({ params }: { params: { siteId: string } }) => {
         </div>
 
         <div className="mb-8">
-          <WebsiteInfo siteId={params.siteId} />
+          <WebsiteInfo siteId={siteId} />
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 mb-8">
-          <SubscriptionCard siteId={params.siteId} />
+          <SubscriptionCard siteId={siteId} />
         </div>
 
         <BillingHistory />
