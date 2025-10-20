@@ -9,6 +9,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { useTeam } from "@/hooks/useTeam"
+import { Skeleton } from "./ui/skeleton"
 
 export function NavSecondary({
   items,
@@ -25,7 +26,7 @@ export function NavSecondary({
     <SidebarGroup {...props}>
       <SidebarGroupContent>
         <SidebarMenu>
-          {items.map((item) => (
+          {siteId !== undefined ? items.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton asChild size="sm">
                 <a href={'/dashboard/' + siteId + '/' + item.url}>
@@ -34,6 +35,8 @@ export function NavSecondary({
                 </a>
               </SidebarMenuButton>
             </SidebarMenuItem>
+          )) : Array.from({ length: 3 }).map((_, idx) => (
+            <Skeleton key={idx} className="w-full h-5 mb-2" />
           ))}
         </SidebarMenu>
       </SidebarGroupContent>

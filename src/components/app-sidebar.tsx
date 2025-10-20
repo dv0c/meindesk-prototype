@@ -19,6 +19,7 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
   SidebarHeader
 } from "@/components/ui/sidebar"
 import { useTeams } from "@/hooks/useTeams"
@@ -130,15 +131,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         onMouseLeave={handleMouseLeave}
       >
         <div
-          className={`transition-[width] duration-300 ease-in-out overflow-hidden h-full ${
-            isOpen ? "w-64" : "w-0 md:w-0"
-          }`}
+          className={`transition-[width] duration-300 ease-in-out overflow-hidden h-full ${isOpen ? "w-64" : "w-0 md:w-0"
+            }`}
         >
           <Sidebar
             variant={toggled ? "sidebar" : "floating"}
-            className={`h-full overflow-hidden transition-all duration-300 ${
-              isOpen ? "opacity-100" : "opacity-0"
-            }`}
+            className={`h-full overflow-hidden transition-all duration-300 ${isOpen ? "opacity-100" : "opacity-0"
+              }`}
             {...props}
           >
             <SidebarHeader>
@@ -148,7 +147,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <TeamSwitcher teams={data.teams} />
               )}
             </SidebarHeader>
-
             <SidebarContent>
               <NavMain items={data.navMain} />
               <NavProjects projects={data.projects} />

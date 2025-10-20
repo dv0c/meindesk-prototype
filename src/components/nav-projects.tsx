@@ -24,6 +24,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { useTeam } from "@/hooks/useTeam"
+import { Skeleton } from "./ui/skeleton"
 
 export function NavProjects({
   projects,
@@ -40,7 +41,7 @@ export function NavProjects({
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Content Managment</SidebarGroupLabel>
       <SidebarMenu>
-        {projects.map((item) => (
+        {siteId !== undefined ? projects.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild>
               <a href={'/dashboard/' + siteId + '/' + item.url}>
@@ -76,7 +77,9 @@ export function NavProjects({
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>
-        ))}
+        )) : Array.from({ length: 5 }).map((_, idx) => (
+            <Skeleton key={idx} className="w-full h-5 mb-2" />
+          ))}
         {/* <SidebarMenuItem>
           <SidebarMenuButton className="text-sidebar-foreground/70">
             <MoreHorizontal className="text-sidebar-foreground/70" />

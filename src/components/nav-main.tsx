@@ -19,6 +19,8 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
 import { useTeam } from "@/hooks/useTeam"
+import { notFound } from "next/navigation"
+import { Skeleton } from "./ui/skeleton"
 
 export function NavMain({
   items,
@@ -39,7 +41,7 @@ export function NavMain({
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map((item) => (
+        {siteId !== undefined ? items.map((item) => (
           <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip={item.title}>
@@ -61,7 +63,7 @@ export function NavMain({
                       {item.items?.map((subItem) => (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton asChild>
-                           <a href={'/dashboard/' + siteId + '/' + subItem.url}>
+                            <a href={'/dashboard/' + siteId + '/' + subItem.url}>
                               <span>{subItem.title}</span>
                             </a>
                           </SidebarMenuSubButton>
@@ -73,6 +75,8 @@ export function NavMain({
               ) : null}
             </SidebarMenuItem>
           </Collapsible>
+        )) : Array.from({ length: 3 }).map((_, idx) => (
+          <Skeleton key={idx} className="w-full h-5 mb-2" />
         ))}
       </SidebarMenu>
     </SidebarGroup>
