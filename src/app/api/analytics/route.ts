@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-
+import geoip from "geoip-lite";
 export const runtime = "nodejs";
 
 // OPTIONS preflight ONLY
@@ -15,7 +15,7 @@ export async function OPTIONS(req: NextRequest) {
 // POST request
 export async function POST(req: NextRequest) {
   try {
-    const { url, path, referrer, userAgent, sessionId, timeOnPage } = await req.json();
+    const { url, path, referrer, userAgent } = await req.json();
 
     if (!url || !path) {
       const res = NextResponse.json({ error: "url and path required" }, { status: 400 });
@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
 
     const ipAddress = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
 
+      const region = ipAddress ? geoip.lookup(ipAddress)?.city || geoip.lookup(ipAddress)?.country : null;
     // Find the site by URL
     const site = await db.site.findUnique({ where: { url } });
     if (!site) {
@@ -40,9 +41,8 @@ export async function POST(req: NextRequest) {
         path,
         referrer,
         userAgent,
+        region,
         ipAddress,
-        sessionId: sessionId || ipAddress, // fallback to IP if no sessionId
-        timeOnPage: timeOnPage || null,   // optional, in seconds
       },
     });
 

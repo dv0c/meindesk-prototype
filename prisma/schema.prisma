@@ -183,6 +183,7 @@ model AnalyticsEvent {
   path      String
   referrer  String?
   userAgent String?
+  region    String? 
   ipAddress String?
   createdAt DateTime @default(now())
 
