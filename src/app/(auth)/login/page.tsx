@@ -30,7 +30,7 @@ export default async function LoginPage() {
           <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
             <ChartBarDecreasingIcon className="size-4" />
           </div>
-          Meindesk Payments Gateway
+          Meindesk Prototype Gateway
         </a>
         <LoginForm />
       </div>
