@@ -11,7 +11,6 @@ export async function GET(
   const { siteId } = params;
 
   try {
-    // Fetch analytics events for last 60 days
     const since = subDays(new Date(), 60);
     const events = await db.analyticsEvent.findMany({
       where: { siteId, createdAt: { gte: since } },
@@ -23,7 +22,7 @@ export async function GET(
       const day = format(e.createdAt, "MMM d");
       if (!dailyStats[day]) dailyStats[day] = { views: 0, visitors: new Set() };
       dailyStats[day].views++;
-      dailyStats[day].visitors.add(e.ipAddress || "unknown");
+      dailyStats[day].visitors.add(e.sessionId || e.ipAddress || "unknown");
     }
     const viewsOverTime = Object.entries(dailyStats).map(([date, data]) => ({
       date,
@@ -49,7 +48,6 @@ export async function GET(
           ? "Social Media"
           : "Referral"
         : "Direct";
-
       refSources[ref] = (refSources[ref] || 0) + 1;
     }
     const colors = [
@@ -67,16 +65,16 @@ export async function GET(
 
     // ===== CARD METRICS =====
     const totalViews = events.length;
-    const uniqueVisitors = new Set(events.map((e) => e.ipAddress || "unknown")).size;
+    const uniqueVisitors = new Set(events.map((e) => e.sessionId || e.ipAddress || "unknown")).size;
     const totalPageViews = Object.values(pageViews).reduce((acc, v) => acc + v, 0);
 
-    // Changes compared to previous 30 days
+    // Compare to previous 30 days
     const previousSince = subDays(new Date(), 90);
     const prevEvents = await db.analyticsEvent.findMany({
       where: { siteId, createdAt: { gte: previousSince, lt: since } },
     });
     const prevTotalViews = prevEvents.length;
-    const prevUniqueVisitors = new Set(prevEvents.map((e) => e.ipAddress || "unknown")).size;
+    const prevUniqueVisitors = new Set(prevEvents.map((e) => e.sessionId || e.ipAddress || "unknown")).size;
     const prevPageViews = prevEvents.length;
 
     const viewsChange = prevTotalViews ? ((totalViews - prevTotalViews) / prevTotalViews) * 100 : 0;
@@ -85,17 +83,17 @@ export async function GET(
 
     // ===== REAL AVG SESSION DURATION =====
     function calculateAvgSession(eventsList: typeof events) {
-      const sessionsByIP: Record<string, Date[]> = {};
+      const sessionsById: Record<string, Date[]> = {};
       for (const e of eventsList) {
-        const ip = e.ipAddress || "unknown";
-        if (!sessionsByIP[ip]) sessionsByIP[ip] = [];
-        sessionsByIP[ip].push(e.createdAt);
+        const session = e.sessionId || e.ipAddress || "unknown";
+        if (!sessionsById[session]) sessionsById[session] = [];
+        sessionsById[session].push(e.createdAt);
       }
 
       const sessionDurations: number[] = [];
       const SESSION_GAP = 30 * 60 * 1000; // 30 minutes
 
-      for (const times of Object.values(sessionsByIP)) {
+      for (const times of Object.values(sessionsById)) {
         times.sort((a, b) => a.getTime() - b.getTime());
         let sessionStart = times[0].getTime();
 
@@ -124,29 +122,29 @@ export async function GET(
       ? ((currentSession.seconds - previousSession.seconds) / previousSession.seconds) * 100
       : 0;
 
-    const res = NextResponse.json({
-      viewsOverTime,
-      topPages,
-      trafficSources,
-      cardMetrics: {
-        totalViews,
-        viewsChange,
-        uniqueVisitors,
-        visitorsChange,
-        pageViews: totalPageViews,
-        pageViewsChange,
-        avgSessionDuration,
-        durationChange,
+    return NextResponse.json(
+      {
+        viewsOverTime,
+        topPages,
+        trafficSources,
+        cardMetrics: {
+          totalViews,
+          viewsChange,
+          uniqueVisitors,
+          visitorsChange,
+          pageViews: totalPageViews,
+          pageViewsChange,
+          avgSessionDuration,
+          durationChange,
+        },
       },
-    });
-
-    res.headers.set("Access-Control-Allow-Origin", "*");
-    return res;
-
+      { status: 200, headers: { "Access-Control-Allow-Origin": "*" } }
+    );
   } catch (err) {
     console.error(err);
-    const res = NextResponse.json({ error: "Failed to load analytics" }, { status: 500 });
-    res.headers.set("Access-Control-Allow-Origin", "*");
-    return res;
+    return NextResponse.json(
+      { error: "Failed to load analytics" },
+      { status: 500, headers: { "Access-Control-Allow-Origin": "*" } }
+    );
   }
 }
