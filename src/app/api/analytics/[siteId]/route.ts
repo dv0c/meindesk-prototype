@@ -18,12 +18,13 @@ export async function GET(
     });
 
     // ===== VIEWS OVER TIME =====
-    const dailyStats: Record<string, { views: number; visitors: Set<string> }> = {};
+    const dailyStats: Record<string, { views: number; visitors: Set<string> }> =
+      {};
     for (const e of events) {
       const day = format(e.createdAt, "MMM d");
       if (!dailyStats[day]) dailyStats[day] = { views: 0, visitors: new Set() };
       dailyStats[day].views++;
-      dailyStats[day].visitors.add(e.sessionId || e.ipAddress || "unknown");
+      dailyStats[day].visitors.add(e.ipAddress || "unknown");
     }
     const viewsOverTime = Object.entries(dailyStats).map(([date, data]) => ({
       date,
@@ -59,16 +60,22 @@ export async function GET(
       "hsl(var(--chart-4))",
       "hsl(var(--chart-5))",
     ];
-    const trafficSources = Object.entries(refSources).map(([source, value], i) => ({
-      source,
-      value,
-      color: colors[i % colors.length],
-    }));
+    const trafficSources = Object.entries(refSources).map(
+      ([source, value], i) => ({
+        source,
+        value,
+        color: colors[i % colors.length],
+      })
+    );
 
     // ===== CARD METRICS =====
     const totalViews = events.length;
-    const uniqueVisitors = new Set(events.map((e) => e.sessionId || e.ipAddress || "unknown")).size;
-    const totalPageViews = Object.values(pageViews).reduce((acc, v) => acc + v, 0);
+    const uniqueVisitors = new Set(events.map((e) => e.ipAddress || "unknown"))
+      .size;
+    const totalPageViews = Object.values(pageViews).reduce(
+      (acc, v) => acc + v,
+      0
+    );
 
     // Changes compared to previous 30 days
     const previousSince = subDays(new Date(), 90);
@@ -76,26 +83,34 @@ export async function GET(
       where: { siteId, createdAt: { gte: previousSince, lt: since } },
     });
     const prevTotalViews = prevEvents.length;
-    const prevUniqueVisitors = new Set(prevEvents.map((e) => e.sessionId || e.ipAddress || "unknown")).size;
+    const prevUniqueVisitors = new Set(
+      prevEvents.map((e) => e.ipAddress || "unknown")
+    ).size;
     const prevPageViews = prevEvents.length;
 
-    const viewsChange = prevTotalViews ? ((totalViews - prevTotalViews) / prevTotalViews) * 100 : 0;
-    const visitorsChange = prevUniqueVisitors ? ((uniqueVisitors - prevUniqueVisitors) / prevUniqueVisitors) * 100 : 0;
-    const pageViewsChange = prevPageViews ? ((totalPageViews - prevPageViews) / prevPageViews) * 100 : 0;
+    const viewsChange = prevTotalViews
+      ? ((totalViews - prevTotalViews) / prevTotalViews) * 100
+      : 0;
+    const visitorsChange = prevUniqueVisitors
+      ? ((uniqueVisitors - prevUniqueVisitors) / prevUniqueVisitors) * 100
+      : 0;
+    const pageViewsChange = prevPageViews
+      ? ((totalPageViews - prevPageViews) / prevPageViews) * 100
+      : 0;
 
     // ===== REAL AVG SESSION DURATION =====
     function calculateAvgSession(eventsList: typeof events) {
-      const sessionsById: Record<string, Date[]> = {};
+      const sessionsByIP: Record<string, Date[]> = {};
       for (const e of eventsList) {
-        const session = e.sessionId || e.ipAddress || "unknown";
-        if (!sessionsById[session]) sessionsById[session] = [];
-        sessionsById[session].push(e.createdAt);
+        const ip = e.ipAddress || "unknown";
+        if (!sessionsByIP[ip]) sessionsByIP[ip] = [];
+        sessionsByIP[ip].push(e.createdAt);
       }
 
       const sessionDurations: number[] = [];
       const SESSION_GAP = 30 * 60 * 1000; // 30 minutes
 
-      for (const times of Object.values(sessionsById)) {
+      for (const times of Object.values(sessionsByIP)) {
         times.sort((a, b) => a.getTime() - b.getTime());
         let sessionStart = times[0].getTime();
 
@@ -111,7 +126,10 @@ export async function GET(
 
       if (!sessionDurations.length) return { avg: "0m 0s", seconds: 0 };
 
-      const avgSeconds = sessionDurations.reduce((a, b) => a + b, 0) / sessionDurations.length / 1000;
+      const avgSeconds =
+        sessionDurations.reduce((a, b) => a + b, 0) /
+        sessionDurations.length /
+        1000;
       const minutes = Math.floor(avgSeconds / 60);
       const seconds = Math.round(avgSeconds % 60);
       return { avg: `${minutes}m ${seconds}s`, seconds: avgSeconds };
@@ -121,13 +139,28 @@ export async function GET(
     const previousSession = calculateAvgSession(prevEvents);
     const avgSessionDuration = currentSession.avg;
     const durationChange = previousSession.seconds
-      ? ((currentSession.seconds - previousSession.seconds) / previousSession.seconds) * 100
+      ? ((currentSession.seconds - previousSession.seconds) /
+          previousSession.seconds) *
+        100
       : 0;
+
+    const regionCounts: Record<string, number> = {};
+    for (const e of events) {
+      const region = e.region || "Unknown";
+      regionCounts[region] = (regionCounts[region] || 0) + 1;
+    }
+
+    // Sort by most visits
+    const regions = Object.entries(regionCounts)
+      .map(([region, count]) => ({ region, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10); // top 10 regions
 
     const res = NextResponse.json({
       viewsOverTime,
       topPages,
       trafficSources,
+      regions,
       cardMetrics: {
         totalViews,
         viewsChange,
@@ -142,10 +175,12 @@ export async function GET(
 
     res.headers.set("Access-Control-Allow-Origin", "*");
     return res;
-
   } catch (err) {
     console.error(err);
-    const res = NextResponse.json({ error: "Failed to load analytics" }, { status: 500 });
+    const res = NextResponse.json(
+      { error: "Failed to load analytics" },
+      { status: 500 }
+    );
     res.headers.set("Access-Control-Allow-Origin", "*");
     return res;
   }
