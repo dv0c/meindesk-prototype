@@ -153,7 +153,7 @@ model Site {
 
 model Features {
   id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  analytics Boolean @default(false)
+  analytics Boolean @default(true)
   articles  Boolean @default(false)
 
   viewslimit Int @default(500)
