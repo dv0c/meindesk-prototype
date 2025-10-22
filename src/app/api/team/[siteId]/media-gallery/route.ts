@@ -1,8 +1,7 @@
-import { type NextRequest, NextResponse } from "next/server";
-import cloudinary from "@/lib/cloudinary";
 import { getAuthSession } from "@/lib/auth";
-import { db } from "@/lib/db";
+import cloudinary from "@/lib/cloudinary";
 import type { Media, MediaGalleryResponse } from "@/types/media-gallery";
+import { type NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   req: NextRequest,
