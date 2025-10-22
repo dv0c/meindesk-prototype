@@ -1,19 +1,5 @@
 "use client"
 
-import React, { useState, useRef, useEffect } from "react"
-import {
-  Book,
-  GalleryVerticalEnd,
-  Globe,
-  Home,
-  LifeBuoy,
-  Send,
-  WholeWord,
-  SidebarIcon,
-  Image,
-  Menu,
-  List
-} from "lucide-react"
 import { NavMain } from "@/components/nav-main"
 import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
@@ -21,14 +7,27 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
   SidebarHeader
 } from "@/components/ui/sidebar"
 import { useTeams } from "@/hooks/useTeams"
-import { Skeleton } from "./ui/skeleton"
-import { TeamSwitcher } from "./team-switcher"
+import {
+  Book,
+  GalleryVerticalEnd,
+  Globe,
+  Home,
+  Image,
+  LifeBuoy,
+  List,
+  Send,
+  Settings,
+  SidebarIcon,
+  WholeWord
+} from "lucide-react"
+import React, { useEffect, useRef, useState } from "react"
 import { NavProjects } from "./nav-projects"
+import { TeamSwitcher } from "./team-switcher"
 import { Button } from "./ui/button"
+import { Skeleton } from "./ui/skeleton"
 
 const data = {
   teams: [] as any,
@@ -36,7 +35,7 @@ const data = {
     { title: "Home", url: "/", icon: Home, isActive: true },
     {
       title: "Website Overview",
-      url: "/projects/website",
+      url: '/projects/website/',
       icon: Globe,
       isActive: false,
       items: [
@@ -45,6 +44,7 @@ const data = {
         { title: "Subscription", url: "/projects/website/subscription" },
       ],
     },
+    { title: "Settings", url: "/projects/settings", icon: Settings, isActive: true },
   ],
   navSecondary: [
     { title: "Support", url: "#", icon: LifeBuoy },

@@ -2,36 +2,33 @@
 
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { unstable_cache } from "next/cache";
 
-/**
- * Fetches the "active team" for the currently logged-in user
- * by extracting siteId from the URL path.
- *
- * @param pathname The current URL pathname (e.g., /dashboard/68f4da67a116560fc8c2a2eb)
- */
-export async function getActiveTeam(pathname: string, analytics?: string) {
-  const user = await getAuthSession();
-  if (!user?.user?.id) return null;
+// cached function — no dynamic calls allowed here
+const _getActiveTeamCached = unstable_cache(
+  async (userId: string, siteId: string, analytics?: string) => {
+    if (!siteId || !userId) return null;
 
-  // Extract siteId from pathname
-  // Assumes URL structure: /dashboard/:siteId
+    return await db.site.findFirst({
+      where: { id: siteId, userId },
+      include: {
+        subscription: true,
+        features: true,
+        Post: true,
+        Category: true,
+        AnalyticsEvent: analytics ? true : false,
+      },
+    });
+  },
+  ["get-active-team"],
+  { tags: ["active-team"] }
+);
 
-  if (!pathname) return null;
+// wrapper that handles session and passes userId into cached layer
+export async function getActiveTeam(siteId: string, analytics?: string) {
+  const session = await getAuthSession();
+  const userId = session?.user?.id;
+  if (!userId) return null;
 
-  // Fetch the team
-  const team = await db.site.findFirst({
-    where: {
-      id: pathname,
-      userId: user.user.id, // ensures user owns this team
-    },
-    include: {
-      subscription: true,
-      features: true,
-      Post: true,
-      Category: true,
-      AnalyticsEvent: analytics ? true : false,
-    },
-  });
-
-  return team; // null if not found or user has no access
+  return _getActiveTeamCached(userId, siteId, analytics);
 }
