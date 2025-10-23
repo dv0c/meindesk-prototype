@@ -6,7 +6,7 @@ import GoogleProvider from "next-auth/providers/google"
 import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcrypt"
 import { cookies } from "next/headers"
-import { NextAuthOptions, getServerSession } from "next-auth";
+import { NextAuthOptions, getServerSession } from "next-auth"
 import { Role } from "@prisma/client"
 
 const IMPERSONATION_COOKIE_NAME = "impersonation_token"
@@ -22,7 +22,6 @@ export const authOptions: NextAuthOptions = {
     newUser: "/setup",
   },
   providers: [
-    // --- Email/Password Provider ---
     CredentialsProvider({
       name: "Credentials",
       credentials: {
@@ -45,8 +44,7 @@ export const authOptions: NextAuthOptions = {
           user.hashedPassword
         )
 
-        if (!isValid)
-          throw new Error("Invalid email or password")
+        if (!isValid) throw new Error("Invalid email or password")
 
         return {
           id: user.id,
@@ -59,7 +57,6 @@ export const authOptions: NextAuthOptions = {
       },
     }),
 
-    // --- OAuth Providers ---
     GithubProvider({
       clientId: process.env.GITHUB_ID!,
       clientSecret: process.env.GITHUB_SECRET!,
@@ -74,7 +71,7 @@ export const authOptions: NextAuthOptions = {
       const cookieStore = await cookies()
       const impersonationCookie = cookieStore.get(IMPERSONATION_COOKIE_NAME)
 
-      // -------------- Impersonation Handling --------------
+      // --- Impersonation Handling ---
       if (
         impersonationCookie &&
         typeof impersonationCookie.value === "string" &&
@@ -103,6 +100,7 @@ export const authOptions: NextAuthOptions = {
         }
       }
 
+      // --- Restore from impersonation ---
       if (token.isImpersonating && token.originalAdminId) {
         const originalAdminUser = await db.user.findUnique({
           where: { id: token.originalAdminId as string },
@@ -124,7 +122,7 @@ export const authOptions: NextAuthOptions = {
       delete token.isImpersonating
       delete token.originalAdminId
 
-      // Standard token population
+      // --- Standard user population ---
       if (user) {
         token.id = user.id
         token.name = user.name
@@ -139,28 +137,39 @@ export const authOptions: NextAuthOptions = {
           ? await db.user.findFirst({ where: { email: token.email as string } })
           : null
 
-      if (dbUser) {
-        token.id = dbUser.id
-        token.name = dbUser.name
-        token.email = dbUser.email
-        token.picture = dbUser.image
-        token.username = dbUser.username
-        token.role = dbUser.role
+      // --- KEY FIX: invalidate ghost sessions ---
+      if (!dbUser) {
+        // user no longer exists → wipe token
+        return {}
+      }
 
-        if (!dbUser.username) {
-          const newUsername = nanoid(10)
-          await db.user.update({
-            where: { id: dbUser.id },
-            data: { username: newUsername },
-          })
-          token.username = newUsername
-        }
+      // update user info in token
+      token.id = dbUser.id
+      token.name = dbUser.name
+      token.email = dbUser.email
+      token.picture = dbUser.image
+      token.username = dbUser.username
+      token.role = dbUser.role
+
+      // ensure username exists
+      if (!dbUser.username) {
+        const newUsername = nanoid(10)
+        await db.user.update({
+          where: { id: dbUser.id },
+          data: { username: newUsername },
+        })
+        token.username = newUsername
       }
 
       return token
     },
 
     async session({ session, token }) {
+      if (!token || !token.id) {
+        // make sure session is empty if user is gone
+        return null as any
+      }
+
       session.user.id = token.id as string
       session.user.name = token.name
       session.user.email = token.email

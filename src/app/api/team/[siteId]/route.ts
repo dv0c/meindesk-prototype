@@ -23,7 +23,7 @@ export async function GET(
     const site = await db.site.findUnique({
       where: { id: siteId },
       include: {
-        User: true, // optional: to return owner info
+        user: true, // optional: to return owner info
         subscription: true,
         features: true,
       },

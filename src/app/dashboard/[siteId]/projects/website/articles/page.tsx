@@ -11,18 +11,20 @@ import {
     EmptyTitle,
 } from "@/components/ui/empty";
 import { X } from "lucide-react";
+import PageWrapper from "@/components/PageWrapper";
+import { CreateArticleButton } from "@/components/CreateArticleButton";
 
 export default async function Page() {
     const site = await getSite()
-    if (site?.features?.articles === false) return <EmptyCard />
+    // if (site?.features?.articles === false) return <EmptyCard />
     if (!site) {
         return <div className="flex flex-1 items-center justify-center p-4">
             <p className="text-muted-foreground">Site not found.</p>
         </div>
     }
-    return <div>
-        WIP
-    </div>
+    return <PageWrapper title="Articles" action={<CreateArticleButton siteId={site.id} />} >
+        test
+    </PageWrapper>
 }
 
 

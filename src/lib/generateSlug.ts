@@ -1,22 +1,33 @@
-export function generateSlug(input?: string) {
-  const title = (input || "").toString().trim()
-  if (!title) return `${Date.now().toString(36)}`
-  // try to remove diacritics (for latin-based chars)
-  let slug = title
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "") // remove diacritics
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "")
+import slugify from "slugify";
+import { db } from "./db";
 
-  if (slug) return slug
+/**
+ * Generates a unique slug recursively.
+ * @param input - The string to generate the slug from (e.g., a post title).
+ * @param model - The Prisma model to check for existing slugs (e.g., "post").
+ * @param suffix - Optional suffix to append for uniqueness (used internally in recursion).
+ * @returns A unique slug.
+ */
+export default async function generateSlug(
+  input: string,
+  model: "article",
+  suffix: number = 0
+): Promise<string> {
+  const baseSlug = slugify(input, {
+    lower: true,
+    strict: true,
+    trim: true,
+  });
 
-  // Fallback: base64url of the title (shortened) to handle non-latin titles like Greek
-  try {
-    const b64 = Buffer.from(title).toString("base64url")
-    return `t-${b64.slice(0, 12)}`
-  } catch {
-    // final fallback: timestamp-based
-    return `${Date.now().toString(36)}`
+  const slug = suffix === 0 ? baseSlug : `${baseSlug}-${suffix}`;
+
+  const existingRecord = await db[model].findUnique({
+    where: { slug },
+  });
+
+  if (!existingRecord) {
+    return slug;
   }
+
+  return generateSlug(input, model, suffix + 1);
 }

@@ -4,12 +4,11 @@ import { ChartBarDecreasingIcon } from "lucide-react";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import LoginImage from "../../../../public/login.jpg";
-import { getSite } from "@/lib/actions/helpers/site";
 
-export default async function LoginPage() {
+export default async function SetupPage() {
 
     const session = await getAuthSession()
-    if (!session) redirect("/login")
+    if (!session?.user) redirect("/login")
 
     return (
         <div className="bg-muted-foreground flex min-h-svh relative flex-col items-center justify-center gap-6 p-6 md:p-10">

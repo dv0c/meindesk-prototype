@@ -18,7 +18,7 @@ export async function WebsiteInfo({ siteId }: { siteId: string }) {
   if (data) {
     websiteData.name = data.title
     websiteData.url = data.url || "No URL provided"
-    websiteData.createdDate = data.createdAt.toDateString()
+    // websiteData.createdDate = data.createdAt.toDateString()
     websiteData.plan = data.subscription?.plan || "Not Implemented"
     websiteData.status = data.subscription?.status || "Error"
   }

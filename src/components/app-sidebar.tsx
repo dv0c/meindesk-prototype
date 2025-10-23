@@ -61,7 +61,7 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { teams, loading: loadingTeams } = useTeams()
   const [hovered, setHovered] = useState(false)
-  const [toggled, setToggled] = useState(false)
+  const [toggled, setToggled] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
   const collapseTimer = useRef<NodeJS.Timeout | null>(null)
   const sidebarRef = useRef<HTMLDivElement | null>(null)
