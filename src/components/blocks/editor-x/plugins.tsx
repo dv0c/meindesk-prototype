@@ -1,4 +1,3 @@
-import { useState } from "react"
 import {
   CHECK_LIST,
   ELEMENT_TRANSFORMERS,
@@ -19,6 +18,7 @@ import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPl
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin"
 import { TabIndentationPlugin } from "@lexical/react/LexicalTabIndentationPlugin"
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin"
+import { useState } from "react"
 
 import { ContentEditable } from "@/components/editor/editor-ui/content-editable"
 import { ActionsPlugin } from "@/components/editor/plugins/actions/actions-plugin"
@@ -78,12 +78,6 @@ import { FormatHeading } from "@/components/editor/plugins/toolbar/block-format/
 import { FormatNumberedList } from "@/components/editor/plugins/toolbar/block-format/format-numbered-list"
 import { FormatParagraph } from "@/components/editor/plugins/toolbar/block-format/format-paragraph"
 import { FormatQuote } from "@/components/editor/plugins/toolbar/block-format/format-quote"
-import { BlockInsertPlugin } from "@/components/editor/plugins/toolbar/block-insert-plugin"
-import { InsertColumnsLayout } from "@/components/editor/plugins/toolbar/block-insert/insert-columns-layout"
-import { InsertEmbeds } from "@/components/editor/plugins/toolbar/block-insert/insert-embeds"
-import { InsertHorizontalRule } from "@/components/editor/plugins/toolbar/block-insert/insert-horizontal-rule"
-import { InsertImage } from "@/components/editor/plugins/toolbar/block-insert/insert-image"
-import { InsertTable } from "@/components/editor/plugins/toolbar/block-insert/insert-table"
 import { ClearFormattingToolbarPlugin } from "@/components/editor/plugins/toolbar/clear-formatting-toolbar-plugin"
 import { CodeLanguageToolbarPlugin } from "@/components/editor/plugins/toolbar/code-language-toolbar-plugin"
 import { ElementFormatToolbarPlugin } from "@/components/editor/plugins/toolbar/element-format-toolbar-plugin"
@@ -108,7 +102,7 @@ import { Separator } from "@/components/ui/separator"
 const placeholder = "Press / for commands..."
 const maxLength = 7000
 
-export function Plugins({}) {
+export function Plugins({ }) {
   const [floatingAnchorElem, setFloatingAnchorElem] =
     useState<HTMLDivElement | null>(null)
   const [isLinkEditMode, setIsLinkEditMode] = useState<boolean>(false)
@@ -197,7 +191,7 @@ export function Plugins({}) {
         <DraggableBlockPlugin anchorElem={floatingAnchorElem} />
         <KeywordsPlugin />
         <EmojisPlugin />
-        <ImagesPlugin />
+        <ImagesPlugin captionsEnabled={false} />
 
         <LayoutPlugin />
 
@@ -275,6 +269,7 @@ export function Plugins({}) {
             <MaxLengthPlugin maxLength={maxLength} />
             <CharacterLimitPlugin maxLength={maxLength} charset="UTF-16" />
           </div>
+          
           <div>
             <CounterCharacterPlugin charset="UTF-16" />
           </div>
