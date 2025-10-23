@@ -96,7 +96,7 @@ export async function PATCH(
     }
 
     const updated = await db.article.update({
-      where: { id: articleId },
+      where: { id: articleId, authorId: session.user.id },
       data: updateData,
     });
 
