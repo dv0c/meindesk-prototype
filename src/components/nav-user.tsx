@@ -31,10 +31,12 @@ import {
 } from "@/components/ui/sidebar"
 import { signOut, useSession } from "next-auth/react"
 import { Skeleton } from "./ui/skeleton"
+import { useRouter } from "next/navigation"
 
 export function NavUser({
 }: {
   }) {
+  const router = useRouter()
   const { isMobile } = useSidebar()
   const { data, status } = useSession()
   const user = data?.user
@@ -44,7 +46,10 @@ export function NavUser({
     )
   }
 
-  
+  if (!user?.id || status === 'unauthenticated') {
+    router.push('/login')
+  }
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
