@@ -1,15 +1,16 @@
 "use client"
 
 import { SerializedEditorState } from "lexical"
-import { use, useEffect, useState, useMemo } from "react"
+import { use, useEffect, useMemo, useState } from "react"
 
 import { Editor } from "@/components/blocks/editor-x/editor"
-import { Input } from "@/components/ui/input"
-import RightSection from "./_comps/RightSection"
-import { useArticle } from "@/hooks/use-article"
-import { Spinner } from "@/components/ui/spinner"
+import { ImagesPlugin } from "@/components/editor/plugins/images-plugin"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input"
+import { Spinner } from "@/components/ui/spinner"
+import { useArticle } from "@/hooks/use-article"
+import RightSection from "./_comps/RightSection"
 
 interface EditorPageProps {
   params: {
@@ -123,6 +124,7 @@ export default function EditorPage({ params }: EditorPageProps) {
               editorSerializedState={editorState}
               onSerializedChange={(value) => setEditorState(value)}
             />
+
           </div>
         </div>
         <RightSection />

@@ -12,6 +12,7 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 
 import { nodes } from "./nodes"
 import { Plugins } from "./plugins"
+import { ImagesPlugin } from "@/components/editor/plugins/images-plugin"
 
 const editorConfig: InitialConfigType = {
   namespace: "Editor",
@@ -46,6 +47,7 @@ export function Editor({
       >
         <TooltipProvider>
           <Plugins />
+            <ImagesPlugin captionsEnabled={false} />
 
           <OnChangePlugin
             ignoreSelectionChange={true}

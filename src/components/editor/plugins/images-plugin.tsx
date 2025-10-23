@@ -7,8 +7,6 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-import { JSX, useEffect, useRef, useState } from "react"
-import * as React from "react"
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext"
 import { $wrapNodeInElement, mergeRegister } from "@lexical/utils"
 import {
@@ -29,6 +27,7 @@ import {
   LexicalCommand,
   LexicalEditor,
 } from "lexical"
+import { JSX, useEffect, useRef, useState } from "react"
 
 import {
   $createImageNode,
@@ -37,6 +36,7 @@ import {
   ImagePayload,
 } from "@/components/editor/nodes/image-node"
 import { CAN_USE_DOM } from "@/components/editor/shared/can-use-dom"
+import { InsertImageGalleryDialogBody } from "@/components/MediaGallery/media-gallery-for-editor"
 import { Button } from "@/components/ui/button"
 import { DialogFooter } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
@@ -184,23 +184,28 @@ export function InsertImageDialog({
     onClose()
   }
 
+
   return (
     <Tabs defaultValue="url">
       <TabsList className="w-full">
-        <TabsTrigger value="url" className="w-full">
-          URL
-        </TabsTrigger>
-        <TabsTrigger value="file" className="w-full">
-          File
-        </TabsTrigger>
+        <TabsTrigger value="url" className="w-full">URL</TabsTrigger>
+        <TabsTrigger value="file" className="w-full">File</TabsTrigger>
+        <TabsTrigger value="gallery" className="w-full">Gallery</TabsTrigger>
       </TabsList>
+
       <TabsContent value="url">
         <InsertImageUriDialogBody onClick={onClick} />
       </TabsContent>
+
       <TabsContent value="file">
         <InsertImageUploadedDialogBody onClick={onClick} />
       </TabsContent>
+
+      <TabsContent value="gallery">
+        <InsertImageGalleryDialogBody activeEditor={activeEditor} siteId={""} onClose={onClose} />
+      </TabsContent>
     </Tabs>
+
   )
 }
 

@@ -11,7 +11,7 @@ export async function GET(
   { params }: { params: { siteId: string } }
 ) {
   const { siteId } = await params;
-  console.log(siteId);
+  console.log(siteId);  
   try {
     // 1. Get logged in user
     const session = await getAuthSession();
