@@ -109,3 +109,29 @@ export async function PATCH(
     );
   }
 }
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { articleId: string } }
+) {
+  try {
+    const session = await getAuthSession();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Not authorized" }, { status: 401 });
+    }
+
+    const { articleId } = await params;
+
+    const updated = await db.article.delete({
+      where: { id: articleId, authorId: session.user.id },
+    });
+
+    return NextResponse.json(updated);
+  } catch (error: any) {
+    console.error("Error updating article:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}

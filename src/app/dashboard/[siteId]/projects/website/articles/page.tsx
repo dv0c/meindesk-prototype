@@ -13,6 +13,7 @@ import {
 import { X } from "lucide-react";
 import PageWrapper from "@/components/PageWrapper";
 import { CreateArticleButton } from "@/components/CreateArticleButton";
+import { ArticleTable } from "@/components/ArticlesTable";
 
 export default async function Page() {
     const site = await getSite()
@@ -23,7 +24,7 @@ export default async function Page() {
         </div>
     }
     return <PageWrapper title="Articles" action={<CreateArticleButton siteId={site.id} />} >
-        test
+        <ArticleTable />
     </PageWrapper>
 }
 
