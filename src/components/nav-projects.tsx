@@ -42,7 +42,7 @@ export function NavProjects({
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Content Managment</SidebarGroupLabel>
       <SidebarMenu>
-        {siteId !== undefined ? projects.map((item) => (
+        {siteId !== undefined && projects !== null ? projects.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild>
               <Link href={'/dashboard/' + siteId + '/' + item.url}>

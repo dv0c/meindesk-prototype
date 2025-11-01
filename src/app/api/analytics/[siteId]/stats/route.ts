@@ -9,7 +9,7 @@ export async function GET(
   { params }: { params: { siteId: string } }
 ) {
   try {
-    const { siteId } = params
+    const { siteId } = await params
     if (!siteId) return NextResponse.json({ error: "Missing siteId" }, { status: 400 })
 
     const url = new URL(req.url)

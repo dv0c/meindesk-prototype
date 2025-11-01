@@ -22,6 +22,13 @@ export interface Site {
     billing_cycle: string
     next_billing_date: string
   } | null
+  features: {
+    articles: boolean
+    pages: boolean
+    cateories: boolean
+    media: boolean
+    analytics: boolean
+  }
 }
 
 export function useTeam() {

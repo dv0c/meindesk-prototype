@@ -130,7 +130,10 @@ model Site {
 model Features {
   id        String  @id @default(auto()) @map("_id") @db.ObjectId
   analytics Boolean @default(true)
-  articles  Boolean @default(false)
+  articles  Boolean @default(true)
+  pages     Boolean @default(true)
+  cateories Boolean @default(true)
+  media     Boolean @default(true)
 
   viewslimit Int @default(500)
   ratelimit  Int @default(10000)

@@ -60,6 +60,7 @@ export function TeamSwitcher({
   const handleTeamChange = (teamId: string) => {
     // @ts-ignore
     setActiveTeam(teams.find((t) => t.id === teamId) || null)
+    document.cookie = `activeTeamId=${activeTeam.id}; Path=/; Secure; SameSite=Lax`
 
     const parts = pathname.split("/")
 
@@ -116,11 +117,10 @@ export function TeamSwitcher({
               <DropdownMenuItem
                 key={team.id}
                 onClick={() => handleTeamChange(team.id)}
-                className={`gap-2 cursor-pointer p-2 ${
-                  activeTeam.id === team.id
+                className={`gap-2 cursor-pointer p-2 ${activeTeam.id === team.id
                     ? "bg-sidebar-ring text-sidebar-accent-foreground"
                     : ""
-                }`}
+                  }`}
               >
                 <div className="flex size-6 items-center justify-center rounded-md border">
                   <team.logo className="size-3.5 shrink-0" />

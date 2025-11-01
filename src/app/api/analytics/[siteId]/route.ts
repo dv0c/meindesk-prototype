@@ -29,7 +29,7 @@ function getDateRange(range: string): { since: Date; previousSince?: Date } {
 }
 
 export async function GET(req: NextRequest, { params }: { params: { siteId: string } }) {
-  const { siteId } = params;
+  const { siteId } = await params;
   const range = req.nextUrl.searchParams.get("range") || "last60Days";
 
   try {
