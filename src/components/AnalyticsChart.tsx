@@ -1,14 +1,13 @@
 "use client"
 
-import { TrendingUp } from "lucide-react"
-import { Bar, BarChart, XAxis, YAxis, Cell, ResponsiveContainer, PieChart, Pie, LabelList, CartesianGrid } from "recharts"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { useAnalytics } from "@/hooks/useAnalytics"
-import { AnalyticsAreaChart } from "./AnalyticsAreaChart"
+import { TrendingUp } from "lucide-react"
 import { useState } from "react"
+import { Bar, BarChart, CartesianGrid, Cell, LabelList, Pie, PieChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
+import { AnalyticsAreaChart } from "./AnalyticsAreaChart"
 import { Button } from "./ui/button"
-import { Badge } from "./ui/badge"
 
 const RANGE_OPTIONS = [
     { label: "Yesterday", value: "yesterday" },
@@ -124,7 +123,7 @@ export function AnalyticsCharts({ siteId }: { siteId: string }) {
                 </CardContent>
                 <CardFooter className="flex-col items-start gap-2 text-sm">
                     <div className="flex gap-2 leading-none font-medium">
-                        Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+                        Trending up by 0% this month <TrendingUp className="h-4 w-4" />
                     </div>
                     <div className="text-muted-foreground leading-none">
                         Showing total views for top pages
@@ -188,7 +187,7 @@ export function AnalyticsCharts({ siteId }: { siteId: string }) {
                 </CardContent>
                 <CardFooter className="flex-col items-start gap-2 text-sm">
                     <div className="flex gap-2 leading-none font-medium">
-                        Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+                        Trending up by 0% this month <TrendingUp className="h-4 w-4" />
                     </div>
                     <div className="text-muted-foreground leading-none">
                         Showing total views for top pages

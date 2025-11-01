@@ -42,7 +42,7 @@ const layout: FC<layoutProps> = ({ children }) => {
                     </Breadcrumb>
                 </div>
             </header>
-            <div className="">
+            <div className="h-full">
                 <RouterRefresh>
                     <LoadingOverlay />
                     {children}
