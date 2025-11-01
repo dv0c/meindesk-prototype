@@ -1,4 +1,5 @@
 'use client'
+import NotFound from "@/app/not-found";
 import { DashboardSkeleton } from "@/components/DashboardSkeletonHomepage";
 import QuickActions from "@/components/QuickActions";
 import RecentContentView from "@/components/RecentContentView";
@@ -8,14 +9,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Empty, EmptyContent, EmptyDescription, EmptyTitle } from "@/components/ui/empty";
 import { useTeam } from "@/hooks/useTeam";
 import { Ghost, TrendingUp, X } from "lucide-react";
+import { notFound } from "next/navigation";
 export default function Page() {
   const { team, loading } = useTeam()
   if (loading) return <DashboardSkeleton />
 
   if (!team?.id) {
-    return <div className="flex flex-1 items-center justify-center p-4">
-      <p className="text-muted-foreground">Site not found.</p>
-    </div>
+    notFound()
   }
 
   return <div>

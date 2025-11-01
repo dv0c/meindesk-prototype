@@ -64,7 +64,7 @@ export default function LoadingOverlay() {
         .text-draw {
           stroke-dasharray: 1100;
           stroke-dashoffset: 1100;
-          animation: drawText 1.5s ease forwards;
+          animation: drawText 2s ease forwards;
         }
 
         @keyframes drawText {

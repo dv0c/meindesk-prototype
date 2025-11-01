@@ -3,7 +3,6 @@ import { getToken } from "next-auth/jwt";
 import { db } from "@/lib/db";
 
 export async function middleware(req: NextRequest) {
-  const url = req.nextUrl.clone();
 
   // 1️⃣ Get JWT token
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
