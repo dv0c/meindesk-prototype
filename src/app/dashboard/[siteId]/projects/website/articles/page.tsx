@@ -15,15 +15,14 @@ import PageWrapper from "@/components/PageWrapper";
 import { CreateArticleButton } from "@/components/CreateArticleButton";
 import { ArticleTable } from "@/components/ArticlesTable";
 
-export default async function Page() {
-    const site = await getSite()
+export default async function Page({params}: {params: {siteId: string}}) {
     // if (site?.features?.articles === false) return <EmptyCard />
-    if (!site) {
+    if (!params.siteId) {
         return <div className="flex flex-1 items-center justify-center p-4">
             <p className="text-muted-foreground">Site not found.</p>
         </div>
     }
-    return <PageWrapper title="Articles" action={<CreateArticleButton siteId={site.id} />} >
+    return <PageWrapper title="Articles" action={<CreateArticleButton siteId={params.siteId} />} >
         <ArticleTable />
     </PageWrapper>
 }

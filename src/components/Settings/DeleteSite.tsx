@@ -33,7 +33,7 @@ export const DeleteWebsite = ({ siteId }: { siteId: string }) => {
   };
 
   return (
-    <div className="max-w-3xl w-full">
+    <div className="max-w-3xl pl-5 w-full">
       <div className="grid gap-6">
         <Card className="border-dashed pb-0 overflow-hidden border-2 border-red-500/30">
           <CardHeader>

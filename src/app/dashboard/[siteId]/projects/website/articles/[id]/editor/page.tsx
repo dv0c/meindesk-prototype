@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { useArticle } from "@/hooks/use-article"
 import RightSection from "./_comps/RightSection"
+import { ArrowLeft } from "lucide-react"
 
 interface EditorPageProps {
   params: {
@@ -70,9 +71,12 @@ export default function EditorPage({ params }: EditorPageProps) {
     <div>
       <header className="border-t border-b shadow sticky top-0 bg-background z-20 p-3 mb-10">
         <div className="flex justify-between items-center flex-wrap gap-3">
-          <div >
-            <h1 className="text-3xl font-bold">Article</h1>
-            <p className="text-sm ">Title: {title}</p>
+          <div>
+            <Button onClick={() => history.back()} variant={'ghost'} size={'icon-sm'} className="mr-2 cursor-pointer">
+              <ArrowLeft className="inline-block" />
+
+            </Button>
+            <span className="text-lg font-semibold">Editing Article</span>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
             <DropdownMenu>

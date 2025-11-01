@@ -11,7 +11,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { siteId: string } }
 ) {
-  const { siteId } = params;
+  const { siteId } = await params;
 
   try {
     const session = await getAuthSession();

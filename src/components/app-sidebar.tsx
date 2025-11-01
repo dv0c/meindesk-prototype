@@ -11,17 +11,17 @@ import {
 } from "@/components/ui/sidebar"
 import { useTeams } from "@/hooks/useTeams"
 import {
-  Book,
+  FileIcon,
+  FileText,
+  Folder,
   GalleryVerticalEnd,
   Globe,
   Home,
   Image,
   LifeBuoy,
-  List,
   Send,
   Settings,
-  SidebarIcon,
-  WholeWord
+  SidebarIcon
 } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
 import { NavProjects } from "./nav-projects"
@@ -51,9 +51,9 @@ const data = {
     { title: "Feedback", url: "#", icon: Send },
   ],
   projects: [
-    { name: "Articles", url: "/projects/website/articles", icon: WholeWord },
-    { name: "Pages", url: "/projects/website/pages", icon: Book },
-    { name: "Categories", url: "/projects/website/categories", icon: List },
+    { name: "Articles", url: "/projects/website/articles", icon: FileText },
+    { name: "Pages", url: "/projects/website/pages", icon: FileIcon },
+    { name: "Categories", url: "/projects/website/categories", icon: Folder },
     { name: "Media Gallery", url: "/projects/website/media-gallery", icon: Image },
   ],
 }
@@ -151,7 +151,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             }`}
         >
           <Sidebar
-            variant={toggled ? "sidebar" : "floating"}
+            variant={toggled ? "inset" : "floating"}
             className={`h-full overflow-hidden transition-all duration-300 ${isOpen ? "opacity-100" : "opacity-0"
               }`}
             {...props}

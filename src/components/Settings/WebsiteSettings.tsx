@@ -67,7 +67,7 @@ const WebsiteSettings = ({ site }: { site: Site }) => {
     }
 
     return (
-        <div className="max-w-3xl w-full">
+        <div className="max-w-3xl pl-5 w-full">
             <div className="grid gap-6">
                 <Card>
                     <CardHeader>

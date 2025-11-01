@@ -118,7 +118,7 @@ export function TeamSwitcher({
                 onClick={() => handleTeamChange(team.id)}
                 className={`gap-2 cursor-pointer p-2 ${
                   activeTeam.id === team.id
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                    ? "bg-sidebar-ring text-sidebar-accent-foreground"
                     : ""
                 }`}
               >
