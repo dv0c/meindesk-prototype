@@ -1,7 +1,7 @@
-import { AnalyticsCards } from "@/components/AnalyticsCards";
-import { AnalyticsCharts } from "@/components/AnalyticsChart";
-import { getSite } from "@/lib/actions/helpers/site";
 
+import { ArticleTable } from "@/components/ArticlesTable";
+import { CreateArticleButton } from "@/components/CreateArticleButton";
+import PageWrapper from "@/components/PageWrapper";
 import {
     Empty,
     EmptyContent,
@@ -11,9 +11,6 @@ import {
     EmptyTitle,
 } from "@/components/ui/empty";
 import { X } from "lucide-react";
-import PageWrapper from "@/components/PageWrapper";
-import { CreateArticleButton } from "@/components/CreateArticleButton";
-import { ArticleTable } from "@/components/ArticlesTable";
 
 export default async function Page({params}: {params: {siteId: string}}) {
     // if (site?.features?.articles === false) return <EmptyCard />

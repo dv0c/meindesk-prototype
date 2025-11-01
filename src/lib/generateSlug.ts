@@ -10,7 +10,7 @@ import { db } from "./db";
  */
 export default async function generateSlug(
   input: string,
-  model: "article",
+  model: "article" | "page",
   suffix: number = 0
 ): Promise<string> {
   const baseSlug = slugify(input, {

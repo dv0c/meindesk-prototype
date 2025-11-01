@@ -35,6 +35,7 @@ model User {
   Category       Category[]
   Subscription   Subscription[]
   Article        Article[]
+  Page           Page[]
 
   @@index([email, id])
 }
@@ -125,6 +126,7 @@ model Site {
   featuresId     String?          @db.ObjectId
   articleId      String?          @db.ObjectId
   Article        Article[]
+  Page           Page[]
 }
 
 model Features {
@@ -207,4 +209,33 @@ enum ArticleStatus {
   DRAFT
   BANNED
   DELETED
+}
+
+model Page {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  slug      String     @unique @default(uuid())
+  content   String?
+  excerpt   String?
+  template  String     @default("default")
+  status    PageStatus @default(DRAFT)
+  parentId  String?    @db.ObjectId
+  authorId  String?    @db.ObjectId
+  meta      Json?
+  order     Int?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  siteId    String     @db.ObjectId
+  site      Site       @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  userId    String?    @db.ObjectId
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // virtual relations (manual linking)
+  // These aren't real foreign keys, just convenience for TypeScript typing
+  // You’ll manually query related pages/users using the IDs
+}
+
+enum PageStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
 }
