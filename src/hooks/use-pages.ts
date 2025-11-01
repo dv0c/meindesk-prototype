@@ -54,7 +54,7 @@ export function usePages({ onSuccess, onError }: UsePageOptions = {}) {
 
       setLoading(true)
       try {
-        const res = await axios.get(`/api/taem/${siteId}/pages/${pageId}`)
+        const res = await axios.get(`/api/team/${siteId}/pages/${pageId}`)
         setPage(res.data)
         onSuccess?.(res.data)
         return res.data
@@ -82,7 +82,7 @@ export function usePages({ onSuccess, onError }: UsePageOptions = {}) {
 
       setLoading(true)
       try {
-        const res = await axios.patch(`/api/team/${siteId}/pages/${pageId}`, data)
+        const res = await axios.put(`/api/team/${siteId}/pages/${pageId}`, data)
         toast.success("Page updated successfully!")
         setPage(res.data)
         setPages((prev) => prev.map((p) => (p.id === pageId ? res.data : p)))

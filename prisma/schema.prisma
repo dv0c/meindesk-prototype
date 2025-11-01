@@ -215,7 +215,7 @@ model Page {
   id        String     @id @default(auto()) @map("_id") @db.ObjectId
   title     String
   slug      String     @unique @default(uuid())
-  content   String?
+  content   Json?
   excerpt   String?
   template  String     @default("default")
   status    PageStatus @default(DRAFT)

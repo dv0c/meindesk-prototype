@@ -67,7 +67,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 // PUT /pages/:id -> update a page
 // -----------------------------
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
-  const { id } = params;
+  const { id } = await params;
   const body = await req.json();
 
   try {
