@@ -22,7 +22,7 @@ export default function Page() {
     <main className="flex-1 p-6">
       <StatsCards siteId={team.id} />
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <QuickActions siteId={team.id} />
+        <QuickActions features={team.features} siteId={team.id} />
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
