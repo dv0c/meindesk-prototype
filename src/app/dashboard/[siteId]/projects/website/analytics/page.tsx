@@ -1,6 +1,5 @@
 import { AnalyticsCards } from "@/components/AnalyticsCards";
 import { AnalyticsCharts } from "@/components/AnalyticsChart";
-import { getSite } from "@/lib/actions/helpers/site";
 
 import {
     Empty,
@@ -10,8 +9,8 @@ import {
     EmptyMedia,
     EmptyTitle,
 } from "@/components/ui/empty";
-import { X } from "lucide-react";
 import { getActiveTeam } from "@/lib/actions/helpers/team";
+import { X } from "lucide-react";
 
 export default async function Page({ params }: { params: { siteId: string } }) {
     const site = await getActiveTeam(params.siteId, "analytics")
@@ -21,7 +20,7 @@ export default async function Page({ params }: { params: { siteId: string } }) {
             <p className="text-muted-foreground">Site not found.</p>
         </div>
     }
-    return <div className="flex flex-1 flex-col gap-4 p-4">
+    return <div className="flex flex-1 flex-col gap-4 p-5">
         <AnalyticsCards siteId={site.id} />
         <AnalyticsCharts siteId={site.id} />
     </div>

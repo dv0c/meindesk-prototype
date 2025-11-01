@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, userAgent } from "next/server";
+import { geolocation } from "@vercel/functions";
 
 export const runtime = "nodejs";
 
@@ -12,24 +13,19 @@ export async function OPTIONS(req: NextRequest) {
   return res;
 }
 
-// Helper: get region from IP via ipapi.co
-async function getRegionFromIP(ip: string): Promise<string | null> {
-  if (!ip || ip === "unknown") return null;
-
-  try {
-    const res = await fetch(`https://ipapi.co/${ip}/json/`);
-    if (!res.ok) return null;
-    const data = await res.json();
-    return `${data.city || ""}${data.city ? ", " : ""}${data.country_name || ""}`.trim() || null;
-  } catch {
-    return null;
-  }
+// Helper: get device type from UA
+function getDeviceType(uaString?: string) {
+  if (!uaString) return "Unknown";
+  const ua = uaString.toLowerCase();
+  if (ua.includes("mobile") || ua.includes("iphone") || ua.includes("android")) return "Mobile";
+  if (ua.includes("tablet") || ua.includes("ipad")) return "Tablet";
+  return "Desktop";
 }
 
 // POST request
 export async function POST(req: NextRequest) {
   try {
-    const { url, path, referrer, userAgent } = await req.json();
+    const { url, path, referrer } = await req.json();
 
     if (!url || !path) {
       const res = NextResponse.json({ error: "url and path required" }, { status: 400 });
@@ -38,9 +34,11 @@ export async function POST(req: NextRequest) {
     }
 
     const ipAddress = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
+    const geo = geolocation(req); // Vercel geolocation
+    const ua = userAgent(req);
 
-    // Get region from IP (remote API)
-    const region = await getRegionFromIP(ipAddress);
+    const region = geo.region || geo.country || "Unknown";
+    const device = ua.isBot ? "BOT" : getDeviceType(ua.ua);
 
     // Find the site by URL
     const site = await db.site.findUnique({ where: { url } });
@@ -56,8 +54,9 @@ export async function POST(req: NextRequest) {
         siteId: site.id,
         path,
         referrer,
-        userAgent,
+        userAgent: ua.ua || "Unknown",
         region,
+        device,
         ipAddress,
       },
     });
