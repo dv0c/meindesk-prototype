@@ -1,11 +1,8 @@
-import { NextRequest, NextResponse, userAgent } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { subDays, format } from "date-fns";
 import { db } from "@/lib/db";
-import { geolocation } from "@vercel/functions";
 
-export const runtime = "nodejs";
-
-// Helper: detect device type
+// --- helper: detect device type
 function getDeviceType(uaString?: string) {
   if (!uaString) return "Unknown";
   const ua = uaString.toLowerCase();
@@ -14,14 +11,39 @@ function getDeviceType(uaString?: string) {
   return "Desktop";
 }
 
+// --- helper: determine date range
+function getDateRange(range: string): { since: Date; previousSince?: Date } {
+  const now = new Date();
+  switch (range) {
+    case "yesterday":
+      return { since: subDays(now, 1), previousSince: subDays(now, 2) };
+    case "lastWeek":
+      return { since: subDays(now, 7), previousSince: subDays(now, 14) };
+    case "lastMonth":
+      return { since: subDays(now, 30), previousSince: subDays(now, 60) };
+    case "last3Months":
+      return { since: subDays(now, 90), previousSince: subDays(now, 180) };
+    default:
+      return { since: subDays(now, 60), previousSince: subDays(now, 120) };
+  }
+}
+
 export async function GET(req: NextRequest, { params }: { params: { siteId: string } }) {
   const { siteId } = params;
+  const range = req.nextUrl.searchParams.get("range") || "last60Days";
 
   try {
-    const since = subDays(new Date(), 60);
+    const { since, previousSince } = getDateRange(range);
+
+    // Fetch current and previous events
     const events = await db.analyticsEvent.findMany({
       where: { siteId, createdAt: { gte: since } },
     });
+    const prevEvents = previousSince
+      ? await db.analyticsEvent.findMany({
+          where: { siteId, createdAt: { gte: previousSince, lt: since } },
+        })
+      : [];
 
     // --- VIEWS OVER TIME ---
     const dailyStats: Record<string, { views: number; visitors: Set<string> }> = {};
@@ -75,10 +97,6 @@ export async function GET(req: NextRequest, { params }: { params: { siteId: stri
     const uniqueVisitors = new Set(events.map((e) => e.ipAddress || "unknown")).size;
     const totalPageViews = Object.values(pageViews).reduce((acc, v) => acc + v, 0);
 
-    const previousSince = subDays(new Date(), 90);
-    const prevEvents = await db.analyticsEvent.findMany({
-      where: { siteId, createdAt: { gte: previousSince, lt: since } },
-    });
     const prevTotalViews = prevEvents.length;
     const prevUniqueVisitors = new Set(prevEvents.map((e) => e.ipAddress || "unknown")).size;
     const prevPageViews = prevEvents.length;
@@ -123,15 +141,12 @@ export async function GET(req: NextRequest, { params }: { params: { siteId: stri
       ? ((currentSession.seconds - previousSession.seconds) / previousSession.seconds) * 100
       : 0;
 
-    // --- REGIONS & DEVICES via Vercel geolocation & UA ---
+    // --- REGIONS & DEVICES (from stored events)
     const regionCounts: Record<string, number> = {};
     const deviceCounts: Record<string, number> = {};
-
     for (const e of events) {
-      const geo = geolocation(req); // Vercel geolocation
-      const ua = userAgent(req);
-      const region = geo.region || geo.country || "Unknown";
-      const device = ua.isBot ? "BOT" : getDeviceType(ua.ua || e.userAgent);
+      const region = e.region || "Unknown"; // stored at POST using ip.com
+      const device = e.userAgent ? getDeviceType(e.userAgent) : "Unknown";
       regionCounts[region] = (regionCounts[region] || 0) + 1;
       deviceCounts[device] = (deviceCounts[device] || 0) + 1;
     }
@@ -164,7 +179,6 @@ export async function GET(req: NextRequest, { params }: { params: { siteId: stri
         durationChange,
       },
     });
-
     res.headers.set("Access-Control-Allow-Origin", "*");
     return res;
   } catch (err) {
