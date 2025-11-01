@@ -19,6 +19,17 @@ export interface TrafficSource {
   color: string
 }
 
+export interface Region {
+  region: string
+  count: number
+}
+
+export interface Device {
+  device: string
+  count: number
+  color: string
+}
+
 export interface CardMetrics {
   totalViews: number
   viewsChange: number
@@ -34,10 +45,12 @@ export interface AnalyticsData {
   viewsOverTime: ViewData[]
   topPages: TopPage[]
   trafficSources: TrafficSource[]
+  regions: Region[]
+  devices: Device[]
   cardMetrics: CardMetrics
 }
 
-export function useAnalytics(siteId: string) {
+export function useAnalytics(siteId: string, range: string = "last60Days") {
   const [data, setData] = useState<AnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -50,7 +63,7 @@ export function useAnalytics(siteId: string) {
         setLoading(true)
         setError(null)
 
-        const res = await fetch(`/api/analytics/${siteId}`, {
+        const res = await fetch(`/api/analytics/${siteId}?range=${range}`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         })
@@ -69,7 +82,7 @@ export function useAnalytics(siteId: string) {
     }
 
     fetchAnalytics()
-  }, [siteId])
+  }, [siteId, range])
 
   return { data, loading, error }
 }

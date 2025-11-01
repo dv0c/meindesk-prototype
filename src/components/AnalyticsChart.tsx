@@ -1,14 +1,25 @@
 "use client"
 
 import { TrendingUp } from "lucide-react"
-import { Bar, BarChart, XAxis, YAxis, Cell, ResponsiveContainer, PieChart, Pie } from "recharts"
+import { Bar, BarChart, XAxis, YAxis, Cell, ResponsiveContainer, PieChart, Pie, LabelList, CartesianGrid } from "recharts"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { useAnalytics } from "@/hooks/useAnalytics"
 import { AnalyticsAreaChart } from "./AnalyticsAreaChart"
+import { useState } from "react"
+import { Button } from "./ui/button"
+import { Badge } from "./ui/badge"
+
+const RANGE_OPTIONS = [
+    { label: "Yesterday", value: "yesterday" },
+    { label: "Last Week", value: "lastWeek" },
+    { label: "Last Month", value: "lastMonth" },
+    { label: "Last 3 Months", value: "last3Months" },
+]
 
 export function AnalyticsCharts({ siteId }: { siteId: string }) {
-    const { data, loading, error } = useAnalytics(siteId)
+    const [range, setRange] = useState("lastMonth")
+    const { data, loading, error } = useAnalytics(siteId, range)
 
     if (loading) return (
         <div className="grid gap-6 lg:grid-cols-2">
@@ -32,11 +43,11 @@ export function AnalyticsCharts({ siteId }: { siteId: string }) {
 
     // Dynamic color palette
     const colors = [
-        "hsl(var(--chart-1))",
-        "hsl(var(--chart-2))",
-        "hsl(var(--chart-3))",
-        "hsl(var(--chart-4))",
-        "hsl(var(--chart-5))",
+        "var(--chart-1)",
+        "var(--chart-2)",
+        "var(--chart-3)",
+        "var(--chart-4)",
+        "var(--chart-5)",
     ]
 
     const trafficConfig: Record<string, { label: string; color: string }> =
@@ -56,6 +67,19 @@ export function AnalyticsCharts({ siteId }: { siteId: string }) {
 
     return (
         <div className="grid gap-6 lg:grid-cols-2">
+            <div className="lg:col-span-2 pt-2 flex gap-2">
+                {RANGE_OPTIONS.map((opt) => (
+                    <Button
+                        key={opt.value}
+                        className={`cursor-pointer ${range === opt.value ? "bg-primary-foreground text-muted-foreground" : "bg-muted hover:bg-muted-foreground hover:text-muted text-muted-foreground"
+                            }`}
+                        onClick={() => setRange(opt.value)}
+                    >
+                        {opt.label}
+                    </Button>
+                ))}
+            </div>
+
             {/* Views Over Time */}
             <div className="lg:col-span-2">
                 <AnalyticsAreaChart data={viewsOverTime} />
@@ -108,6 +132,70 @@ export function AnalyticsCharts({ siteId }: { siteId: string }) {
                 </CardFooter>
             </Card>
 
+            <Card>
+                <CardHeader className="border-b">
+                    <CardTitle>Top Locations</CardTitle>
+                    <CardDescription>Most visitors by region</CardDescription>
+                </CardHeader>
+                <CardContent className="border-b">
+                    <ChartContainer config={chartConfig}>
+                        <BarChart
+                            accessibilityLayer
+                            data={data.regions.map((p) => ({ month: p.region || "Unknown", desktop: p.count }))}
+                            layout="vertical"
+                            margin={{
+                                right: 16,
+                            }}
+                        >
+                            <CartesianGrid horizontal={false} />
+                            <YAxis
+                                dataKey="month"
+                                type="category"
+                                tickLine={false}
+                                tickMargin={10}
+                                axisLine={false}
+                                tickFormatter={(value) => value.slice(0, 3)}
+                                hide
+                            />
+                            <XAxis dataKey="desktop" type="number" hide />
+                            <ChartTooltip
+                                cursor={false}
+                                content={<ChartTooltipContent indicator="line" />}
+                            />
+                            <Bar
+                                dataKey="desktop"
+                                layout="vertical"
+                                fill="var(--color-chart-1)"
+                                radius={4}
+                            >
+                                <LabelList
+                                    dataKey="month"
+                                    position="inside"
+                                    offset={16}
+                                    className="fill-(--color-label)"
+                                    fontSize={13}
+                                />
+                                <LabelList
+                                    dataKey="desktop"
+                                    position="right"
+                                    offset={8}
+                                    className="fill-foreground"
+                                    fontSize={12}
+                                />
+                            </Bar>
+                        </BarChart>
+                    </ChartContainer>
+                </CardContent>
+                <CardFooter className="flex-col items-start gap-2 text-sm">
+                    <div className="flex gap-2 leading-none font-medium">
+                        Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+                    </div>
+                    <div className="text-muted-foreground leading-none">
+                        Showing total views for top pages
+                    </div>
+                </CardFooter>
+            </Card>
+
             {/* Traffic Sources Chart */}
             <Card>
                 <CardHeader>
@@ -132,6 +220,38 @@ export function AnalyticsCharts({ siteId }: { siteId: string }) {
                                     dataKey="value"
                                 >
                                     {trafficSources.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                                    ))}
+                                </Pie>
+                                <ChartTooltip content={<ChartTooltipContent />} />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </ChartContainer>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Device Types</CardTitle>
+                    <CardDescription>Visitors by device</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <ChartContainer
+                        className="h-[400px] w-full"
+                        config={{ visitors: { label: "Visitors" } }} // <-- add this
+                    >
+                        <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                                <Pie
+                                    data={data.devices}
+                                    cx="50%"
+                                    cy="50%"
+                                    labelLine={false}
+                                    label={({ device, percent }) => `${device} ${(percent * 100).toFixed(0)}%`}
+                                    outerRadius={120}
+                                    fill="#ffc658"
+                                    dataKey="count"
+                                >
+                                    {data.devices.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
                                     ))}
                                 </Pie>
