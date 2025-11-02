@@ -269,7 +269,7 @@ export function Plugins({ }) {
             <MaxLengthPlugin maxLength={maxLength} />
             <CharacterLimitPlugin maxLength={maxLength} charset="UTF-16" />
           </div>
-          
+
           <div>
             <CounterCharacterPlugin charset="UTF-16" />
           </div>
