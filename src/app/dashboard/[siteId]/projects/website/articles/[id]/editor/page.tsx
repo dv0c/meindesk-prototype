@@ -1,10 +1,9 @@
 "use client"
 
 import { SerializedEditorState } from "lexical"
-import { use, useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 import { Editor } from "@/components/blocks/editor-x/editor"
-import { ImagesPlugin } from "@/components/editor/plugins/images-plugin"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
@@ -21,29 +20,40 @@ interface EditorPageProps {
 }
 
 export default function EditorPage({ params }: EditorPageProps) {
-  const { id: articleId, siteId } = use(params as any) as any
+  const { id: articleId, siteId } = params
 
   const [title, setTitle] = useState("")
   const [editorState, setEditorState] = useState<SerializedEditorState>()
+  const [slug, setSlug] = useState("")
+  const [excerpt, setExcerpt] = useState("")
   const [loaded, setLoaded] = useState(false)
 
   const { article, getArticle, updateArticle, loading } = useArticle()
 
+  // Fetch article
   useEffect(() => {
     if (!articleId || !siteId) return
     getArticle(siteId, articleId)
   }, [articleId, siteId, getArticle])
 
+  // Initialize state when article loads
   useEffect(() => {
     if (!article || loaded) return
     setTitle(article.title || "")
-    setEditorState(article.content)
+    setEditorState(article.content || "")
+    setSlug(article.slug || "")
+    setExcerpt(article.excerpt || "")
     setLoaded(true)
   }, [article, loaded])
 
   const handleSave = async () => {
     if (!articleId || !siteId) return
-    await updateArticle(siteId, articleId, { title, content: editorState })
+    await updateArticle(siteId, articleId, {
+      title,
+      content: editorState,
+      slug,
+      excerpt
+    })
   }
 
   const handleStatus = async ({ status }: { status: string }) => {
@@ -55,9 +65,11 @@ export default function EditorPage({ params }: EditorPageProps) {
   const unsavedChanges = useMemo(() => {
     if (!article) return false
     const titleChanged = title !== (article.title || "")
-    const contentChanged = JSON.stringify(editorState) !== JSON.stringify(article.content)
-    return titleChanged || contentChanged
-  }, [title, editorState, article])
+    const contentChanged = JSON.stringify(editorState) !== JSON.stringify(article.content || "")
+    const slugChanged = slug !== (article.slug || "")
+    const excerptChanged = excerpt !== (article.excerpt || "")
+    return titleChanged || contentChanged || slugChanged || excerptChanged
+  }, [title, editorState, slug, excerpt, article])
 
   if (!loaded) {
     return (
@@ -72,9 +84,8 @@ export default function EditorPage({ params }: EditorPageProps) {
       <header className="border-t border-b shadow sticky top-0 bg-background z-20 p-3 mb-10">
         <div className="flex justify-between items-center flex-wrap gap-3">
           <div>
-            <Button onClick={() => history.back()} variant={'ghost'} size={'icon-sm'} className="mr-2 cursor-pointer">
+            <Button onClick={() => history.back()} variant="ghost" size="icon-sm" className="mr-2 cursor-pointer">
               <ArrowLeft className="inline-block" />
-
             </Button>
             <span className="text-lg font-semibold">Editing Article</span>
           </div>
@@ -128,10 +139,15 @@ export default function EditorPage({ params }: EditorPageProps) {
               editorSerializedState={editorState}
               onSerializedChange={(value) => setEditorState(value)}
             />
-
           </div>
         </div>
-        <RightSection />
+        <RightSection
+          article={article}
+          slug={slug}
+          setSlug={setSlug}
+          excerpt={excerpt}
+          setExcerpt={setExcerpt}
+        />
       </div>
     </div>
   )

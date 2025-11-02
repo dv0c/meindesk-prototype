@@ -82,6 +82,7 @@ export async function PATCH(
 
     const allowed = [
       "title",
+      "slug",      // <-- include slug here
       "excerpt",
       "content",
       "html",
@@ -93,6 +94,24 @@ export async function PATCH(
     const updateData: Record<string, any> = {};
     for (const key of allowed) {
       if (data[key] !== undefined) updateData[key] = data[key];
+    }
+
+    // -------------------------------
+    // SLUG uniqueness check
+    // -------------------------------
+    if (updateData.slug) {
+      const existing = await db.article.findFirst({
+        where: {
+          slug: updateData.slug,
+          NOT: { id: articleId }, // exclude current article
+        },
+      });
+      if (existing) {
+        return NextResponse.json(
+          { error: "Slug already exists. Choose a different one." },
+          { status: 400 }
+        );
+      }
     }
 
     const updated = await db.article.update({
@@ -109,6 +128,7 @@ export async function PATCH(
     );
   }
 }
+
 
 export async function DELETE(
   req: NextRequest,
