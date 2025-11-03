@@ -1,10 +1,11 @@
 'use client'
 
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useFeed } from "@/hooks/useFeed"
-import { ArrowLeft, List } from "lucide-react"
+import { ArrowLeft, Link2, List } from "lucide-react"
 import Link from "next/link"
 import { use } from "react"
 
@@ -13,6 +14,9 @@ const page = ({ params }: { params: { siteId: string, url: string } }) => {
 
     const { feed, error, loading } = useFeed(url)
     if (loading) return <FeedSkeleton />
+
+    if (error) return <div className="p-10 text-red-500">Error loading feed: {error}</div>
+
     return <div>
         <header className="sticky top-0 left-0 py-5 bg-background z-1">
             <div className="flex items-center justify-between bg-background pb-5 border-b">
@@ -30,10 +34,10 @@ const page = ({ params }: { params: { siteId: string, url: string } }) => {
                 </div>
             </div>
         </header>
-        <main className="mt-5 pt-5">
+        <main className="">
             {loading && <div>Loading feed...</div>}
             {error && <div className="text-red-500">Error: {error}</div>}
-            <div className="flex justify-between gap-5 max-w-3xl mx-auto">
+            <div className="flex justify-between max-w-4xl mx-auto">
                 <div className="flex flex-col gap-5">
                     <h1 className="text-lg font-semibold border-b py-5">Feed Preview</h1>
                     <div className="flex justify-between items-center">
@@ -66,7 +70,11 @@ const page = ({ params }: { params: { siteId: string, url: string } }) => {
                     )}
                 </div>
                 <div>
-                    Feed Preview by {feed?.type}
+                    Feed Preview via <Badge variant="secondary">{feed?.type}</Badge>
+                    <Link href={feed?.feedUrl || '#'} target="_blank" rel="noopener noreferrer" className="flex line-clamp-1 max-w-[300px] overflow-hidden items-center mt-2 text-sm text-muted-foreground hover:underline">
+                        <Link2 className="mr-2" size={14} />
+                        {feed?.feedUrl}
+                    </Link>
                 </div>
             </div>
         </main>

@@ -271,7 +271,7 @@ async function detectRealFeed(target: string, fetchContent = false) {
 
         return {
           feedUrl,
-          type: parsed.feed ? "atom" : "rss",
+          type: parsed.feed ? "atom" : "Native RSS",
           title: channel?.title || parsed.feed?.title?._ || null,
           description: feedDescription,
           image: feedImage,
@@ -350,7 +350,7 @@ export async function GET(req: NextRequest) {
         });
       feedData = {
         feedUrl: target,
-        type: "virtual",
+        type: "Generator",
         title: null,
         description: null,
         image: null,
