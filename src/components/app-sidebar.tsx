@@ -20,6 +20,7 @@ import {
   Home,
   Image,
   LifeBuoy,
+  Rss,
   Send,
   Settings,
   SidebarIcon
@@ -30,6 +31,7 @@ import { TeamSwitcher } from "./team-switcher"
 import { Button } from "./ui/button"
 import { Skeleton } from "./ui/skeleton"
 import { useTeam } from "@/hooks/useTeam"
+import { NavRSS } from "./nav-rss"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { teams, loading: loadingTeams } = useTeams()
@@ -113,11 +115,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     },
     { title: "Settings", url: "/projects/settings", icon: Settings, isActive: true },
   ]
+  const rsscontent = [
+    { title: "RSS Feeds", url: "rss/feeds", icon: Rss, isActive: false },
+  ]
 
   // Build filtered data based on features
   const filteredData = React.useMemo(() => {
     if (!teams?.length || !activeTeam) {
-      return { navMain: defaultNavMain, projects: null, teams: [] }
+      return { navMain: defaultNavMain, projects: null, teams: [], rss: rsscontent }
     }
 
     // Use the active team instead of teams[0]
@@ -144,6 +149,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       }
     })
 
+    const rss = features.media ? rsscontent : []
+
     // Map teams for TeamSwitcher
     const mappedTeams = teams.map((t) => ({
       name: t.title || "Untitled Team",
@@ -152,7 +159,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       id: t.id,
     }))
 
-    return { navMain, projects, teams: mappedTeams }
+    return { navMain, projects, teams: mappedTeams, rss }
   }, [teams, activeTeam])
 
   return (
@@ -183,10 +190,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <NavMain items={filteredData.navMain} />
               {/* @ts-ignore */}
               <NavProjects projects={filteredData.projects} />
+              <NavRSS items={filteredData.rss} />
               <NavSecondary items={[
                 { title: "Support", url: "#", icon: LifeBuoy },
                 { title: "Feedback", url: "#", icon: Send },
               ]} className="mt-auto" />
+              
             </SidebarContent>
 
             <SidebarFooter>
