@@ -28,7 +28,7 @@ const page = ({ params }: { params: { siteId: string, url: string } }) => {
                     <div className="flex flex-col">
                         {feed?.site.title}
                         <div className="text-sm text-muted-foreground">
-                            {feed?.site.url}
+                            {feed?.feedUrl}
                         </div>
                     </div>
                 </div>
