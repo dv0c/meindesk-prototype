@@ -1,4 +1,5 @@
-import { AppSidebar } from "@/components/app-sidebar"
+
+import { AppSidebar, ToggleSidebar } from "@/components/app-sidebar"
 import LoadingOverlay from "@/components/loading-overlay"
 import RouterRefresh from "@/components/RouterRefresh"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
@@ -22,7 +23,8 @@ const layout: FC<layoutProps> = ({ children }) => {
         <SidebarInset>
             <header className="flex h-16 shrink-0 items-center gap-2">
                 <div className="flex items-center gap-2 px-4">
-                    <SidebarTrigger className="-ml-1" />
+                    {/* <SidebarTrigger className="-ml-1" /> */}
+                    <ToggleSidebar />
                     <Separator
                         orientation="vertical"
                         className="mr-2 data-[orientation=vertical]:h-4"

@@ -7,7 +7,8 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarHeader
+  SidebarHeader,
+  useSidebar
 } from "@/components/ui/sidebar"
 import { useTeams } from "@/hooks/useTeams"
 import {
@@ -34,7 +35,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { teams, loading: loadingTeams } = useTeams()
   const { team: activeTeam } = useTeam()
   const [hovered, setHovered] = useState(false)
-  const [toggled, setToggled] = useState(true)
+  const {newOpen, setNewOpen} = useSidebar()
   const [isMobile, setIsMobile] = useState(false)
   const collapseTimer = useRef<NodeJS.Timeout | null>(null)
   const sidebarRef = useRef<HTMLDivElement | null>(null)
@@ -50,15 +51,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // Restore sidebar state from localStorage
   useEffect(() => {
     if (typeof window === "undefined") return
-    const savedState = localStorage.getItem("sidebarToggled")
-    if (savedState !== null) setToggled(savedState === "true")
+    const savedState = localStorage.getItem("sidebarnewOpen")
+    if (savedState !== null) setNewOpen(savedState === "true")
   }, [])
 
   // Save sidebar state
   useEffect(() => {
     if (typeof window === "undefined") return
-    localStorage.setItem("sidebarToggled", String(toggled))
-  }, [toggled])
+    localStorage.setItem("sidebarnewOpen", String(newOpen))
+  }, [newOpen])
 
   // Handle hover toggle
   const handleMouseEnter = () => {
@@ -73,7 +74,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     collapseTimer.current = setTimeout(() => setHovered(false), 300)
   }
 
-  const handleToggle = () => setToggled((prev) => !prev)
+  // @ts-ignore
+  const handleToggle = () => setNewOpen((prev) => !prev)
 
   // Sidebar open logic
   useEffect(() => {
@@ -93,7 +95,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return () => window.removeEventListener("mousemove", handleMouseMove)
   }, [hovered, isMobile])
 
-  const isOpen = isMobile ? toggled : hovered || toggled
+  const isOpen = isMobile ? newOpen : hovered || newOpen
 
   // Default nav and projects
   const defaultNavMain = [
@@ -165,7 +167,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           className={`transition-[width] duration-300 ease-in-out overflow-hidden h-full ${isOpen ? "w-64" : "w-0 md:w-0"}`}
         >
           <Sidebar
-            variant={toggled ? "inset" : "floating"}
+            variant={newOpen ? "inset" : "floating"}
             className={`h-full overflow-hidden transition-all duration-300 ${isOpen ? "opacity-100" : "opacity-0"}`}
             {...props}
           >
@@ -179,6 +181,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
             <SidebarContent>
               <NavMain items={filteredData.navMain} />
+              {/* @ts-ignore */}
               <NavProjects projects={filteredData.projects} />
               <NavSecondary items={[
                 { title: "Support", url: "#", icon: LifeBuoy },
@@ -187,19 +190,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarContent>
 
             <SidebarFooter>
-              <Button
-                onClick={handleToggle}
-                variant="ghost"
-                className="justify-start items-center"
-              >
-                <SidebarIcon className="w-6 h-6" />
-                Sidebar View
-              </Button>
               <NavUser />
             </SidebarFooter>
           </Sidebar>
         </div>
       </div>
     </div>
+  )
+}
+
+
+export const ToggleSidebar = () => {
+  const {toggleNewSidebar} = useSidebar()
+  return (
+    <Button
+      onClick={toggleNewSidebar}
+      variant="ghost"
+      className="justify-start items-center"
+    >
+      <SidebarIcon className="w-6 h-6" />
+    </Button>
   )
 }

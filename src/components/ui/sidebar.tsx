@@ -40,6 +40,9 @@ type SidebarContextProps = {
   setOpenMobile: (open: boolean) => void
   isMobile: boolean
   toggleSidebar: () => void
+  toggleNewSidebar: () => void
+  setNewOpen: (open: boolean) => void
+  newOpen: boolean
 }
 
 const SidebarContext = React.createContext<SidebarContextProps | null>(null)
@@ -56,6 +59,7 @@ function useSidebar() {
 function SidebarProvider({
   defaultOpen = true,
   open: openProp,
+  newOpen: newOpenProp,
   onOpenChange: setOpenProp,
   className,
   style,
@@ -64,6 +68,7 @@ function SidebarProvider({
 }: React.ComponentProps<"div"> & {
   defaultOpen?: boolean
   open?: boolean
+  newOpen?: boolean
   onOpenChange?: (open: boolean) => void
 }) {
   const isMobile = useIsMobile()
@@ -72,6 +77,9 @@ function SidebarProvider({
   // This is the internal state of the sidebar.
   // We use openProp and setOpenProp for control from outside the component.
   const [_open, _setOpen] = React.useState(defaultOpen)
+  const [newOpen, setNewOpen] = React.useState(false);
+
+
   const open = openProp ?? _open
   const setOpen = React.useCallback(
     (value: boolean | ((value: boolean) => boolean)) => {
@@ -87,6 +95,11 @@ function SidebarProvider({
     },
     [setOpenProp, open]
   )
+
+
+  const toggleNewSidebar = React.useCallback(() => {
+    return isMobile ? setOpenMobile((open) => !open) : setNewOpen((open) => !open)
+  }, [isMobile, setNewOpen, setOpenMobile]);
 
   // Helper to toggle the sidebar.
   const toggleSidebar = React.useCallback(() => {
@@ -120,10 +133,13 @@ function SidebarProvider({
       setOpen,
       isMobile,
       openMobile,
+      setNewOpen,
+      newOpen,
       setOpenMobile,
       toggleSidebar,
+      toggleNewSidebar,
     }),
-    [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
+    [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar, toggleNewSidebar, newOpen, setNewOpen]
   )
 
   return (
@@ -569,7 +585,7 @@ function SidebarMenuAction({
         "peer-data-[size=lg]/menu-button:top-2.5",
         "group-data-[collapsible=icon]:hidden",
         showOnHover &&
-          "peer-data-[active=true]/menu-button:text-sidebar-accent-foreground group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 md:opacity-0",
+        "peer-data-[active=true]/menu-button:text-sidebar-accent-foreground group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 md:opacity-0",
         className
       )}
       {...props}
