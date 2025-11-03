@@ -127,6 +127,7 @@ model Site {
   articleId      String?          @db.ObjectId
   Article        Article[]
   Page           Page[]
+  RSS            Rss[]
 }
 
 model Features {
@@ -238,4 +239,17 @@ enum PageStatus {
   DRAFT
   PUBLISHED
   ARCHIVED
+}
+
+model Rss {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  icon        String?
+  url         String   @unique
+  siteId      String   @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
 }
