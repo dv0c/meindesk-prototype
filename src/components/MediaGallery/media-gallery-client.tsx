@@ -261,7 +261,7 @@ export function MediaGalleryClient() {
       {/* Media Grid/List */}
       {
         filteredItems.length === 0 ? (
-          <ScrollArea>
+          <div>
             <div className="flex max-h-screen overflow-auto flex-col items-center justify-center py-16 text-center">
               <ImageIcon className="h-16 w-16 text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold mb-2">No images found</h3>
@@ -287,9 +287,9 @@ export function MediaGalleryClient() {
                 </CldUploadButton>
               )}
             </div>
-          </ScrollArea>
+          </div>
         ) : viewMode === "grid" ? (
-          <ScrollArea>
+          <div>
             <div className="grid max-h-screen grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
               {filteredItems.map((item) => (
                 <Card key={item.public_id} className="group p-0 overflow-hidden">
@@ -353,7 +353,7 @@ export function MediaGalleryClient() {
                 </Card>
               ))}
             </div>
-          </ScrollArea>
+          </div>
         ) : (
           <div className="space-y-2">
             {filteredItems.map((item) => (

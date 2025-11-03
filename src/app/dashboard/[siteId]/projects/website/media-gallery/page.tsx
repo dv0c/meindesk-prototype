@@ -2,7 +2,7 @@ import { MediaGalleryClient } from "@/components/MediaGallery/media-gallery-clie
 
 const page= () => {
   return <div className="px-5">
-    <MediaGalleryClient />
+    <MediaGalleryClient  />
   </div>
 }
 
