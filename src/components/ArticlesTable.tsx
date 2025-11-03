@@ -103,11 +103,6 @@ export function ArticleTable() {
         getArticles(team.id)
     }
 
-    if (loading) {
-        return <Skeleton className="h-64 w-full" />
-    }
-
-
     return (
         <>
             <div className="space-y-4 w-full">
@@ -140,117 +135,120 @@ export function ArticleTable() {
                         </SelectContent>
                     </Select>
                 </div>
-
-                <div className="rounded-lg border border-border bg-card overflow-hidden">
-                    <Table>
-                        <TableHeader>
-                            <TableRow className="hover:bg-transparent border-border">
-                                <TableHead className="h-10 text-xs font-medium text-muted-foreground w-[80px]">
-                                    Thumbnail
-                                </TableHead>
-                                <TableHead className="h-10 text-xs font-medium text-muted-foreground">Title</TableHead>
-                                <TableHead className="h-10 text-xs font-medium text-muted-foreground">Slug</TableHead>
-                                <TableHead className="h-10 text-xs font-medium text-muted-foreground">Status</TableHead>
-                                <TableHead className="h-10 text-xs font-medium text-muted-foreground">Created</TableHead>
-                                <TableHead className="h-10 text-xs font-medium text-muted-foreground">Updated</TableHead>
-                                <TableHead className="h-10 text-xs font-medium text-muted-foreground text-right w-[60px]">
-                                    Actions
-                                </TableHead>
-                            </TableRow>
-                        </TableHeader>
-
-                        <TableBody>
-                            {paginatedArticles.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
-                                        No articles found.
-                                    </TableCell>
+                {!loading ? (
+                    <div className="rounded-lg border border-border bg-card overflow-hidden">
+                        <Table>
+                            <TableHeader>
+                                <TableRow className="hover:bg-transparent border-border">
+                                    <TableHead className="h-10 text-xs font-medium text-muted-foreground w-[80px]">
+                                        Thumbnail
+                                    </TableHead>
+                                    <TableHead className="h-10 text-xs font-medium text-muted-foreground">Title</TableHead>
+                                    <TableHead className="h-10 text-xs font-medium text-muted-foreground">Slug</TableHead>
+                                    <TableHead className="h-10 text-xs font-medium text-muted-foreground">Status</TableHead>
+                                    <TableHead className="h-10 text-xs font-medium text-muted-foreground">Created</TableHead>
+                                    <TableHead className="h-10 text-xs font-medium text-muted-foreground">Updated</TableHead>
+                                    <TableHead className="h-10 text-xs font-medium text-muted-foreground text-right w-[60px]">
+                                        Actions
+                                    </TableHead>
                                 </TableRow>
-                            ) : (
-                                paginatedArticles.map((article: any) => (
-                                    <TableRow
-                                        key={article.id}
-                                        className="border-border cursor-pointer hover:bg-muted/50 transition-colors"
-                                        onClick={(e) => {
-                                            // Prevent triggering when clicking inside the dropdown menu
-                                            const target = e.target as HTMLElement
-                                            if (target.closest("button") || target.closest("[role='menu']")) return
-                                            router.push(`/dashboard/${team?.id}/projects/website/articles/${article.id}/editor`)
-                                        }}
-                                    >
-                                        <TableCell className="py-3">
-                                            <div className="w-14 h-14 rounded-md overflow-hidden bg-muted flex items-center justify-center">
-                                                {article.cover ? (
-                                                    <Image
-                                                        src={article.cover}
-                                                        alt={article.title}
-                                                        width={56}
-                                                        height={56}
-                                                        className="object-cover w-full h-full"
-                                                    />
-                                                ) : (
-                                                    <div className="text-xs text-muted-foreground">No image</div>
-                                                )}
-                                            </div>
-                                        </TableCell>
+                            </TableHeader>
 
-                                        <TableCell className="font-medium py-3 text-sm">{article.title}</TableCell>
-                                        <TableCell className="font-mono text-xs text-muted-foreground py-3">{article.slug}</TableCell>
-                                        <TableCell className="py-3">
-                                            <Badge variant={statusColors[article.status]} className="text-xs">
-                                                {article.status}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell className="text-sm text-muted-foreground py-3">
-                                            {new Date(article.createdAt).toLocaleDateString()}
-                                        </TableCell>
-                                        <TableCell className="text-sm text-muted-foreground py-3">
-                                            {new Date(article.updateAt).toLocaleDateString()}
-                                        </TableCell>
-
-                                        <TableCell
-                                            className="text-right py-3"
-                                            onClick={(e) => e.stopPropagation()} // Stop click propagation for menu
-                                        >
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem
-                                                        onClick={() =>
-                                                            router.push(`/dashboard/${team?.id}/projects/website/articles/${article.id}/editor`)
-                                                        }
-                                                    >
-                                                        <Edit className="h-4 w-4 mr-2" /> Edit
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem
-                                                        onClick={() =>
-                                                            router.push(`${team?.url}/article/${article.slug}`)
-                                                        }
-                                                    >
-                                                        <Eye className="h-4 w-4 mr-2" /> View
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => handleDuplicate(article)}>
-                                                        <Copy className="h-4 w-4 mr-2" /> Duplicate
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem
-                                                        onClick={() => confirmDelete(article)}
-                                                        className="text-destructive focus:text-destructive"
-                                                    >
-                                                        <Trash className="h-4 w-4 mr-2" /> Delete
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                            <TableBody>
+                                {paginatedArticles.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                                            No articles found.
                                         </TableCell>
                                     </TableRow>
-                                ))
-                            )}
-                        </TableBody>
-                    </Table>
-                </div>
+                                ) : (
+                                    paginatedArticles.map((article: any) => (
+                                        <TableRow
+                                            key={article.id}
+                                            className="border-border cursor-pointer hover:bg-muted/50 transition-colors"
+                                            onClick={(e) => {
+                                                // Prevent triggering when clicking inside the dropdown menu
+                                                const target = e.target as HTMLElement
+                                                if (target.closest("button") || target.closest("[role='menu']")) return
+                                                router.push(`/dashboard/${team?.id}/projects/website/articles/${article.id}/editor`)
+                                            }}
+                                        >
+                                            <TableCell className="py-3">
+                                                <div className="w-14 h-14 rounded-md overflow-hidden bg-muted flex items-center justify-center">
+                                                    {article.cover ? (
+                                                        <Image
+                                                            src={article.cover}
+                                                            alt={article.title}
+                                                            width={56}
+                                                            height={56}
+                                                            className="object-cover w-full h-full"
+                                                        />
+                                                    ) : (
+                                                        <div className="text-xs text-muted-foreground">No image</div>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+
+                                            <TableCell className="font-medium py-3 text-sm">{article.title}</TableCell>
+                                            <TableCell className="font-mono text-xs text-muted-foreground py-3">{article.slug}</TableCell>
+                                            <TableCell className="py-3">
+                                                <Badge variant={statusColors[article.status]} className="text-xs">
+                                                    {article.status}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell className="text-sm text-muted-foreground py-3">
+                                                {new Date(article.createdAt).toLocaleDateString()}
+                                            </TableCell>
+                                            <TableCell className="text-sm text-muted-foreground py-3">
+                                                {new Date(article.updateAt).toLocaleDateString()}
+                                            </TableCell>
+
+                                            <TableCell
+                                                className="text-right py-3"
+                                                onClick={(e) => e.stopPropagation()} // Stop click propagation for menu
+                                            >
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                            <MoreHorizontal className="h-4 w-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuItem
+                                                            onClick={() =>
+                                                                router.push(`/dashboard/${team?.id}/projects/website/articles/${article.id}/editor`)
+                                                            }
+                                                        >
+                                                            <Edit className="h-4 w-4 mr-2" /> Edit
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem
+                                                            onClick={() =>
+                                                                router.push(`${team?.url}/article/${article.slug}`)
+                                                            }
+                                                        >
+                                                            <Eye className="h-4 w-4 mr-2" /> View
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => handleDuplicate(article)}>
+                                                            <Copy className="h-4 w-4 mr-2" /> Duplicate
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem
+                                                            onClick={() => confirmDelete(article)}
+                                                            className="text-destructive focus:text-destructive"
+                                                        >
+                                                            <Trash className="h-4 w-4 mr-2" /> Delete
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
+                ) : 
+                    <Skeleton className="h-52 w-full rounded-lg" />
+                }
 
                 {filteredArticles.length > 0 && (
                     <div className="flex items-center justify-between px-2">

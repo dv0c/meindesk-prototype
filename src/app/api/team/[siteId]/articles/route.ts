@@ -43,6 +43,7 @@ export async function GET(
           },
         },
       },
+      orderBy: { createdAt: "desc" }, 
     });
 
     if (!articles || articles.length === 0) {
