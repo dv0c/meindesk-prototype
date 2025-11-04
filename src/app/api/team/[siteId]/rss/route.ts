@@ -2,14 +2,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as cheerio from "cheerio";
 import * as xml2js from "xml2js";
-import pLimit from "p-limit"; // concurrency control
+import pLimit from "p-limit";
 
 export const runtime = "nodejs";
 
 const cache = new Map<string, { data: any; expires: number }>();
-const CACHE_TTL = 1000 * 60 * 60 * 3; // 3h
+const CACHE_TTL = 1000 * 60 * 60 * 3; // 3 hours
 const FETCH_TIMEOUT = 10000; // 10s timeout
-const limit = pLimit(8); // throttle concurrent fetches
+const limit = pLimit(8);
 
 function normalizeUrl(url: string) {
   if (!/^https?:\/\//i.test(url)) url = "https://" + url;
@@ -24,13 +24,12 @@ async function safeFetch(url: string, options: RequestInit = {}) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
   try {
-    const res = await fetch(url, {
+    return await fetch(url, {
       ...options,
       signal: controller.signal,
       headers: { "User-Agent": "Mozilla/5.0", ...(options.headers || {}) },
     });
-    return res;
-  } catch (err) {
+  } catch (err: any) {
     console.error(`Fetch failed for ${url}:`, err.message);
     return null;
   } finally {
@@ -38,7 +37,7 @@ async function safeFetch(url: string, options: RequestInit = {}) {
   }
 }
 
-// Fetch site-level metadata (title, favicon, logo)
+// Fetch site metadata (title, favicon, logo)
 async function fetchSiteMetadata(url: string) {
   try {
     const res = await safeFetch(url);
@@ -46,16 +45,15 @@ async function fetchSiteMetadata(url: string) {
     const html = await res.text();
     const $ = cheerio.load(html);
 
-    // Step 1: Try og:site_name
+    // Use og:site_name first
     let title = $('meta[property="og:site_name"]').attr("content")?.trim();
 
-    // Step 2: If missing, fallback to domain name
+    // Fallback: domain-based site name
     if (!title) {
       try {
         const u = new URL(url);
-        title = u.hostname.replace(/^www\./, "");
-        title = title.split(".")[0]; // e.g., "unboxholics"
-        title = title.charAt(0).toUpperCase() + title.slice(1); // "Unboxholics"
+        title = u.hostname.replace(/^www\./, "").split(".")[0];
+        title = title.charAt(0).toUpperCase() + title.slice(1);
       } catch {
         title = "Unknown Site";
       }
@@ -65,6 +63,7 @@ async function fetchSiteMetadata(url: string) {
       $('link[rel="icon"]').attr("href") ||
       $('link[rel="shortcut icon"]').attr("href") ||
       "/favicon.ico";
+
     const logo =
       $('meta[property="og:image"]').attr("content") ||
       $('meta[name="twitter:image"]').attr("content") ||
@@ -73,54 +72,13 @@ async function fetchSiteMetadata(url: string) {
     const favicon = new URL(faviconRel, url).href;
 
     return { title, favicon, logo: logo ? new URL(logo, url).href : null, url };
-  } catch (err) {
+  } catch (err: any) {
     console.error("fetchSiteMetadata error:", err.message);
     return {};
   }
 }
 
-
-
-// Fix WordPress /feed or other feed endpoints
-async function fetchBaseSiteMetadata(feedUrl: string) {
-  try {
-    const baseUrl = feedUrl.replace(
-      /\/(feed|rss|rss\.xml|atom\.xml)(\/)?$/,
-      ""
-    );
-    const res = await safeFetch(baseUrl);
-    if (!res || !res.ok) return {};
-    const html = await res.text();
-    const $ = cheerio.load(html);
-
-    const title =
-      $('meta[property="og:site_name"]').attr("content") ||
-      $("title").text().trim() ||
-      null;
-    const faviconRel =
-      $('link[rel="icon"]').attr("href") ||
-      $('link[rel="shortcut icon"]').attr("href") ||
-      "/favicon.ico";
-    const logo =
-      $('meta[property="og:image"]').attr("content") ||
-      $('meta[name="twitter:image"]').attr("content") ||
-      null;
-
-    const favicon = new URL(faviconRel, baseUrl).href;
-
-    return {
-      title,
-      favicon,
-      logo: logo ? new URL(logo, baseUrl).href : null,
-      url: baseUrl,
-    };
-  } catch (err) {
-    console.error("fetchBaseSiteMetadata error:", err.message);
-    return {};
-  }
-}
-
-// Fetch article metadata and optional content
+// Fetch metadata from article page
 async function fetchMetadataFromPage(url: string, fetchContent = false) {
   try {
     const res = await safeFetch(url);
@@ -162,7 +120,6 @@ async function fetchMetadataFromPage(url: string, fetchContent = false) {
       .get();
 
     let content: string | null = null;
-
     if (fetchContent) {
       const articleTag = $("article");
       if (articleTag.length) content = articleTag.html() || "";
@@ -206,20 +163,18 @@ async function fetchMetadataFromPage(url: string, fetchContent = false) {
   }
 }
 
-// Detect real RSS/Atom/JSON feed
+// Detect RSS / Atom / JSON feeds
 async function detectRealFeed(
   target: string,
   fetchContent = false,
   siteMeta: any = {}
 ) {
   const baseUrl = target.replace(/\/(feed|rss|rss\.xml|atom\.xml)(\/)?$/, "");
-
   const res = await safeFetch(target);
   if (!res || !res.ok) return null;
   const html = await res.text();
   const $ = cheerio.load(html);
 
-  // Collect potential feed URLs from <link> and <a> tags
   const candidates = new Set<string>();
   $("link, a").each((_, el) => {
     const href = $(el).attr("href");
@@ -239,7 +194,6 @@ async function detectRealFeed(
     }
   });
 
-  // Add common feed guess URLs
   const path = new URL(target).pathname;
   const guesses = [
     "feed",
@@ -286,7 +240,7 @@ async function detectRealFeed(
           return {
             feedUrl,
             type: "json",
-            title: siteMeta.title || json.title || null,
+            title: siteMeta.title || null,
             description: json.description || null,
             image: json.icon || null,
             items,
@@ -329,7 +283,7 @@ async function detectRealFeed(
               const description =
                 item.description || item.summary || meta.description || null;
               const pubDate = item.pubDate || item.updated || null;
-              const author = meta.author || null;
+              const author = item.author?.name || meta.author || null;
               const categories = Array.isArray(item.category)
                 ? item.category
                 : item.category
@@ -357,8 +311,7 @@ async function detectRealFeed(
         return {
           feedUrl,
           type: parsed.feed ? "atom" : "Native RSS",
-          title:
-            siteMeta.title || channel?.title || parsed.feed?.title?._ || null,
+          title: siteMeta.title || null,
           description: feedDescription,
           image: feedImage,
           items,
@@ -372,7 +325,7 @@ async function detectRealFeed(
   return null;
 }
 
-// Virtual feed scraping fallback
+// Virtual feed fallback
 async function scrapeVirtualFeed(target: string, fetchContent = false) {
   const res = await safeFetch(target);
   if (!res || !res.ok) return [];
@@ -411,7 +364,7 @@ async function scrapeVirtualFeed(target: string, fetchContent = false) {
   return items;
 }
 
-// Main API route
+// --- Main API Route ---
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const rawUrl = searchParams.get("url");
@@ -426,14 +379,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(cached.data);
 
   try {
-    let siteMeta = await fetchSiteMetadata(target);
+    const siteMeta = await fetchSiteMetadata(target);
 
-    // Fix WordPress /feed endpoints
-    if (target.match(/\/(feed|rss|rss\.xml|atom\.xml)(\/)?$/)) {
-      siteMeta = await fetchBaseSiteMetadata(target);
-    }
-
-    let feedData = await detectRealFeed(target, fetchContent);
+    let feedData = await detectRealFeed(target, fetchContent, siteMeta);
 
     if (!feedData) {
       const items = await scrapeVirtualFeed(target, fetchContent);
@@ -445,7 +393,7 @@ export async function GET(req: NextRequest) {
       feedData = {
         feedUrl: target,
         type: "Generator",
-        title: null,
+        title: siteMeta.title,
         description: null,
         image: null,
         items,
@@ -454,7 +402,6 @@ export async function GET(req: NextRequest) {
 
     feedData.items = feedData.items.map((item: any) => ({
       ...item,
-      author: item.author || siteMeta.title || null,
       site: siteMeta,
     }));
 
@@ -462,7 +409,7 @@ export async function GET(req: NextRequest) {
       found: true,
       feedUrl: feedData.feedUrl,
       type: feedData.type,
-      title: feedData.title,
+      title: siteMeta.title, // always match site title
       description: feedData.description,
       image: feedData.image,
       itemCount: feedData.items.length,

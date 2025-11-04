@@ -103,7 +103,7 @@ const page = ({ params }: { params: { siteId: string, url: string } }) => {
                                     <CardContent className="px-0">
                                         <img src={item.thumbnail || ''} alt={item.title || 'Thumbnail'} className="mb-4 max-w-full h-auto" />
                                         <div className="">
-                                            <div dangerouslySetInnerHTML={{ __html: item.description || 'No description' }} />
+                                            <div className="prose" dangerouslySetInnerHTML={{ __html: item.description || 'No description' }} />
                                         </div>
                                     </CardContent>
                                 </Card>
