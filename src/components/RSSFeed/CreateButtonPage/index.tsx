@@ -1,52 +1,37 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Search, Rss, Zap } from "lucide-react"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { useTeam } from "@/hooks/useTeam"
+import { Search, Rss } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useFetch } from "@/hooks/useFetch"
 
-interface FeedOption {
-    id: string
-    name: string
-    icon: React.ReactNode
-}
-
-const feedOptions: FeedOption[] = [
-    { id: "webpage", name: "Webpage to RSS Feed", icon: "🌐" },
-    { id: "instagram", name: "Instagram RSS Feed", icon: "📷" },
-    { id: "twitter", name: "X / Twitter RSS Feed", icon: "𝕏" },
-    { id: "google-news", name: "Google News RSS Feed", icon: "📰" },
-    { id: "linkedin", name: "LinkedIn RSS Feed", icon: "💼" },
-    { id: "tiktok", name: "TikTok RSS Feed", icon: "🎵" },
-    { id: "threads", name: "Threads RSS Feed", icon: "◉" },
-    { id: "reddit", name: "Reddit RSS Feed", icon: "🔴" },
-    { id: "facebook", name: "Facebook RSS Feed", icon: "f" },
-    { id: "youtube", name: "YouTube RSS Feed", icon: "▶️" },
-    { id: "telegram", name: "Telegram RSS Feed", icon: "✈️" },
-    { id: "bluesky", name: "Bluesky RSS Feed", icon: "🦋" },
-    { id: "mastodon", name: "Mastodon RSS Feed", icon: "🐘" },
-    { id: "substack", name: "Substack RSS Feed", icon: "📧" },
-]
-
-export default function CreateNewFeed() {
+export default function CreateNewFeed({ siteId }: { siteId: string }) {
     const router = useRouter()
-    const team = useTeam().team
     const [activeTab, setActiveTab] = useState("websites")
     const [mode, setMode] = useState<"generator" | "builder">("generator")
     const [searchQuery, setSearchQuery] = useState("")
     const [url, setUrl] = useState("")
 
-    const filteredFeeds = feedOptions.filter((feed) =>
-        feed.name.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+    const { data, error, loading } = useFetch(`/api/team/${siteId}/rss/feeds`)
 
-    const handleGenerate = async () => {
-        if (!url) return
-        router.push(`/dashboard/${team?.id}/projects/website/rss/feed/${encodeURIComponent(url)}`)
+    const feeds = Array.isArray(data) ? data : []
+
+    const filteredFeeds = useMemo(() => {
+        if (!feeds.length) return []
+        const query = searchQuery.toLowerCase()
+        return feeds.filter((feed) =>
+            feed?.title?.toLowerCase().includes(query)
+        )
+    }, [feeds, searchQuery])
+
+    const handleGenerate = () => {
+        if (!url.trim()) return
+        router.push(
+            `/dashboard/${siteId}/projects/website/rss/feed/${encodeURIComponent(url)}`
+        )
     }
 
     return (
@@ -63,15 +48,6 @@ export default function CreateNewFeed() {
                     >
                         <Rss className="w-4 h-4" /> RSS Generator
                     </Button>
-                    <Button
-                        onClick={() => setMode("builder")}
-                        className={`gap-2 px-6 py-2 h-auto ${mode === "builder"
-                            ? "bg-blue-500 hover:bg-blue-600 text-white"
-                            : "bg-muted hover:bg-muted/80 text-muted-foreground"
-                            }`}
-                    >
-                        <Zap className="w-4 h-4" /> RSS Builder
-                    </Button>
                 </div>
 
                 {/* URL Input */}
@@ -83,12 +59,14 @@ export default function CreateNewFeed() {
                         onChange={(e) => setUrl(e.target.value)}
                         className="flex-1"
                     />
-                    <Button onClick={handleGenerate} className="bg-orange-500 hover:bg-orange-600 text-white px-8">
+                    <Button
+                        onClick={handleGenerate}
+                        disabled={!url.trim()}
+                        className="bg-orange-500 hover:bg-orange-600 text-white px-8"
+                    >
                         Generate
                     </Button>
                 </div>
-
-                {/* Feed Result */}
 
                 {/* Category Tabs */}
                 <div className="mb-8">
@@ -96,21 +74,29 @@ export default function CreateNewFeed() {
                         <TabsList className="bg-transparent border-b border-border">
                             <TabsTrigger
                                 value="websites"
-                                className={`gap-2 px-4 py-2 border-b-2 rounded-none ${activeTab === "websites" ? "border-blue-500 text-blue-500" : "border-transparent text-muted-foreground"
+                                className={`gap-2 px-4 py-2 border-b-2 rounded-none ${activeTab === "websites"
+                                    ? "border-blue-500 text-blue-500"
+                                    : "border-transparent text-muted-foreground"
                                     }`}
                             >
                                 📁 Websites
                             </TabsTrigger>
                             <TabsTrigger
+                                disabled
                                 value="topics"
-                                className={`gap-2 px-4 py-2 border-b-2 rounded-none ${activeTab === "topics" ? "border-blue-500 text-blue-500" : "border-transparent text-muted-foreground"
+                                className={`gap-2 px-4 py-2 border-b-2 rounded-none ${activeTab === "topics"
+                                    ? "border-blue-500 text-blue-500"
+                                    : "border-transparent text-muted-foreground"
                                     }`}
                             >
                                 🏷️ Topics
                             </TabsTrigger>
                             <TabsTrigger
+                                disabled
                                 value="newsletters"
-                                className={`gap-2 px-4 py-2 border-b-2 rounded-none ${activeTab === "newsletters" ? "border-blue-500 text-blue-500" : "border-transparent text-muted-foreground"
+                                className={`gap-2 px-4 py-2 border-b-2 rounded-none ${activeTab === "newsletters"
+                                    ? "border-blue-500 text-blue-500"
+                                    : "border-transparent text-muted-foreground"
                                     }`}
                             >
                                 📬 Newsletters
@@ -119,33 +105,57 @@ export default function CreateNewFeed() {
                     </Tabs>
                 </div>
 
-                {/* Feed Options */}
-                <div>
-                    <p className="text-muted-foreground mb-4">Select which RSS feed you would like to create</p>
-                    <div className="mb-6 flex justify-end">
-                        <div className="relative w-48">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                            <Input
-                                type="text"
-                                placeholder="Search"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-9 bg-muted"
-                            />
-                        </div>
-                    </div>
+                {/* Feed List */}
+                {loading ? (
+                    <p className="text-muted-foreground">Loading feeds...</p>
+                ) : error ? (
+                    <p className="text-red-500">Failed to load feeds: {error}</p>
+                ) : feeds.length === 0 ? (
+                    <p className="text-muted-foreground">No feeds found for this site.</p>
+                ) : (
+                    <div>
+                        <p className="text-muted-foreground mb-4">
+                            Select which RSS feed you would like to create
+                        </p>
 
-                    <div className="grid grid-cols-3 gap-4">
-                        {filteredFeeds.map((feed) => (
-                            <button key={feed.id} className="p-6 border border-border rounded-lg hover:border-primary hover:shadow-md transition-all text-left">
-                                <div className="flex items-center gap-4">
-                                    <span className="text-3xl">{feed.icon}</span>
-                                    <span className="text-foreground font-medium">{feed.name}</span>
-                                </div>
-                            </button>
-                        ))}
+                        <div className="mb-6 flex justify-end">
+                            <div className="relative w-48">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                <Input
+                                    type="text"
+                                    placeholder="Search"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="pl-9 bg-muted"
+                                />
+                            </div>
+                        </div>
+
+                        {filteredFeeds.length === 0 ? (
+                            <p className="text-muted-foreground">No feeds match your search.</p>
+                        ) : (
+                            <div className="grid lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-4">
+                                {filteredFeeds.map((feed) => (
+                                    <Button
+                                        variant={'outline'}
+                                        key={feed.id}
+                                        className="w-fit cursor-pointer px-10 py-5 h-full"
+                                    >
+                                        <span className="text-3xl">{feed.icon && <img src={feed.icon} className="w-8 h-8 object-cover" />}</span>
+                                        <span className="text-foreground font-medium ">
+                                            <div className="max-w-sm items-start flex flex-col line-clamp-2">
+                                                {feed.title || "Untitled Feed"}
+                                                <p className="text-xs text-muted-foreground">
+                                                    {decodeURIComponent(feed.url) || "Untitled Feed"}
+                                                </p>
+                                            </div>
+                                        </span>
+                                    </Button>
+                                ))}
+                            </div>
+                        )}
                     </div>
-                </div>
+                )}
             </div>
         </div>
     )

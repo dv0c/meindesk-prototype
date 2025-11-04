@@ -25,7 +25,7 @@ export async function SaveFeed({
   }
 
   return {
-    url: `/dashboard/${siteId}/projects/website/rss/feed/${feed.url}/`,
+    url: `/dashboard/${siteId}/projects/website/rss/feed/${feed.url}`,
     rss: feed,
   };
 }

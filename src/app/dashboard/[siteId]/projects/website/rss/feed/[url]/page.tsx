@@ -9,10 +9,12 @@ import { useFetch } from "@/hooks/useFetch"
 import { SaveFeed } from "@/lib/actions/helpers/save-feed"
 import { ArrowLeft, Link2, List } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import React, { use } from "react"
 import { toast } from "sonner"
 
 const page = ({ params }: { params: { siteId: string, url: string } }) => {
+    const router = useRouter()
     const { siteId, url } = use(params as any) as any
     const { data, error: dataError, loading: dataLoading } = useFetch(`/api/team/${siteId}/rss/my-feed`)
     const [isSaved, setIsSaved] = React.useState(false)
@@ -21,7 +23,9 @@ const page = ({ params }: { params: { siteId: string, url: string } }) => {
 
     React.useEffect(() => {
         if (data && feed) {
-            const saved = data.find((f: any) => decodeURIComponent(f.url) === feed.feedUrl)
+            const normalize = (u?: string) => (u ? decodeURIComponent(u).replace(/\/+$/, "") : "")
+            const feedUrlNorm = normalize(feed.feedUrl as string)
+            const saved = data.find((f: any) => normalize(f.url) === feedUrlNorm)
             setIsSaved(!!saved)
         }
     }, [data, feed])
@@ -31,13 +35,14 @@ const page = ({ params }: { params: { siteId: string, url: string } }) => {
         await SaveFeed({
             data: {
                 title: feed.site.title || "Untitled",
-                url: encodeURIComponent(feed.feedUrl as string),
+                url: feed.feedUrl,
                 siteId: siteId,
                 description: feed.description || "",
                 icon: feed.site.favicon || "",
             }, siteId
         }).then((res) => {
             toast.success("Feed saved to your feeds!")
+            console.log('SAVED DATA', res, "FETCHED DATA", data)
         })
 
     }
@@ -51,7 +56,7 @@ const page = ({ params }: { params: { siteId: string, url: string } }) => {
         <header className="sticky top-0 left-0 py-5 bg-background z-1">
             <div className="flex items-center justify-between bg-background pb-5 border-b">
                 <div className="flex gap-3 px-5 items-center">
-                    <Button className="cursor-pointer" onClick={() => history.back()} variant={'ghost'} size={'icon-sm'}>
+                    <Button className="cursor-pointer" onClick={() => router.push(`/dashboard/${siteId}/projects/website/rss/my-feed`)} variant={'ghost'} size={'icon-sm'}>
                         <ArrowLeft />
                     </Button>
                     {feed?.site.favicon && <img src={feed.site.favicon} alt="Site Favicon" className="object-cover w-10 h-10 rounded-full" />}

@@ -2,11 +2,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as cheerio from "cheerio";
 import * as xml2js from "xml2js";
+import pLimit from "p-limit"; // concurrency control
 
 export const runtime = "nodejs";
 
 const cache = new Map<string, { data: any; expires: number }>();
-const CACHE_TTL = 1000 * 60 * 60 * 24; // 24h
+const CACHE_TTL = 1000 * 60 * 60 * 3; // 3h
+const FETCH_TIMEOUT = 10000; // 10s timeout
+const limit = pLimit(8); // throttle concurrent fetches
 
 function normalizeUrl(url: string) {
   if (!/^https?:\/\//i.test(url)) url = "https://" + url;
@@ -17,11 +20,76 @@ function normalizeUrl(url: string) {
   }
 }
 
+async function safeFetch(url: string, options: RequestInit = {}) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
+  try {
+    const res = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+      headers: { "User-Agent": "Mozilla/5.0", ...(options.headers || {}) },
+    });
+    return res;
+  } catch (err) {
+    console.error(`Fetch failed for ${url}:`, err.message);
+    return null;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 // Fetch site-level metadata (title, favicon, logo)
 async function fetchSiteMetadata(url: string) {
   try {
-    const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
-    if (!res.ok) return {};
+    const res = await safeFetch(url);
+    if (!res || !res.ok) return {};
+    const html = await res.text();
+    const $ = cheerio.load(html);
+
+    // Step 1: Try og:site_name
+    let title = $('meta[property="og:site_name"]').attr("content")?.trim();
+
+    // Step 2: If missing, fallback to domain name
+    if (!title) {
+      try {
+        const u = new URL(url);
+        title = u.hostname.replace(/^www\./, "");
+        title = title.split(".")[0]; // e.g., "unboxholics"
+        title = title.charAt(0).toUpperCase() + title.slice(1); // "Unboxholics"
+      } catch {
+        title = "Unknown Site";
+      }
+    }
+
+    const faviconRel =
+      $('link[rel="icon"]').attr("href") ||
+      $('link[rel="shortcut icon"]').attr("href") ||
+      "/favicon.ico";
+    const logo =
+      $('meta[property="og:image"]').attr("content") ||
+      $('meta[name="twitter:image"]').attr("content") ||
+      null;
+
+    const favicon = new URL(faviconRel, url).href;
+
+    return { title, favicon, logo: logo ? new URL(logo, url).href : null, url };
+  } catch (err) {
+    console.error("fetchSiteMetadata error:", err.message);
+    return {};
+  }
+}
+
+
+
+// Fix WordPress /feed or other feed endpoints
+async function fetchBaseSiteMetadata(feedUrl: string) {
+  try {
+    const baseUrl = feedUrl.replace(
+      /\/(feed|rss|rss\.xml|atom\.xml)(\/)?$/,
+      ""
+    );
+    const res = await safeFetch(baseUrl);
+    if (!res || !res.ok) return {};
     const html = await res.text();
     const $ = cheerio.load(html);
 
@@ -29,22 +97,25 @@ async function fetchSiteMetadata(url: string) {
       $('meta[property="og:site_name"]').attr("content") ||
       $("title").text().trim() ||
       null;
-    const favicon =
+    const faviconRel =
       $('link[rel="icon"]').attr("href") ||
       $('link[rel="shortcut icon"]').attr("href") ||
-      null;
+      "/favicon.ico";
     const logo =
       $('meta[property="og:image"]').attr("content") ||
       $('meta[name="twitter:image"]').attr("content") ||
       null;
 
+    const favicon = new URL(faviconRel, baseUrl).href;
+
     return {
       title,
-      favicon: favicon ? new URL(favicon, url).href : null,
-      logo: logo ? new URL(logo, url).href : null,
-      url,
+      favicon,
+      logo: logo ? new URL(logo, baseUrl).href : null,
+      url: baseUrl,
     };
-  } catch {
+  } catch (err) {
+    console.error("fetchBaseSiteMetadata error:", err.message);
     return {};
   }
 }
@@ -52,8 +123,8 @@ async function fetchSiteMetadata(url: string) {
 // Fetch article metadata and optional content
 async function fetchMetadataFromPage(url: string, fetchContent = false) {
   try {
-    const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
-    if (!res.ok) return {};
+    const res = await safeFetch(url);
+    if (!res || !res.ok) return {};
     const html = await res.text();
     const $ = cheerio.load(html);
 
@@ -129,18 +200,26 @@ async function fetchMetadataFromPage(url: string, fetchContent = false) {
       categories,
       content,
     };
-  } catch {
+  } catch (err) {
+    console.error("fetchMetadataFromPage error:", err.message);
     return {};
   }
 }
 
 // Detect real RSS/Atom/JSON feed
-async function detectRealFeed(target: string, fetchContent = false) {
-  const res = await fetch(target, { headers: { "User-Agent": "Mozilla/5.0" } });
-  if (!res.ok) return null;
+async function detectRealFeed(
+  target: string,
+  fetchContent = false,
+  siteMeta: any = {}
+) {
+  const baseUrl = target.replace(/\/(feed|rss|rss\.xml|atom\.xml)(\/)?$/, "");
+
+  const res = await safeFetch(target);
+  if (!res || !res.ok) return null;
   const html = await res.text();
   const $ = cheerio.load(html);
 
+  // Collect potential feed URLs from <link> and <a> tags
   const candidates = new Set<string>();
   $("link, a").each((_, el) => {
     const href = $(el).attr("href");
@@ -155,11 +234,12 @@ async function detectRealFeed(target: string, fetchContent = false) {
       type.includes("atom")
     ) {
       try {
-        candidates.add(new URL(href, target).href);
+        candidates.add(new URL(href, baseUrl).href);
       } catch {}
     }
   });
 
+  // Add common feed guess URLs
   const path = new URL(target).pathname;
   const guesses = [
     "feed",
@@ -169,41 +249,44 @@ async function detectRealFeed(target: string, fetchContent = false) {
     "feeds/posts/default",
     `${path}?format=rss`,
     "?format=rss",
-  ].map((p) => new URL(p, target).href);
+  ].map((p) => new URL(p, baseUrl).href);
+
   const allCandidates = [...candidates, ...guesses];
 
   for (const feedUrl of allCandidates) {
     try {
-      const r = await fetch(feedUrl, {
-        headers: { "User-Agent": "Mozilla/5.0" },
-      });
+      const r = await safeFetch(feedUrl);
+      if (!r || !r.ok) continue;
       const text = await r.text();
       const contentType = r.headers.get("content-type") || "";
 
-      // JSON Feed
+      // --- JSON Feed ---
       if (contentType.includes("json") || text.trim().startsWith("{")) {
         const json = JSON.parse(text);
         if (json.items || json.feed_url || json.title) {
           const items = await Promise.all(
-            (json.items || []).map(async (i: any) => {
-              const url = i.url || i.link;
-              const meta = await fetchMetadataFromPage(url, fetchContent);
-              return {
-                title: i.title,
-                link: url,
-                thumbnail: i.image || meta.thumbnail || null,
-                description: i.summary || i.content || meta.description || null,
-                content: meta.content || null,
-                pubDate: i.date_published || i.pubDate || null,
-                author: i.author?.name || meta.author || null,
-                categories: i.tags || meta.categories || [],
-              };
-            })
+            (json.items || []).map((i: any) =>
+              limit(async () => {
+                const url = i.url || i.link;
+                const meta = await fetchMetadataFromPage(url, fetchContent);
+                return {
+                  title: i.title,
+                  link: url,
+                  thumbnail: i.image || meta.thumbnail || null,
+                  description:
+                    i.summary || i.content || meta.description || null,
+                  content: meta.content || null,
+                  pubDate: i.date_published || i.pubDate || null,
+                  author: i.author?.name || meta.author || null,
+                  categories: i.tags || meta.categories || [],
+                };
+              })
+            )
           );
           return {
             feedUrl,
             type: "json",
-            title: json.title || null,
+            title: siteMeta.title || json.title || null,
             description: json.description || null,
             image: json.icon || null,
             items,
@@ -211,7 +294,7 @@ async function detectRealFeed(target: string, fetchContent = false) {
         }
       }
 
-      // XML feed (RSS / Atom)
+      // --- XML Feed (RSS / Atom) ---
       if (contentType.includes("xml") || /<rss|<feed/i.test(text)) {
         const parsed = await xml2js.parseStringPromise(text, {
           explicitArray: false,
@@ -229,40 +312,42 @@ async function detectRealFeed(target: string, fetchContent = false) {
           [];
 
         const items = await Promise.all(
-          itemsArray.map(async (item: any) => {
-            let url = item.link;
-            if (typeof url === "object" && url?.href) url = url.href;
-            const meta = await fetchMetadataFromPage(url, fetchContent);
+          itemsArray.map((item: any) =>
+            limit(async () => {
+              let url = item.link;
+              if (typeof url === "object" && url?.href) url = url.href;
+              const meta = await fetchMetadataFromPage(url, fetchContent);
 
-            let thumb =
-              item["media:thumbnail"]?.$.url ||
-              item["media:content"]?.$.url ||
-              item.enclosure?.$.url ||
-              (item.description &&
-                item.description.match(/<img[^>]+src="([^"]+)"/)?.[1]) ||
-              meta.thumbnail ||
-              null;
-            const description =
-              item.description || item.summary || meta.description || null;
-            const pubDate = item.pubDate || item.updated || null;
-            const author = meta.author || null;
-            const categories = Array.isArray(item.category)
-              ? item.category
-              : item.category
-              ? [item.category]
-              : meta.categories || [];
+              let thumb =
+                item["media:thumbnail"]?.$.url ||
+                item["media:content"]?.$.url ||
+                item.enclosure?.$.url ||
+                (item.description &&
+                  item.description.match(/<img[^>]+src="([^"]+)"/)?.[1]) ||
+                meta.thumbnail ||
+                null;
+              const description =
+                item.description || item.summary || meta.description || null;
+              const pubDate = item.pubDate || item.updated || null;
+              const author = meta.author || null;
+              const categories = Array.isArray(item.category)
+                ? item.category
+                : item.category
+                ? [item.category]
+                : meta.categories || [];
 
-            return {
-              title: item.title,
-              link: url,
-              thumbnail: thumb,
-              description,
-              content: meta.content,
-              pubDate,
-              author,
-              categories,
-            };
-          })
+              return {
+                title: item.title,
+                link: url,
+                thumbnail: thumb,
+                description,
+                content: meta.content,
+                pubDate,
+                author,
+                categories,
+              };
+            })
+          )
         );
 
         const feedImage = channel?.image?.url || parsed.feed?.logo?._ || null;
@@ -272,13 +357,16 @@ async function detectRealFeed(target: string, fetchContent = false) {
         return {
           feedUrl,
           type: parsed.feed ? "atom" : "Native RSS",
-          title: channel?.title || parsed.feed?.title?._ || null,
+          title:
+            siteMeta.title || channel?.title || parsed.feed?.title?._ || null,
           description: feedDescription,
           image: feedImage,
           items,
         };
       }
-    } catch {}
+    } catch (err) {
+      console.error(`Feed check failed for ${feedUrl}:`, err.message);
+    }
   }
 
   return null;
@@ -286,8 +374,8 @@ async function detectRealFeed(target: string, fetchContent = false) {
 
 // Virtual feed scraping fallback
 async function scrapeVirtualFeed(target: string, fetchContent = false) {
-  const res = await fetch(target, { headers: { "User-Agent": "Mozilla/5.0" } });
-  if (!res.ok) return [];
+  const res = await safeFetch(target);
+  if (!res || !res.ok) return [];
   const html = await res.text();
   const $ = cheerio.load(html);
 
@@ -338,9 +426,15 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(cached.data);
 
   try {
-    const siteMeta = await fetchSiteMetadata(target);
+    let siteMeta = await fetchSiteMetadata(target);
+
+    // Fix WordPress /feed endpoints
+    if (target.match(/\/(feed|rss|rss\.xml|atom\.xml)(\/)?$/)) {
+      siteMeta = await fetchBaseSiteMetadata(target);
+    }
 
     let feedData = await detectRealFeed(target, fetchContent);
+
     if (!feedData) {
       const items = await scrapeVirtualFeed(target, fetchContent);
       if (!items || items.length === 0)
@@ -358,7 +452,6 @@ export async function GET(req: NextRequest) {
       };
     }
 
-    // Add site-level info & fallback author
     feedData.items = feedData.items.map((item: any) => ({
       ...item,
       author: item.author || siteMeta.title || null,
@@ -380,6 +473,7 @@ export async function GET(req: NextRequest) {
     cache.set(cacheKey, { data, expires: Date.now() + CACHE_TTL });
     return NextResponse.json(data);
   } catch (err: any) {
+    console.error("Route error:", err.message);
     return NextResponse.json(
       { error: err.message || "Unknown error" },
       { status: 500 }
