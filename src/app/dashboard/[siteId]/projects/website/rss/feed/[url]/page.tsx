@@ -5,17 +5,47 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useFeed } from "@/hooks/useFeed"
+import { useFetch } from "@/hooks/useFetch"
+import { SaveFeed } from "@/lib/actions/helpers/save-feed"
 import { ArrowLeft, Link2, List } from "lucide-react"
 import Link from "next/link"
-import { use } from "react"
+import React, { use } from "react"
+import { toast } from "sonner"
 
 const page = ({ params }: { params: { siteId: string, url: string } }) => {
     const { siteId, url } = use(params as any) as any
+    const { data, error: dataError, loading: dataLoading } = useFetch(`/api/team/${siteId}/rss/my-feed`)
+    const [isSaved, setIsSaved] = React.useState(false)
 
     const { feed, error, loading } = useFeed(url)
-    if (loading) return <FeedSkeleton />
 
-    if (error) return <div className="p-10 text-red-500">Error loading feed: {error}</div>
+    React.useEffect(() => {
+        if (data && feed) {
+            const saved = data.find((f: any) => decodeURIComponent(f.url) === feed.feedUrl)
+            setIsSaved(!!saved)
+        }
+    }, [data, feed])
+
+    const save = async () => {
+        if (!feed || isSaved) return
+        await SaveFeed({
+            data: {
+                title: feed.site.title || "Untitled",
+                url: encodeURIComponent(feed.feedUrl as string),
+                siteId: siteId,
+                description: feed.description || "",
+                icon: feed.site.favicon || "",
+            }, siteId
+        }).then((res) => {
+            toast.success("Feed saved to your feeds!")
+        })
+
+    }
+
+    if (loading || dataLoading) return <FeedSkeleton />
+
+    if (error || dataError) return <div className="p-10 text-red-500">Error loading feed: {error || dataError}</div>
+
 
     return <div>
         <header className="sticky top-0 left-0 py-5 bg-background z-1">
@@ -34,10 +64,17 @@ const page = ({ params }: { params: { siteId: string, url: string } }) => {
                 </div>
             </div>
         </header>
-        <main className="">
+        <main className="h-full">
             {loading && <div>Loading feed...</div>}
             {error && <div className="text-red-500">Error: {error}</div>}
-            <div className="flex justify-between max-w-4xl mx-auto">
+            <div className="relative flex justify-between max-w-4xl mx-auto">
+                {!isSaved && (
+                    <div className="absolute max-w-xl top-[50px] left-0 w-full flex justify-center items-center mx-auto">
+                        <Button onClick={save} className=" cursor-pointer bg-accent-foreground" variant={'outline'}>
+                            Save to my feeds
+                        </Button>
+                    </div>
+                )}
                 <div className="flex flex-col gap-5">
                     <h1 className="text-lg font-semibold border-b py-5">Feed Preview</h1>
                     <div className="flex justify-between items-center">
@@ -70,11 +107,13 @@ const page = ({ params }: { params: { siteId: string, url: string } }) => {
                     )}
                 </div>
                 <div>
-                    Feed Preview via <Badge variant="secondary">{feed?.type}</Badge>
-                    <Link href={feed?.feedUrl || '#'} target="_blank" rel="noopener noreferrer" className="flex line-clamp-1 max-w-[300px] overflow-hidden items-center mt-2 text-sm text-muted-foreground hover:underline">
-                        <Link2 className="mr-2" size={14} />
-                        {feed?.feedUrl}
-                    </Link>
+                    <div className="sticky top-[14%] left-0">
+                        Feed Preview via <Badge variant="secondary">{feed?.type}</Badge>
+                        <Link href={feed?.feedUrl || '#'} target="_blank" rel="noopener noreferrer" className="flex line-clamp-1 max-w-[300px] overflow-hidden items-center mt-2 text-sm text-muted-foreground hover:underline">
+                            <Link2 className="mr-2" size={14} />
+                            {feed?.feedUrl}
+                        </Link>
+                    </div>
                 </div>
             </div>
         </main>

@@ -51,7 +51,7 @@ export function useFeed(url: string | null) {
       setFeed(null);
 
       try {
-        const res = await axios.get<FeedResult>(
+        const res = await axios.get<any>(
           `/api/team/${team?.id}/rss?url=${url}`
         );
         if (!cancelled) {
