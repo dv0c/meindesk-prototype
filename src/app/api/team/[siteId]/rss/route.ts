@@ -1,4 +1,3 @@
-// app/api/find-or-generate-rss/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import * as cheerio from "cheerio";
 import * as xml2js from "xml2js";
@@ -45,10 +44,7 @@ async function fetchSiteMetadata(url: string) {
     const html = await res.text();
     const $ = cheerio.load(html);
 
-    // Use og:site_name first
     let title = $('meta[property="og:site_name"]').attr("content")?.trim();
-
-    // Fallback: domain-based site name
     if (!title) {
       try {
         const u = new URL(url);
@@ -163,12 +159,8 @@ async function fetchMetadataFromPage(url: string, fetchContent = false) {
   }
 }
 
-// Detect RSS / Atom / JSON feeds
-async function detectRealFeed(
-  target: string,
-  fetchContent = false,
-  siteMeta: any = {}
-) {
+// Detect RSS / Atom / JSON feeds manually
+async function detectRealFeed(target: string, fetchContent = false, siteMeta: any = {}) {
   const baseUrl = target.replace(/\/(feed|rss|rss\.xml|atom\.xml)(\/)?$/, "");
   const res = await safeFetch(target);
   if (!res || !res.ok) return null;
@@ -214,7 +206,7 @@ async function detectRealFeed(
       const text = await r.text();
       const contentType = r.headers.get("content-type") || "";
 
-      // --- JSON Feed ---
+      // JSON Feed
       if (contentType.includes("json") || text.trim().startsWith("{")) {
         const json = JSON.parse(text);
         if (json.items || json.feed_url || json.title) {
@@ -227,8 +219,7 @@ async function detectRealFeed(
                   title: i.title,
                   link: url,
                   thumbnail: i.image || meta.thumbnail || null,
-                  description:
-                    i.summary || i.content || meta.description || null,
+                  description: i.summary || i.content || meta.description || null,
                   content: meta.content || null,
                   pubDate: i.date_published || i.pubDate || null,
                   author: i.author?.name || meta.author || null,
@@ -240,7 +231,7 @@ async function detectRealFeed(
           return {
             feedUrl,
             type: "json",
-            title: siteMeta.title || null,
+            title: siteMeta.title || json.title,
             description: json.description || null,
             image: json.icon || null,
             items,
@@ -248,21 +239,16 @@ async function detectRealFeed(
         }
       }
 
-      // --- XML Feed (RSS / Atom) ---
+      // XML Feed
       if (contentType.includes("xml") || /<rss|<feed/i.test(text)) {
-        const parsed = await xml2js.parseStringPromise(text, {
-          explicitArray: false,
-        });
+        const parsed = await xml2js.parseStringPromise(text, { explicitArray: false });
         const channel = parsed.rss?.channel || parsed.feed;
         if (!channel) continue;
 
         const itemsArray =
-          (channel?.item &&
-            (Array.isArray(channel.item) ? channel.item : [channel.item])) ||
+          (channel?.item && (Array.isArray(channel.item) ? channel.item : [channel.item])) ||
           (parsed.feed?.entry &&
-            (Array.isArray(parsed.feed.entry)
-              ? parsed.feed.entry
-              : [parsed.feed.entry])) ||
+            (Array.isArray(parsed.feed.entry) ? parsed.feed.entry : [parsed.feed.entry])) ||
           [];
 
         const items = await Promise.all(
@@ -271,7 +257,6 @@ async function detectRealFeed(
               let url = item.link;
               if (typeof url === "object" && url?.href) url = url.href;
               const meta = await fetchMetadataFromPage(url, fetchContent);
-
               let thumb =
                 item["media:thumbnail"]?.$.url ||
                 item["media:content"]?.$.url ||
@@ -289,7 +274,6 @@ async function detectRealFeed(
                 : item.category
                 ? [item.category]
                 : meta.categories || [];
-
               return {
                 title: item.title,
                 link: url,
@@ -311,7 +295,7 @@ async function detectRealFeed(
         return {
           feedUrl,
           type: parsed.feed ? "atom" : "Native RSS",
-          title: siteMeta.title || null,
+          title: siteMeta.title || channel?.title,
           description: feedDescription,
           image: feedImage,
           items,
@@ -325,7 +309,7 @@ async function detectRealFeed(
   return null;
 }
 
-// Virtual feed fallback
+// Fallback: scrape articles to build virtual feed
 async function scrapeVirtualFeed(target: string, fetchContent = false) {
   const res = await safeFetch(target);
   if (!res || !res.ok) return [];
@@ -345,10 +329,7 @@ async function scrapeVirtualFeed(target: string, fetchContent = false) {
       a.text().trim() || $(el).find("h1,h2,h3,h4").first().text().trim();
     if (!title) continue;
 
-    const meta = await fetchMetadataFromPage(
-      new URL(href, target).href,
-      fetchContent
-    );
+    const meta = await fetchMetadataFromPage(new URL(href, target).href, fetchContent);
     items.push({
       title,
       link: new URL(href, target).href,
@@ -362,6 +343,22 @@ async function scrapeVirtualFeed(target: string, fetchContent = false) {
   }
 
   return items;
+}
+
+// FeedSearch.dev API integration (priority #1)
+async function fetchFromFeedSearchAPI(target: string) {
+  try {
+    const apiUrl = `https://feedsearch.dev/api/v1/search?url=${encodeURIComponent(target)}`;
+    const res = await safeFetch(apiUrl);
+    if (!res || !res.ok) return null;
+    const json = await res.json();
+    if (!Array.isArray(json) || json.length === 0) return null;
+    json.sort((a, b) => b.score - a.score);
+    return json;
+  } catch (err: any) {
+    console.error("FeedSearch API error:", err.message);
+    return null;
+  }
 }
 
 // --- Main API Route ---
@@ -380,9 +377,21 @@ export async function GET(req: NextRequest) {
 
   try {
     const siteMeta = await fetchSiteMetadata(target);
+    let feedData = null;
 
-    let feedData = await detectRealFeed(target, fetchContent, siteMeta);
+    // 1️⃣ Try FeedSearch.dev API first
+    const externalFeeds = await fetchFromFeedSearchAPI(target);
+    if (externalFeeds && externalFeeds.length > 0) {
+      const topFeed = externalFeeds[0];
+      feedData = await detectRealFeed(topFeed.url, fetchContent, siteMeta);
+    }
 
+    // 2️⃣ Fallback: Local feed detection
+    if (!feedData) {
+      feedData = await detectRealFeed(target, fetchContent, siteMeta);
+    }
+
+    // 3️⃣ Last resort: Virtual feed
     if (!feedData) {
       const items = await scrapeVirtualFeed(target, fetchContent);
       if (!items || items.length === 0)
@@ -409,7 +418,7 @@ export async function GET(req: NextRequest) {
       found: true,
       feedUrl: feedData.feedUrl,
       type: feedData.type,
-      title: siteMeta.title, // always match site title
+      title: siteMeta.title,
       description: feedData.description,
       image: feedData.image,
       itemCount: feedData.items.length,
