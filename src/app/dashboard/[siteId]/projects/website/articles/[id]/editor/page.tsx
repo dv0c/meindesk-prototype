@@ -26,6 +26,7 @@ export default function EditorPage({ params }: EditorPageProps) {
   const [editorState, setEditorState] = useState<SerializedEditorState>()
   const [slug, setSlug] = useState("")
   const [excerpt, setExcerpt] = useState("")
+  const [thumbnail, setThumbnail] = useState("")
   const [loaded, setLoaded] = useState(false)
 
   const { article, getArticle, updateArticle, loading } = useArticle()
@@ -44,6 +45,7 @@ export default function EditorPage({ params }: EditorPageProps) {
     setSlug(article.slug || "")
     setExcerpt(article.excerpt || "")
     setLoaded(true)
+    setThumbnail(article.cover || "")
   }, [article, loaded])
 
   const handleSave = async () => {
@@ -52,7 +54,8 @@ export default function EditorPage({ params }: EditorPageProps) {
       title,
       content: editorState,
       slug,
-      excerpt
+      excerpt,
+      cover: thumbnail
     })
   }
 
@@ -68,8 +71,9 @@ export default function EditorPage({ params }: EditorPageProps) {
     const contentChanged = JSON.stringify(editorState) !== JSON.stringify(article.content || "")
     const slugChanged = slug !== (article.slug || "")
     const excerptChanged = excerpt !== (article.excerpt || "")
-    return titleChanged || contentChanged || slugChanged || excerptChanged
-  }, [title, editorState, slug, excerpt, article])
+    const thumbnailChanged = thumbnail !== (article.cover || "")
+    return titleChanged || contentChanged || slugChanged || excerptChanged || thumbnailChanged
+  }, [title, editorState, slug, excerpt, article, thumbnail])
 
   if (!loaded) {
     return (
@@ -142,6 +146,8 @@ export default function EditorPage({ params }: EditorPageProps) {
           </div>
         </div>
         <RightSection
+          setThumbnail={setThumbnail}
+          thumbnail={thumbnail}
           article={article}
           slug={slug}
           setSlug={setSlug}

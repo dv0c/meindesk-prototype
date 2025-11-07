@@ -313,7 +313,7 @@ export default function MediaLibraryDialog({
               >
                 <div className="flex flex-col items-center justify-center">
                   <UploadCloud className="h-12 w-12 text-muted-foreground mb-3" />
-                  <p className="font-semibold">Click or drag files here to upload</p>
+                  <p className="font-semibold">Click here to upload images</p>
                   <p className="text-xs text-muted-foreground mt-1">Max 5MB per image. Supports JPG, PNG, GIF, WEBP.</p>
                 </div>
               </CldUploadButton>
@@ -321,10 +321,10 @@ export default function MediaLibraryDialog({
           </Tabs>
           <DialogFooter className="p-6 pt-4 border-t shrink-0">
             <p className="text-sm text-muted-foreground mr-auto">{selectedItems.length} item(s) selected</p>
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="outline" className="cursor-pointer" onClick={onClose}>
               Cancel
             </Button>
-            <Button onClick={handleSubmit} disabled={selectedItems.length === 0 && multiSelect}>
+            <Button onClick={handleSubmit} className="cursor-pointer" disabled={selectedItems.length === 0 && multiSelect}>
               {multiSelect ? `Insert ${selectedItems.length} Item(s)` : "Insert Item"}
             </Button>
           </DialogFooter>

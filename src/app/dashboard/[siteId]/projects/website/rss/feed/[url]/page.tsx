@@ -3,11 +3,13 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
+import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useFeed } from "@/hooks/useFeed"
 import { useFetch } from "@/hooks/useFetch"
 import { SaveFeed } from "@/lib/actions/helpers/save-feed"
-import { ArrowLeft, Link2, List } from "lucide-react"
+import { ArrowLeft, Link2, List, Upload } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import React, { use } from "react"
@@ -92,15 +94,20 @@ const page = ({ params }: { params: { siteId: string, url: string } }) => {
                             <div>No items found in the feed.</div>
                         ) : (
                             feed.items.map((item, index) => (
-                                <Card key={index} className="bg-background max-w-xl border-0 border-b pb-10">
+                                <Card key={index} className="bg-background group relative max-w-xl border-0 border-b pb-10">
                                     <CardHeader className="px-0">
                                         <CardTitle>
                                             <Link href={item.link || '#'} target="_blank" rel="noopener noreferrer" className="hover:underline text-xl">
                                                 {item.title || 'No title'}
                                             </Link>
+                                            <div className="absolute opacity-0 group-hover:opacity-100 transition-opacity top-0 right-0">
+                                                <Button variant={'outline'} size={'icon-sm'} className="cursor-pointer">
+                                                    <Upload />
+                                                </Button>
+                                            </div>
                                         </CardTitle>
                                     </CardHeader>
-                                    <CardContent className="px-0">
+                                    <CardContent className="px-0 relative">
                                         <img src={item.thumbnail || ''} alt={item.title || 'Thumbnail'} className="mb-4 w-full max-w-full max-h-[400px]\\" />
                                         <div className="">
                                             <div className="line-clamp-3" dangerouslySetInnerHTML={{ __html: item.description || 'No description' }} />

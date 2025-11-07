@@ -7,8 +7,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 import { Separator } from "@/components/ui/separator"
 import {
     SidebarInset,
-    SidebarProvider,
-    SidebarTrigger
+    SidebarProvider
 } from "@/components/ui/sidebar"
 import React, { FC } from 'react'
 
