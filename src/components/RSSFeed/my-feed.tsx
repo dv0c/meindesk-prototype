@@ -123,7 +123,7 @@ const CreateRSS = ({ siteId }: { siteId: string }) => {
                     Create RSS Feed
                 </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-4xl w-full sm:h-auto p-6 rounded-md">
+            <DialogContent className="!max-w-7xl">
                 <CreateNewFeed siteId={siteId} />
             </DialogContent>
         </Dialog>

@@ -89,7 +89,7 @@ export default function CreateNewFeed({ siteId }: { siteId: string }) {
     }, [url, selectedFilter])
 
     return (
-        <div className="bg-background min-h-screen">
+        <div className="bg-background min-h-[80vh]">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
                 {/* Mode Toggle */}
                 <div className="flex flex-wrap justify-center gap-3 mb-10">
@@ -233,6 +233,7 @@ export default function CreateNewFeed({ siteId }: { siteId: string }) {
                                 {filteredFeeds.map((feed) => (
                                     <Button
                                         key={feed.id}
+                                        onClick={() => setUrl(feed.url)}
                                         variant="outline"
                                         className="flex flex-col items-start justify-start p-5 gap-3 h-full text-left hover:bg-muted/50 transition"
                                     >
