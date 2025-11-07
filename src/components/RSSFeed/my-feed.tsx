@@ -19,10 +19,11 @@ import {
 import CreateNewFeed from "./CreateButtonPage"
 import { useFetch } from "@/hooks/useFetch"
 import Link from "next/link"
+import { useSite } from "../Contexts/site-id-context"
 
-const MyFeed = ({ siteId }: { siteId: string }) => {
+const MyFeed = () => {
+    const { siteId } = useSite()
     const { data, error, loading } = useFetch<RSS[]>(`/api/team/${siteId}/rss/my-feed`)
-
     if (loading) {
         return (
             <PageWrapper action title="My RSS Feed" description="Manage your RSS feed subscriptions">
@@ -31,7 +32,7 @@ const MyFeed = ({ siteId }: { siteId: string }) => {
         )
     }
 
-    if (error) {
+    if (error || !siteId) {
         return (
             <PageWrapper action title="My RSS Feed" description="Manage your RSS feed subscriptions">
                 <p className="text-red-500">Failed to load feeds: {error}</p>

@@ -101,9 +101,9 @@ const page = ({ params }: { params: { siteId: string, url: string } }) => {
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent className="px-0">
-                                        <img src={item.thumbnail || ''} alt={item.title || 'Thumbnail'} className="mb-4 max-w-full h-auto" />
+                                        <img src={item.thumbnail || ''} alt={item.title || 'Thumbnail'} className="mb-4 w-full max-w-full max-h-[400px]\\" />
                                         <div className="">
-                                            <div className="prose" dangerouslySetInnerHTML={{ __html: item.description || 'No description' }} />
+                                            <div className="line-clamp-3" dangerouslySetInnerHTML={{ __html: item.description || 'No description' }} />
                                         </div>
                                     </CardContent>
                                 </Card>

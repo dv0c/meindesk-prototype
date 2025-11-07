@@ -1,5 +1,6 @@
 
 import { AppSidebar, ToggleSidebar } from "@/components/app-sidebar"
+import { SiteProvider } from "@/components/Contexts/site-id-context"
 import LoadingOverlay from "@/components/loading-overlay"
 import RouterRefresh from "@/components/RouterRefresh"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
@@ -18,40 +19,42 @@ interface layoutProps {
 const layout: FC<layoutProps> = ({ children }) => {
     // const site = await getSite()
     // if (!site) redirect('/setup')
-    return <SidebarProvider>
-        <AppSidebar />
-        <SidebarInset>
-            <header className="flex h-16 shrink-0 items-center gap-2">
-                <div className="flex items-center gap-2 px-4">
-                    {/* <SidebarTrigger className="-ml-1" /> */}
-                    <ToggleSidebar />
-                    <Separator
-                        orientation="vertical"
-                        className="mr-2 data-[orientation=vertical]:h-4"
-                    />
-                    <Breadcrumb>
-                        <BreadcrumbList>
-                            <BreadcrumbItem className="hidden md:block">
-                                <BreadcrumbLink href="#">
-                                    Your Project
-                                </BreadcrumbLink>
-                            </BreadcrumbItem>
-                            <BreadcrumbSeparator className="hidden md:block" />
-                            <BreadcrumbItem>
-                                <BreadcrumbPage>Website</BreadcrumbPage>
-                            </BreadcrumbItem>
-                        </BreadcrumbList>
-                    </Breadcrumb>
+    return <SiteProvider>
+        <SidebarProvider>
+            <AppSidebar />
+            <SidebarInset>
+                <header className="flex h-16 shrink-0 items-center gap-2">
+                    <div className="flex items-center gap-2 px-4">
+                        {/* <SidebarTrigger className="-ml-1" /> */}
+                        <ToggleSidebar />
+                        <Separator
+                            orientation="vertical"
+                            className="mr-2 data-[orientation=vertical]:h-4"
+                        />
+                        <Breadcrumb>
+                            <BreadcrumbList>
+                                <BreadcrumbItem className="hidden md:block">
+                                    <BreadcrumbLink href="#">
+                                        Your Project
+                                    </BreadcrumbLink>
+                                </BreadcrumbItem>
+                                <BreadcrumbSeparator className="hidden md:block" />
+                                <BreadcrumbItem>
+                                    <BreadcrumbPage>Website</BreadcrumbPage>
+                                </BreadcrumbItem>
+                            </BreadcrumbList>
+                        </Breadcrumb>
+                    </div>
+                </header>
+                <div className="h-full">
+                    <RouterRefresh>
+                        <LoadingOverlay />
+                        {children}
+                    </RouterRefresh>
                 </div>
-            </header>
-            <div className="h-full">
-                <RouterRefresh>
-                    <LoadingOverlay />
-                    {children}
-                </RouterRefresh>
-            </div>
-        </SidebarInset>
-    </SidebarProvider>
+            </SidebarInset>
+        </SidebarProvider>
+    </SiteProvider>
 }
 
 export default layout

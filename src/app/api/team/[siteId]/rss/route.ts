@@ -10,6 +10,9 @@ const CACHE_TTL = 1000 * 60 * 60 * 3; // 3 hours
 const FETCH_TIMEOUT = 10000; // 10s timeout
 const limit = pLimit(8);
 
+// --------------------------------------------------
+// Utilities
+// --------------------------------------------------
 function normalizeUrl(url: string) {
   if (!/^https?:\/\//i.test(url)) url = "https://" + url;
   try {
@@ -36,7 +39,9 @@ async function safeFetch(url: string, options: RequestInit = {}) {
   }
 }
 
-// Fetch site metadata (title, favicon, logo)
+// --------------------------------------------------
+// Site Metadata
+// --------------------------------------------------
 async function fetchSiteMetadata(url: string) {
   try {
     const res = await safeFetch(url);
@@ -74,7 +79,9 @@ async function fetchSiteMetadata(url: string) {
   }
 }
 
-// Fetch metadata from article page
+// --------------------------------------------------
+// Page Metadata (for articles)
+// --------------------------------------------------
 async function fetchMetadataFromPage(url: string, fetchContent = false) {
   try {
     const res = await safeFetch(url);
@@ -159,8 +166,78 @@ async function fetchMetadataFromPage(url: string, fetchContent = false) {
   }
 }
 
-// Detect RSS / Atom / JSON feeds manually
-async function detectRealFeed(target: string, fetchContent = false, siteMeta: any = {}) {
+// --------------------------------------------------
+// YouTube Feed Parser
+// --------------------------------------------------
+async function parseYouTubeFeed(xmlText: string) {
+  const parsed = await xml2js.parseStringPromise(xmlText, {
+    explicitArray: false,
+  });
+  const feed = parsed.feed;
+  if (!feed || !feed.entry) return null;
+
+  const entries = Array.isArray(feed.entry) ? feed.entry : [feed.entry];
+  const channelTitle = feed.title || "YouTube Channel";
+  // I don't really know why should i do this but it is working.
+  const channelId = "UC" + feed["yt:channelId"] || null;
+
+  const site = {
+    title: "YouTube",
+    favicon: "https://www.youtube.com/s/desktop/ce69dda5/img/favicon_32x32.png",
+    logo: `https://yt3.googleusercontent.com/ytc/${channelId}`,
+    url: feed.author?.uri || "https://www.youtube.com",
+  };
+
+  const items = entries.map((entry: any) => {
+    const videoId = entry["yt:videoId"];
+    const link = `https://www.youtube.com/watch?v=${videoId}`;
+
+    const title = entry.title;
+    const published = entry.published;
+    const updated = entry.updated;
+    const author = entry.author?.name || null;
+    const thumbnail =
+      entry["media:group"]?.["media:thumbnail"]?.url ||
+      entry["media:thumbnail"]?.url ||
+      `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+
+    const description =
+      entry["media:group"]?.["media:description"] ||
+      entry.summary?._ ||
+      entry.summary ||
+      null;
+
+    return {
+      title,
+      link,
+      thumbnail,
+      description,
+      pubDate: published || updated,
+      author,
+      categories: ["YouTube"],
+      content: `<iframe width="560" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`,
+      site,
+    };
+  });
+
+  return {
+    feedUrl: `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`,
+    type: "YouTube",
+    title: channelTitle,
+    description: `YouTube feed for ${channelTitle}`,
+    image: site.logo,
+    items,
+  };
+}
+
+// --------------------------------------------------
+// Feed Detection
+// --------------------------------------------------
+async function detectRealFeed(
+  target: string,
+  fetchContent = false,
+  siteMeta: any = {}
+) {
   const baseUrl = target.replace(/\/(feed|rss|rss\.xml|atom\.xml)(\/)?$/, "");
   const res = await safeFetch(target);
   if (!res || !res.ok) return null;
@@ -206,7 +283,17 @@ async function detectRealFeed(target: string, fetchContent = false, siteMeta: an
       const text = await r.text();
       const contentType = r.headers.get("content-type") || "";
 
-      // JSON Feed
+      // --- YouTube Detection ---
+      if (
+        target.includes("youtube.com/feeds/videos.xml") ||
+        text.includes("yt:videoId") ||
+        text.includes("youtube.com")
+      ) {
+        const ytFeed = await parseYouTubeFeed(text);
+        if (ytFeed) return ytFeed;
+      }
+
+      // --- JSON Feed ---
       if (contentType.includes("json") || text.trim().startsWith("{")) {
         const json = JSON.parse(text);
         if (json.items || json.feed_url || json.title) {
@@ -219,11 +306,13 @@ async function detectRealFeed(target: string, fetchContent = false, siteMeta: an
                   title: i.title,
                   link: url,
                   thumbnail: i.image || meta.thumbnail || null,
-                  description: i.summary || i.content || meta.description || null,
+                  description:
+                    i.summary || i.content || meta.description || null,
                   content: meta.content || null,
                   pubDate: i.date_published || i.pubDate || null,
                   author: i.author?.name || meta.author || null,
                   categories: i.tags || meta.categories || [],
+                  site: siteMeta,
                 };
               })
             )
@@ -239,16 +328,21 @@ async function detectRealFeed(target: string, fetchContent = false, siteMeta: an
         }
       }
 
-      // XML Feed
+      // --- XML Feed ---
       if (contentType.includes("xml") || /<rss|<feed/i.test(text)) {
-        const parsed = await xml2js.parseStringPromise(text, { explicitArray: false });
+        const parsed = await xml2js.parseStringPromise(text, {
+          explicitArray: false,
+        });
         const channel = parsed.rss?.channel || parsed.feed;
         if (!channel) continue;
 
         const itemsArray =
-          (channel?.item && (Array.isArray(channel.item) ? channel.item : [channel.item])) ||
+          (channel?.item &&
+            (Array.isArray(channel.item) ? channel.item : [channel.item])) ||
           (parsed.feed?.entry &&
-            (Array.isArray(parsed.feed.entry) ? parsed.feed.entry : [parsed.feed.entry])) ||
+            (Array.isArray(parsed.feed.entry)
+              ? parsed.feed.entry
+              : [parsed.feed.entry])) ||
           [];
 
         const items = await Promise.all(
@@ -283,6 +377,7 @@ async function detectRealFeed(target: string, fetchContent = false, siteMeta: an
                 pubDate,
                 author,
                 categories,
+                site: siteMeta,
               };
             })
           )
@@ -309,7 +404,9 @@ async function detectRealFeed(target: string, fetchContent = false, siteMeta: an
   return null;
 }
 
-// Fallback: scrape articles to build virtual feed
+// --------------------------------------------------
+// Fallback Scraper
+// --------------------------------------------------
 async function scrapeVirtualFeed(target: string, fetchContent = false) {
   const res = await safeFetch(target);
   if (!res || !res.ok) return [];
@@ -329,7 +426,10 @@ async function scrapeVirtualFeed(target: string, fetchContent = false) {
       a.text().trim() || $(el).find("h1,h2,h3,h4").first().text().trim();
     if (!title) continue;
 
-    const meta = await fetchMetadataFromPage(new URL(href, target).href, fetchContent);
+    const meta = await fetchMetadataFromPage(
+      new URL(href, target).href,
+      fetchContent
+    );
     items.push({
       title,
       link: new URL(href, target).href,
@@ -345,10 +445,14 @@ async function scrapeVirtualFeed(target: string, fetchContent = false) {
   return items;
 }
 
-// FeedSearch.dev API integration (priority #1)
+// --------------------------------------------------
+// FeedSearch.dev API
+// --------------------------------------------------
 async function fetchFromFeedSearchAPI(target: string) {
   try {
-    const apiUrl = `https://feedsearch.dev/api/v1/search?url=${encodeURIComponent(target)}`;
+    const apiUrl = `https://feedsearch.dev/api/v1/search?url=${encodeURIComponent(
+      target
+    )}`;
     const res = await safeFetch(apiUrl);
     if (!res || !res.ok) return null;
     const json = await res.json();
@@ -361,7 +465,9 @@ async function fetchFromFeedSearchAPI(target: string) {
   }
 }
 
-// --- Main API Route ---
+// --------------------------------------------------
+// Main API Route
+// --------------------------------------------------
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const rawUrl = searchParams.get("url");
@@ -379,19 +485,19 @@ export async function GET(req: NextRequest) {
     const siteMeta = await fetchSiteMetadata(target);
     let feedData = null;
 
-    // 1️⃣ Try FeedSearch.dev API first
+    // 1️⃣ FeedSearch.dev API
     const externalFeeds = await fetchFromFeedSearchAPI(target);
     if (externalFeeds && externalFeeds.length > 0) {
       const topFeed = externalFeeds[0];
       feedData = await detectRealFeed(topFeed.url, fetchContent, siteMeta);
     }
 
-    // 2️⃣ Fallback: Local feed detection
+    // 2️⃣ Local detection
     if (!feedData) {
       feedData = await detectRealFeed(target, fetchContent, siteMeta);
     }
 
-    // 3️⃣ Last resort: Virtual feed
+    // 3️⃣ Fallback: scrape
     if (!feedData) {
       const items = await scrapeVirtualFeed(target, fetchContent);
       if (!items || items.length === 0)
@@ -408,11 +514,6 @@ export async function GET(req: NextRequest) {
         items,
       };
     }
-
-    feedData.items = feedData.items.map((item: any) => ({
-      ...item,
-      site: siteMeta,
-    }));
 
     const data = {
       found: true,
