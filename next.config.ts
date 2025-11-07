@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
     domains: ["res.cloudinary.com"], // Add Cloudinary domain here
   },
 
+  serverExternalPackages: ["@sparticuz/chromium", "puppeteer-core"],
+
   typescript: {
     ignoreBuildErrors: true,
   },
