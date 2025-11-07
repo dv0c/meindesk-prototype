@@ -2,58 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import * as cheerio from "cheerio";
 import * as xml2js from "xml2js";
 import pLimit from "p-limit";
-import chromium from "@sparticuz/chromium";
-import puppeteer from "puppeteer-core";
 
 export const runtime = "nodejs";
 
 const cache = new Map<string, { data: any; expires: number }>();
 const CACHE_TTL = 1000 * 60 * 60 * 3; // 3 hours
-const FETCH_TIMEOUT = 10000;
+const FETCH_TIMEOUT = 10000; // 10s timeout
 const limit = pLimit(8);
-
-// --------------------------------------------------
-// Puppeteer Fallback
-// --------------------------------------------------
-async function fetchWithPuppeteer(url: string) {
-  let browser;
-  try {
-    let puppeteer: typeof import("puppeteer-core") | undefined;
-    let chromium: typeof import("@sparticuz/chromium") | undefined;
-
-    // Detect if running on Vercel
-    const isVercel = !!process.env.VERCEL;
-
-    if (isVercel) {
-      // Dynamic import for Vercel environment
-      chromium = (await import("@sparticuz/chromium")).default;
-      puppeteer = (await import("puppeteer-core")).default;
-    } else {
-      // Local development
-      puppeteer = (await import("puppeteer")).default;
-    }
-
-    if (!puppeteer) throw new Error("Failed to load puppeteer");
-
-    browser = await puppeteer.launch({
-      args: chromium?.args || [],
-      defaultViewport: chromium?.defaultViewport || null,
-      executablePath:
-        isVercel && chromium ? await chromium.executablePath() : undefined,
-      headless: chromium?.headless ?? true,
-    });
-
-    const page = await browser.newPage();
-    await page.goto(url, { waitUntil: "networkidle2", timeout: 20000 });
-    const html = await page.content();
-    return html;
-  } catch (err: any) {
-    console.error("Puppeteer fetch failed:", err.message);
-    return null;
-  } finally {
-    if (browser) await browser.close();
-  }
-}
 
 // --------------------------------------------------
 // Utilities
@@ -89,16 +44,9 @@ async function safeFetch(url: string, options: RequestInit = {}) {
 // --------------------------------------------------
 async function fetchSiteMetadata(url: string) {
   try {
-    let res = await safeFetch(url);
-    let html: string | null = null;
-
-    if (res && res.ok) html = await res.text();
-    if (!html || html.length < 1500) {
-      console.warn(`[Fallback] Using Puppeteer for site metadata: ${url}`);
-      html = await fetchWithPuppeteer(url);
-    }
-
-    if (!html) return {};
+    const res = await safeFetch(url);
+    if (!res || !res.ok) return {};
+    const html = await res.text();
     const $ = cheerio.load(html);
 
     let title = $('meta[property="og:site_name"]').attr("content")?.trim();
@@ -136,16 +84,9 @@ async function fetchSiteMetadata(url: string) {
 // --------------------------------------------------
 async function fetchMetadataFromPage(url: string, fetchContent = false) {
   try {
-    let res = await safeFetch(url);
-    let html: string | null = null;
-
-    if (res && res.ok) html = await res.text();
-    if (!html || html.length < 1500) {
-      console.warn(`[Fallback] Using Puppeteer for page: ${url}`);
-      html = await fetchWithPuppeteer(url);
-    }
-
-    if (!html) return {};
+    const res = await safeFetch(url);
+    if (!res || !res.ok) return {};
+    const html = await res.text();
     const $ = cheerio.load(html);
 
     const title =
@@ -237,6 +178,7 @@ async function parseYouTubeFeed(xmlText: string) {
 
   const entries = Array.isArray(feed.entry) ? feed.entry : [feed.entry];
   const channelTitle = feed.title || "YouTube Channel";
+  // I don't really know why should i do this but it is working.
   const channelId = "UC" + feed["yt:channelId"] || null;
 
   const site = {
@@ -249,6 +191,7 @@ async function parseYouTubeFeed(xmlText: string) {
   const items = entries.map((entry: any) => {
     const videoId = entry["yt:videoId"];
     const link = `https://www.youtube.com/watch?v=${videoId}`;
+
     const title = entry.title;
     const published = entry.published;
     const updated = entry.updated;
@@ -257,6 +200,7 @@ async function parseYouTubeFeed(xmlText: string) {
       entry["media:group"]?.["media:thumbnail"]?.url ||
       entry["media:thumbnail"]?.url ||
       `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+
     const description =
       entry["media:group"]?.["media:description"] ||
       entry.summary?._ ||
@@ -339,6 +283,7 @@ async function detectRealFeed(
       const text = await r.text();
       const contentType = r.headers.get("content-type") || "";
 
+      // --- YouTube Detection ---
       if (
         target.includes("youtube.com/feeds/videos.xml") ||
         text.includes("yt:videoId") ||
@@ -348,6 +293,7 @@ async function detectRealFeed(
         if (ytFeed) return ytFeed;
       }
 
+      // --- JSON Feed ---
       if (contentType.includes("json") || text.trim().startsWith("{")) {
         const json = JSON.parse(text);
         if (json.items || json.feed_url || json.title) {
@@ -382,6 +328,7 @@ async function detectRealFeed(
         }
       }
 
+      // --- XML Feed ---
       if (contentType.includes("xml") || /<rss|<feed/i.test(text)) {
         const parsed = await xml2js.parseStringPromise(text, {
           explicitArray: false,
@@ -458,19 +405,12 @@ async function detectRealFeed(
 }
 
 // --------------------------------------------------
-// Scraper Fallback
+// Fallback Scraper
 // --------------------------------------------------
 async function scrapeVirtualFeed(target: string, fetchContent = false) {
-  let res = await safeFetch(target);
-  let html: string | null = null;
-
-  if (res && res.ok) html = await res.text();
-  if (!html || html.length < 1500) {
-    console.warn(`[Fallback] Using Puppeteer for scraping: ${target}`);
-    html = await fetchWithPuppeteer(target);
-  }
-
-  if (!html) return [];
+  const res = await safeFetch(target);
+  if (!res || !res.ok) return [];
+  const html = await res.text();
   const $ = cheerio.load(html);
 
   const articleEls = $("article");
@@ -545,16 +485,19 @@ export async function GET(req: NextRequest) {
     const siteMeta = await fetchSiteMetadata(target);
     let feedData = null;
 
+    // 1️⃣ FeedSearch.dev API
     const externalFeeds = await fetchFromFeedSearchAPI(target);
     if (externalFeeds && externalFeeds.length > 0) {
       const topFeed = externalFeeds[0];
       feedData = await detectRealFeed(topFeed.url, fetchContent, siteMeta);
     }
 
+    // 2️⃣ Local detection
     if (!feedData) {
       feedData = await detectRealFeed(target, fetchContent, siteMeta);
     }
 
+    // 3️⃣ Fallback: scrape
     if (!feedData) {
       const items = await scrapeVirtualFeed(target, fetchContent);
       if (!items || items.length === 0)
@@ -587,9 +530,9 @@ export async function GET(req: NextRequest) {
     cache.set(cacheKey, { data, expires: Date.now() + CACHE_TTL });
     return NextResponse.json(data);
   } catch (err: any) {
-    console.error("Main handler error:", err.message);
+    console.error("Route error:", err.message);
     return NextResponse.json(
-      { error: "Unexpected server error" },
+      { error: err.message || "Unknown error" },
       { status: 500 }
     );
   }

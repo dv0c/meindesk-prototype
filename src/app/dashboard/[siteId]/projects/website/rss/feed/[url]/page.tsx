@@ -106,7 +106,7 @@ const page = ({ params }: { params: { siteId: string, url: string } }) => {
                                             <div className="line-clamp-3" dangerouslySetInnerHTML={{ __html: item.description || 'No description' }} />
                                             <div className="text-xs mt-5 flex items-center gap-1">
                                                 <Badge variant={'secondary'}>
-                                                    {feed.type}
+                                                    {feed.type} {feed.type === "Youtube" || feed.type === "Generator" && 'SRC'}
                                                 </Badge>
                                                 <p>
                                                     provided by <Link className="underline" href={item.site.url || "#"}>{item.site.title}</Link>
