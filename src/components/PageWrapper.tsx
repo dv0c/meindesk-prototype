@@ -22,7 +22,7 @@ const PageWrapper: FC<PageWrapperProps> = ({
         </div>
         {action}
       </div>
-      <div id="page-wrapper" className="flex mt-10 px-5">
+      <div id="page-wrapper" className="flex my-10 px-5">
         {children}
       </div>
     </>

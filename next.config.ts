@@ -4,9 +4,13 @@ const nextConfig: NextConfig = {
   /* config options here */
   trailingSlash: false, // avoid redirect /api/analytics/ -> /api/analytics
   images: {
-    domains: ["res.cloudinary.com"], // Add Cloudinary domain here
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**", // wildcard — allows any domain
+      },
+    ],
   },
-
 
   typescript: {
     ignoreBuildErrors: true,

@@ -189,8 +189,10 @@ export function ArticleTable() {
                                                 </div>
                                             </TableCell>
 
-                                            <TableCell className="font-medium py-3 text-sm">{article.title}</TableCell>
-                                            <TableCell className="font-mono text-xs text-muted-foreground py-3">{article.slug}</TableCell>
+                                            <TableCell className="font-medium py-3 overflow-hidden max-w-md text-sm">
+                                                {article.title}
+                                                </TableCell>
+                                            <TableCell className="font-mono text-xs text-muted-foreground max-w-md overflow-hidden py-3">{article.slug}</TableCell>
                                             <TableCell className="py-3">
                                                 <Badge variant={statusColors[article.status]} className="text-xs">
                                                     {article.status}

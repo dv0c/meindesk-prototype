@@ -1,7 +1,7 @@
 "use client"
 
 import { SerializedEditorState } from "lexical"
-import { useEffect, useMemo, useState } from "react"
+import { use, useEffect, useMemo, useState } from "react"
 
 import { Editor } from "@/components/blocks/editor-x/editor"
 import { Button } from "@/components/ui/button"
@@ -20,7 +20,7 @@ interface EditorPageProps {
 }
 
 export default function EditorPage({ params }: EditorPageProps) {
-  const { id: articleId, siteId } = params
+  const { id: articleId, siteId } = use(params as any) as any
 
   const [title, setTitle] = useState("")
   const [editorState, setEditorState] = useState<SerializedEditorState>()

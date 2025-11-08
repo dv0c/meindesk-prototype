@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useFeed } from "@/hooks/useFeed"
 import { useFetch } from "@/hooks/useFetch"
 import { SaveFeed } from "@/lib/actions/helpers/save-feed"
+import { SaveRssToArticles } from "@/lib/actions/helpers/save-rss-to-articles"
 import { ArrowLeft, Link2, List, Upload } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -41,10 +42,14 @@ const page = ({ params }: { params: { siteId: string, url: string } }) => {
                 siteId: siteId,
                 description: feed.description || "",
                 icon: feed.site.favicon || "",
-            }, siteId
+            },
+            siteId,
+            feedItems: feed.items
         }).then((res) => {
             toast.success("Feed saved to your feeds!")
             console.log('SAVED DATA', res, "FETCHED DATA", data)
+        }).finally(() => {
+            location.reload()
         })
 
     }
@@ -127,14 +132,48 @@ const page = ({ params }: { params: { siteId: string, url: string } }) => {
                     )}
                 </div>
                 <div>
-                    <div className="sticky top-[14%] left-0">
-                        Feed Preview via <Badge variant="secondary">{feed?.type}</Badge>
-                        <Link href={feed?.feedUrl || '#'} target="_blank" rel="noopener noreferrer" className="flex line-clamp-1 max-w-[300px] overflow-hidden items-center mt-2 text-sm text-muted-foreground hover:underline">
-                            <Link2 className="mr-2" size={14} />
-                            {feed?.feedUrl}
-                        </Link>
+                    <div className="sticky top-[14%] left-0 flex flex-col gap-3">
+                        <div>
+                            Feed Preview via <Badge variant="secondary">{feed?.type}</Badge>
+                            <Link
+                                href={feed?.feedUrl || '#'}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex line-clamp-1 max-w-[300px] overflow-hidden items-center mt-2 text-sm text-muted-foreground hover:underline"
+                            >
+                                <Link2 className="mr-2" size={14} />
+                                {feed?.feedUrl}
+                            </Link>
+                        </div>
+
+                        {/* Save to Articles button */}
+                        {isSaved && (
+                            <Button
+                                className="mt-5 bg-primary text-primary-foreground cursor-pointer"
+                                variant="default"
+                                size="sm"
+                                disabled={!feed || feed.items.length === 0}
+                                onClick={async () => {
+                                    try {
+                                        toast.loading("Saving feed items to articles...", { id: "saveRss" });
+                                        const res = await SaveRssToArticles({
+                                            siteId,
+                                            rssId: data.find((f: any) => f.url === feed?.feedUrl)?.id,
+                                        });
+                                        toast.success(res.message || "Saved!", { id: "saveRss" });
+                                    } catch (err: any) {
+                                        toast.error(err.message || "Failed to save articles", { id: "saveRss" });
+                                    }
+                                }}
+                            >
+                                <Upload className="mr-2 h-4 w-4" />
+                                Save all to Articles
+                            </Button>
+                        )}
+
                     </div>
                 </div>
+
             </div>
         </main>
     </div>

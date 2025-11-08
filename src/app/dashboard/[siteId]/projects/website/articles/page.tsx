@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/empty";
 import { X } from "lucide-react";
 
-export default async function Page({params}: {params: {siteId: string}}) {
+export default async function Page({ params }: { params: { siteId: string } }) {
     // if (site?.features?.articles === false) return <EmptyCard />
     if (!params.siteId) {
         return <div className="flex flex-1 items-center justify-center p-4">

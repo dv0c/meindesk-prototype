@@ -89,14 +89,14 @@ model Category {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  site     Site?  @relation(fields: [siteId], references: [id], onDelete: Cascade)
-  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId String @db.ObjectId
+  site Site? @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
   siteId String? @db.ObjectId
 
   metadata Json?
   Article  Article[]
+  user     User?     @relation(fields: [userId], references: [id])
+  userId   String?   @db.ObjectId
 }
 
 model Site {
@@ -124,19 +124,18 @@ model Site {
   subscription   Subscription?    @relation(fields: [subscriptionId], references: [id])
   subscriptionId String?          @db.ObjectId
   featuresId     String?          @db.ObjectId
-  articleId      String?          @db.ObjectId
   Article        Article[]
   Page           Page[]
   RSS            Rss[]
 }
 
 model Features {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  analytics Boolean @default(true)
-  articles  Boolean @default(true)
-  pages     Boolean @default(true)
-  cateories Boolean @default(true)
-  media     Boolean @default(true)
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  analytics  Boolean @default(true)
+  articles   Boolean @default(true)
+  pages      Boolean @default(true)
+  categories Boolean @default(true)
+  media      Boolean @default(true)
 
   viewslimit Int @default(500)
   ratelimit  Int @default(10000)
@@ -197,6 +196,9 @@ model Article {
   category   Category? @relation(fields: [categoryId], references: [id])
   categoryId String?   @db.ObjectId
 
+  sourceType ArticleSourceType @default(MANUAL)
+  sourceId   String? // if RSS, store RssItem.id
+
   author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId String @db.ObjectId
 
@@ -241,6 +243,12 @@ enum PageStatus {
   ARCHIVED
 }
 
+enum ArticleSourceType {
+  MANUAL
+  RSS
+  API
+}
+
 model Rss {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   title       String
@@ -251,5 +259,24 @@ model Rss {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  site     Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  rssItems RssItem[]
+}
+
+model RssItem {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  rssId       String    @db.ObjectId
+  title       String
+  site_name   String
+  link        String
+  description String?
+  thumbnail   String?
+  publishedAt DateTime?
+  content     String?
+  author      String?
+  categories  String[]
+  guid        String? // unique ID from feed, helps deduplication
+  createdAt   DateTime  @default(now())
+
+  rss Rss @relation(fields: [rssId], references: [id], onDelete: Cascade)
 }
