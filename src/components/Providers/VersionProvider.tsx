@@ -15,7 +15,7 @@ const VersionContext = createContext<VersionContextType>({
   isOutdated: false,
 });
 
-export const VersionProvider = ({ children, checkInterval = 10000 }: { children: ReactNode, checkInterval?: number }) => {
+export const VersionProvider = ({ children, checkInterval = 60000 }: { children: ReactNode, checkInterval?: number }) => {
   const currentVersion = process.env.NEXT_PUBLIC_APP_VERSION || "1.0.0";
   const [latestVersion, setLatestVersion] = useState(currentVersion);
 
@@ -26,7 +26,7 @@ export const VersionProvider = ({ children, checkInterval = 10000 }: { children:
         const data = await res.json();
         if (data.version && data.version !== currentVersion) {
           setLatestVersion(data.version);
-          toast.info("New version available! Refresh to update.");
+          toast.info("New version available! Refresh to update.", {duration:99999});
         }
       } catch (err) {
         console.error("Version check failed", err);
