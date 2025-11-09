@@ -6,6 +6,7 @@ import "./globals.css";
 import LoadingBar from "@/components/LoadingBar";
 import { ThemeProvider } from "@/components/Homepage/theme-provider";
 import { ThemeTogglerButton } from "@/components/animate-ui/components/buttons/theme-toggler";
+import { VersionProvider } from "@/components/Providers/VersionProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,7 +37,9 @@ export default function RootLayout({
           <SessionProvider>
             <Toaster />
             <LoadingBar>
-              {children}
+              <VersionProvider>
+                {children}
+              </VersionProvider>
             </LoadingBar>
           </SessionProvider>
         </ThemeProvider>
