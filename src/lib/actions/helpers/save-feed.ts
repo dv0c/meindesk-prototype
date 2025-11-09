@@ -13,44 +13,47 @@ export async function SaveFeed({
   siteId: string;
 }) {
   const session = await getAuthSession();
+  if (!session?.user.id) throw new Error("Not authorized");
 
-  if (!session?.user.id) {
-    return "Not authorized";
-  }
-
-  // 1. Create the feed
-  const feed = await db.rss.create({
-    data: { ...data },
+  // 1. Check if feed already exists by URL & siteId
+  let feed = await db.rss.findFirst({
+    where: { url: data.url, siteId },
   });
 
-  if (!feed) {
-    return "An error has occurred";
+  if (feed) {
+    // 2. Update existing feed
+    feed = await db.rss.update({
+      where: { id: feed.id },
+      data: {
+        title: data.title,
+        description: data.description,
+        icon: data.icon,
+        autoImport: data.autoImport ?? feed.autoImport,
+      },
+    });
+  } else {
+    // 3. Create new feed
+    feed = await db.rss.create({
+      data: { ...data, siteId },
+    });
   }
 
-  // 2. Insert feed items concurrently with duplicate check
+  // 4. Insert/update feed items concurrently
   if (feedItems?.length) {
-    try {
-      await Promise.all(
-        feedItems.map(async (item) => {
-          // Step 1: Normalize identifying fields
-          const guid = item.guid || item.link || null;
-          if (!guid) return; // skip broken items with no identity
+    await Promise.all(
+      feedItems.map(async (item) => {
+        const guid = item.guid || item.link || null;
+        if (!guid) return;
 
-          // Step 2: Check if this item already exists for this feed
-          const existing = await db.rssItem.findFirst({
-            where: {
-              OR: [
-                { guid },
-                { link: item.link || "" },
-              ],
-              rssId: feed.id,
-            },
-            select: { id: true },
-          });
+        const existingItem = await db.rssItem.findFirst({
+          where: {
+            OR: [{ guid }, { link: item.link || "" }],
+            rssId: feed.id,
+          },
+          select: { id: true },
+        });
 
-          if (existing) return; // skip duplicates
-
-          // Step 3: Create the new item
+        if (!existingItem) {
           await db.rssItem.create({
             data: {
               guid,
@@ -68,19 +71,13 @@ export async function SaveFeed({
               rssId: feed.id,
             },
           });
-        })
-      );
-    } catch (err) {
-      console.error("Error creating feed items:", err);
-      // rollback feed if necessary
-      await db.rss.delete({ where: { id: feed.id } });
-      throw new Error("Failed to save feed items");
-    }
+        }
+      })
+    );
   }
 
-  // 3. Return response
   return {
-    url: `/dashboard/${siteId}/projects/website/rss/feed/${feed.url}`,
+    url: `/dashboard/${siteId}/projects/website/rss/feed/${encodeURIComponent(feed.url as string)}`,
     rss: feed,
   };
 }

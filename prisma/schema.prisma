@@ -136,6 +136,7 @@ model Features {
   pages      Boolean @default(true)
   categories Boolean @default(true)
   media      Boolean @default(true)
+  rss        Boolean @default(true)
 
   viewslimit Int @default(500)
   ratelimit  Int @default(10000)
@@ -258,6 +259,7 @@ model Rss {
   siteId      String   @db.ObjectId
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  autoImport  Boolean  @default(false)
 
   site     Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
   rssItems RssItem[]
