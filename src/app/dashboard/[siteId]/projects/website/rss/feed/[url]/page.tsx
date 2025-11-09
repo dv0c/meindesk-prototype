@@ -24,9 +24,11 @@ import { toast } from "sonner"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Drawer, DrawerContent } from "@/components/ui/drawer"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { Spinner } from "@/components/ui/spinner"
 
 const FeedPage = ({ params }: { params: { siteId: string, url: string } }) => {
     const router = useRouter()
+    const isMobile = useIsMobile()
     const { siteId, url } = use(params as any) as any
 
     const { data: myFeeds, error: dataError, loading: dataLoading } = useFetch(`/api/team/${siteId}/rss/my-feed`)
@@ -36,7 +38,7 @@ const FeedPage = ({ params }: { params: { siteId: string, url: string } }) => {
     const [autoImport, setAutoImport] = useState(false)
     const [currentData, setCurrentData] = useState<any>(null)
     const [openDrawer, setOpenDrawer] = useState<boolean>(false)
-    const isMobile = useIsMobile()
+    const [feedSaving, setFeedSaving] = useState<boolean>(false)
 
     // Normalize URL helper
     const normalizeUrl = useCallback((u?: string) => u ? decodeURIComponent(u).replace(/\/+$/, "") : "", [])
@@ -53,7 +55,7 @@ const FeedPage = ({ params }: { params: { siteId: string, url: string } }) => {
     // Save feed
     const handleSaveFeed = async () => {
         if (!feed || isSaved) return
-
+        setFeedSaving(true)
         try {
             const res = await SaveFeed({
                 data: {
@@ -68,10 +70,12 @@ const FeedPage = ({ params }: { params: { siteId: string, url: string } }) => {
                 feedItems: feed.items
             })
             toast.success("Feed saved to your feeds!")
+            setFeedSaving(false)
             location.reload()
         } catch (err) {
             console.error(err)
             toast.error("Failed to save feed")
+            setFeedSaving(false)
         }
     }
 
@@ -126,7 +130,8 @@ const FeedPage = ({ params }: { params: { siteId: string, url: string } }) => {
                 <div className="relative flex justify-between gap-5 max-w-4xl mx-auto">
                     {!isSaved && (
                         <div className="absolute top-[50px] left-0 max-w-xl w-full flex justify-center">
-                            <Button variant="outline" onClick={handleSaveFeed} className="bg-accent-foreground">
+                            <Button variant="outline" disabled={feedSaving} onClick={handleSaveFeed} className="bg-accent-foreground">
+                                {feedSaving && <Spinner />}
                                 Save to my feeds
                             </Button>
                         </div>
@@ -218,7 +223,7 @@ const FeedPage = ({ params }: { params: { siteId: string, url: string } }) => {
 // Settings Dialog extracted
 const FeedSettings = ({ feed, autoImport, setAutoImport, currentData, siteId, myFeeds }: any) => {
     const [openDelete, setOpenDelete] = useState(false);
-
+    const [loading, setLoading] = useState<boolean>(false)
     const handleDelete = async () => {
         if (!feed) return;
         try {
@@ -279,18 +284,22 @@ const FeedSettings = ({ feed, autoImport, setAutoImport, currentData, siteId, my
             <Button
                 variant="outline"
                 size="sm"
-                disabled={!feed || feed.items.length === 0}
+                disabled={!feed || feed.items.length === 0 || loading}
                 onClick={async () => {
                     try {
+                        setLoading(true)
                         toast.loading("Saving feed items to articles...", { id: "saveRss" });
                         const res = await SaveRssToArticles({ siteId, rssId: myFeeds.find((f: any) => f.url === feed?.feedUrl)?.id })
                         toast.success(res.message || "Saved!", { id: "saveRss" });
+                        setLoading(false)
                     } catch (err: any) {
+                        setLoading(false)
                         toast.error(err.message || "Failed to save articles", { id: "saveRss" });
                     }
                 }}
             >
-                <Upload className="mr-2 h-4 w-4" /> Save as articles
+                {loading ? <Spinner className="mr-2" /> : <Upload className="mr-2 h-4 w-4" />  }
+                 Save as articles
             </Button>
 
             <DropdownMenu>

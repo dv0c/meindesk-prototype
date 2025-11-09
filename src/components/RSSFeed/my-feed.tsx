@@ -1,7 +1,7 @@
 "use client"
 
 import { Rss as RSS } from "@prisma/client"
-import { Menu, Rss } from "lucide-react"
+import { Menu, Rss, RssIcon } from "lucide-react"
 import PageWrapper from "../PageWrapper"
 import { Button } from "../ui/button"
 import { Card, CardContent } from "../ui/card"
@@ -11,6 +11,7 @@ import CreateNewFeed from "./CreateButtonPage"
 import { useFetch } from "@/hooks/useFetch"
 import Link from "next/link"
 import { useSite } from "../Contexts/site-id-context"
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "../ui/empty"
 
 const MyFeed = () => {
     const { siteId } = useSite()
@@ -49,7 +50,7 @@ const MyFeed = () => {
             ) : error || !siteId ? (
                 <p className="text-red-500">Failed to load feeds: {error}</p>
             ) : feeds.length === 0 ? (
-                <p className="text-muted-foreground">No feeds created yet.</p>
+                <NoFeed siteId={siteId} />
             ) : (
                 <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                     {feeds.map((feed) => {
@@ -64,7 +65,7 @@ const MyFeed = () => {
                                 <Card className="group relative p-4 border rounded-md hover:shadow-md transition">
                                     <CardContent className="px-3 pb-3 w-full">
                                         {/* Feed actions */}
-                                        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        {/* <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
                                                     <Button size="icon-sm" variant="ghost" className="cursor-pointer">
@@ -76,7 +77,7 @@ const MyFeed = () => {
                                                     <DropdownMenuItem className="text-red-500">Delete Feed</DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
-                                        </div>
+                                        </div> */}
 
                                         {/* Feed info */}
                                         <div className="flex items-center gap-3">
@@ -129,3 +130,21 @@ const CreateRSS = ({ siteId }: { siteId: string }) => {
         </Dialog>
     )
 }
+
+
+const NoFeed = ({ siteId }: { siteId: string }) => (
+    <Empty className="border border-dashed">
+        <EmptyHeader>
+            <EmptyMedia variant="icon">
+                <RssIcon />
+            </EmptyMedia>
+            <EmptyTitle>There is no RSS Feed.</EmptyTitle>
+            <EmptyDescription>
+                Discovery or create your first RSS Feed.
+            </EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent>
+            <CreateRSS siteId={siteId} />
+        </EmptyContent>
+    </Empty>
+)

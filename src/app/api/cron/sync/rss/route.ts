@@ -86,7 +86,9 @@ export async function GET(request: Request) {
         updatedFeeds++;
 
         // 4️⃣ Auto-import to Articles
-        const rssItems = await db.rssItem.findMany({ where: { rssId: rss.id } });
+        const rssItems = await db.rssItem.findMany({
+          where: { rssId: rss.id },
+        });
 
         const limit = pLimit(5);
         let importedCount = 0;
@@ -116,23 +118,9 @@ export async function GET(request: Request) {
                     html: item.content || item.description || "",
                     cover: item.thumbnail || null,
                     status: "DRAFT",
-                    content: {
-                      root: {
-                        children: [
-                          {
-                            type: "paragraph",
-                            children: [
-                              { type: "text", text: "Source provided by " },
-                              {
-                                type: "link",
-                                url: item.link,
-                                children: [{ type: "text", text: item.site_name }],
-                              },
-                            ],
-                          },
-                        ],
-                      },
-                    },
+                    content: JSON.parse(
+                      `{"root":{"children":[{"children":[{"detail":0,"format":8,"mode":"normal","style":"font-size: 13px;","text":"Source provided by ","type":"text","version":1},{"children":[{"detail":0,"format":8,"mode":"normal","style":"font-size: 13px;","text":"${item.site_name}","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"link","version":1,"textFormat":8,"textStyle":"font-size: 13px;","rel":"noreferrer","target":null,"title":null,"url":"${item.link}"}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":8,"textStyle":"font-size: 13px;"}],"direction":null,"format":"","indent":0,"type":"root","version":1,"textFormat":8,"textStyle":"font-size: 13px;"}}`
+                    ),
                     sourceType: "RSS",
                     sourceId: item.id,
                     authorId: site.userId, // make sure this is valid

@@ -1,4 +1,5 @@
 
+import { ThemeTogglerButton } from "@/components/animate-ui/components/buttons/theme-toggler"
 import { AppSidebar, ToggleSidebar } from "@/components/app-sidebar"
 import { SiteProvider } from "@/components/Contexts/site-id-context"
 import LoadingOverlay from "@/components/loading-overlay"
@@ -31,7 +32,7 @@ const layout: FC<layoutProps> = ({ children }) => {
                             className="mr-2 data-[orientation=vertical]:h-4"
                         />
                         <Breadcrumb>
-                            <BreadcrumbList>
+                            <BreadcrumbList className="w-full">
                                 <BreadcrumbItem className="hidden md:block">
                                     <BreadcrumbLink href="#">
                                         Your Project
@@ -40,6 +41,9 @@ const layout: FC<layoutProps> = ({ children }) => {
                                 <BreadcrumbSeparator className="hidden md:block" />
                                 <BreadcrumbItem>
                                     <BreadcrumbPage>Website</BreadcrumbPage>
+                                </BreadcrumbItem>
+                                <BreadcrumbItem className="flex-1">
+                                    <ThemeTogglerButton />
                                 </BreadcrumbItem>
                             </BreadcrumbList>
                         </Breadcrumb>

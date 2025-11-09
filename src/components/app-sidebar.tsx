@@ -116,7 +116,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     { title: "Settings", url: "/projects/settings", icon: Settings, isActive: true },
   ]
   const rsscontent = [
-    { title: "RSS Feed", url: "rss/feeds", icon: Rss, isActive: false, items: [
+    { title: "RSS Feed", url: "projects/website/rss/my-feed", icon: Rss, isActive: false, items: [
       { title: "My Feed", url: "projects/website/rss/my-feed" },
       // { title: "Add New Feed", url: "/rss/feeds/new" },
     ] },
