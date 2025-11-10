@@ -6,7 +6,7 @@ import Link from "next/link";
 interface Features {
   articles?: boolean;
   pages?: boolean;
-  cateories?: boolean; // keep same typo as in DB
+  categories?: boolean; // keep same typo as in DB
   media?: boolean;
   analytics?: boolean;
 }
@@ -69,7 +69,7 @@ const QuickActions = ({ siteId, features }: QuickActionsProps) => {
             </Link>
           )}
 
-          {features.cateories && (
+          {features.categories && (
             <Link className="grid cursor-pointer" href={`${path}/categories`}>
               <Button
                 className="cursor-pointer h-auto flex-col items-start gap-2 p-4 bg-transparent"

@@ -1,6 +1,4 @@
 
-import { ArticleTable } from "@/components/ArticlesTable";
-import { CreateArticleButton } from "@/components/CreateArticleButton";
 import { CreatePageButton } from "@/components/CreatePageButton";
 import { PagesTable } from "@/components/PagesTable";
 import PageWrapper from "@/components/PageWrapper";

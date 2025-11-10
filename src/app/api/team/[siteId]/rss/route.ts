@@ -112,16 +112,87 @@ async function fetchMetadataFromPage(url: string, fetchContent = false) {
       $("img").first().attr("src") ||
       null;
 
-    const author =
+    let author =
       $('meta[name="author"]').attr("content") ||
       $('meta[property="article:author"]').attr("content") ||
-      $(".author, [rel=author]").first().text().trim() ||
+      $('meta[property="og:article:author"]').attr("content") ||
+      $(".author, [rel=author], .byline, .posted-by").first().text().trim() ||
       null;
 
-    const categories = $(".tags a, .categories a")
-      .map((_, el) => $(el).text().trim())
-      .get();
+    // --- Smart Category Extraction ---
+    let categories: string[] = [];
 
+    // From visible elements
+    const selectors = [
+      ".tags a",
+      ".tag a",
+      ".categories a",
+      ".category a",
+      ".post-tag",
+      ".post-category",
+      ".label",
+      ".topic",
+    ];
+    selectors.forEach((sel) =>
+      $(sel).each((_, el) => {
+        const txt = $(el).text().trim();
+        if (txt && !categories.includes(txt)) categories.push(txt);
+      })
+    );
+
+    // From meta tags
+    const metaKeys = [
+      "keywords",
+      "news_keywords",
+      "article:section",
+      "section",
+      "category",
+      "topic",
+    ];
+    metaKeys.forEach((name) => {
+      const content =
+        $(`meta[name="${name}"]`).attr("content") ||
+        $(`meta[property="${name}"]`).attr("content");
+      if (content) {
+        content
+          .split(/[,|]/)
+          .map((x) => x.trim())
+          .filter(Boolean)
+          .forEach((x) => {
+            if (!categories.includes(x)) categories.push(x);
+          });
+      }
+    });
+
+    // From JSON-LD (schema.org data)
+    $('script[type="application/ld+json"]').each((_, el) => {
+      try {
+        const json = JSON.parse($(el).contents().text());
+        const data = Array.isArray(json) ? json : [json];
+        for (const item of data) {
+          const keys = ["keywords", "articleSection", "genre", "about"];
+          keys.forEach((key) => {
+            const val = item[key];
+            if (Array.isArray(val)) {
+              val.forEach((v) => {
+                const name = typeof v === "string" ? v : v?.name;
+                if (name && !categories.includes(name)) categories.push(name);
+              });
+            } else if (typeof val === "string") {
+              val
+                .split(/[,|]/)
+                .map((x) => x.trim())
+                .filter(Boolean)
+                .forEach((x) => {
+                  if (!categories.includes(x)) categories.push(x);
+                });
+            }
+          });
+        }
+      } catch {}
+    });
+
+    // --- Content extraction (unchanged) ---
     let content: string | null = null;
     if (fetchContent) {
       const articleTag = $("article");
@@ -141,6 +212,7 @@ async function fetchMetadataFromPage(url: string, fetchContent = false) {
       content = clean.html() || null;
     }
 
+    // --- Normalize URLs ---
     const absolute = (path: string | null) => {
       if (!path) return null;
       if (path.startsWith("http")) return path;
@@ -151,6 +223,26 @@ async function fetchMetadataFromPage(url: string, fetchContent = false) {
       }
     };
 
+    // --- Fallback author ---
+    if (!author) {
+      try {
+        const u = new URL(url);
+        author = u.hostname.replace(/^www\./, "");
+      } catch {
+        author = "Unknown Author";
+      }
+    }
+
+    // --- Fallback categories ---
+    if (!categories.length) {
+      try {
+        const u = new URL(url);
+        categories = [u.hostname.replace(/^www\./, "")];
+      } catch {
+        categories = ["General"];
+      }
+    }
+
     return {
       title,
       description,
@@ -160,7 +252,7 @@ async function fetchMetadataFromPage(url: string, fetchContent = false) {
       categories,
       content,
     };
-  } catch (err) {
+  } catch (err: any) {
     console.error("fetchMetadataFromPage error:", err.message);
     return {};
   }
@@ -177,12 +269,12 @@ async function parseYouTubeFeed(xmlText: string) {
   if (!feed || !feed.entry) return null;
 
   const entries = Array.isArray(feed.entry) ? feed.entry : [feed.entry];
-  const channelTitle = feed.title || "YouTube Channel";
+  const channelTitle = feed.title;
   // I don't really know why should i do this but it is working.
   const channelId = "UC" + feed["yt:channelId"] || null;
 
   const site = {
-    title: "YouTube",
+    title: `Youtube ${feed.author?.name ? `| ${feed.author.name}` : ""}`,
     favicon: "https://www.youtube.com/s/desktop/ce69dda5/img/favicon_32x32.png",
     logo: `https://yt3.googleusercontent.com/ytc/${channelId}`,
     url: feed.author?.uri || "https://www.youtube.com",
@@ -223,7 +315,7 @@ async function parseYouTubeFeed(xmlText: string) {
   return {
     feedUrl: `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`,
     type: "YouTube",
-    title: channelTitle,
+    title: `Youtube ${feed.author?.name ? `| ${feed.author.name}` : ""}`,
     description: `YouTube feed for ${channelTitle}`,
     image: site.logo,
     items,
@@ -396,7 +488,7 @@ async function detectRealFeed(
           items,
         };
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(`Feed check failed for ${feedUrl}:`, err.message);
     }
   }
@@ -519,9 +611,9 @@ export async function GET(req: NextRequest) {
       found: true,
       feedUrl: feedData.feedUrl,
       type: feedData.type,
-      title: siteMeta.title,
+      title: feedData.title,
       description: feedData.description,
-      image: feedData.image,
+      image: feedData.image || siteMeta.favicon,
       itemCount: feedData.items.length,
       site: siteMeta,
       items: feedData.items,
@@ -537,3 +629,4 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+  

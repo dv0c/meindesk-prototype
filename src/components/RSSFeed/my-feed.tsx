@@ -1,23 +1,22 @@
 "use client"
 
+import { useFetch } from "@/hooks/useFetch"
 import { Rss as RSS } from "@prisma/client"
-import { Menu, Rss, RssIcon } from "lucide-react"
+import { Rss, RssIcon } from "lucide-react"
+import Link from "next/link"
+import { useSite } from "../Contexts/site-id-context"
 import PageWrapper from "../PageWrapper"
 import { Button } from "../ui/button"
 import { Card, CardContent } from "../ui/card"
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu"
-import CreateNewFeed from "./CreateButtonPage"
-import { useFetch } from "@/hooks/useFetch"
-import Link from "next/link"
-import { useSite } from "../Contexts/site-id-context"
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "../ui/empty"
+import CreateNewFeed from "./CreateButtonPage"
 
 const MyFeed = () => {
     const { siteId } = useSite()
     const { data, error, loading } = useFetch<RSS[]>(`/api/team/${siteId}/rss/my-feed`)
     const feeds = Array.isArray(data) ? data : []
-
+    console.log(data)
     if (!siteId) return null
 
     // Skeleton cards for loading state
@@ -96,7 +95,7 @@ const MyFeed = () => {
                                             <div className="flex flex-col gap-1 min-w-0">
                                                 <span className="text-lg font-bold truncate max-w-full">{feed.title || "Untitled Feed"}</span>
                                                 <p
-                                                    className="text-sm text-accent truncate max-w-full break-all"
+                                                    className="text-sm dark:text-accent text-accent-foreground truncate max-w-full break-all"
                                                     title={feedUrl}
                                                 >
                                                     {feedUrl}

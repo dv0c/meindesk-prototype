@@ -1,15 +1,19 @@
 'use client'
 
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Drawer, DrawerContent } from "@/components/ui/drawer"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Spinner } from "@/components/ui/spinner"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { useFeed } from "@/hooks/useFeed"
 import { useFetch } from "@/hooks/useFetch"
 import { ChangeAutoImport } from "@/lib/actions/helpers/auto-import-toggle"
@@ -19,12 +23,8 @@ import { SaveRssToArticles } from "@/lib/actions/helpers/save-rss-to-articles"
 import { ArrowLeft, Edit, Link2, List, MoreHorizontal, Upload } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import React, { useEffect, useState, useCallback, use } from "react"
+import { use, useCallback, useEffect, useState } from "react"
 import { toast } from "sonner"
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Drawer, DrawerContent } from "@/components/ui/drawer"
-import { useIsMobile } from "@/hooks/use-mobile"
-import { Spinner } from "@/components/ui/spinner"
 
 const FeedPage = ({ params }: { params: { siteId: string, url: string } }) => {
     const router = useRouter()
@@ -59,7 +59,7 @@ const FeedPage = ({ params }: { params: { siteId: string, url: string } }) => {
         try {
             const res = await SaveFeed({
                 data: {
-                    title: feed.site.title || "Untitled",
+                    title: feed.title || "Untitled",
                     url: feed.feedUrl,
                     siteId,
                     description: feed.description || "",
@@ -111,7 +111,7 @@ const FeedPage = ({ params }: { params: { siteId: string, url: string } }) => {
                         </Button>
                         {feed?.site.favicon && <img src={feed.site.favicon} alt="Site Favicon" className="w-10 h-10 rounded-full object-cover" />}
                         <div className="flex flex-col">
-                            <span>{feed?.site.title}</span>
+                            <span>{feed?.title}</span>
                             <span className="text-sm text-muted-foreground">{feed?.feedUrl}</span>
                         </div>
                     </div>

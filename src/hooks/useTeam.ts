@@ -25,7 +25,7 @@ export interface Site {
   features: {
     articles: boolean
     pages: boolean
-    cateories: boolean
+    categories: boolean
     media: boolean
     analytics: boolean
   }

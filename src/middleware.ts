@@ -33,7 +33,7 @@ export async function middleware(req: NextRequest) {
   const featureRules: Record<string, boolean> = {
     "/projects/website/articles": !!features.articles,
     "/projects/website/pages": !!features.pages,
-    "/projects/website/categories": !!features.cateories, // note typo in your DB?
+    "/projects/website/categories": !!features.categories, // were typo but fixed not frm evry files
     "/projects/website/media-gallery": !!features.media,
     "/projects/website/analytics": !!features.analytics,
   };

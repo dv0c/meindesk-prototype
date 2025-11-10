@@ -135,7 +135,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const projects = [
       features.articles && { name: "Articles", url: "/projects/website/articles", icon: FileText },
       features.pages && { name: "Pages", url: "/projects/website/pages", icon: FileIcon },
-      features.cateories && { name: "Categories", url: "/projects/website/categories", icon: Folder },
+      features.categories && { name: "Categories", url: "/projects/website/categories", icon: Folder },
       features.media && { name: "Media Gallery", url: "/projects/website/media-gallery", icon: Image },
     ].filter(Boolean)
 

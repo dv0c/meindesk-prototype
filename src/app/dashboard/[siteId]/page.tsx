@@ -20,7 +20,6 @@ export default function Page() {
 
   return <div>
     <main className="flex-1 p-6">
-      <ThemeTogglerButton direction="ltr" />
       <StatsCards siteId={team.id} />
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <QuickActions features={team.features} siteId={team.id} />
