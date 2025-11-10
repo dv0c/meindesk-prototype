@@ -30,12 +30,6 @@ export async function GET(
             image: true,
           },
         },
-        category: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
         site: {
           select: {
             id: true,
