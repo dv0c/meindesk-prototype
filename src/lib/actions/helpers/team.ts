@@ -15,7 +15,7 @@ const _getActiveTeamCached = unstable_cache(
         subscription: true,
         features: true,
         Article: true,
-        Category: true,
+        category: true,
         AnalyticsEvent: analytics ? true : false,
       },
     });
