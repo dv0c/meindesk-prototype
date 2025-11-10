@@ -7,6 +7,9 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Search, Rss, Youtube, Globe, Newspaper } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useFetch } from "@/hooks/useFetch"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Command, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command"
+import { Loader2 } from "lucide-react"
 
 export default function CreateNewFeed({ siteId }: { siteId: string }) {
     const router = useRouter()
