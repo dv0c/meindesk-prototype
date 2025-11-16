@@ -8,7 +8,7 @@ export async function SaveFeed({
   siteId,
   feedItems,
 }: {
-  data: Omit<Rss, "id" | "createdAt" | "updatedAt">;
+  data: Omit<Rss, "id" | "createdAt" | "updatedAt"> & { site_name: any };
   feedItems: any[];
   siteId: string;
 }) {
@@ -61,7 +61,7 @@ export async function SaveFeed({
               link: item.link || "",
               description: item.description || "",
               thumbnail: item.thumbnail || null,
-              site_name: item.site.title,
+              site_name: item.site?.title || feed.title,
               publishedAt: item.publishedAt
                 ? new Date(item.publishedAt)
                 : new Date(),
@@ -77,7 +77,9 @@ export async function SaveFeed({
   }
 
   return {
-    url: `/dashboard/${siteId}/projects/website/rss/feed/${encodeURIComponent(feed.url as string)}`,
+    url: `/dashboard/${siteId}/projects/website/rss/feed/${encodeURIComponent(
+      feed.url as string
+    )}`,
     rss: feed,
   };
 }

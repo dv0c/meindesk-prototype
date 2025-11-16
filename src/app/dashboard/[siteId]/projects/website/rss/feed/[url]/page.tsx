@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Drawer, DrawerContent } from "@/components/ui/drawer"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -20,7 +21,7 @@ import { ChangeAutoImport } from "@/lib/actions/helpers/auto-import-toggle"
 import { DeleteFeed } from "@/lib/actions/helpers/delete-feed"
 import { SaveFeed } from "@/lib/actions/helpers/save-feed"
 import { SaveRssToArticles } from "@/lib/actions/helpers/save-rss-to-articles"
-import { ArrowLeft, Edit, Link2, List, MoreHorizontal, Upload } from "lucide-react"
+import { ArrowLeft, Edit, Link2, List, MoreHorizontal, RssIcon, Upload } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { use, useCallback, useEffect, useState } from "react"
@@ -50,12 +51,37 @@ const FeedPage = ({ params }: { params: { siteId: string, url: string } }) => {
         setIsSaved(!!savedFeed)
         setAutoImport(savedFeed?.autoImport ?? false)
         setCurrentData(savedFeed ?? null)
+        console.log(feed)
     }, [feed, myFeeds, normalizeUrl])
+
+
+    useEffect(() => {
+        if (!error || !myFeeds || (error || dataError) !== "No feed could be generated") return;
+
+        const savedFeed = myFeeds.find((f: any) => normalizeUrl(f.url) === normalizeUrl(url));
+        if (!savedFeed) return;
+
+        const autoDeleteFeed = async () => {
+            try {
+                toast.warning("This feed is no longer available. Removing it from your list...");
+                await DeleteFeed({ feedId: savedFeed.id, siteId });
+                toast.success("Invalid feed removed successfully!");
+                router.push(`/dashboard/${siteId}/projects/website/rss/my-feed`);
+            } catch (err: any) {
+                console.error("Auto-delete failed:", err);
+                toast.error("Failed to remove invalid feed.");
+            }
+        };
+
+        autoDeleteFeed();
+    }, [error, myFeeds, siteId, url, normalizeUrl, router]);
+
 
     // Save feed
     const handleSaveFeed = async () => {
         if (!feed || isSaved) return
         setFeedSaving(true)
+        console.log(feed)
         try {
             const res = await SaveFeed({
                 data: {
@@ -98,7 +124,20 @@ const FeedPage = ({ params }: { params: { siteId: string, url: string } }) => {
     }
 
     if (loading || dataLoading) return <FeedSkeleton />
-    if (error || dataError) return <div className="p-10 text-red-500">Error loading feed: {error || dataError}</div>
+    if (error || dataError) return <Empty className="border border-dashed">
+        <EmptyHeader>
+            <EmptyMedia variant="icon">
+                <RssIcon />
+            </EmptyMedia>
+            <EmptyTitle>There is no RSS Feed.</EmptyTitle>
+            <EmptyDescription>
+                {error || dataError}
+            </EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent>
+            <Button onClick={() => history.back()} variant={'outline'}>Go Back</Button>
+        </EmptyContent>
+    </Empty>
 
     return (
         <div>
@@ -160,7 +199,7 @@ const FeedPage = ({ params }: { params: { siteId: string, url: string } }) => {
                                     <div className="line-clamp-3" dangerouslySetInnerHTML={{ __html: item.description || "No description" }} />
                                     <div className="text-xs mt-5 flex items-center gap-1">
                                         <Badge variant="secondary">{feed.type} {(feed.type === "Youtube" || feed.type === "Generator") && "SRC"}</Badge>
-                                        <p>provided by <Link href={item.site.url || "#"} className="underline">{item.site.title}</Link></p>
+                                        <p>provided by <Link href={item.site?.url || feed.feedUrl || "#"} className="underline">{item.site?.title || feed.title}</Link></p>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -298,8 +337,8 @@ const FeedSettings = ({ feed, autoImport, setAutoImport, currentData, siteId, my
                     }
                 }}
             >
-                {loading ? <Spinner className="mr-2" /> : <Upload className="mr-2 h-4 w-4" />  }
-                 Save as articles
+                {loading ? <Spinner className="mr-2" /> : <Upload className="mr-2 h-4 w-4" />}
+                Save as articles
             </Button>
 
             <DropdownMenu>
