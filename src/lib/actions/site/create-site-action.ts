@@ -13,29 +13,17 @@ export async function createSite(formData: FormData) {
   const description = formData.get("description")?.toString().trim() || null;
   const url = formData.get("url")?.toString().trim();
   const logo = formData.get("logo")?.toString().trim() || null;
+  const subdomain = formData.get("subdomain")?.toString().trim() || null;
 
   if (!title) {
     throw new Error("Title is required");
   }
 
-  if (!url) {
+  if (!url || !subdomain) {
     throw new Error("Url is required");
   }
 
   try {
-    const getDomainName = (urlString: string): string => {
-      try {
-        const urlObj = new URL(urlString);
-        const hostname = urlObj.hostname;
-        const parts = hostname.split(".");
-        // Get the main domain (e.g., "meindesk" from "www.meindesk.gr")
-        return parts.length > 1 ? parts[parts.length - 2] : parts[0];
-      } catch {
-        return title.toLowerCase().replace(/\s+/g, "-");
-      }
-    };
-
-    const domainName = getDomainName(url);
 
     const site = await db.site.create({
       data: {
@@ -43,7 +31,7 @@ export async function createSite(formData: FormData) {
         description,
         url,
         logo,
-        subdomain: domainName,
+        subdomain,
         userId: session.user.id, // link site to logged-in user
       },
     });
