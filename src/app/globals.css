@@ -3,7 +3,7 @@
 @import 'swiper/css';
 @import 'swiper/css/navigation';
 @import 'swiper/css/pagination';
-
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 

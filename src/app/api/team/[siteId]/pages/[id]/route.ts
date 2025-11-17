@@ -35,6 +35,7 @@ async function fetchChildren(parentId: string): Promise<PageWithChildren[]> {
       content: child.content ?? undefined,
       excerpt: child.excerpt ?? undefined,
       order: child.order ?? undefined,
+      html: child.html ?? undefined,
       parentId: child.parentId ?? undefined,
       userId: child.userId ?? undefined,
       children: await fetchChildren(child.id),
@@ -42,31 +43,40 @@ async function fetchChildren(parentId: string): Promise<PageWithChildren[]> {
   );
 }
 
-
 // -----------------------------
 // GET /pages/:id -> fetch page + children
 // -----------------------------
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const { id } = await params;
 
   try {
     const page = await db.page.findUnique({ where: { id } });
 
-    if (!page) return NextResponse.json({ error: "Page not found" }, { status: 404 });
+    if (!page)
+      return NextResponse.json({ error: "Page not found" }, { status: 404 });
 
     const children: PageWithChildren[] = await fetchChildren(page.id);
 
     return NextResponse.json({ ...page, children }, { status: 200 });
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Failed to fetch page" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch page" },
+      { status: 500 }
+    );
   }
 }
 
 // -----------------------------
 // PUT /pages/:id -> update a page
 // -----------------------------
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   const { id } = await params;
   const body = await req.json();
 
@@ -79,6 +89,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         excerpt: body.excerpt,
         template: body.template,
         status: body.status,
+        html: body.html,
         order: body.order,
         meta: body.meta,
         parentId: body.parentId,
@@ -88,14 +99,20 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     return NextResponse.json(updatedPage, { status: 200 });
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Failed to update page" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update page" },
+      { status: 500 }
+    );
   }
 }
 
 // -----------------------------
 // DELETE /pages/:id -> remove a page
 // -----------------------------
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   const { id } = params;
 
   try {
@@ -103,6 +120,9 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     return NextResponse.json({ message: "Page deleted" }, { status: 200 });
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Failed to delete page" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to delete page" },
+      { status: 500 }
+    );
   }
 }

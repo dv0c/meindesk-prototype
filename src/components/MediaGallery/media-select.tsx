@@ -89,9 +89,8 @@ function MediaItemCard({
 
   return (
     <div
-      className={`relative aspect-square rounded-lg overflow-hidden cursor-pointer border transition group ${
-        isSelected ? "border-primary" : "border-transparent hover:border-muted-foreground/40"
-      }`}
+      className={`relative aspect-square rounded-lg overflow-hidden cursor-pointer border transition group ${isSelected ? "border-primary" : "border-transparent hover:border-muted-foreground/40"
+        }`}
       onClick={onSelect}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -221,19 +220,23 @@ export default function MediaLibraryDialog({
   }
 
   const handleUploadSuccess = async (result: any) => {
-    try {
-      await axios.post(`/api/team/${siteId}/media-gallery`, {
-        siteId,
-        url: result.info.secure_url,
-        publicId: result.info.public_id,
-      })
-      toast.success("Upload successful!")
-      fetchMedia()
-      setActiveTab("library")
-    } catch (err) {
-      console.error(err)
-      toast.error("Failed to save uploaded media.")
-    }
+    // try {
+    //   await axios.post(`/api/team/${siteId}/media-gallery`, {
+    //     siteId,
+    //     url: result.info.secure_url,
+    //     publicId: result.info.public_id,
+    //   })
+    //   toast.success("Upload successful!")
+    //   fetchMedia()
+    //   setActiveTab("library")
+    // } catch (err) {
+    //   console.error(err)
+    //   toast.error("Failed to save uploaded media.")
+    //   setActiveTab("library")
+    // }
+    setActiveTab("library")
+    toast.success("Upload successful!")
+    fetchMedia()
   }
 
   const handleSubmit = () => {
@@ -302,12 +305,18 @@ export default function MediaLibraryDialog({
             <TabsContent value="upload" className="flex-grow overflow-hidden flex flex-col items-center justify-center">
               <CldUploadButton
                 options={{
-                  folder: `${siteId}/uploads`,
-                  sources: ["local", "url", "camera"],
+                  folder: `${siteId}/uploads/`,
                   clientAllowedFormats: ["png", "gif", "jpeg", "webp"],
                   maxFileSize: 5 * 1024 * 1024,
+                  tags: siteId
+                    ? ["gallery_image", siteId, "user_upload"]
+                    : ["gallery_image", "user_upload"],
+                  context: {
+                    site_id: siteId || "",
+                    upload_source: "media_gallery",
+                  },
                 }}
-                uploadPreset="esiln4yu"
+                uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "esiln4yu"}
                 onSuccess={handleUploadSuccess}
                 className="w-full h-full border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center text-center cursor-pointer border-muted-foreground/30 hover:border-primary/60 transition-colors"
               >
