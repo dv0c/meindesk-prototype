@@ -19,7 +19,7 @@ const layout: FC<layoutProps> = async ({ children, params }) => {
     if (!session?.user.id) redirect('/login')
     if (!team) redirect('/dashboard')
 
-    return <div className='bg-neutral-950'>
+    return <div className='bg-neutral-950 h-screen overflow-auto pb-5'>
         {children}
     </div>
 }
