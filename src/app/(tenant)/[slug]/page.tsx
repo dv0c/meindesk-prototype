@@ -12,7 +12,7 @@ export default async function TenantPage({ params }: { params: { slug: string } 
       siteId: tenantId,
       slug: params.slug,
       status: "PUBLISHED",
-    },
+    },  
   });
 
   if (!page) return <div>404 - Page not found</div>;

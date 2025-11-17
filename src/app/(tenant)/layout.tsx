@@ -6,7 +6,6 @@ export default async function TenantLayout({ children }: { children: React.React
 
   // Fallback: if missing (local dev maybe)
   const tenant = tenantHeader === "prototype" ? null : tenantHeader;
-
   // Get site data
   const site = tenant
     ? await db.site.findUnique({ where: { id: tenant } })
@@ -16,7 +15,7 @@ export default async function TenantLayout({ children }: { children: React.React
     return (
       <html>
         <body>
-          <h1>Tenant not found</h1>
+          <h1>Tenant not found: layout</h1>
         </body>
       </html>
     );
