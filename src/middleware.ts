@@ -1,64 +1,51 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { db } from "./lib/db";
 
-export const config = {
-  matcher: [
-    /*
-     * Match all paths except:
-     * 1. /api routes
-     * 2. /_next (Next.js internals)
-     * 3. /_static (inside /public)
-     * 4. root files inside /public (e.g. /favicon.ico)
-     */
-    "/((?!api/|_next/|_static/|_vercel|[\\w-]+\\.\\w+).*)",
-  ],
-};
+export async function middleware(req: NextRequest) {
+  const host = req.headers.get("host") || "";
+  const url = new URL(req.url);
+  const pathname = url.pathname;
 
-export default async function middleware(req: NextRequest) {
-  const url = req.nextUrl.clone();
-  const hostnameRaw = req.headers.get("host") || "";
+  const domainParts = host.split(".");
+  const subdomain = domainParts.length > 2 ? domainParts[0].toLowerCase() : null;
 
-  // Normalize hostname for localhost and dev
-  const hostname = hostnameRaw.replace(
-    ".localhost:3000",
-    `.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
-  );
+  // Routes that always belong to the base (prototype) app
+  const baseRoutes = ["/dashboard", "/login", "/api/auth"];
 
-  const path = `${url.pathname}${url.searchParams.toString() ? `?${url.searchParams.toString()}` : ""}`;
+  // Check if request path starts with one of the base routes
+  const isBaseRoute = baseRoutes.some((r) => pathname.startsWith(r));
 
-  // ----------------------------
-  // 1️⃣ Dashboard auth
-  // ----------------------------
-  if (hostname.startsWith(`prototype.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`) || hostname.startsWith("localhost:3000")) {
-    const session = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  // meindesk.gr or prototype.meindesk.gr => base app
+  const isDefaultDomain =
+    !subdomain || subdomain === "prototype" || subdomain === "www";
 
-    if (!session && path !== "/login") {
-      return NextResponse.redirect(new URL("/login", req.url));
-    } else if (session && path === "/login") {
-      return NextResponse.redirect(new URL("/", req.url));
+  // If it’s a base route or main domain → prototype tenant
+  if (isBaseRoute || isDefaultDomain) {
+    req.headers.set("x-tenant", "prototype");
+    return NextResponse.next();
+  }
+
+  // Otherwise, tenant mode
+  try {
+    const site = await db.site.findUnique({
+      where: { subdomain },
+      select: { id: true },
+    });
+
+    if (!site) {
+      return new NextResponse("Tenant not found", { status: 404 });
     }
 
-    // Rewrite to /app pages
-    return NextResponse.rewrite(
-      new URL(`/prototype${path === "/" ? "" : path}`, req.url)
-    );
+    req.headers.set("x-tenant", site.id);
+    return NextResponse.next();
+  } catch (err) {
+    console.error("Tenant resolution failed:", err);
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
-
-  // ----------------------------
-  // 2️⃣ Root domain → homepage
-  // ----------------------------
-  if (hostname === process.env.NEXT_PUBLIC_ROOT_DOMAIN || hostname === "localhost:3000" || hostname.endsWith("lvh.me")) {
-    // rewrite to /home folder
-    return NextResponse.rewrite(
-      new URL(`/home${path === "/" ? "" : path}`, req.url)
-    );
-  }
-
-  // ----------------------------
-  // 3️⃣ All other subdomains → tenant
-  // ----------------------------
-  // example: prototype.meindesk.gr -> rewrites to /[subdomain]/[slug]
-  return NextResponse.rewrite(
-    new URL(`/${hostname}${path}`, req.url)
-  );
 }
+
+// Avoid running on static assets
+export const config = {
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt).*)"],
+  runtime: "nodejs"
+};
