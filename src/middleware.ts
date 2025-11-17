@@ -27,7 +27,7 @@ export async function middleware(req: NextRequest) {
   }
 
   // -----------------------------
-  // 1️⃣ Dashboard routes
+  // 1️⃣ Dashboard routes: auth + feature checks
   // -----------------------------
   if (url.pathname.startsWith("/dashboard")) {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
@@ -51,7 +51,7 @@ export async function middleware(req: NextRequest) {
       "/projects/website/categories": "categories",
       "/projects/website/media-gallery": "media",
       "/projects/website/analytics": "analytics",
-    } as any
+    } as any;
 
     for (const route in pathFeatureMap) {
       if (url.pathname.startsWith(route) && !features[pathFeatureMap[route]]) {
@@ -78,13 +78,10 @@ export async function middleware(req: NextRequest) {
     subdomain = pathSegments[0] || "";
     if (!subdomain) return NextResponse.next(); // main site in dev
   } else {
-    // PROD: any subdomain other than root domain
+    // PROD: any subdomain other than root domain is tenant
+    if (hostname === "meindesk.gr") return NextResponse.next(); // root domain → homepage
     const domainParts = hostname.split(".");
-    if (domainParts.length < 3) {
-      // Root domain: meindesk.gr → main site
-      return NextResponse.next();
-    }
-    subdomain = domainParts[0].toLowerCase(); // normalize for DB
+    subdomain = domainParts[0].toLowerCase(); // normalize
   }
 
   // -----------------------------
@@ -96,13 +93,12 @@ export async function middleware(req: NextRequest) {
   });
 
   if (!tenant) {
-    // Unknown tenant → 404
     url.pathname = "/404";
     return NextResponse.rewrite(url);
   }
 
   // -----------------------------
-  // Attach headers
+  // Attach tenant headers
   // -----------------------------
   const res = NextResponse.next();
   res.headers.set("x-tenant-id", tenant.id);
