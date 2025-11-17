@@ -10,7 +10,8 @@ const limit = pLimit(8);
 export async function detectRealFeed(
   target: string,
   fetchContent = false,
-  siteMeta: any = {}
+  siteMeta: any = {},
+  maxItems = 20 // <-- limit number of items
 ) {
   const baseUrl = target.replace(/\/(feed|rss|rss\.xml|atom\.xml)(\/)?$/, "");
   const res = await safeFetch(target);
@@ -18,6 +19,7 @@ export async function detectRealFeed(
   const html = await res.text();
   const $ = cheerio.load(html);
 
+  // --- Collect possible feed URLs ---
   const candidates = new Set<string>();
   $("link, a").each((_, el) => {
     const href = $(el).attr("href");
@@ -37,6 +39,7 @@ export async function detectRealFeed(
     }
   });
 
+  // --- Common guesses for feed URLs ---
   const path = new URL(target).pathname;
   const guesses = [
     "feed",
@@ -50,6 +53,7 @@ export async function detectRealFeed(
 
   const allCandidates = [...candidates, ...guesses];
 
+  // --- Try each candidate feed ---
   for (const feedUrl of allCandidates) {
     try {
       const r = await safeFetch(feedUrl);
@@ -57,14 +61,17 @@ export async function detectRealFeed(
       const text = await r.text();
       const contentType = r.headers.get("content-type") || "";
 
-      // --- YouTube Detection ---
+      // --- YouTube feed detection ---
       if (
         target.includes("youtube.com/feeds/videos.xml") ||
         text.includes("yt:videoId") ||
         text.includes("youtube.com")
       ) {
         const ytFeed = await parseYouTubeFeed(text);
-        if (ytFeed) return ytFeed;
+        if (ytFeed) {
+          if (ytFeed.items.length > maxItems) ytFeed.items = ytFeed.items.slice(0, maxItems);
+          return ytFeed;
+        }
       }
 
       // --- JSON Feed ---
@@ -72,7 +79,7 @@ export async function detectRealFeed(
         const json = JSON.parse(text);
         if (json.items || json.feed_url || json.title) {
           const items = await Promise.all(
-            (json.items || []).map((i: any) =>
+            (json.items || []).slice(0, maxItems).map((i: any) =>
               limit(async () => {
                 const url = i.url || i.link;
                 const meta = await fetchMetadataFromPage(url, fetchContent);
@@ -80,8 +87,7 @@ export async function detectRealFeed(
                   title: i.title,
                   link: url,
                   thumbnail: i.image || meta.thumbnail || null,
-                  description:
-                    i.summary || i.content || meta.description || null,
+                  description: i.summary || i.content || meta.description || null,
                   content: meta.content || null,
                   pubDate: i.date_published || i.pubDate || null,
                   author: i.author?.name || meta.author || null,
@@ -102,39 +108,31 @@ export async function detectRealFeed(
         }
       }
 
-      // --- XML Feed ---
+      // --- XML/Atom Feed ---
       if (contentType.includes("xml") || /<rss|<feed/i.test(text)) {
-        const parsed = await xml2js.parseStringPromise(text, {
-          explicitArray: false,
-        });
+        const parsed = await xml2js.parseStringPromise(text, { explicitArray: false });
         const channel = parsed.rss?.channel || parsed.feed;
         if (!channel) continue;
 
         const itemsArray =
-          (channel?.item &&
-            (Array.isArray(channel.item) ? channel.item : [channel.item])) ||
-          (parsed.feed?.entry &&
-            (Array.isArray(parsed.feed.entry)
-              ? parsed.feed.entry
-              : [parsed.feed.entry])) ||
+          (channel?.item && (Array.isArray(channel.item) ? channel.item : [channel.item])) ||
+          (parsed.feed?.entry && (Array.isArray(parsed.feed.entry) ? parsed.feed.entry : [parsed.feed.entry])) ||
           [];
 
         const items = await Promise.all(
-          itemsArray.map((item: any) =>
+          itemsArray.slice(0, maxItems).map((item: any) =>
             limit(async () => {
               let url = item.link;
               if (typeof url === "object" && url?.href) url = url.href;
               const meta = await fetchMetadataFromPage(url, fetchContent);
-              let thumb =
+              const thumb =
                 item["media:thumbnail"]?.$.url ||
                 item["media:content"]?.$.url ||
                 item.enclosure?.$.url ||
-                (item.description &&
-                  item.description.match(/<img[^>]+src="([^"]+)"/)?.[1]) ||
+                (item.description && item.description.match(/<img[^>]+src="([^"]+)"/)?.[1]) ||
                 meta.thumbnail ||
                 null;
-              const description =
-                item.description || item.summary || meta.description || null;
+              const description = item.description || item.summary || meta.description || null;
               const pubDate = item.pubDate || item.updated || null;
               const author = item.author?.name || meta.author || null;
               const categories = Array.isArray(item.category)
@@ -158,8 +156,7 @@ export async function detectRealFeed(
         );
 
         const feedImage = channel?.image?.url || parsed.feed?.logo?._ || null;
-        const feedDescription =
-          channel?.description || parsed.feed?.subtitle?._ || null;
+        const feedDescription = channel?.description || parsed.feed?.subtitle?._ || null;
 
         return {
           feedUrl,

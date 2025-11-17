@@ -14,11 +14,12 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const rawUrl = searchParams.get("url");
   const fetchContent = searchParams.get("content") === "true";
+  const maxItems = parseInt(searchParams.get("maxItems") || "20", 10); // default 20
   const target = normalizeUrl(rawUrl || "");
   if (!target)
     return NextResponse.json({ error: "Invalid ?url" }, { status: 400 });
 
-  const cacheKey = target + (fetchContent ? "_content" : "_meta");
+  const cacheKey = target + (fetchContent ? "_content" : "_meta") + `_${maxItems}`;
   const cached = cache.get(cacheKey);
   if (cached && cached.expires > Date.now())
     return NextResponse.json(cached.data);
@@ -30,18 +31,21 @@ export async function GET(req: NextRequest) {
     // 1️⃣ FeedSearch.dev API
     const externalFeeds = await fetchFromFeedSearchAPI(target);
     if (externalFeeds && externalFeeds.length > 0) {
+      console.error("[RSS Scraper]: Detection=FeedSearchAPI");
       const topFeed = externalFeeds[0];
-      feedData = await detectRealFeed(topFeed.url, fetchContent, siteMeta);
+      feedData = await detectRealFeed(topFeed.url, fetchContent, siteMeta, maxItems);
     }
 
     // 2️⃣ Local detection
     if (!feedData) {
-      feedData = await detectRealFeed(target, fetchContent, siteMeta);
+      console.error("[RSS Scraper]: Detection=Local Detection");
+      feedData = await detectRealFeed(target, fetchContent, siteMeta, maxItems);
     }
 
     // 3️⃣ Fallback: scrape
     if (!feedData) {
-      const items = await scrapeVirtualFeed(target, fetchContent);
+      console.error("[RSS Scraper]: Detection=Fallback");
+      const items = await scrapeVirtualFeed(target, fetchContent, maxItems); // pass maxItems
       if (!items || items.length === 0)
         return NextResponse.json({
           found: false,

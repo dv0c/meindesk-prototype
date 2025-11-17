@@ -7,9 +7,6 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Search, Rss, Youtube, Globe, Newspaper } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useFetch } from "@/hooks/useFetch"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Command, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command"
-import { Loader2 } from "lucide-react"
 
 export default function CreateNewFeed({ siteId }: { siteId: string }) {
     const router = useRouter()
@@ -22,7 +19,187 @@ export default function CreateNewFeed({ siteId }: { siteId: string }) {
     const { data, error, loading } = useFetch(`/api/team/${siteId}/rss/feeds`)
     const feeds = Array.isArray(data) ? data : []
 
-    // Preset filters with validation
+    // --- Hardcoded feeds ---
+    const hardcodedFeeds = [
+        {
+            id: "skai",
+            title: "ΣΚΑΪ Ειδήσεις",
+            url: "https://www.skai.gr/rss",
+            icon: "https://www.skai.gr/favicon.ico",
+        },
+        {
+            id: "iefimerida",
+            title: "iefimerida.gr",
+            url: "https://www.iefimerida.gr/rss.xml",
+            icon: "https://www.iefimerida.gr/favicon.ico",
+        },
+        {
+            id: "protothema",
+            title: "Πρώτο Θέμα",
+            url: "https://www.protothema.gr/rss/general/",
+            icon: "https://www.protothema.gr/favicon.ico",
+        },
+        {
+            id: "in_gr",
+            title: "in.gr",
+            url: "https://www.in.gr/feed/",
+            icon: "https://www.in.gr/favicon.ico",
+        },
+        {
+            id: "naftemporiki",
+            title: "Ναυτεμπορική",
+            url: "https://www.naftemporiki.gr/feed/",
+            icon: "https://www.naftemporiki.gr/favicon.ico",
+        },
+        {
+            id: "kathimerini",
+            title: "Καθημερινή",
+            url: "https://www.kathimerini.gr/rss",
+            icon: "https://www.kathimerini.gr/favicon.ico",
+        },
+        {
+            id: "cnn_greece",
+            title: "CNN Greece",
+            url: "https://www.cnn.gr/feed",
+            icon: "https://www.cnn.gr/favicon.ico",
+        },
+        {
+            id: "tanea",
+            title: "Τα Νέα",
+            url: "https://www.tanea.gr/feed/",
+            icon: "https://www.tanea.gr/favicon.ico",
+        },
+        {
+            id: "news247",
+            title: "News247",
+            url: "https://www.news247.gr/feed/",
+            icon: "https://www.news247.gr/favicon.ico",
+        },
+        {
+            id: "zougla",
+            title: "Zougla.gr",
+            url: "https://www.zougla.gr/feed",
+            icon: "https://www.zougla.gr/favicon.ico",
+        },
+        {
+            id: "newsbomb",
+            title: "Newsbomb.gr",
+            url: "https://www.newsbomb.gr/rss",
+            icon: "https://www.newsbomb.gr/favicon.ico",
+        },
+        {
+            id: "documentonews",
+            title: "Documento News",
+            url: "https://www.documentonews.gr/feed/",
+            icon: "https://www.documentonews.gr/favicon.ico",
+        },
+        {
+            id: "newsit",
+            title: "Newsit.gr",
+            url: "https://www.newsit.gr/feed/",
+            icon: "https://www.newsit.gr/favicon.ico",
+        },
+        {
+            id: "tvxs",
+            title: "TVXS.gr",
+            url: "https://tvxs.gr/rss.xml",
+            icon: "https://tvxs.gr/favicon.ico",
+        },
+        {
+            id: "enikos",
+            title: "Enikos.gr",
+            url: "https://www.enikos.gr/feed/",
+            icon: "https://www.enikos.gr/favicon.ico",
+        },
+        {
+            id: "newsbeast",
+            title: "Newsbeast.gr",
+            url: "https://www.newsbeast.gr/rss",
+            icon: "https://www.newsbeast.gr/favicon.ico",
+        },
+        {
+            id: "capital",
+            title: "Capital.gr Οικονομία",
+            url: "https://www.capital.gr/rssFeed.aspx?catID=0",
+            icon: "https://www.capital.gr/favicon.ico",
+        },
+        {
+            id: "gazzetta",
+            title: "Gazzetta.gr Αθλητικά",
+            url: "https://www.gazzetta.gr/rss.xml",
+            icon: "https://www.gazzetta.gr/favicon.ico",
+        },
+        {
+            id: "sport24",
+            title: "Sport24",
+            url: "https://www.sport24.gr/feed/",
+            icon: "https://www.sport24.gr/favicon.ico",
+        },
+        {
+            id: "caranddrivergr",
+            title: "Car and Driver Greece",
+            url: "https://www.caranddriver.gr/feed/",
+            icon: "https://www.caranddriver.gr/favicon.ico",
+        },
+        {
+            id: "insomnia",
+            title: "Insomnia.gr Τεχνολογία",
+            url: "https://www.insomnia.gr/rss/all.xml/",
+            icon: "https://www.insomnia.gr/favicon.ico",
+        },
+        {
+            id: "unboxholics",
+            title: "Unboxholics",
+            url: "https://unboxholics.com/rss.xml",
+            icon: "https://unboxholics.com/favicon.ico",
+        },
+        {
+            id: "ethnos",
+            title: "Έθνος",
+            url: "https://www.ethnos.gr/rss.xml",
+            icon: "https://www.ethnos.gr/favicon.ico",
+        },
+        {
+            id: "newsauto",
+            title: "NewsAuto.gr",
+            url: "https://www.newsauto.gr/feed/",
+            icon: "https://www.newsauto.gr/favicon.ico",
+        },
+        {
+            id: "mononews",
+            title: "Mononews.gr",
+            url: "https://www.mononews.gr/feed",
+            icon: "https://www.mononews.gr/favicon.ico",
+        },
+        {
+            id: "ot",
+            title: "OT.gr Οικονομικός Ταχυδρόμος",
+            url: "https://www.ot.gr/feed/",
+            icon: "https://www.ot.gr/favicon.ico",
+        },
+        {
+            id: "athensvoice",
+            title: "Athens Voice",
+            url: "https://www.athensvoice.gr/feed/",
+            icon: "https://www.athensvoice.gr/favicon.ico",
+        },
+        {
+            id: "lifo",
+            title: "LiFO.gr",
+            url: "https://www.lifo.gr/feed",
+            icon: "https://www.lifo.gr/favicon.ico",
+        },
+        {
+            id: "readergr",
+            title: "Reader.gr",
+            url: "https://www.reader.gr/feed/",
+            icon: "https://www.reader.gr/favicon.ico",
+        },
+    ];
+
+
+    const allFeeds = [...hardcodedFeeds, ...feeds]
+
     const filterPresets = [
         {
             id: "youtube",
@@ -31,7 +208,7 @@ export default function CreateNewFeed({ siteId }: { siteId: string }) {
             match: (feed: any) =>
                 feed.url?.includes("youtube.com") || feed.title?.toLowerCase().includes("youtube"),
             template: "https://youtube.com/@",
-            validate: (value: string) => /^https:\/\/(www\.)?youtube\.com\/@[\w-]+$/.test(value.trim())
+            validate: (value: string) => /^https:\/\/(www\.)?youtube\.com\/@[\w-]+$/.test(value.trim()),
         },
         {
             id: "news",
@@ -40,7 +217,7 @@ export default function CreateNewFeed({ siteId }: { siteId: string }) {
             match: (feed: any) =>
                 feed.title?.toLowerCase().includes("news") || feed.url?.includes("news"),
             template: "https://",
-            validate: (value: string) => /^https?:\/\/[\w.-]+\.[a-z]{2,}/.test(value.trim())
+            validate: (value: string) => /^https?:\/\/[\w.-]+\.[a-z]{2,}/.test(value.trim()),
         },
         {
             id: "general",
@@ -48,8 +225,8 @@ export default function CreateNewFeed({ siteId }: { siteId: string }) {
             icon: <Globe className="w-4 h-4 text-green-500" />,
             match: () => true,
             template: "https://",
-            validate: (value: string) => /^https?:\/\/[\w.-]+\.[a-z]{2,}/.test(value.trim())
-        }
+            validate: (value: string) => /^https?:\/\/[\w.-]+\.[a-z]{2,}/.test(value.trim()),
+        },
     ]
 
     const handlePresetSelect = (presetId: string) => {
@@ -60,10 +237,10 @@ export default function CreateNewFeed({ siteId }: { siteId: string }) {
     }
 
     const filteredFeeds = useMemo(() => {
-        if (!feeds.length) return []
+        if (!allFeeds.length) return []
         const query = searchQuery.toLowerCase()
 
-        let filtered = feeds.filter(feed =>
+        let filtered = allFeeds.filter(feed =>
             feed?.title?.toLowerCase().includes(query)
         )
 
@@ -73,7 +250,7 @@ export default function CreateNewFeed({ siteId }: { siteId: string }) {
         }
 
         return filtered
-    }, [feeds, searchQuery, selectedFilter])
+    }, [allFeeds, searchQuery, selectedFilter])
 
     const handleGenerate = () => {
         if (!url.trim()) return
@@ -82,12 +259,10 @@ export default function CreateNewFeed({ siteId }: { siteId: string }) {
         )
     }
 
-    // Determine if URL is valid for the selected preset
     const isUrlValid = useMemo(() => {
         if (!url.trim()) return false
         const preset = filterPresets.find(p => p.id === selectedFilter)
         if (preset && preset.validate) return preset.validate(url)
-        // fallback to general URL validation
         return /^https?:\/\/[\w.-]+\.[a-z]{2,}/.test(url.trim())
     }, [url, selectedFilter])
 
@@ -99,8 +274,8 @@ export default function CreateNewFeed({ siteId }: { siteId: string }) {
                     <Button
                         onClick={() => setMode("generator")}
                         className={`gap-2 px-6 py-2 h-auto text-sm sm:text-base ${mode === "generator"
-                                ? "bg-blue-500 hover:bg-blue-600 text-white"
-                                : "bg-muted hover:bg-muted/80 text-muted-foreground"
+                            ? "bg-blue-500 hover:bg-blue-600 text-white"
+                            : "bg-muted hover:bg-muted/80 text-muted-foreground"
                             }`}
                     >
                         <Rss className="w-4 h-4" /> RSS Generator
@@ -120,8 +295,8 @@ export default function CreateNewFeed({ siteId }: { siteId: string }) {
                         onClick={handleGenerate}
                         disabled={!isUrlValid}
                         className={`px-8 whitespace-nowrap ${isUrlValid
-                                ? "bg-orange-500 hover:bg-orange-600 text-white"
-                                : "bg-muted text-muted-foreground cursor-not-allowed"
+                            ? "bg-orange-500 hover:bg-orange-600 text-white"
+                            : "bg-muted text-muted-foreground cursor-not-allowed"
                             }`}
                     >
                         Generate
@@ -135,30 +310,16 @@ export default function CreateNewFeed({ siteId }: { siteId: string }) {
                             <TabsTrigger
                                 value="websites"
                                 className={`gap-2 px-4 py-2 border-b-2 rounded-none text-sm sm:text-base ${activeTab === "websites"
-                                        ? "border-blue-500 text-blue-500"
-                                        : "border-transparent text-muted-foreground"
+                                    ? "border-blue-500 text-blue-500"
+                                    : "border-transparent text-muted-foreground"
                                     }`}
                             >
                                 📁 Websites
                             </TabsTrigger>
-                            <TabsTrigger
-                                disabled
-                                value="topics"
-                                className={`gap-2 px-4 py-2 border-b-2 rounded-none text-sm sm:text-base ${activeTab === "topics"
-                                        ? "border-blue-500 text-blue-500"
-                                        : "border-transparent text-muted-foreground"
-                                    }`}
-                            >
+                            <TabsTrigger disabled value="topics" className="gap-2 px-4 py-2 border-b-2 rounded-none text-sm sm:text-base border-transparent text-muted-foreground">
                                 🏷️ Topics
                             </TabsTrigger>
-                            <TabsTrigger
-                                disabled
-                                value="newsletters"
-                                className={`gap-2 px-4 py-2 border-b-2 rounded-none text-sm sm:text-base ${activeTab === "newsletters"
-                                        ? "border-blue-500 text-blue-500"
-                                        : "border-transparent text-muted-foreground"
-                                    }`}
-                            >
+                            <TabsTrigger disabled value="newsletters" className="gap-2 px-4 py-2 border-b-2 rounded-none text-sm sm:text-base border-transparent text-muted-foreground">
                                 📬 Newsletters
                             </TabsTrigger>
                         </TabsList>
@@ -170,7 +331,7 @@ export default function CreateNewFeed({ siteId }: { siteId: string }) {
                     <p className="text-muted-foreground text-center">Loading feeds...</p>
                 ) : error ? (
                     <p className="text-red-500 text-center">Failed to load feeds: {error}</p>
-                ) : feeds.length === 0 ? (
+                ) : allFeeds.length === 0 ? (
                     <p className="text-muted-foreground text-center">
                         No feeds found for this site.
                     </p>
@@ -206,8 +367,8 @@ export default function CreateNewFeed({ siteId }: { siteId: string }) {
                                     key={preset.id}
                                     variant={selectedFilter === preset.id ? "default" : "outline"}
                                     className={`gap-2 px-4 py-2 text-sm transition ${selectedFilter === preset.id
-                                            ? "bg-blue-500 text-white hover:bg-blue-600"
-                                            : "text-muted-foreground hover:text-foreground"
+                                        ? "bg-blue-500 text-white hover:bg-blue-600"
+                                        : "text-muted-foreground hover:text-foreground"
                                         }`}
                                     onClick={() => handlePresetSelect(preset.id)}
                                 >
@@ -232,7 +393,7 @@ export default function CreateNewFeed({ siteId }: { siteId: string }) {
                                 No feeds match your search or selected filter.
                             </p>
                         ) : (
-                            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                            <div className="grid max-h-[300px] overflow-auto gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                                 {filteredFeeds.map((feed) => (
                                     <Button
                                         key={feed.id}
@@ -258,6 +419,11 @@ export default function CreateNewFeed({ siteId }: { siteId: string }) {
                                         >
                                             {decodeURIComponent(feed.url) || "Untitled Feed"}
                                         </p>
+                                        {hardcodedFeeds.some(h => h.id === feed.id) && (
+                                            <span className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded">
+                                                Built-in
+                                            </span>
+                                        )}
                                     </Button>
                                 ))}
                             </div>

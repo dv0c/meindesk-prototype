@@ -7,6 +7,8 @@ export async function parseYouTubeFeed(xmlText: string) {
   const feed = parsed.feed;
   if (!feed || !feed.entry) return null;
 
+    console.error("[RSS Scraper]: Method used YoutubeScraper");  
+
   const entries = Array.isArray(feed.entry) ? feed.entry : [feed.entry];
   const channelTitle = feed.title;
   const channelId = "UC" + feed["yt:channelId"] || null;

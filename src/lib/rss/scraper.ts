@@ -2,17 +2,23 @@ import * as cheerio from "cheerio";
 import { safeFetch } from "./fetch-utils";
 import { fetchMetadataFromPage } from "./page-metadata";
 
-export async function scrapeVirtualFeed(target: string, fetchContent = false) {
+export async function scrapeVirtualFeed(
+  target: string,
+  fetchContent = false,
+  maxItems = 20 // <-- add maxItems param
+) {
   const res = await safeFetch(target);
   if (!res || !res.ok) return [];
   const html = await res.text();
   const $ = cheerio.load(html);
 
+  console.error("[RSS Scraper]: Method used VirtualFeed");
+
   const articleEls = $("article");
   const candidateEls = articleEls.length ? articleEls : $("div:has(a)");
   const items: any[] = [];
 
-  for (let i = 0; i < candidateEls.length && items.length < 20; i++) {
+  for (let i = 0; i < candidateEls.length && items.length < maxItems; i++) {
     const el = candidateEls[i];
     const a = $(el).find("a").first();
     const href = a.attr("href");

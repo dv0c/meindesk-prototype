@@ -8,11 +8,12 @@ export async function fetchFromFeedSearchAPI(target: string) {
     const res = await safeFetch(apiUrl);
     if (!res || !res.ok) return null;
     const json = await res.json();
+    console.error("[RSS Scraper]: Method used FeedSearchAPI");  
     if (!Array.isArray(json) || json.length === 0) return null;
     json.sort((a, b) => b.score - a.score);
     return json;
   } catch (err: any) {
-    console.error("FeedSearch API error:", err.message);
+    console.error("FeedSearch API error:", err.message);  
     return null;
   }
 }
