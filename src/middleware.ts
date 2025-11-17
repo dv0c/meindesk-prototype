@@ -1,56 +1,49 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
 import { db } from "@/lib/db";
 
+const tenantCache = new Map<string, any>();
+
 export async function middleware(req: NextRequest) {
+  const url = req.nextUrl.clone();
+  const hostname = req.nextUrl.hostname;
 
-  // 1️⃣ Get JWT token
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-  if (!token) {
-    return NextResponse.redirect("/login");
+  // Ignore main domain and dashboard
+  if (
+    hostname === "example.com" || 
+    req.nextUrl.pathname.startsWith("/dashboard")
+  ) {
+    return NextResponse.next();
   }
 
-  // 2️⃣ Extract siteId from URL: /dashboard/:siteId/projects/...
-  const pathSegments = req.nextUrl.pathname.split("/");
-  const siteId = pathSegments[2]; // '/dashboard/:siteId/...'
-  if (!siteId) {
-      return NextResponse.redirect(process.env.NEXT_PUBLIC_BASE_URL + "/dashboard/" + siteId);
+  const domainParts = hostname.split(".");
+  if (domainParts.length < 3) {
+    return NextResponse.next();
   }
 
-  // 3️⃣ Fetch site + features from DB
-  const site = await db.site.findFirst({
-    where: { id: siteId, userId: token.sub },
-    include: { features: true },
-  });
+  const subdomain = domainParts[0];
 
-  if (!site || !site.features) {
-      return NextResponse.redirect(process.env.NEXT_PUBLIC_BASE_URL + "/dashboard/" + siteId);
-  }
-
-  const features = site.features;
-
-  // 4️⃣ Define feature rules
-  const featureRules: Record<string, boolean> = {
-    "/projects/website/articles": !!features.articles,
-    "/projects/website/pages": !!features.pages,
-    "/projects/website/categories": !!features.categories, // were typo but fixed not frm evry files
-    "/projects/website/media-gallery": !!features.media,
-    "/projects/website/analytics": !!features.analytics,
-  };
-
-  // 5️⃣ Check access
-  for (const route in featureRules) {
-    if (req.nextUrl.pathname.includes(route) && !featureRules[route]) {
-      return NextResponse.redirect(process.env.NEXT_PUBLIC_BASE_URL + "/dashboard/" + siteId);
+  // Fetch tenant info
+  let tenant = tenantCache.get(subdomain);
+  if (!tenant) {
+    tenant = await db.site.findFirst({
+      where: { subdomain },
+      include: { features: true }, // fetch enabled features
+    });
+    if (!tenant) {
+      url.pathname = "/404";
+      return NextResponse.rewrite(url);
     }
+    tenantCache.set(subdomain, tenant);
   }
 
-  // 6️⃣ All good
-  return NextResponse.next();
+  const res = NextResponse.next();
+  res.headers.set("x-tenant-id", tenant.id);
+  res.headers.set("x-tenant-subdomain", subdomain);
+
+  return res;
 }
 
-// ⚡ Node runtime required for Prisma
 export const config = {
-  matcher: ["/dashboard/:siteId/projects/:path*"],
+  matcher: ["/((?!dashboard).*)"], // everything except /dashboard
   runtime: "nodejs",
 };
