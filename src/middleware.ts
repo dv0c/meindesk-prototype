@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { db } from "@/lib/db";
 
+// Caches for performance
 const siteCache = new Map<string, any>();
 const tenantCache = new Map<string, any>();
 
@@ -30,14 +31,14 @@ export async function middleware(req: NextRequest) {
   }
 
   // -----------------------------
-  // 1️⃣ Dashboard routes
+  // 1️⃣ Dashboard routes: auth + feature checks
   // -----------------------------
   if (url.pathname.startsWith("/dashboard")) {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
     if (!token) return NextResponse.redirect("/login");
 
     const match = url.pathname.match(/^\/dashboard\/([^/]+)/);
-    if (!match) return NextResponse.next();
+    if (!match) return NextResponse.next(); // Not a site route
     const siteId = match[1];
 
     let site = siteCache.get(siteId);
@@ -72,25 +73,25 @@ export async function middleware(req: NextRequest) {
   }
 
   // -----------------------------
-  // 2️⃣ Tenant public pages
+  // 2️⃣ Tenant pages
   // -----------------------------
   let subdomain = "";
   let tenant: any = null;
   const isLocalhost = hostname === "localhost" || hostname.endsWith(".localhost");
 
   if (isLocalhost) {
-    // Local dev: first path segment as tenant
+    // DEV: first path segment is tenant
     const pathSegments = url.pathname.split("/").filter(Boolean);
-    subdomain = pathSegments[0];
-    if (!subdomain) return NextResponse.next(); // main site or public page
+    subdomain = pathSegments[0] || "";
+    if (!subdomain) return NextResponse.next(); // main site in dev
   } else {
-    // Production: subdomain.meindesk.gr
+    // PROD: any subdomain is tenant except root domain
     const domainParts = hostname.split(".");
-    if (domainParts.length < 3) return NextResponse.next(); // main domain: meindesk.gr
-    subdomain = domainParts[0];
+    if (domainParts.length < 3) return NextResponse.next(); // meindesk.gr → main site
+    subdomain = domainParts[0]; // tenant1, meindesk, etc.
   }
 
-  // Fetch tenant from cache or DB
+  // Lookup tenant
   tenant = tenantCache.get(subdomain);
   if (!tenant) {
     tenant = await db.site.findFirst({
@@ -106,13 +107,16 @@ export async function middleware(req: NextRequest) {
     tenantCache.set(subdomain, tenant);
   }
 
+  // Set headers for tenant
   const res = NextResponse.next();
   res.headers.set("x-tenant-id", tenant.id);
   res.headers.set("x-tenant-subdomain", subdomain);
-
   return res;
 }
 
+// -----------------------------
+// Middleware matcher
+// -----------------------------
 export const config = {
   matcher: ["/dashboard/:siteId/projects/:path*", "/:path*"],
   runtime: "nodejs",
