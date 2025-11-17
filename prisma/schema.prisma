@@ -99,34 +99,53 @@ model Category {
 }
 
 model Site {
+  // Primary Key and ID (Standard MongoDB/Prisma Setup)
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  views      Int @default(0)
-  limitViews Int @default(5000)
-
-  title       String
-  description String?
-
-  url String @unique
+  // --- Tenant Identity and Limits ---
+  // Subdomain is the key identifier for middleware lookup. 
+  // It's indexed and unique for fast lookups.
   subdomain String @unique
+  url       String @unique // Full domain/URL (e.g., 'sub.yourdomain.com')
 
-  logo String?
+  // Usage/Quota Management
+  views      Int @default(0) // Current views count
+  limitViews Int @default(5000) // The subscription or plan view limit
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  // --- Content and Branding ---
+  title                  String
+  description            String?
+  logo                   String? // URL or reference to the logo image
+  theme                  Json?    @default("{\"light\":{\"background\":\"oklch(1 0 0)\",\"foreground\":\"oklch(0.145 0 0)\",\"card\":\"oklch(1 0 0)\",\"card_foreground\":\"oklch(0.145 0 0)\",\"popover\":\"oklch(1 0 0)\",\"popover_foreground\":\"oklch(0.145 0 0)\",\"primary\":\"oklch(0.205 0 0)\",\"primary_foreground\":\"oklch(0.985 0 0)\",\"secondary\":\"oklch(0.97 0 0)\",\"secondary_foreground\":\"oklch(0.205 0 0)\",\"muted\":\"oklch(0.97 0 0)\",\"muted_foreground\":\"oklch(0.556 0 0)\",\"accent\":\"oklch(0.97 0 0)\",\"accent_foreground\":\"oklch(0.205 0 0)\",\"destructive\":\"oklch(0.577 0.245 27.325)\",\"destructive_foreground\":\"oklch(1 0 0)\",\"border\":\"oklch(0.922 0 0)\",\"input\":\"oklch(0.922 0 0)\",\"ring\":\"oklch(0.708 0 0)\",\"chart_1\":\"oklch(0.81 0.1 252)\",\"chart_2\":\"oklch(0.62 0.19 260)\",\"chart_3\":\"oklch(0.55 0.22 263)\",\"chart_4\":\"oklch(0.49 0.22 264)\",\"chart_5\":\"oklch(0.42 0.18 266)\",\"sidebar\":\"oklch(0.985 0 0)\",\"sidebar_foreground\":\"oklch(0.145 0 0)\",\"sidebar_primary\":\"oklch(0.205 0 0)\",\"sidebar_primary_foreground\":\"oklch(0.985 0 0)\",\"sidebar_accent\":\"oklch(0.97 0 0)\",\"sidebar_accent_foreground\":\"oklch(0.205 0 0)\",\"sidebar_border\":\"oklch(0.922 0 0)\",\"sidebar_ring\":\"oklch(0.708 0 0)\",\"font_sans\":\"ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \\\"Segoe UI\\\", Roboto, \\\"Helvetica Neue\\\", Arial, \\\"Noto Sans\\\", sans-serif, \\\"Apple Color Emoji\\\", \\\"Segoe UI Emoji\\\", \\\"Segoe UI Symbol\\\", \\\"Noto Color Emoji\\\"\",\"font_serif\":\"ui-serif, Georgia, Cambria, \\\"Times New Roman\\\", Times, serif\",\"font_mono\":\"ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \\\"Liberation Mono\\\", \\\"Courier New\\\", monospace\",\"radius\":\"0rem\",\"shadow_x\":\"0\",\"shadow_y\":\"1px\",\"shadow_blur\":\"3px\",\"shadow_spread\":\"0px\",\"shadow_opacity\":\"0.1\",\"shadow_color\":\"oklch(0 0 0)\",\"shadow_2xs\":\"0 1px 3px 0px hsl(0 0% 0% / 0.05)\",\"shadow_xs\":\"0 1px 3px 0px hsl(0 0% 0% / 0.05)\",\"shadow_sm\":\"0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1)\",\"shadow\":\"0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1)\",\"shadow_md\":\"0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.1)\",\"shadow_lg\":\"0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1)\",\"shadow_xl\":\"0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1)\",\"shadow_2xl\":\"0 1px 3px 0px hsl(0 0% 0% / 0.25)\",\"tracking_normal\":\"0em\",\"spacing\":\"0.25rem\"},\"dark\":{\"background\":\"oklch(0.145 0 0)\",\"foreground\":\"oklch(0.985 0 0)\",\"card\":\"oklch(0.205 0 0)\",\"card_foreground\":\"oklch(0.985 0 0)\",\"popover\":\"oklch(0.269 0 0)\",\"popover_foreground\":\"oklch(0.985 0 0)\",\"primary\":\"oklch(0.922 0 0)\",\"primary_foreground\":\"oklch(0.205 0 0)\",\"secondary\":\"oklch(0.269 0 0)\",\"secondary_foreground\":\"oklch(0.985 0 0)\",\"muted\":\"oklch(0.269 0 0)\",\"muted_foreground\":\"oklch(0.708 0 0)\",\"accent\":\"oklch(0.371 0 0)\",\"accent_foreground\":\"oklch(0.985 0 0)\",\"destructive\":\"oklch(0.704 0.191 22.216)\",\"destructive_foreground\":\"oklch(0.985 0 0)\",\"border\":\"oklch(0.275 0 0)\",\"input\":\"oklch(0.325 0 0)\",\"ring\":\"oklch(0.556 0 0)\",\"chart_1\":\"oklch(0.81 0.1 252)\",\"chart_2\":\"oklch(0.62 0.19 260)\",\"chart_3\":\"oklch(0.55 0.22 263)\",\"chart_4\":\"oklch(0.49 0.22 264)\",\"chart_5\":\"oklch(0.42 0.18 266)\",\"sidebar\":\"oklch(0.205 0 0)\",\"sidebar_foreground\":\"oklch(0.985 0 0)\",\"sidebar_primary\":\"oklch(0.488 0.243 264.376)\",\"sidebar_primary_foreground\":\"oklch(0.985 0 0)\",\"sidebar_accent\":\"oklch(0.269 0 0)\",\"sidebar_accent_foreground\":\"oklch(0.985 0 0)\",\"sidebar_border\":\"oklch(0.275 0 0)\",\"sidebar_ring\":\"oklch(0.439 0 0)\"}}")
+  status                 String   @default("active") // New: 'active', 'suspended', 'trial', 'pending'
+  defaultThemePreference String   @default("system")
+  // --- Timestamps ---
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 
-  features Features? @relation(fields: [featuresId], references: [id])
+  // --- Relationships (Foreign Keys) ---
+  // User (Owner)
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade) // Changed to User? if Site can exist before owner is assigned
+  userId String? @db.ObjectId // Changed to String? if Site can exist before owner is assigned
 
-  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId         String           @db.ObjectId
+  // Features/Plan (The tenant's feature package)
+  features   Features? @relation(fields: [featuresId], references: [id])
+  featuresId String?   @db.ObjectId
+
+  // Subscription Details (Billing context)
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  subscriptionId String?       @db.ObjectId
+
+  // --- Embedded/Referenced Content ---
   category       Category[]
-  AnalyticsEvent AnalyticsEvent[]
-  subscription   Subscription?    @relation(fields: [subscriptionId], references: [id])
-  subscriptionId String?          @db.ObjectId
-  featuresId     String?          @db.ObjectId
   Article        Article[]
   Page           Page[]
   RSS            Rss[]
+  AnalyticsEvent AnalyticsEvent[]
+
+  // Optional: Add a custom index for performance on frequently queried fields
+  @@index([userId])
+  @@map("sites") // Optional: Custom collection name
 }
 
 model Features {
