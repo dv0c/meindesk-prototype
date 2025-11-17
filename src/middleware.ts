@@ -2,10 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { db } from "@/lib/db";
 
-// Caches for performance
-const siteCache = new Map<string, any>();
-const tenantCache = new Map<string, any>();
-
 export async function middleware(req: NextRequest) {
   const url = req.nextUrl.clone();
   const hostname = req.nextUrl.hostname;
@@ -23,7 +19,7 @@ export async function middleware(req: NextRequest) {
   }
 
   // -----------------------------
-  // 0.5️⃣ Skip public non-tenant pages
+  // 0.5️⃣ Skip public pages
   // -----------------------------
   const PUBLIC_PATHS = ["/login", "/register", "/api", "/about"];
   if (PUBLIC_PATHS.some((p) => url.pathname.startsWith(p))) {
@@ -31,7 +27,7 @@ export async function middleware(req: NextRequest) {
   }
 
   // -----------------------------
-  // 1️⃣ Dashboard routes: auth + feature checks
+  // 1️⃣ Dashboard routes
   // -----------------------------
   if (url.pathname.startsWith("/dashboard")) {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
@@ -41,15 +37,12 @@ export async function middleware(req: NextRequest) {
     if (!match) return NextResponse.next(); // Not a site route
     const siteId = match[1];
 
-    let site = siteCache.get(siteId);
-    if (!site) {
-      site = await db.site.findFirst({
-        where: { id: siteId, userId: token.sub },
-        include: { features: true },
-      });
-      if (!site) return NextResponse.redirect("/dashboard");
-      siteCache.set(siteId, site);
-    }
+    const site = await db.site.findFirst({
+      where: { id: siteId, userId: token.sub },
+      include: { features: true },
+    });
+
+    if (!site) return NextResponse.redirect("/dashboard");
 
     const features = site.features || {};
     const pathFeatureMap: Record<string, keyof typeof features> = {
@@ -58,7 +51,7 @@ export async function middleware(req: NextRequest) {
       "/projects/website/categories": "categories",
       "/projects/website/media-gallery": "media",
       "/projects/website/analytics": "analytics",
-    };
+    } as any
 
     for (const route in pathFeatureMap) {
       if (url.pathname.startsWith(route) && !features[pathFeatureMap[route]]) {
@@ -80,34 +73,37 @@ export async function middleware(req: NextRequest) {
   const isLocalhost = hostname === "localhost" || hostname.endsWith(".localhost");
 
   if (isLocalhost) {
-    // DEV: first path segment is tenant
+    // DEV: first path segment as tenant
     const pathSegments = url.pathname.split("/").filter(Boolean);
     subdomain = pathSegments[0] || "";
     if (!subdomain) return NextResponse.next(); // main site in dev
   } else {
-    // PROD: any subdomain is tenant except root domain
+    // PROD: any subdomain other than root domain
     const domainParts = hostname.split(".");
-    if (domainParts.length < 3) return NextResponse.next(); // meindesk.gr → main site
-    subdomain = domainParts[0]; // tenant1, meindesk, etc.
-  }
-
-  // Lookup tenant
-  tenant = tenantCache.get(subdomain);
-  if (!tenant) {
-    tenant = await db.site.findFirst({
-      where: { subdomain },
-      include: { features: true },
-    });
-
-    if (!tenant) {
-      url.pathname = "/404";
-      return NextResponse.rewrite(url);
+    if (domainParts.length < 3) {
+      // Root domain: meindesk.gr → main site
+      return NextResponse.next();
     }
-
-    tenantCache.set(subdomain, tenant);
+    subdomain = domainParts[0].toLowerCase(); // normalize for DB
   }
 
-  // Set headers for tenant
+  // -----------------------------
+  // Lookup tenant in DB
+  // -----------------------------
+  tenant = await db.site.findFirst({
+    where: { subdomain },
+    include: { features: true },
+  });
+
+  if (!tenant) {
+    // Unknown tenant → 404
+    url.pathname = "/404";
+    return NextResponse.rewrite(url);
+  }
+
+  // -----------------------------
+  // Attach headers
+  // -----------------------------
   const res = NextResponse.next();
   res.headers.set("x-tenant-id", tenant.id);
   res.headers.set("x-tenant-subdomain", subdomain);
