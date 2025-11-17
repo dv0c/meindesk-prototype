@@ -72,7 +72,7 @@ export async function middleware(req: NextRequest) {
     console.log(`Tenant '${normalizedSubdomain}' not found.`);
     // For a smoother experience, you might redirect to a 'tenant not found' page on your main domain.
     // e.g., return NextResponse.redirect(new URL('/tenant-not-found', `https://${APP_BASE_DOMAIN}`));
-    return NextResponse.redirect(new URL('/tenant-not-found', `https://www.meindesk.gr/`))
+    return NextResponse.redirect(new URL('/', `https://www.meindesk.gr/`))
   }
 
   // ✅ Rewrite the URL to a dynamic route like '/app/[tenantId]' or '/[tenantId]'
