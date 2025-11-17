@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { db } from "@/lib/db";
 
-// Caches for performance (optional)
 const siteCache = new Map<string, any>();
 const tenantCache = new Map<string, any>();
 
@@ -24,7 +23,6 @@ export async function middleware(req: NextRequest) {
 
   // -----------------------------
   // 0.5️⃣ Skip public non-tenant pages
-  // Add any other public paths here
   // -----------------------------
   const PUBLIC_PATHS = ["/login", "/register", "/api", "/about"];
   if (PUBLIC_PATHS.some((p) => url.pathname.startsWith(p))) {
@@ -32,7 +30,7 @@ export async function middleware(req: NextRequest) {
   }
 
   // -----------------------------
-  // 1️⃣ Dashboard routes: auth + feature checks
+  // 1️⃣ Dashboard routes
   // -----------------------------
   if (url.pathname.startsWith("/dashboard")) {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
@@ -48,11 +46,10 @@ export async function middleware(req: NextRequest) {
         where: { id: siteId, userId: token.sub },
         include: { features: true },
       });
-      if (!site) return NextResponse.redirect("/dashboard"); // invalid site
+      if (!site) return NextResponse.redirect("/dashboard");
       siteCache.set(siteId, site);
     }
 
-    // Feature access map
     const features = site.features || {};
     const pathFeatureMap: Record<string, keyof typeof features> = {
       "/projects/website/articles": "articles",
@@ -75,24 +72,25 @@ export async function middleware(req: NextRequest) {
   }
 
   // -----------------------------
-  // 2️⃣ Tenant public pages (subdomain or localhost fallback)
+  // 2️⃣ Tenant public pages
   // -----------------------------
   let subdomain = "";
   let tenant: any = null;
   const isLocalhost = hostname === "localhost" || hostname.endsWith(".localhost");
 
   if (isLocalhost) {
-    // Local dev fallback: /tenant-name/... → first path segment
+    // Local dev: first path segment as tenant
     const pathSegments = url.pathname.split("/").filter(Boolean);
     subdomain = pathSegments[0];
     if (!subdomain) return NextResponse.next(); // main site or public page
   } else {
-    // Production: subdomain.example.com
+    // Production: subdomain.meindesk.gr
     const domainParts = hostname.split(".");
-    if (domainParts.length < 3) return NextResponse.next(); // main domain
+    if (domainParts.length < 3) return NextResponse.next(); // main domain: meindesk.gr
     subdomain = domainParts[0];
   }
 
+  // Fetch tenant from cache or DB
   tenant = tenantCache.get(subdomain);
   if (!tenant) {
     tenant = await db.site.findFirst({
@@ -108,7 +106,6 @@ export async function middleware(req: NextRequest) {
     tenantCache.set(subdomain, tenant);
   }
 
-  // Attach tenant info headers for pages or API
   const res = NextResponse.next();
   res.headers.set("x-tenant-id", tenant.id);
   res.headers.set("x-tenant-subdomain", subdomain);
@@ -116,9 +113,6 @@ export async function middleware(req: NextRequest) {
   return res;
 }
 
-// -----------------------------
-// Middleware matcher
-// -----------------------------
 export const config = {
   matcher: ["/dashboard/:siteId/projects/:path*", "/:path*"],
   runtime: "nodejs",
