@@ -191,3 +191,27 @@
     pointer-events: auto !important;
   }
 }
+
+
+@layer components {
+  /* Smooth checkbox animation */
+  input[type='checkbox'] {
+    @apply transition-all duration-200;
+  }
+
+  /* Smooth scale animation for selected items */
+  @keyframes checkboxScale {
+    from {
+      transform: scale(0.95);
+      opacity: 0.7;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  input[type='checkbox']:checked {
+    animation: checkboxScale 0.2s ease-out;
+  }
+}
