@@ -129,7 +129,6 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
         ))}
       </nav>
 
-      
     </aside>
   )
 }

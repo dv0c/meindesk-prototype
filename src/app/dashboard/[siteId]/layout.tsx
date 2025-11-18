@@ -24,7 +24,7 @@ const layout: FC<layoutProps> = ({ children }) => {
             <AppSidebar />
             <SidebarInset>
                 <div className="rounded-2xl relative h-full shadow m-2 border">
-                    <header className="flex h-16 shrink-0 items-center gap-2">
+                    <header className="flex dark:bg-neutral-900 mb-5 rounded-t-2xl h-16 shrink-0 items-center gap-2">
                         <div className="flex items-center gap-2 px-4">
                             {/* <SidebarTrigger className="-ml-1" /> */}
                             <ToggleSidebar />
