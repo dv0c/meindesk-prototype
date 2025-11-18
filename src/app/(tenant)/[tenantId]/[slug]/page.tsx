@@ -1,5 +1,5 @@
-import NotFound from "@/app/not-found"
 import { db } from "@/lib/db"
+import { notFound } from "next/navigation"
 
 
 
@@ -11,7 +11,7 @@ const page = async ({ params }: { params: { slug: string } }) => {
         }
     })
 
-    if (!page) return NotFound()
+    if (!page) return notFound()
 
     return <div>
         <div className="prose prose-invert prose-xl mx-auto" dangerouslySetInnerHTML={{ __html: page.html as string }} />

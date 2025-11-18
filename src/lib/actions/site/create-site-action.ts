@@ -1,7 +1,7 @@
 "use server";
 import { db } from "@/lib/db";
 import { getAuthSession } from "@/lib/auth";
-
+import InitialTemplateTheme from "@/lib/initialTemplateTheme.json";
 export async function createSite(formData: FormData) {
   // Get current logged-in user
   const session = await getAuthSession();
@@ -24,7 +24,6 @@ export async function createSite(formData: FormData) {
   }
 
   try {
-
     const site = await db.site.create({
       data: {
         title,
@@ -32,6 +31,7 @@ export async function createSite(formData: FormData) {
         url,
         logo,
         subdomain,
+        template_schema: InitialTemplateTheme,
         userId: session.user.id, // link site to logged-in user
       },
     });

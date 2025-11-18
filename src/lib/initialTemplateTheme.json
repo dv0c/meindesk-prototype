@@ -1,0 +1,338 @@
+{
+  "version": "1.2.0",
+  "template": "simple",
+  "global": {
+    "container": "max-w-7xl",
+    "radius": "xl",
+    "spacing": {
+      "sectionY": 80,
+      "sectionX": 40
+    },
+    "font": {
+      "primary": "Inter",
+      "secondary": "Playfair Display",
+      "mono": "JetBrains Mono"
+    },
+    "typography": {
+      "h1": { "size": "3rem", "weight": 700, "tracking": "-0.02em" },
+      "body": { "size": "1rem", "lineHeight": "1.7" }
+    },
+    "layout": {
+      "boxed": false,
+      "maxWidth": 1440,
+      "gridGap": 24,
+      "showGridLines": false
+    }
+  },
+  "theme": {
+    "mode": "system",
+    "colorMode": "oklch",
+    "palette": {
+      "light": {
+        "primary": "#2563eb",
+        "secondary": "#9333ea",
+        "accent": "#f97316",
+        "background": "#ffffff",
+        "foreground": "#111827",
+        "muted": "#6b7280",
+        "success": "#22c55e",
+        "warning": "#eab308",
+        "danger": "#ef4444",
+        "border": "#e5e7eb",
+        "card": "#f9fafb"
+      },
+      "dark": {
+        "primary": "#3b82f6",
+        "secondary": "#a855f7",
+        "accent": "#fb923c",
+        "background": "#0f172a",
+        "foreground": "#f1f5f9",
+        "muted": "#94a3b8",
+        "border": "#1e293b",
+        "card": "#1e293b"
+      }
+    },
+    "effects": {
+      "blur": 8,
+      "shadows": {
+        "xs": "0 1px 3px rgba(0,0,0,0.1)",
+        "md": "0 3px 8px rgba(0,0,0,0.15)",
+        "xl": "0 8px 20px rgba(0,0,0,0.25)"
+      },
+      "transitions": {
+        "duration": 250,
+        "timing": "ease-in-out"
+      }
+    }
+  },
+  "header": {
+    "sticky": true,
+    "transparent": false,
+    "height": 72,
+    "logo": {
+      "url": "/assets/logo.svg",
+      "height": 40,
+      "alignment": "left"
+    },
+    "navbar": {
+      "alignment": "center",
+      "style": "underline",
+      "order": ["home", "products", "pricing", "blog", "about", "contact"],
+      "hidden": [],
+      "dropdowns": [
+        {
+          "label": "Products",
+          "items": [
+            { "label": "AI Assistant", "href": "/products/assistant" },
+            { "label": "API Platform", "href": "/products/api" }
+          ]
+        }
+      ],
+      "cta": {
+        "label": "Get Started",
+        "href": "/signup",
+        "variant": "primary"
+      },
+      "icons": {
+        "showSearch": true,
+        "showCart": true,
+        "showThemeToggle": true,
+        "showUserMenu": true
+      }
+    },
+    "announcementBar": {
+      "enabled": true,
+      "text": "🚀 Black Friday Sale! 50% off all plans.",
+      "link": "/pricing",
+      "background": "#111827",
+      "color": "#ffffff"
+    }
+  },
+  "hero": {
+    "enabled": true,
+    "variant": "split",
+    "title": "Build your dream site with {{site.title}}",
+    "subtitle": "A headless multi-tenant system built for speed and flexibility.",
+    "image": "/assets/hero.webp",
+    "video": null,
+    "cta": [
+      { "label": "Start Free", "href": "/signup", "variant": "primary" },
+      { "label": "Learn More", "href": "/about", "variant": "outline" }
+    ],
+    "alignment": "center",
+    "background": {
+      "type": "gradient",
+      "colors": ["#3b82f6", "#9333ea"]
+    }
+  },
+  "sections": [
+    {
+      "type": "features",
+      "enabled": true,
+      "title": "Features built for growth",
+      "subtitle": "Everything you need to scale.",
+      "columns": 3,
+      "iconStyle": "circle",
+      "items": [
+        {
+          "icon": "Rocket",
+          "title": "Lightning Fast",
+          "description": "Optimized for performance and SEO out of the box."
+        },
+        {
+          "icon": "Shield",
+          "title": "Secure by Design",
+          "description": "Enterprise-grade security baked in."
+        },
+        {
+          "icon": "Plug",
+          "title": "Modular Components",
+          "description": "Customize your layout without touching code."
+        }
+      ]
+    },
+    {
+      "type": "gallery",
+      "enabled": true,
+      "title": "Recent Projects",
+      "layout": "masonry",
+      "images": [
+        { "src": "/assets/gallery1.jpg", "alt": "Project 1" },
+        { "src": "/assets/gallery2.jpg", "alt": "Project 2" },
+        { "src": "/assets/gallery3.jpg", "alt": "Project 3" }
+      ]
+    },
+    {
+      "type": "team",
+      "enabled": true,
+      "title": "Meet the Team",
+      "members": [
+        {
+          "name": "Alex Johnson",
+          "role": "Founder & CEO",
+          "image": "/assets/team/alex.jpg",
+          "social": {
+            "twitter": "https://twitter.com/alex",
+            "linkedin": "https://linkedin.com/in/alex"
+          }
+        },
+        {
+          "name": "Maria Lopez",
+          "role": "Head of Design",
+          "image": "/assets/team/maria.jpg"
+        }
+      ]
+    },
+    {
+      "type": "testimonials",
+      "enabled": true,
+      "layout": "carousel",
+      "title": "What our customers say",
+      "items": [
+        {
+          "name": "Chris D.",
+          "role": "Product Manager",
+          "quote": "This platform cut our dev time in half.",
+          "avatar": "/assets/users/chris.jpg"
+        }
+      ]
+    },
+    {
+      "type": "pricing",
+      "enabled": true,
+      "layout": "cards",
+      "title": "Plans for every team",
+      "plans": [
+        {
+          "name": "Free",
+          "price": 0,
+          "features": ["1 site", "Basic analytics", "Community support"],
+          "cta": { "label": "Start Free", "href": "/signup" }
+        },
+        {
+          "name": "Pro",
+          "price": 29,
+          "features": ["10 sites", "Priority support", "Custom themes"],
+          "cta": { "label": "Upgrade", "href": "/upgrade" }
+        }
+      ]
+    },
+    {
+      "type": "faq",
+      "enabled": true,
+      "title": "Frequently Asked Questions",
+      "items": [
+        {
+          "q": "Can I use my own domain?",
+          "a": "Yes, custom domains are supported on all paid plans."
+        },
+        {
+          "q": "Is there an API?",
+          "a": "Absolutely. Every feature is accessible via REST or GraphQL."
+        }
+      ]
+    }
+  ],
+  "blog": {
+    "enabled": true,
+    "layout": "grid",
+    "showAuthor": true,
+    "showDate": true,
+    "excerptLength": 160,
+    "sidebar": {
+      "enabled": true,
+      "widgets": ["categories", "tags", "recentPosts"]
+    }
+  },
+  "shop": {
+    "enabled": false,
+    "currency": "USD",
+    "showStock": true,
+    "layout": "cards",
+    "filters": ["price", "category", "rating"]
+  },
+  "footer": {
+    "layout": "3-columns",
+    "background": "#0f172a",
+    "foreground": "#f1f5f9",
+    "columns": [
+      {
+        "title": "Product",
+        "links": [
+          { "label": "Features", "href": "/features" },
+          { "label": "Pricing", "href": "/pricing" }
+        ]
+      },
+      {
+        "title": "Company",
+        "links": [
+          { "label": "About", "href": "/about" },
+          { "label": "Careers", "href": "/careers" }
+        ]
+      },
+      {
+        "title": "Resources",
+        "links": [
+          { "label": "Blog", "href": "/posts" },
+          { "label": "Docs", "href": "/docs" }
+        ]
+      }
+    ],
+    "social": {
+      "facebook": "https://facebook.com/example",
+      "twitter": "https://twitter.com/example",
+      "github": "https://github.com/example",
+      "linkedin": "https://linkedin.com/company/example",
+      "youtube": "https://youtube.com/@example"
+    },
+    "newsletter": {
+      "enabled": true,
+      "title": "Stay updated",
+      "placeholder": "Your email address",
+      "buttonLabel": "Subscribe",
+      "provider": "mailchimp"
+    },
+    "copyright": "© {{year}} {{site.title}}. All rights reserved."
+  },
+  "seo": {
+    "metaTitle": "Default Site Title",
+    "metaDescription": "A fully customizable multi-tenant site.",
+    "keywords": ["multi-tenant", "headless", "cms"],
+    "openGraph": {
+      "image": "/og/default.jpg",
+      "type": "website"
+    },
+    "twitter": {
+      "handle": "@example",
+      "cardType": "summary_large_image"
+    },
+    "jsonLd": {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "{{site.title}}",
+      "url": "{{site.url}}"
+    }
+  },
+  "integrations": {
+    "googleAnalytics": { "id": "G-XXXXXXX" },
+    "plausible": { "domain": "example.com" },
+    "facebookPixel": { "id": "XXXXXX" },
+    "stripe": { "enabled": true, "products": ["prod_ABC123"] },
+    "mailchimp": { "enabled": true, "audienceId": "XYZ789" },
+    "chat": { "enabled": true, "provider": "crisp", "id": "XXXXX" }
+  },
+  "performance": {
+    "lazyLoadImages": true,
+    "prefetchLinks": true,
+    "optimizeFonts": true,
+    "cacheTTL": 3600
+  },
+  "features": {
+    "darkMode": true,
+    "animations": true,
+    "parallax": false,
+    "backToTop": true,
+    "cookieConsent": true,
+    "autoPlayVideos": false
+  }
+}
