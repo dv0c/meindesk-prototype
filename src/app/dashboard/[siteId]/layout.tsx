@@ -23,37 +23,39 @@ const layout: FC<layoutProps> = ({ children }) => {
         <SidebarProvider>
             <AppSidebar />
             <SidebarInset>
-                <header className="flex h-16 shrink-0 items-center gap-2">
-                    <div className="flex items-center gap-2 px-4">
-                        {/* <SidebarTrigger className="-ml-1" /> */}
-                        <ToggleSidebar />
-                        <Separator
-                            orientation="vertical"
-                            className="mr-2 data-[orientation=vertical]:h-4"
-                        />
-                        <Breadcrumb>
-                            <BreadcrumbList className="w-full">
-                                <BreadcrumbItem className="hidden md:block">
-                                    <BreadcrumbLink href="#">
-                                        Your Project
-                                    </BreadcrumbLink>
-                                </BreadcrumbItem>
-                                <BreadcrumbSeparator className="hidden md:block" />
-                                <BreadcrumbItem>
-                                    <BreadcrumbPage>Website</BreadcrumbPage>
-                                </BreadcrumbItem>
-                                <BreadcrumbItem className="flex-1">
-                                    <ThemeTogglerButton />
-                                </BreadcrumbItem>
-                            </BreadcrumbList>
-                        </Breadcrumb>
+                <div className="rounded-2xl h-full shadow m-2 border">
+                    <header className="flex h-16 shrink-0 items-center gap-2">
+                        <div className="flex items-center gap-2 px-4">
+                            {/* <SidebarTrigger className="-ml-1" /> */}
+                            <ToggleSidebar />
+                            <Separator
+                                orientation="vertical"
+                                className="mr-2 data-[orientation=vertical]:h-4"
+                            />
+                            <Breadcrumb>
+                                <BreadcrumbList className="w-full">
+                                    <BreadcrumbItem className="hidden md:block">
+                                        <BreadcrumbLink href="#">
+                                            Your Project
+                                        </BreadcrumbLink>
+                                    </BreadcrumbItem>
+                                    <BreadcrumbSeparator className="hidden md:block" />
+                                    <BreadcrumbItem>
+                                        <BreadcrumbPage>Website</BreadcrumbPage>
+                                    </BreadcrumbItem>
+                                    <BreadcrumbItem className="flex-1">
+                                        <ThemeTogglerButton />
+                                    </BreadcrumbItem>
+                                </BreadcrumbList>
+                            </Breadcrumb>
+                        </div>
+                    </header>
+                    <div className="h-full">
+                        <RouterRefresh>
+                            <LoadingOverlay />
+                            {children}
+                        </RouterRefresh>
                     </div>
-                </header>
-                <div className="h-full">
-                    <RouterRefresh>
-                        <LoadingOverlay />
-                        {children}
-                    </RouterRefresh>
                 </div>
             </SidebarInset>
         </SidebarProvider>

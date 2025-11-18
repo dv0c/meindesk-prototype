@@ -4,7 +4,7 @@ import { useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Search, Rss, Youtube, Globe, Newspaper } from "lucide-react"
+import { Search, Rss, Youtube, Globe, Newspaper, RssIcon } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useFetch } from "@/hooks/useFetch"
 
@@ -24,8 +24,8 @@ export default function CreateNewFeed({ siteId }: { siteId: string }) {
         {
             id: "skai",
             title: "ΣΚΑΪ Ειδήσεις",
-            url: "https://www.skai.gr/rss",
-            icon: "https://www.skai.gr/favicon.ico",
+            url: "https://www.skai.gr/rss.xml",
+            icon: "",
         },
         {
             id: "iefimerida",
@@ -36,7 +36,7 @@ export default function CreateNewFeed({ siteId }: { siteId: string }) {
         {
             id: "protothema",
             title: "Πρώτο Θέμα",
-            url: "https://www.protothema.gr/rss/general/",
+            url: "https://www.protothema.gr/rss/",
             icon: "https://www.protothema.gr/favicon.ico",
         },
         {
@@ -54,13 +54,13 @@ export default function CreateNewFeed({ siteId }: { siteId: string }) {
         {
             id: "kathimerini",
             title: "Καθημερινή",
-            url: "https://www.kathimerini.gr/rss",
+            url: "https://www.kathimerini.gr",
             icon: "https://www.kathimerini.gr/favicon.ico",
         },
         {
             id: "cnn_greece",
             title: "CNN Greece",
-            url: "https://www.cnn.gr/feed",
+            url: "https://www.cnn.gr/eidhseis?format=feed&type=rss",
             icon: "https://www.cnn.gr/favicon.ico",
         },
         {
@@ -72,26 +72,26 @@ export default function CreateNewFeed({ siteId }: { siteId: string }) {
         {
             id: "news247",
             title: "News247",
-            url: "https://www.news247.gr/feed/",
-            icon: "https://www.news247.gr/favicon.ico",
+            url: "https://www.news247.gr/",
+            icon: "",
         },
         {
             id: "zougla",
             title: "Zougla.gr",
             url: "https://www.zougla.gr/feed",
-            icon: "https://www.zougla.gr/favicon.ico",
+            icon: "",
         },
         {
             id: "newsbomb",
             title: "Newsbomb.gr",
-            url: "https://www.newsbomb.gr/rss",
+            url: "https://www.newsbomb.gr/oles-oi-eidhseis?format=feed&type=rss",
             icon: "https://www.newsbomb.gr/favicon.ico",
         },
         {
             id: "documentonews",
             title: "Documento News",
             url: "https://www.documentonews.gr/feed/",
-            icon: "https://www.documentonews.gr/favicon.ico",
+            icon: "",
         },
         {
             id: "newsit",
@@ -102,55 +102,49 @@ export default function CreateNewFeed({ siteId }: { siteId: string }) {
         {
             id: "tvxs",
             title: "TVXS.gr",
-            url: "https://tvxs.gr/rss.xml",
-            icon: "https://tvxs.gr/favicon.ico",
+            url: "https://tvxs.gr/feed",
+            icon: "",
         },
         {
             id: "enikos",
             title: "Enikos.gr",
             url: "https://www.enikos.gr/feed/",
-            icon: "https://www.enikos.gr/favicon.ico",
+            icon: "",
         },
         {
             id: "newsbeast",
             title: "Newsbeast.gr",
-            url: "https://www.newsbeast.gr/rss",
+            url: "https://www.newsbeast.gr/feed",
             icon: "https://www.newsbeast.gr/favicon.ico",
         },
         {
             id: "capital",
             title: "Capital.gr Οικονομία",
-            url: "https://www.capital.gr/rssFeed.aspx?catID=0",
+            url: "https://www.capital.gr/api/tags/all",
             icon: "https://www.capital.gr/favicon.ico",
-        },
-        {
-            id: "gazzetta",
-            title: "Gazzetta.gr Αθλητικά",
-            url: "https://www.gazzetta.gr/rss.xml",
-            icon: "https://www.gazzetta.gr/favicon.ico",
         },
         {
             id: "sport24",
             title: "Sport24",
-            url: "https://www.sport24.gr/feed/",
-            icon: "https://www.sport24.gr/favicon.ico",
+            url: "https://www.sport24.gr/",
+            icon: "",
         },
         {
             id: "caranddrivergr",
             title: "Car and Driver Greece",
-            url: "https://www.caranddriver.gr/feed/",
+            url: "https://www.caranddriver.gr/arxiki/rss/",
             icon: "https://www.caranddriver.gr/favicon.ico",
         },
         {
             id: "insomnia",
             title: "Insomnia.gr Τεχνολογία",
-            url: "https://www.insomnia.gr/rss/all.xml/",
+            url: "https://www.insomnia.gr",
             icon: "https://www.insomnia.gr/favicon.ico",
         },
         {
             id: "unboxholics",
             title: "Unboxholics",
-            url: "https://unboxholics.com/rss.xml",
+            url: "https://unboxholics.com/",
             icon: "https://unboxholics.com/favicon.ico",
         },
         {
@@ -163,7 +157,7 @@ export default function CreateNewFeed({ siteId }: { siteId: string }) {
             id: "newsauto",
             title: "NewsAuto.gr",
             url: "https://www.newsauto.gr/feed/",
-            icon: "https://www.newsauto.gr/favicon.ico",
+            icon: "",
         },
         {
             id: "mononews",
@@ -180,25 +174,35 @@ export default function CreateNewFeed({ siteId }: { siteId: string }) {
         {
             id: "athensvoice",
             title: "Athens Voice",
-            url: "https://www.athensvoice.gr/feed/",
+            url: "https://www.athensvoice.gr/rss/echobox/",
             icon: "https://www.athensvoice.gr/favicon.ico",
         },
         {
             id: "lifo",
             title: "LiFO.gr",
-            url: "https://www.lifo.gr/feed",
+            url: "https://www.lifo.gr/",
             icon: "https://www.lifo.gr/favicon.ico",
         },
         {
             id: "readergr",
             title: "Reader.gr",
-            url: "https://www.reader.gr/feed/",
-            icon: "https://www.reader.gr/favicon.ico",
+            url: "https://www.reader.gr/rss.xml",
+            icon: "",
         },
     ];
 
 
-    const allFeeds = [...hardcodedFeeds, ...feeds]
+    const allFeeds = useMemo(() => {
+        const combined = [...hardcodedFeeds, ...(Array.isArray(feeds) ? feeds : [])]
+
+        const uniqueMap = new Map()
+        for (const feed of combined) {
+            const key = (feed.url || feed.title || "").trim().toLowerCase()
+            if (!uniqueMap.has(key)) uniqueMap.set(key, feed)
+        }
+
+        return Array.from(uniqueMap.values())
+    }, [feeds])
 
     const filterPresets = [
         {
@@ -402,13 +406,13 @@ export default function CreateNewFeed({ siteId }: { siteId: string }) {
                                         className="flex flex-col items-start justify-start p-5 gap-3 h-full text-left hover:bg-muted/50 transition"
                                     >
                                         <div className="flex items-center gap-3">
-                                            {feed.icon && (
+                                            {feed.icon ? (
                                                 <img
                                                     src={feed.icon}
                                                     alt="feed icon"
                                                     className="w-8 h-8 object-cover rounded"
                                                 />
-                                            )}
+                                            ) : <RssIcon />}
                                             <h3 className="font-medium text-foreground line-clamp-1">
                                                 {feed.title || "Untitled Feed"}
                                             </h3>
@@ -419,11 +423,13 @@ export default function CreateNewFeed({ siteId }: { siteId: string }) {
                                         >
                                             {decodeURIComponent(feed.url) || "Untitled Feed"}
                                         </p>
-                                        {hardcodedFeeds.some(h => h.id === feed.id) && (
+                                        {hardcodedFeeds.some(h => h.id === feed.id) ? (
                                             <span className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded">
                                                 Built-in
                                             </span>
-                                        )}
+                                        ) : <span className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded">
+                                            External Source
+                                        </span>}
                                     </Button>
                                 ))}
                             </div>
