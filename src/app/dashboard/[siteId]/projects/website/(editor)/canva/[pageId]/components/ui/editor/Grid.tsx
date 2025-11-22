@@ -11,10 +11,21 @@ interface GridProps {
   [key: string]: any
 }
 
-export default function Grid({ columns = 2, gap = 4, padding = 4, className, children, style, ...props }: GridProps) {
+export default function Grid({
+  columns = 2,
+  gap = 4,
+  padding = 4,
+  className,
+  children,
+  style,
+  ...props
+}: GridProps) {
+  const isEmpty =
+    !children || (Array.isArray(children) && children.length === 0)
+
   return (
     <div
-      className={cn("grid w-full", className)}
+      className={cn("grid bg-card w-full", className)}
       style={{
         gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
         gap: `${gap * 0.25}rem`,
@@ -23,10 +34,12 @@ export default function Grid({ columns = 2, gap = 4, padding = 4, className, chi
       }}
       {...props}
     >
-      {children || (
+      {isEmpty ? (
         <div className="col-span-full p-8 border-2 border-dashed border-muted rounded-lg flex items-center justify-center text-muted-foreground">
           Grid Container ({columns} Columns) - Drop items here
         </div>
+      ) : (
+        children
       )}
     </div>
   )

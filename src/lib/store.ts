@@ -1,5 +1,5 @@
-import { create } from "zustand"
-import type { LayoutNode, PageData, WebsiteSettings } from "./types"
+import { create } from "zustand";
+import type { LayoutNode, PageData, WebsiteSettings } from "./types";
 
 const defaultSettings: WebsiteSettings = {
   title: "My Website",
@@ -11,38 +11,38 @@ const defaultSettings: WebsiteSettings = {
     backgroundColor: "#ffffff",
     textColor: "#000000",
   },
-}
+};
 
 interface BuilderState {
   // Current page data
-  currentPage: PageData | null
+  currentPage: PageData | null;
 
-  websiteSettings: WebsiteSettings
+  websiteSettings: WebsiteSettings;
 
   // Layout tree
-  nodes: LayoutNode[]
+  nodes: LayoutNode[];
 
   // Selected node for property editing
-  selectedNodeId: string | null
+  selectedNodeId: string | null;
 
   // Drag and drop state
-  isDragging: boolean
+  isDragging: boolean;
 
   // Actions
-  setCurrentPage: (page: PageData) => void
-  updateWebsiteSettings: (settings: Partial<WebsiteSettings>) => void
-  setNodes: (nodes: LayoutNode[]) => void
-  addNode: (node: LayoutNode, parentId?: string) => void
-  updateNode: (id: string, updates: Partial<LayoutNode>) => void
-  removeNode: (id: string) => void
-  moveNode: (nodeId: string, newParentId: string | null, index: number) => void
-  selectNode: (id: string | null) => void
-  setIsDragging: (isDragging: boolean) => void
-  clearCanvas: () => void
+  setCurrentPage: (page: PageData) => void;
+  updateWebsiteSettings: (settings: Partial<WebsiteSettings>) => void;
+  setNodes: (nodes: LayoutNode[]) => void;
+  addNode: (node: LayoutNode, parentId?: string) => void;
+  updateNode: (id: string, updates: Partial<LayoutNode>) => void;
+  removeNode: (id: string) => void;
+  moveNode: (nodeId: string, newParentId: string | null, index: number) => void;
+  selectNode: (id: string | null) => void;
+  setIsDragging: (isDragging: boolean) => void;
+  clearCanvas: () => void;
 
   // Utility functions
-  findNode: (id: string, nodes?: LayoutNode[]) => LayoutNode | null
-  getNodePath: (id: string) => string[]
+  findNode: (id: string, nodes?: LayoutNode[]) => LayoutNode | null;
+  getNodePath: (id: string) => string[];
 }
 
 export const useBuilderStore = create<BuilderState>((set, get) => ({
@@ -74,11 +74,11 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
   setNodes: (nodes) => set({ nodes }),
 
   addNode: (node, parentId) => {
-    const { nodes } = get()
+    const { nodes } = get();
 
     if (!parentId) {
       // Add to root
-      set({ nodes: [...nodes, node] })
+      set({ nodes: [...nodes, node] });
     } else {
       // Add to parent's children
       const addToParent = (items: LayoutNode[]): LayoutNode[] => {
@@ -87,45 +87,45 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
             return {
               ...item,
               children: [...(item.children || []), node],
-            }
+            };
           }
           if (item.children) {
             return {
               ...item,
               children: addToParent(item.children),
-            }
+            };
           }
-          return item
-        })
-      }
+          return item;
+        });
+      };
 
-      set({ nodes: addToParent(nodes) })
+      set({ nodes: addToParent(nodes) });
     }
   },
 
   updateNode: (id, updates) => {
-    const { nodes } = get()
+    const { nodes } = get();
 
     const updateInTree = (items: LayoutNode[]): LayoutNode[] => {
       return items.map((item) => {
         if (item.id === id) {
-          return { ...item, ...updates }
+          return { ...item, ...updates };
         }
         if (item.children) {
           return {
             ...item,
             children: updateInTree(item.children),
-          }
+          };
         }
-        return item
-      })
-    }
+        return item;
+      });
+    };
 
-    set({ nodes: updateInTree(nodes) })
+    set({ nodes: updateInTree(nodes) });
   },
 
   removeNode: (id) => {
-    const { nodes, selectedNodeId } = get()
+    const { nodes, selectedNodeId } = get();
 
     const removeFromTree = (items: LayoutNode[]): LayoutNode[] => {
       return items
@@ -133,66 +133,66 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
         .map((item) => ({
           ...item,
           children: item.children ? removeFromTree(item.children) : undefined,
-        }))
-    }
+        }));
+    };
 
     set({
       nodes: removeFromTree(nodes),
       selectedNodeId: selectedNodeId === id ? null : selectedNodeId,
-    })
+    });
   },
 
   moveNode: (nodeId, newParentId, index) => {
-    const { nodes } = get()
-    let nodeToMove: LayoutNode | null = null
+    const { nodes } = get();
+    let nodeToMove: LayoutNode | null = null;
 
     // Find and remove the node
     const removeNode = (items: LayoutNode[]): LayoutNode[] => {
       return items
         .filter((item) => {
           if (item.id === nodeId) {
-            nodeToMove = item
-            return false
+            nodeToMove = item;
+            return false;
           }
-          return true
+          return true;
         })
         .map((item) => ({
           ...item,
           children: item.children ? removeNode(item.children) : undefined,
-        }))
-    }
+        }));
+    };
 
-    let newNodes = removeNode(nodes)
+    let newNodes = removeNode(nodes);
 
-    if (!nodeToMove) return
+    if (!nodeToMove) return;
 
     // Insert at new position
     if (!newParentId) {
       // Insert at root level
-      newNodes.splice(index, 0, nodeToMove)
+      newNodes.splice(index, 0, nodeToMove);
     } else {
       // Insert into parent's children
       const insertIntoParent = (items: LayoutNode[]): LayoutNode[] => {
         return items.map((item) => {
           if (item.id === newParentId) {
-            const children = item.children || []
-            children.splice(index, 0, nodeToMove!)
-            return { ...item, children }
+            const children = item.children || [];
+            children.splice(index, 0, nodeToMove!);
+            return { ...item, children };
           }
           if (item.children) {
             return {
               ...item,
               children: insertIntoParent(item.children),
-            }
+            };
           }
-          return item
-        })
-      }
+          return item;
+        });
+      };
 
-      newNodes = insertIntoParent(newNodes)
+      newNodes = insertIntoParent(newNodes);
     }
 
-    set({ nodes: newNodes })
+    set({ nodes: newNodes });
   },
 
   selectNode: (id) => set({ selectedNodeId: id }),
@@ -202,41 +202,41 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
   clearCanvas: () => set({ nodes: [], selectedNodeId: null }),
 
   findNode: (id, nodes) => {
-    const searchNodes = nodes || get().nodes
+    const searchNodes = nodes || get().nodes;
 
     for (const node of searchNodes) {
-      if (node.id === id) return node
+      if (node.id === id) return node;
       if (node.children) {
-        const found = get().findNode(id, node.children)
-        if (found) return found
+        const found = get().findNode(id, node.children);
+        if (found) return found;
       }
     }
 
-    return null
+    return null;
   },
 
   getNodePath: (id) => {
-    const { nodes, findNode } = get()
-    const path: string[] = []
+    const { nodes, findNode } = get();
+    const path: string[] = [];
 
     const buildPath = (items: LayoutNode[], currentPath: string[]): boolean => {
       for (const node of items) {
-        const newPath = [...currentPath, node.type]
+        const newPath = [...currentPath, node.type];
 
         if (node.id === id) {
-          path.push(...newPath)
-          return true
+          path.push(...newPath);
+          return true;
         }
 
         if (node.children && buildPath(node.children, newPath)) {
-          return true
+          return true;
         }
       }
 
-      return false
-    }
+      return false;
+    };
 
-    buildPath(nodes, [])
-    return path
+    buildPath(nodes, []);
+    return path;
   },
-}))
+}));

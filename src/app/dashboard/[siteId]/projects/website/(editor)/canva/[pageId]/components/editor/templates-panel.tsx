@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { TEMPLATES, getTemplate } from "@/lib/templates"
 import { useBuilderStore } from "@/lib/store"
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "../ui/use-toast"
 
 export function TemplatesPanel() {
   const { setNodes } = useBuilderStore()

@@ -28,7 +28,7 @@ export default function ClientPreview({ tenantId, page }: ClientPreviewProps) {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="">
         {page.layout.length === 0 ? (
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
