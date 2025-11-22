@@ -9,7 +9,7 @@ export async function getAvailableComponents(): Promise<ComponentDefinition[]> {
   }
 
   try {
-    const response = await fetch("/api/components")
+    const response = await fetch(`/api/canva/components`)
     const components = await response.json()
     componentCache = components
     return components

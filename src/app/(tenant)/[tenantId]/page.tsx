@@ -1,50 +1,27 @@
-// app/[tenantId]/page.tsx
+// app/(tenant)/[tenantId]/page.tsx
 
-import { db } from '@/lib/db'
-import { notFound } from 'next/navigation'
-import dynamicImport from 'next/dynamic'
-import { TemplateSchema } from '@/types/TemplateSchema'
+import { notFound } from "next/navigation"
+import { db } from "@/lib/db"
+import type { PageData } from "@/lib/types"
+import ClientPreview from "./ClientPreview" // Direct import — it's already client-side
 
-interface TenantPageProps {
-  params: {
-    tenantId: string
-  }
-}
+export default async function PreviewPage({ params }: { params: { tenantId: string } }) {
+  const { tenantId } = params
 
-const tenantSelectFields = {
-  title: true,
-  id: true,
-  description: true,
-  subdomain: true,
-  template_schema: true,
-}
-
-export default async function TenantHomePage({ params }: TenantPageProps) {
-  const { tenantId } = await params
-
-  // Fetch tenant data
-  const tenantData = await db.site.findUnique({
+  const tenant = await db.site.findUnique({
     where: { id: tenantId },
-    select: tenantSelectFields,
+    select: { id: true, title: true, description: true },
   })
 
-  if (!tenantData) return notFound()
+  if (!tenant) notFound()
 
-  const templateSchema = tenantData.template_schema as unknown as TemplateSchema
-  const template = templateSchema.template || 'simple'
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+  const response = await fetch(`${baseUrl}/api/team/${tenant.id}/canva/pages/sample-page`, {
+    cache: "no-store",
+  })
 
-  // Validate template
-  const templates = ['simple', 'minimal']
-  if (!templates.includes(template)) return notFound()
+  if (!response.ok) notFound()
+  const page: PageData = await response.json()
 
-  // Lazy load the template component dynamically
-  const Template = dynamicImport(() =>
-    import(`../_components/templates/${template}/index`)
-  ) as React.ComponentType<{ tenant: any }>
-
-  return (
-    <div className="min-h-screen">
-      <Template tenant={tenantData} />
-    </div>
-  )
+  return <ClientPreview tenantId={tenant.id} page={page} />
 }

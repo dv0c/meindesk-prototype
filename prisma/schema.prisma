@@ -238,15 +238,13 @@ model Page {
   id        String     @id @default(auto()) @map("_id") @db.ObjectId
   title     String
   slug      String     @unique @default(uuid())
-  content   Json?
-  html      String?
   excerpt   String?
-  template  String     @default("default")
+  order     Int?
+  layout    Json[]
   status    PageStatus @default(DRAFT)
   parentId  String?    @db.ObjectId
   authorId  String?    @db.ObjectId
   meta      Json?
-  order     Int?
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   siteId    String     @db.ObjectId

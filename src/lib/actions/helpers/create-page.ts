@@ -16,9 +16,7 @@ export async function CreatePage({ siteId }: { siteId: string }) {
     data: {
       title: "Untitled",
       slug,
-      content: "",
       excerpt: "",
-      template: "default",
       status: "DRAFT",
       order: 0,
       siteId,
@@ -33,7 +31,7 @@ export async function CreatePage({ siteId }: { siteId: string }) {
   }
 
   return {
-    url: `/dashboard/${siteId}/projects/website/pages/${page.id}/editor`,
+    url: `/dashboard/${siteId}/projects/website/canva/${page.id}`,
     page,
   };
 }

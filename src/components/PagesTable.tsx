@@ -159,7 +159,7 @@ export function PagesTable() {
                     onClick={(e) => {
                       const target = e.target as HTMLElement
                       if (target.closest("button") || target.closest("[role='menu']")) return
-                      router.push(`/dashboard/${team?.id}/projects/website/pages/${page.id}/editor`)
+                      router.push(`/dashboard/${team?.id}/projects/website/canva/${page.id}/`)
                     }}
                   >
                     <TableCell className="font-medium py-3 text-sm">{page.title}</TableCell>
@@ -186,7 +186,7 @@ export function PagesTable() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem
                             onClick={() =>
-                              router.push(`/dashboard/${team?.id}/projects/website/pages/${page.id}/editor`)
+                              router.push(`/dashboard/${team?.id}/projects/website/canva/${page.id}/`)
                             }
                           >
                             <Edit className="h-4 w-4 mr-2" /> Edit

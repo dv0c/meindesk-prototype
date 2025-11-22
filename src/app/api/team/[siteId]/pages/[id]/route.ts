@@ -1,128 +1,114 @@
-import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { NextRequest, NextResponse } from "next/server"
+import { db } from "@/lib/db"
 
-// Type-safe page with nested children
 type PageWithChildren = {
-  id: string;
-  title: string;
-  slug: string;
-  content?: string;
-  excerpt?: string;
-  template: string;
-  status: string;
-  order?: number;
-  parentId?: string | null;
-  userId?: string | null;
-  siteId: string;
-  meta?: any;
-  createdAt: Date;
-  updatedAt: Date;
-  children: PageWithChildren[];
-};
+  id: string
+  title: string
+  slug: string
+  excerpt?: string
+  order?: number
+  layout: any[]
+  status: string
+  parentId?: string | null
+  authorId?: string | null
+  siteId: string
+  meta?: any
+  createdAt: Date
+  updatedAt: Date
+  children: PageWithChildren[]
+}
 
-// -----------------------------
-// Helper: recursively fetch children
-// -----------------------------
+// ------------------------------------
+// Recursive fetch for nested pages
+// ------------------------------------
 async function fetchChildren(parentId: string): Promise<PageWithChildren[]> {
   const children = await db.page.findMany({
     where: { parentId },
     orderBy: { order: "asc" },
-  });
+  })
 
   return Promise.all(
     children.map(async (child) => ({
       ...child,
-      content: child.content ?? undefined,
       excerpt: child.excerpt ?? undefined,
       order: child.order ?? undefined,
-      html: child.html ?? undefined,
       parentId: child.parentId ?? undefined,
-      userId: child.userId ?? undefined,
+      authorId: child.authorId ?? undefined,
+      layout: child.layout ?? [],
       children: await fetchChildren(child.id),
     }))
-  );
+  )
 }
 
-// -----------------------------
-// GET /pages/:id -> fetch page + children
-// -----------------------------
+// ------------------------------------
+// GET /pages/:id → fetch page + children
+// ------------------------------------
 export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { id } = await params;
+  const { id } = params
 
   try {
-    const page = await db.page.findUnique({ where: { id } });
-
+    const page = await db.page.findUnique({ where: { id } })
     if (!page)
-      return NextResponse.json({ error: "Page not found" }, { status: 404 });
+      return NextResponse.json({ error: "Page not found" }, { status: 404 })
 
-    const children: PageWithChildren[] = await fetchChildren(page.id);
-
-    return NextResponse.json({ ...page, children }, { status: 200 });
+    const children = await fetchChildren(page.id)
+    return NextResponse.json({ ...page, children }, { status: 200 })
   } catch (err) {
-    console.error(err);
-    return NextResponse.json(
-      { error: "Failed to fetch page" },
-      { status: 500 }
-    );
+    console.error("GET /pages/:id error:", err)
+    return NextResponse.json({ error: "Failed to fetch page" }, { status: 500 })
   }
 }
 
-// -----------------------------
-// PUT /pages/:id -> update a page
-// -----------------------------
+// ------------------------------------
+// PUT /pages/:id → update page
+// ------------------------------------
 export async function PUT(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { id } = await params;
-  const body = await req.json();
+  const { id } = params
+  const body = await req.json()
 
   try {
     const updatedPage = await db.page.update({
       where: { id },
       data: {
         title: body.title,
-        content: body.content,
+        slug: body.slug,
         excerpt: body.excerpt,
-        template: body.template,
+        layout: body.layout ?? [],
         status: body.status,
-        html: body.html,
         order: body.order,
         meta: body.meta,
         parentId: body.parentId,
+        authorId: body.authorId,
       },
-    });
+    })
 
-    return NextResponse.json(updatedPage, { status: 200 });
+    return NextResponse.json(updatedPage, { status: 200 })
   } catch (err) {
-    console.error(err);
-    return NextResponse.json(
-      { error: "Failed to update page" },
-      { status: 500 }
-    );
+    console.error("PUT /pages/:id error:", err)
+    return NextResponse.json({ error: "Failed to update page" }, { status: 500 })
   }
 }
 
-// -----------------------------
-// DELETE /pages/:id -> remove a page
-// -----------------------------
+// ------------------------------------
+// DELETE /pages/:id → remove page
+// ------------------------------------
 export async function DELETE(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { id } = params;
+  const { id } = params
 
   try {
-    await db.page.delete({ where: { id } });
-    return NextResponse.json({ message: "Page deleted" }, { status: 200 });
+    await db.page.delete({ where: { id } })
+    return NextResponse.json({ message: "Page deleted" }, { status: 200 })
   } catch (err) {
-    console.error(err);
-    return NextResponse.json(
-      { error: "Failed to delete page" },
-      { status: 500 }
-    );
+    console.error("DELETE /pages/:id error:", err)
+    return NextResponse.json({ error: "Failed to delete page" }, { status: 500 })
   }
 }

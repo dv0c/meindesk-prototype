@@ -462,6 +462,12 @@ export async function GET() {
           label: "Interval (ms)",
           defaultValue: 3000,
         },
+        {
+          name: "currIndex",
+          type: "number",
+          label: "Current Index",
+          defaultValue: 0,
+        },
       ],
     },
   ];
