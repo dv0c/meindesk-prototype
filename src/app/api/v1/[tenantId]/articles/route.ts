@@ -14,7 +14,7 @@ export async function GET(
   const { siteId } = await params
   const { searchParams } = new URL(req.url)
   const limitParam = searchParams.get("limit")
-  const limit = limitParam ? parseInt(limitParam, 20) : 20 // default to 10 results
+  const limit = limitParam ? parseInt(limitParam, 10) : 10 // default to 10 results
 
   try {
 

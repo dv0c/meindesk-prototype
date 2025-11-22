@@ -439,7 +439,7 @@ export async function GET() {
           name: "limit",
           type: "number",
           label: "Articles limit",
-          defaultValue: "10",
+          defaultValue: 10,
         },
       ],
     },

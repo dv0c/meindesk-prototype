@@ -15,7 +15,7 @@ interface Article {
     name: string | null
   }
   cover: string | null
-  date: string
+  createdAt: Date
 }
 
 interface ArticleListProps {
@@ -104,7 +104,7 @@ export default function ArticleList({
                   <Image
                     src={article.cover}
                     alt={article.title}
-                    className="object-cover w-full h-full"
+                    className="object-cover! w-full h-full!"
                   />
                 </div>
               )}
@@ -116,7 +116,7 @@ export default function ArticleList({
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <span>{article.author?.name || "Anonymous"}</span>
                   <span>•</span>
-                  <span>{new Date(article.date).toLocaleDateString()}</span>
+                  <span>{new Date(article.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
             </div>
