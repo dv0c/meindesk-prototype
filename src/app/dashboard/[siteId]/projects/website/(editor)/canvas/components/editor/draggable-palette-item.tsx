@@ -1,0 +1,52 @@
+"use client"
+import { useDraggable } from "@dnd-kit/core"
+import { Type, ImageIcon, Box, Layout, MousePointerClick, Square, List, Columns } from "lucide-react"
+import type { ComponentDefinition } from "@/lib/types"
+
+interface DraggablePaletteItemProps {
+  component: ComponentDefinition
+  onAdd: () => void
+}
+
+const iconMap: Record<string, any> = {
+  Container: Box,
+  Grid: Layout,
+  HtmlContainer: Square,
+  Heading: Type,
+  Text: Type,
+  Image: ImageIcon,
+  Button: MousePointerClick,
+  EditorButton: MousePointerClick,
+  ArticleList: List,
+  Columns: Columns,
+}
+
+export function DraggablePaletteItem({ component, onAdd }: DraggablePaletteItemProps) {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: `palette-${component.name}`,
+    data: {
+      type: "palette-item",
+      component,
+    },
+  })
+
+  const style = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+      }
+    : undefined
+
+  const Icon = iconMap[component.name] || Box
+
+  return (
+    <div ref={setNodeRef} style={style} {...listeners} {...attributes} className="touch-none h-full">
+      <div
+        className="flex flex-col items-center justify-center p-3 h-24 border rounded-md hover:border-primary hover:bg-accent/50 cursor-grab active:cursor-grabbing transition-colors bg-card"
+        onClick={onAdd}
+      >
+        <Icon className="h-6 w-6 mb-2 text-muted-foreground" />
+        <span className="text-xs text-center font-medium leading-tight">{component.name}</span>
+      </div>
+    </div>
+  )
+}

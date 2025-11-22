@@ -129,6 +129,18 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
         ))}
       </nav>
 
+      <div className="pt-6 border-t border-border/50 space-y-3 flex-shrink-0">
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3">
+          Resources
+        </p>
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full justify-start text-xs h-9 font-medium hover:bg-secondary/70 transition-colors"
+        >
+          Documentation
+        </Button>
+      </div>
     </aside>
   )
 }
