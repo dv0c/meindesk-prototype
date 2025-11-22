@@ -11,7 +11,6 @@ export async function GET(
   { params }: { params: { siteId: string } }
 ) {
   const { siteId } = await params;
-  console.log(siteId);  
   try {
     // 1. Get logged in user
     const session = await getAuthSession();
@@ -43,7 +42,7 @@ export async function GET(
   } catch (err: any) {
     console.error(err);
     return NextResponse.json(
-      { error: "Something went wrong " + siteId },
+      { error: "Something went wrong " },
       { status: 500 }
     );
   }

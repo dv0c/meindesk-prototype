@@ -31,7 +31,7 @@ export default function ArticleList({
 }: ArticleListProps) {
   const [articles, setArticles] = useState<Article[]>([])
   const [loading, setLoading] = useState(true)
-  const { team, loading: teamLoading } = useTeam()
+  const { team, loading: teamLoading } = useTeam(undefined, 'tenant')
 
   useEffect(() => {
     if (!team?.id) return
@@ -41,7 +41,7 @@ export default function ArticleList({
       try {
         setLoading(true)
         const { data } = await axios.get(
-          `/api/team/${team.id}/articles?limit=${limit}`,
+          `/api/v1/${team.id}/articles?limit=${limit}`,
           { signal: controller.signal }
         )
         setArticles(data || [])
