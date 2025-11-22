@@ -10,7 +10,7 @@ import { LayersPanel } from "./components/editor/layers-panel"
 import { Button } from "./components/ui/button"
 import { createNode, generateNodeId } from "@/lib/component-registry"
 import type { ComponentDefinition, LayoutNode } from "@/lib/types"
-import { Save, Eye, Home, Undo, Redo, Smartphone, Monitor, Tablet, Layers } from "lucide-react"
+import { Save, Eye, Home, Undo, Redo, Smartphone, Monitor, Tablet, Layers, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import {
   DndContext,
@@ -49,6 +49,7 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
   const [deviceMode, setDeviceMode] = useState<"desktop" | "tablet" | "mobile">("desktop")
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; nodeId: string } | null>(null)
   const [showLayersPanel, setShowLayersPanel] = useState(false)
+  const [loading, setLoading] = useState(true) // <--- Loading state
 
   const {
     nodes,
@@ -74,6 +75,7 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
   }, [])
 
   async function loadPage() {
+    setLoading(true)
     try {
       const response = await fetch(`/api/team/${tenantId}/pages/${pageId}`)
       if (response.ok) {
@@ -84,6 +86,8 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
     } catch (error) {
       console.error("Failed to load page:", error)
       toast.error("Failed to load page")
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -281,16 +285,44 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
     }
   }
 
+  // ----------------- Loading Skeleton -----------------
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen bg-muted/10">
+        <div className="w-full max-w-[1200px] p-6 animate-pulse">
+          <div className="h-8 w-1/4 bg-muted rounded mb-6"></div>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="col-span-2 space-y-3">
+              <div className="h-64 bg-muted rounded"></div>
+              <div className="h-40 bg-muted rounded"></div>
+              <div className="h-24 bg-muted rounded"></div>
+            </div>
+            <div className="space-y-3">
+              <div className="h-12 bg-muted rounded"></div>
+              <div className="h-12 bg-muted rounded"></div>
+              <div className="h-12 bg-muted rounded"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ----------------- Main Editor -----------------
   return (
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div className="h-screen flex flex-col bg-muted/10 overflow-hidden">
         {/* Top Bar */}
-        <header className="h-14 border-b bg-background flex items-center justify-between px-5 pb-5 z-30 shrink-0">
+        <header className="h-14 border-b bg-background flex items-center justify-between p-5 z-30 shrink-0">
           {/* Left: Page title */}
           <div className="flex items-center gap-4">
-            <div>
+              <Button onClick={() => history.back()} variant="ghost" size="icon" className="cursor-pointer h-8 w-8">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            <div className="h-6 w-px bg-border mx-2" />
+            <div className="flex items-center gap-3">
               <h1 className="text-lg font-semibold">{pageName}</h1>
-              <span className="text-sm text-muted-foreground">Draft</span>
+              <span className="text-xs text-muted-foreground">Draft</span>
             </div>
           </div>
 
@@ -355,19 +387,19 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
           </div>
         </header>
 
-
         <div className="flex-1 flex overflow-hidden">
           <Sidebar onAddComponent={handleAddComponent} onUpdateNode={handleUpdateNode} onDeleteNode={handleDeleteNode} />
 
           <div className="flex-1 bg-muted/10 overflow-hidden flex flex-col relative">
             <div className="absolute inset-0 p-8 overflow-auto flex justify-center">
               <div
-                className={`bg-background shadow-sm border min-h-fit transition-all duration-300 ${deviceMode === "mobile"
-                  ? "w-[375px]"
-                  : deviceMode === "tablet"
+                className={`bg-background shadow-sm border min-h-fit transition-all duration-300 ${
+                  deviceMode === "mobile"
+                    ? "w-[375px]"
+                    : deviceMode === "tablet"
                     ? "w-[768px]"
                     : "w-full max-w-[1200px]"
-                  }`}
+                }`}
               >
                 <Canvas
                   nodes={nodes}
