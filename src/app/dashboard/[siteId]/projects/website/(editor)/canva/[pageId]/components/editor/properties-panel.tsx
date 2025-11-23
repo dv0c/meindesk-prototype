@@ -12,7 +12,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { ComponentDefinition, LayoutNode, PropDefinition } from "@/lib/types"
 import { getAvailableComponents } from "@/lib/component-registry"
-import { Trash2, Box, Settings, Code, FileCode, Layout, Type, Move, Square, Palette } from "lucide-react"
+import { Trash2, Box, Settings, Code, FileCode, Layout, Type, Move, Square, Palette, Plus } from "lucide-react"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
 interface PropertiesPanelProps {
@@ -579,6 +579,80 @@ function renderPropInput(prop: PropDefinition, value: any, onChange: (propName: 
           />
         </div>
       )
+
+    // ✅ NEW: Dynamic JSON array editor (for things like Stats)
+    case "json": {
+      // Correctly parse or normalize value to an array
+      const parsedValue: any[] = (() => {
+        if (Array.isArray(value)) return value
+        if (typeof value === "string") {
+          try {
+            const parsed = JSON.parse(value)
+            return Array.isArray(parsed) ? parsed : []
+          } catch {
+            return []
+          }
+        }
+        return []
+      })()
+      
+      const handleChange = (index: number, key: string, val: string) => {
+        const newArr = [...parsedValue]
+        newArr[index] = { ...newArr[index], [key]: val }
+        onChange(prop.name, newArr)
+      }
+
+      const addItem = () => {
+        const newItem: any = {}
+        prop.schema?.forEach((f) => (newItem[f.key] = ""))
+        onChange(prop.name, [...parsedValue, newItem])
+      }
+
+      const removeItem = (index: number) => {
+        const newArr = parsedValue.filter((_, i) => i !== index)
+        onChange(prop.name, newArr)
+      }
+
+      return (
+        <div className="space-y-3 border rounded-md p-3 bg-muted/30">
+          {parsedValue.map((item, idx) => (
+            <div key={idx} className="relative border rounded-md p-3 bg-background">
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="absolute top-2 right-2 text-muted-foreground hover:text-destructive"
+                onClick={() => removeItem(idx)}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+
+              {prop.schema?.map((field) => (
+                <div key={field.key} className="space-y-1 mb-2">
+                  <Label className="text-xs">{field.label}</Label>
+                  <Input
+                    className="h-8"
+                    value={item[field.key] || ""}
+                    onChange={(e) => handleChange(idx, field.key, e.target.value)}
+                  />
+                </div>
+              ))}
+            </div>
+          ))}
+
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="w-full"
+            onClick={addItem}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Item
+          </Button>
+        </div>
+      )
+    }
 
     default:
       return <Input id={prop.name} value={value || ""} disabled />

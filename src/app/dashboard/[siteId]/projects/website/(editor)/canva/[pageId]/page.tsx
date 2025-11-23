@@ -445,7 +445,7 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
             </Button>
           ) : null}
         </DragOverlay>
-      </div>
+      </div>  
     </DndContext>
   )
 }

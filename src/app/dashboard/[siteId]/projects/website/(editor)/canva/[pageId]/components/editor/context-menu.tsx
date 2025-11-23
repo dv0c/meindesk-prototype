@@ -40,62 +40,62 @@ export function ContextMenu({ x, y, onClose, onEdit, onDuplicate, onDelete, onMo
   }, [onClose])
 
   return (
-    <div
-      ref={menuRef}
-      className="fixed z-[9999] bg-popover border rounded-lg shadow-lg py-1 min-w-[180px]"
-      style={{ left: x, top: y }}
-    >
-      <button
-        className="w-full px-3 py-2 text-sm hover:bg-accent flex items-center gap-2 text-left"
-        onClick={() => {
-          onEdit()
-          onClose()
-        }}
-      >
-        <Settings className="h-4 w-4" />
-        Edit Properties
-      </button>
-      <button
-        className="w-full px-3 py-2 text-sm hover:bg-accent flex items-center gap-2 text-left"
-        onClick={() => {
-          onDuplicate()
-          onClose()
-        }}
-      >
-        <Copy className="h-4 w-4" />
-        Duplicate
-      </button>
-      <button
-        className="w-full px-3 py-2 text-sm hover:bg-accent flex items-center gap-2 text-left"
-        onClick={() => {
-          onMoveUp()
-          onClose()
-        }}
-      >
-        <ArrowUp className="h-4 w-4" />
-        Move Up
-      </button>
-      <button
-        className="w-full px-3 py-2 text-sm hover:bg-accent flex items-center gap-2 text-left"
-        onClick={() => {
-          onMoveDown()
-          onClose()
-        }}
-      >
-        <ArrowDown className="h-4 w-4" />
-        Move Down
-      </button>
-      <div className="border-t my-1" />
-      <button
-        className="w-full px-3 py-2 text-sm hover:bg-destructive/10 text-destructive flex items-center gap-2 text-left"
-        onClick={() => {
-          onDelete()
-          onClose()
-        }}
-      >
-        <Trash2 className="h-4 w-4" />
-        Delete
-      </button>
+    <div ref={menuRef} className="fixed z-[9999]" style={{ left: x, top: y }}>
+      <div className="bg-popover border rounded-lg shadow-lg overflow-hidden" onClick={(e) => e.stopPropagation()}>
+        <div className="py-1 min-w-[180px]">
+          <button
+            className="w-full px-3 py-2 text-sm hover:bg-accent flex items-center gap-2 text-left"
+            onClick={() => {
+              onEdit()
+              onClose()
+            }}
+          >
+            <Settings className="h-4 w-4" />
+            Edit Properties
+          </button>
+          <button
+            className="w-full px-3 py-2 text-sm hover:bg-accent flex items-center gap-2 text-left"
+            onClick={() => {
+              onDuplicate()
+              onClose()
+            }}
+          >
+            <Copy className="h-4 w-4" />
+            Duplicate
+          </button>
+          <button
+            className="w-full px-3 py-2 text-sm hover:bg-accent flex items-center gap-2 text-left"
+            onClick={() => {
+              onMoveUp()
+              onClose()
+            }}
+          >
+            <ArrowUp className="h-4 w-4" />
+            Move Up
+          </button>
+          <button
+            className="w-full px-3 py-2 text-sm hover:bg-accent flex items-center gap-2 text-left"
+            onClick={() => {
+              onMoveDown()
+              onClose()
+            }}
+          >
+            <ArrowDown className="h-4 w-4" />
+            Move Down
+          </button>
+          <div className="border-t my-1" />
+          <button
+            className="w-full px-3 py-2 text-sm hover:bg-destructive/10 text-destructive flex items-center gap-2 text-left"
+            onClick={() => {
+              onDelete()
+              onClose()
+            }}
+          >
+            <Trash2 className="h-4 w-4" />
+            Delete
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

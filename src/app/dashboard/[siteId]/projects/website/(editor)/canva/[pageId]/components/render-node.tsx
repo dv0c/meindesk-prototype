@@ -3,9 +3,10 @@
 import type React from "react"
 import dynamic from "next/dynamic"
 import type { LayoutNode } from "@/lib/types"
-import { Suspense } from "react"
+import { Suspense, Children, isValidElement } from "react"
 import { DraggableWrapper } from "./editor/draggable-wrapper"
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
+import { cn } from "@/lib/utils"
 
 interface RenderNodeProps {
   node: LayoutNode
@@ -33,9 +34,19 @@ const componentMap: Record<string, React.ComponentType<any>> = {
   Spacer: dynamic(() => import("./ui/editor/Spacer")),
   Divider: dynamic(() => import("./ui/editor/Divider")),
   Footer: dynamic(() => import("./ui/editor/Footer")),
+  Newsletter: dynamic(() => import("./ui/editor/Newsletter").then(mod => ({ default: mod.Newsletter }))),
+  Stats: dynamic(() => import("./ui/editor/Stats").then(mod => ({ default: mod.Stats }))),
+  TeamMember: dynamic(() => import("./ui/editor/TeamMember").then(mod => ({ default: mod.TeamMember }))),
+  Tabs: dynamic(() => import("./ui/editor/Tabs").then(mod => ({ default: mod.Tabs }))),
 }
 
-export function RenderNode({ node, isEditor = false, onSelect, isSelected = false, onContextMenu }: RenderNodeProps) {
+export function RenderNode({
+  node,
+  isEditor = false,
+  onSelect,
+  isSelected = false,
+  onContextMenu,
+}: RenderNodeProps) {
   const Component = componentMap[node.type]
 
   if (!Component) {
@@ -54,7 +65,6 @@ export function RenderNode({ node, isEditor = false, onSelect, isSelected = fals
 
     if (!isEditor && node.script) {
       try {
-        // Safe-ish execution
         new Function(node.script)()
       } catch (err) {
         console.error("Error executing script for node", node.id, err)
@@ -70,20 +80,31 @@ export function RenderNode({ node, isEditor = false, onSelect, isSelected = fals
     />
   ) : null
 
-  const renderedChildren = node.children ? (
-    <SortableContext items={node.children.map((child) => child.id)} strategy={verticalListSortingStrategy}>
-      {node.children.map((child) => (
-        <RenderNode
-          key={child.id}
-          node={child}
-          isEditor={isEditor}
-          onSelect={onSelect}
-          isSelected={isSelected}
-          onContextMenu={onContextMenu}
-        />
-      ))}
-    </SortableContext>
-  ) : null
+  // Render children nodes recursively
+  const renderedChildren = node.children?.map(child => (
+    <RenderNode
+      key={child.id}
+      node={child}
+      isEditor={isEditor}
+      onSelect={onSelect}
+      isSelected={isSelected}
+      onContextMenu={onContextMenu}
+    />
+  ))
+
+  // Decide how to pass children depending on type
+  let childrenToRender: React.ReactNode
+  if (node.type === "Slideshow" || node.type === "Tabs") {
+    // Pass children directly for Tabs and Slideshow
+    childrenToRender = renderedChildren
+  } else if (renderedChildren && renderedChildren.length > 0) {
+    // Wrap in SortableContext for other container types
+    childrenToRender = (
+      <SortableContext items={node.children!.map(c => c.id)} strategy={verticalListSortingStrategy}>
+        {renderedChildren}
+      </SortableContext>
+    )
+  }
 
   const content = (
     <>
@@ -97,12 +118,12 @@ export function RenderNode({ node, isEditor = false, onSelect, isSelected = fals
       >
         <Component
           {...node.props}
-          className={`${node.props.className || ""} ${node.className || ""}`}
+          className={cn(node.props.className || "", node.className || "")}
           style={node.style}
           onClick={handleClick}
           data-node-id={node.id}
         >
-          {renderedChildren}
+          {childrenToRender}
         </Component>
       </Suspense>
     </>
@@ -117,7 +138,7 @@ export function RenderNode({ node, isEditor = false, onSelect, isSelected = fals
         onContextMenu={onContextMenu}
         data={{
           type: "component",
-          isContainer: !!node.children,
+          isContainer: !!node.children?.length,
           component: node,
         }}
       >

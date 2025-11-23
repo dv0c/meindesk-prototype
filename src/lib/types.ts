@@ -1,51 +1,52 @@
 // Core types for the page builder system
 export interface LayoutNode {
-  id: string
-  type: string // component name
-  props: Record<string, any>
-  children?: LayoutNode[]
-  className?: string
-  style?: Record<string, string>
-  customCss?: string
-  attributes?: Record<string, string>
-  script?: string
+  id: string;
+  type: string; // component name
+  props: Record<string, any>;
+  children?: LayoutNode[];
+  className?: string;
+  style?: Record<string, string>;
+  customCss?: string;
+  attributes?: Record<string, string>;
+  script?: string;
 }
 
 export interface WebsiteSettings {
-  title: string
-  description: string
-  favicon?: string
-  globalCss?: string
+  title: string;
+  description: string;
+  favicon?: string;
+  globalCss?: string;
   theme: {
-    primaryColor: string
-    secondaryColor: string
-    fontFamily: string
-    backgroundColor: string
-    textColor: string
-  }
+    primaryColor: string;
+    secondaryColor: string;
+    fontFamily: string;
+    backgroundColor: string;
+    textColor: string;
+  };
 }
 
 export interface PageData {
-  id: string
-  name: string
-  tenantId: string
-  layout: LayoutNode[]
-  settings?: WebsiteSettings
-  createdAt: string
-  updatedAt: string
+  id: string;
+  name: string;
+  tenantId: string;
+  layout: LayoutNode[];
+  settings?: WebsiteSettings;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ComponentDefinition {
-  name: string
-  category: string
-  props: PropDefinition[]
-  allowChildren?: boolean
+  name: string;
+  category: string;
+  props: PropDefinition[];
+  allowChildren?: boolean;
 }
 
 export interface PropDefinition {
-  name: string
-  type: "string" | "number" | "boolean" | "select" | "color" | "url"
-  label: string
-  defaultValue?: any
-  options?: { label: string; value: string }[]
+  name: string;
+  type: "string" | "number" | "boolean" | "select" | "color" | "url" | "json";
+  label: string;
+  schema?: any;
+  defaultValue?: any;
+  options?: { label: string; value: string }[];
 }

@@ -419,6 +419,125 @@ export async function GET() {
       ],
     },
     {
+      name: "Newsletter",
+      category: "conversion",
+      allowChildren: false,
+      props: [
+        {
+          name: "title",
+          type: "string",
+          label: "Title",
+          defaultValue: "Subscribe to our Newsletter",
+        },
+        {
+          name: "description",
+          type: "string",
+          label: "Description",
+          defaultValue: "Get the latest updates delivered to your inbox.",
+        },
+        {
+          name: "placeholder",
+          type: "string",
+          label: "Placeholder",
+          defaultValue: "Enter your email",
+        },
+        {
+          name: "buttonText",
+          type: "string",
+          label: "Button Text",
+          defaultValue: "Subscribe",
+        },
+      ],
+    },
+    {
+      name: "ContactForm",
+      category: "conversion",
+      allowChildren: false,
+      props: [
+        {
+          name: "title",
+          type: "string",
+          label: "Title",
+          defaultValue: "Contact Us",
+        },
+        {
+          name: "submitText",
+          type: "string",
+          label: "Submit Button Text",
+          defaultValue: "Send Message",
+        },
+      ],
+    },
+    {
+      name: "TeamMember",
+      category: "content",
+      allowChildren: false,
+      props: [
+        {
+          name: "name",
+          type: "string",
+          label: "Name",
+          defaultValue: "John Doe",
+        },
+        {
+          name: "role",
+          type: "string",
+          label: "Role",
+          defaultValue: "Co-founder & CEO",
+        },
+        {
+          name: "bio",
+          type: "string",
+          label: "Bio",
+          defaultValue: "Passionate about building great products",
+        },
+        {
+          name: "image",
+          type: "string",
+          label: "Image URL",
+          defaultValue: "/placeholder.svg?height=400&width=400",
+        },
+      ],
+    },
+    {
+      name: "Stats",
+      category: "content",
+      allowChildren: false,
+      props: [
+        {
+          name: "stats",
+          type: "json",
+          label: "Stats",
+          schema: [
+            { key: "label", label: "Label", type: "string" },
+            { key: "value", label: "Value", type: "string" },
+          ],
+          defaultValue: [
+            { label: "Happy Customers", value: "10K+" },
+            { label: "Projects Completed", value: "500+" },
+          ],
+        },
+      ],
+    },
+    {
+      name: "Tabs",
+      category: "content",
+      allowChildren: true,
+      props: [
+        {
+          name: "tabs",
+          type: "json",
+          label: "Tabs",
+          schema: [{ key: "label", label: "Label", type: "string" }],
+          defaultValue: [
+            { label: "Tab 1" },
+            { label: "Tab 2" },
+            { label: "Tab 3" },
+          ],
+        },
+      ],
+    },
+    {
       name: "ArticleList",
       category: "content",
       allowChildren: false,
