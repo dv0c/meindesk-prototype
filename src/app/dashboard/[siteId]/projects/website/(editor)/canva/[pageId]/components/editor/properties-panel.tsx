@@ -603,7 +603,7 @@ function renderPropInput(prop: PropDefinition, value: any, onChange: (propName: 
 
       const addItem = () => {
         const newItem: any = {}
-        prop.schema?.forEach((f) => (newItem[f.key] = f.type === "json" ? [] : ""))
+        prop.schema?.forEach((f: any) => (newItem[f.key] = f.type === "json" ? [] : ""))
         onChange(prop.name, [...parsedValue, newItem])
       }
 
@@ -632,7 +632,7 @@ function renderPropInput(prop: PropDefinition, value: any, onChange: (propName: 
                 </AccordionTrigger>
 
                 <AccordionContent className="p-3 space-y-3 border-t bg-muted/10">
-                  {prop.schema?.map((field) => (
+                  {prop.schema?.map((field: any) => (
                     <div key={field.key} className="space-y-1">
                       <Label className="text-xs">{field.label}</Label>
 
