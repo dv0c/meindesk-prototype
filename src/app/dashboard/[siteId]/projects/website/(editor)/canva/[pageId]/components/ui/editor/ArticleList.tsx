@@ -32,10 +32,8 @@ export default function ArticleList({
   const [articles, setArticles] = useState<Article[]>([])
   const [loading, setLoading] = useState(true)
   const { team, loading: teamLoading } = useTeam(undefined, 'tenant')
-
   useEffect(() => {
     if (!team?.id) return
-
     const controller = new AbortController()
     const loadArticles = async () => {
       try {
@@ -44,6 +42,7 @@ export default function ArticleList({
           `/api/v1/${team.id}/articles?limit=${limit}`,
           { signal: controller.signal }
         )
+        console.log(data)
         setArticles(data || [])
       } catch (error: any) {
         if (axios.isCancel(error)) return

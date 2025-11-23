@@ -9,17 +9,15 @@ export const runtime = "nodejs"
 // -------------------------------------------------------
 export async function GET(
   req: NextRequest,
-  { params }: { params: { siteId: string } }
+  { params }: { params: { tenantId: string } }
 ) {
-  const { siteId } = await params
+  const { tenantId } = await params
   const { searchParams } = new URL(req.url)
   const limitParam = searchParams.get("limit")
   const limit = limitParam ? parseInt(limitParam, 10) : 10 // default to 10 results
-
   try {
-
     const articles = await db.article.findMany({
-      where: { siteId },
+      where: { siteId:tenantId },
       include: {
         author: {
           select: {
