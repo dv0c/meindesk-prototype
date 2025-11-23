@@ -124,6 +124,12 @@ model Site {
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
 
+  // Main Pages
+  home_Id           String?
+  privacy_policy_id String?
+  cookies_id        String?
+  terms_id          String?
+
   // --- Relationships (Foreign Keys) ---
   // User (Owner)
   user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade) // Changed to User? if Site can exist before owner is assigned

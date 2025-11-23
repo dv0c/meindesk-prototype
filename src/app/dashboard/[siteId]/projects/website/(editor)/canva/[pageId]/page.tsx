@@ -21,6 +21,7 @@ import {
   PointerSensor,
 } from "@dnd-kit/core"
 import { toast } from "sonner"
+import { Input } from "@/components/ui/input"
 
 // Helper: find node’s parent recursively
 function findNodeParent(id: string, nodes: LayoutNode[]): { parent: LayoutNode | null; index: number } | null {
@@ -42,7 +43,7 @@ function findNodeParent(id: string, nodes: LayoutNode[]): { parent: LayoutNode |
 }
 
 export default function EditorPage({ params }: { params: { siteId: string; pageId: string } }) {
-  const { id: tenantId, pageId } = use(params as any) as any
+  const { siteId: tenantId, pageId } = use(params as any) as any
   const [pageName, setPageName] = useState<string>("Sample Page")
   const [isSaving, setSaving] = useState(false)
   const [activeDragItem, setActiveDragItem] = useState<ComponentDefinition | null>(null)
@@ -316,12 +317,12 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
         <header className="h-14 border-b bg-background flex items-center justify-between p-5 z-30 shrink-0">
           {/* Left: Page title */}
           <div className="flex items-center gap-4">
-              <Button onClick={() => history.back()} variant="ghost" size="icon" className="cursor-pointer h-8 w-8">
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
+            <Button onClick={() => history.back()} variant="ghost" size="icon" className="cursor-pointer h-8 w-8">
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
             <div className="h-6 w-px bg-border mx-2" />
             <div className="flex items-center gap-3">
-              <h1 className="text-lg font-semibold">{pageName}</h1>
+              <Input size={pageName.length} maxLength={30} onChange={(e) => setPageName(e.target.value)} value={pageName.length ? pageName : "Untitled"} defaultValue={pageName || "Untitled"} className=" bg-background block border-none" />
               <span className="text-xs text-muted-foreground">Draft</span>
             </div>
           </div>
@@ -393,13 +394,12 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
           <div className="flex-1 bg-muted/10 overflow-hidden flex flex-col relative">
             <div className="absolute inset-0 p-8 overflow-auto flex justify-center">
               <div
-                className={`bg-background shadow-sm border min-h-fit transition-all duration-300 ${
-                  deviceMode === "mobile"
-                    ? "w-[375px]"
-                    : deviceMode === "tablet"
+                className={`bg-background shadow-sm border min-h-fit transition-all duration-300 ${deviceMode === "mobile"
+                  ? "w-[375px]"
+                  : deviceMode === "tablet"
                     ? "w-[768px]"
                     : "w-full max-w-[1200px]"
-                }`}
+                  }`}
               >
                 <Canvas
                   nodes={nodes}
@@ -445,7 +445,7 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
             </Button>
           ) : null}
         </DragOverlay>
-      </div>  
+      </div>
     </DndContext>
   )
 }

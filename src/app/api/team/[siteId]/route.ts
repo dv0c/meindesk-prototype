@@ -104,7 +104,7 @@ export async function PUT(
     }
 
     const body = await req.json();
-    const { title, description, link } = body;
+    const { title, description, link, home_Id } = body;
 
     // 1. Find the site
     const site = await db.site.findUnique({
@@ -127,6 +127,7 @@ export async function PUT(
         title: title ?? site.title,
         description: description ?? site.description,
         url: link ?? site.url,
+        home_Id: home_Id ?? site.home_Id
       },
     });
 

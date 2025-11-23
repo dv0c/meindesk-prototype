@@ -37,7 +37,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { teams, loading: loadingTeams } = useTeams()
   const { team: activeTeam } = useTeam()
   const [hovered, setHovered] = useState(false)
-  const {newOpen, setNewOpen} = useSidebar()
+  const { newOpen, setNewOpen } = useSidebar()
   const [isMobile, setIsMobile] = useState(false)
   const collapseTimer = useRef<NodeJS.Timeout | null>(null)
   const sidebarRef = useRef<HTMLDivElement | null>(null)
@@ -108,7 +108,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       icon: Globe,
       isActive: false,
       items: [
-        { title: "Schema", url: "/projects/settings/template-schema" },
         { title: "Features", url: "/projects/website/features" },
         { title: "Analytics", url: "/projects/website/analytics" },
         { title: "Subscription", url: "/projects/website/subscription" },
@@ -117,10 +116,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     { title: "Settings", url: "/projects/settings", icon: Settings, isActive: true },
   ]
   const rsscontent = [
-    { title: "RSS Feed", url: "projects/website/rss/my-feed", icon: Rss, isActive: false, items: [
-      { title: "My Feed", url: "projects/website/rss/my-feed" },
-      // { title: "Add New Feed", url: "/rss/feeds/new" },
-    ] },
+    {
+      title: "RSS Feed", url: "projects/website/rss/my-feed", icon: Rss, isActive: false, items: [
+        { title: "My Feed", url: "projects/website/rss/my-feed" },
+        // { title: "Add New Feed", url: "/rss/feeds/new" },
+      ]
+    },
   ]
 
   // Build filtered data based on features
@@ -199,7 +200,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 { title: "Support", url: "#", icon: LifeBuoy },
                 { title: "Feedback", url: "#", icon: Send },
               ]} className="mt-auto" />
-              
+
             </SidebarContent>
 
             <SidebarFooter>
@@ -214,7 +215,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
 
 export const ToggleSidebar = () => {
-  const {toggleNewSidebar} = useSidebar()
+  const { toggleNewSidebar } = useSidebar()
   return (
     <Button
       onClick={toggleNewSidebar}
