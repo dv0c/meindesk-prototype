@@ -46,7 +46,7 @@ export function Canvas({ nodes, selectedNodeId, onSelectNode, onContextMenu }: C
         </div>
       ) : (
         <SortableContext items={nodes.map((n) => n.id)} strategy={verticalListSortingStrategy}>
-          <div className="space-y-1">
+          <div className="space-y-1 relative">
             {nodes.map((node) => (
               <RenderNode
                 key={node.id}

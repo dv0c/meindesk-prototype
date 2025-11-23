@@ -10,13 +10,19 @@ export default async function PreviewPage({ params }: { params: { tenantId: stri
 
   const tenant = await db.site.findUnique({
     where: { id: tenantId },
-    select: { id: true, title: true, description: true },
+    select: { id: true, title: true, description: true, home_Id: true },
+  })
+
+  const mainPage = await db.page.findUnique({
+    where: { slug: tenant?.home_Id as string }, select: { id: true }
   })
 
   if (!tenant) notFound()
+  if (!mainPage) notFound()
+
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
-  const response = await fetch(`${baseUrl}/api/v1/${tenant.id}/pages/691c722dc1ec380ce2c76fcb`, {
+  const response = await fetch(`${baseUrl}/api/v1/${tenant.id}/pages/${mainPage.id}`, {
     cache: "no-store",
   })
 

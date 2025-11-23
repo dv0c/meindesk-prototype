@@ -582,7 +582,6 @@ function renderPropInput(prop: PropDefinition, value: any, onChange: (propName: 
 
     // ✅ NEW: Dynamic JSON array editor (for things like Stats)
     case "json": {
-      // Correctly parse or normalize value to an array
       const parsedValue: any[] = (() => {
         if (Array.isArray(value)) return value
         if (typeof value === "string") {
@@ -595,8 +594,8 @@ function renderPropInput(prop: PropDefinition, value: any, onChange: (propName: 
         }
         return []
       })()
-      
-      const handleChange = (index: number, key: string, val: string) => {
+
+      const handleChange = (index: number, key: string, val: any) => {
         const newArr = [...parsedValue]
         newArr[index] = { ...newArr[index], [key]: val }
         onChange(prop.name, newArr)
@@ -604,7 +603,7 @@ function renderPropInput(prop: PropDefinition, value: any, onChange: (propName: 
 
       const addItem = () => {
         const newItem: any = {}
-        prop.schema?.forEach((f) => (newItem[f.key] = ""))
+        prop.schema?.forEach((f) => (newItem[f.key] = f.type === "json" ? [] : ""))
         onChange(prop.name, [...parsedValue, newItem])
       }
 
@@ -615,30 +614,104 @@ function renderPropInput(prop: PropDefinition, value: any, onChange: (propName: 
 
       return (
         <div className="space-y-3 border rounded-md p-3 bg-muted/30">
-          {parsedValue.map((item, idx) => (
-            <div key={idx} className="relative border rounded-md p-3 bg-background">
-              <Button
-                type="button"
-                size="icon"
-                variant="ghost"
-                className="absolute top-2 right-2 text-muted-foreground hover:text-destructive"
-                onClick={() => removeItem(idx)}
+          <Accordion type="multiple" className="w-full space-y-2">
+            {parsedValue.map((item, idx) => (
+              <AccordionItem
+                key={idx}
+                value={`item-${idx}`}
+                className="border rounded-md bg-background"
               >
-                <Trash2 className="w-4 h-4" />
-              </Button>
+                <AccordionTrigger className="text-xs px-3 py-2 flex justify-between items-center">
+                  <span className="font-medium">
+                    {item.label ? (
+                      <span>{item.label}</span>
+                    ) : (
+                      <div>Item {idx + 1}</div>
+                    )}
+                  </span>
+                </AccordionTrigger>
 
-              {prop.schema?.map((field) => (
-                <div key={field.key} className="space-y-1 mb-2">
-                  <Label className="text-xs">{field.label}</Label>
-                  <Input
-                    className="h-8"
-                    value={item[field.key] || ""}
-                    onChange={(e) => handleChange(idx, field.key, e.target.value)}
-                  />
-                </div>
-              ))}
-            </div>
-          ))}
+                <AccordionContent className="p-3 space-y-3 border-t bg-muted/10">
+                  {prop.schema?.map((field) => (
+                    <div key={field.key} className="space-y-1">
+                      <Label className="text-xs">{field.label}</Label>
+
+                      {/* Handle nested JSON recursively */}
+                      {field.type === "json" ? (
+                        <div className="ml-2 border-l pl-3">
+                          {renderPropInput(
+                            field,
+                            item[field.key],
+                            (key, val) => handleChange(idx, field.key, val)
+                          )}
+                        </div>
+                      ) : (
+                        <Input
+                          className="h-8"
+                          value={item[field.key] ?? ""}
+                          onChange={(e) =>
+                            handleChange(idx, field.key, e.target.value)
+                          }
+                        />
+                      )}
+                    </div>
+                  ))}
+
+                  {/* Controls: Move up/down + delete */}
+                  {/* Controls: Move up/down + delete */}
+                  <div className="pt-3 mt-1 border-t flex flex-wrap justify-between items-center gap-2">
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="h-7 px-2"
+                        disabled={idx === 0}
+                        onClick={() => {
+                          if (idx === 0) return
+                          const newArr = [...parsedValue]
+                          const [moved] = newArr.splice(idx, 1)
+                          newArr.splice(idx - 1, 0, moved)
+                          onChange(prop.name, newArr)
+                        }}
+                      >
+                        ↑ Move Up
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="h-7 px-2"
+                        disabled={idx === parsedValue.length - 1}
+                        onClick={() => {
+                          if (idx === parsedValue.length - 1) return
+                          const newArr = [...parsedValue]
+                          const [moved] = newArr.splice(idx, 1)
+                          newArr.splice(idx + 1, 0, moved)
+                          onChange(prop.name, newArr)
+                        }}
+                      >
+                        ↓ Move Down
+                      </Button>
+                    </div>
+
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 px-2 text-destructive hover:bg-destructive/10"
+                      onClick={() => removeItem(idx)}
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      Delete
+                    </Button>
+                  </div>
+
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+
 
           <Button
             type="button"
@@ -653,6 +726,7 @@ function renderPropInput(prop: PropDefinition, value: any, onChange: (propName: 
         </div>
       )
     }
+
 
     default:
       return <Input id={prop.name} value={value || ""} disabled />

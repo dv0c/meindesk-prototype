@@ -589,6 +589,80 @@ export async function GET() {
         },
       ],
     },
+    {
+      name: "Navbar",
+      category: "navigation",
+      allowChildren: false,
+      props: [
+        {
+          name: "logoText",
+          type: "string",
+          label: "Logo Text",
+          defaultValue: "Sophia Platanisioti",
+        },
+        {
+          name: "align",
+          type: "select",
+          label: "Menu Alignment",
+          options: [
+            { label: "Left", value: "left" },
+            { label: "Center", value: "center" },
+            { label: "Right", value: "right" },
+          ],
+          defaultValue: "right",
+        },
+        {
+          name: "sticky",
+          type: "boolean",
+          label: "Sticky Header",
+          defaultValue: true,
+        },
+        {
+          name: "darkMode",
+          type: "boolean",
+          label: "Dark Mode",
+          defaultValue: false,
+        },
+        {
+          name: "links",
+          type: "json",
+          label: "Navigation Links",
+          schema: [
+            { key: "label", label: "Label", type: "string" },
+            { key: "href", label: "URL", type: "string" },
+            {
+              key: "submenu",
+              label: "Submenu (JSON Array)",
+              type: "json",
+              // Keep it editable as plain JSON to bypass your builder’s depth limit
+              schema: [
+                { key: "label", label: "Label", type: "string" },
+                { key: "href", label: "URL", type: "string" },
+              ],
+            },
+          ],
+          defaultValue: [
+            { label: "ΑΡΧΙΚΗ", href: "/" },
+            { label: "ΥΠΗΡΕΣΙΕΣ", href: "/services" },
+            { label: "ΒΙΟΓΡΑΦΙΚΟ", href: "/bio" },
+            {
+              label: "ΑΡΘΡΑ",
+              href: "/articles",
+              submenu: [
+                {
+                  label: "Παιδιά και Έφηβοι",
+                  href: "/articles/paidia-kai-efivoi",
+                },
+                { label: "Όλα τα Άρθρα", href: "/articles" },
+              ],
+            },
+            { label: "ΟΜΑΔΕΣ", href: "/groups" },
+            { label: "ΕΚΔΗΛΩΣΕΙΣ", href: "/events" },
+            { label: "ΕΠΙΚΟΙΝΩΝΙΑ", href: "/contact" },
+          ],
+        },
+      ],
+    },
   ];
 
   return NextResponse.json(components);

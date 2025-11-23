@@ -45,6 +45,7 @@ function findNodeParent(id: string, nodes: LayoutNode[]): { parent: LayoutNode |
 export default function EditorPage({ params }: { params: { siteId: string; pageId: string } }) {
   const { siteId: tenantId, pageId } = use(params as any) as any
   const [pageName, setPageName] = useState<string>("Sample Page")
+  const [pageSlug, setPageSlug] = useState<string>()
   const [isSaving, setSaving] = useState(false)
   const [activeDragItem, setActiveDragItem] = useState<ComponentDefinition | null>(null)
   const [deviceMode, setDeviceMode] = useState<"desktop" | "tablet" | "mobile">("desktop")
@@ -83,6 +84,7 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
         const page = await response.json()
         setCurrentPage(page)
         setPageName(page.title)
+        setPageSlug(page.slug)
       }
     } catch (error) {
       console.error("Failed to load page:", error)
@@ -102,6 +104,7 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
           name: pageName,
           tenantId,
           layout: nodes,
+          slug: pageSlug
         }),
       })
 
@@ -392,13 +395,13 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
           <Sidebar onAddComponent={handleAddComponent} onUpdateNode={handleUpdateNode} onDeleteNode={handleDeleteNode} />
 
           <div className="flex-1 bg-muted/10 overflow-hidden flex flex-col relative">
-            <div className="absolute inset-0 p-8 overflow-auto flex justify-center">
+            <div className="overflow-auto">
               <div
                 className={`bg-background shadow-sm border min-h-fit transition-all duration-300 ${deviceMode === "mobile"
                   ? "w-[375px]"
                   : deviceMode === "tablet"
                     ? "w-[768px]"
-                    : "w-full max-w-[1200px]"
+                    : "w-full max-w-full"
                   }`}
               >
                 <Canvas
