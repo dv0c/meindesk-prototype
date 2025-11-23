@@ -77,6 +77,7 @@ export async function PUT(
 ) {
   const { id, siteId } = await params;
   const session = await getAuthSession();
+
   if (!session?.user.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -85,34 +86,44 @@ export async function PUT(
 
   try {
     const page = await db.page.findUnique({ where: { id } });
-    if (!page) {
+    if (!page)
       return NextResponse.json({ error: "Page not found" }, { status: 404 });
-    }
-
-    if (!siteId) {
+    if (!siteId)
       return NextResponse.json(
         { error: "Forbidden, undefined_s3301" },
         { status: 403 }
       );
-    }
 
     const site = await db.site.findUnique({
       where: { id: siteId },
-      include: {
-        user: true,
-      },
+      include: { user: true },
     });
 
-    // Ownership check: block if site.user is null or doesn't match current user
     if (!site?.user || site.user.id !== session.user.id) {
       return NextResponse.json({ error: "Forbidden, s3302" }, { status: 403 });
     }
 
+    // ------------------------
+    // Determine final slug
+    // ------------------------
+    // Determine final slug
+    let finalSlug: string;
+
+    // Treat any slug starting with "untitled" as empty
+    if (!body.slug || /^untitled/i.test(body.slug)) {
+      finalSlug = await generateSlug(body.name, "page", siteId);
+    } else {
+      finalSlug = body.slug;
+    }
+
+    // ------------------------
+    // Update page
+    // ------------------------
     const updatedPage = await db.page.update({
       where: { id },
       data: {
         title: body.name,
-        slug: body.slug ? body.slug : await generateSlug(body.name, "page"),
+        slug: finalSlug,
         excerpt: body.excerpt,
         layout: body.layout ?? [],
         status: body.status,
@@ -138,9 +149,9 @@ export async function PUT(
 // ------------------------------------
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string; siteId: string } }
 ) {
-  const { id } = await params;
+  const { id, siteId } = await params;
   const session = await getAuthSession();
   if (!session?.user.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -148,13 +159,21 @@ export async function DELETE(
 
   try {
     const page = await db.page.findUnique({ where: { id } });
-    if (!page) {
+    if (!page)
       return NextResponse.json({ error: "Page not found" }, { status: 404 });
-    }
+    if (!siteId)
+      return NextResponse.json(
+        { error: "Forbidden, undefined_s3301" },
+        { status: 403 }
+      );
 
-    // Ownership check
-    if (page.authorId !== session.user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const site = await db.site.findUnique({
+      where: { id: siteId },
+      include: { user: true },
+    });
+
+    if (!site?.user || site.user.id !== session.user.id) {
+      return NextResponse.json({ error: "Forbidden, s3302" }, { status: 403 });
     }
 
     await db.page.delete({ where: { id } });

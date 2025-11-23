@@ -16,18 +16,6 @@ export default function ClientPreview({ tenantId, page }: ClientPreviewProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-semibold">{page.name}</h1>
-            <p className="text-sm text-muted-foreground">Preview Mode</p>
-          </div>
-          <a href="/" className="text-sm text-primary hover:underline">
-            Back to Home
-          </a>
-        </div>
-      </header>
-
       <main className="">
         {page.layout.length === 0 ? (
           <div className="flex items-center justify-center min-h-[400px]">

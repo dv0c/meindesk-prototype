@@ -12,12 +12,13 @@ export default async function PreviewPage({ params }: { params: { tenantId: stri
     where: { id: tenantId },
     select: { id: true, title: true, description: true, home_Id: true },
   })
+  if (!tenant) notFound()
+  if (tenant.home_Id === null) notFound()
 
   const mainPage = await db.page.findUnique({
     where: { slug: tenant?.home_Id as string }, select: { id: true }
   })
 
-  if (!tenant) notFound()
   if (!mainPage) notFound()
 
 

@@ -1,22 +1,40 @@
-import { db } from "@/lib/db"
+// app/(tenant)/[tenantId]/[slug]/page.tsx
+
 import { notFound } from "next/navigation"
+import { db } from "@/lib/db"
+import type { PageData } from "@/lib/types"
+import ClientPreview from "../ClientPreview" // adjust path if needed
 
+export default async function TenantPage({
+  params,
+}: {
+  params: { tenantId: string; slug: string }
+}) {
+  const { tenantId, slug } = await params
 
+  // 1. Confirm tenant exists
+  const tenant = await db.site.findUnique({
+    where: { id: tenantId },
+    select: { id: true, title: true },
+  })
+  if (!tenant) notFound()
 
-const page = async ({ params }: { params: { slug: string } }) => {
-    const { slug } = await params
-    const page = await db.page.findFirst({
-        where: {
-            slug: slug
-        }
-    })
+  // 2. Get the specific page under that tenant
+  const pageRecord = await db.page.findFirst({
+    where: { slug, siteId: tenantId },
+    select: { id: true },
+  })
+  if (!pageRecord) notFound()
 
-    if (!page) return notFound()
+  // 3. Fetch through API for consistent rendering logic
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+  const response = await fetch(`${baseUrl}/api/v1/${tenant.id}/pages/${pageRecord.id}`, {
+    cache: "no-store",
+  })
 
-    return <div>
-        <div className="prose prose-invert prose-xl mx-auto" dangerouslySetInnerHTML={{ __html: page.html as string }} />
-    </div>
+  if (!response.ok) notFound()
+  const page: PageData = await response.json()
 
+  // 4. Reuse your client renderer
+  return <ClientPreview tenantId={tenant.id} page={page} />
 }
-
-export default page

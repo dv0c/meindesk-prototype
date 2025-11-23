@@ -603,9 +603,26 @@ function renderPropInput(prop: PropDefinition, value: any, onChange: (propName: 
 
       const addItem = () => {
         const newItem: any = {}
-        prop.schema?.forEach((f: any) => (newItem[f.key] = f.type === "json" ? [] : ""))
-        onChange(prop.name, [...parsedValue, newItem])
+        prop.schema?.forEach((f: any) => {
+          if (f.type === "json") {
+            // Only create submenu if schema has inner defaults or predefined structure
+            // otherwise skip adding an empty array
+            newItem[f.key] = undefined
+          } else if (f.key === "label") {
+            newItem[f.key] = "New Item"
+          } else if (f.key === "href") {
+            newItem[f.key] = ""
+          } else {
+            newItem[f.key] = f.defaultValue ?? ""
+          }
+        })
+        // Clean out any undefined keys before pushing
+        const cleanedItem = Object.fromEntries(
+          Object.entries(newItem).filter(([_, v]) => v !== undefined)
+        )
+        onChange(prop.name, [...parsedValue, cleanedItem])
       }
+
 
       const removeItem = (index: number) => {
         const newArr = parsedValue.filter((_, i) => i !== index)

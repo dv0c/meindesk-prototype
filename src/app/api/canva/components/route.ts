@@ -632,7 +632,7 @@ export async function GET() {
             { key: "href", label: "URL", type: "string" },
             {
               key: "submenu",
-              label: "Submenu (JSON Array)",
+              label: "Submenu",
               type: "json",
               // Keep it editable as plain JSON to bypass your builder’s depth limit
               schema: [

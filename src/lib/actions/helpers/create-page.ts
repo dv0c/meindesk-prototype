@@ -6,7 +6,7 @@ import generateSlug from "@/lib/generateSlug";
 
 export async function CreatePage({ siteId }: { siteId: string }) {
   const session = await getAuthSession();
-  const slug = await generateSlug("Untitled", "page");
+  const slug = await generateSlug("Untitled", "page", siteId);
 
   if (!session?.user?.id) {
     return "Not authorized";

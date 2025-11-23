@@ -243,7 +243,7 @@ enum ArticleStatus {
 model Page {
   id        String     @id @default(auto()) @map("_id") @db.ObjectId
   title     String
-  slug      String     @unique @default(uuid())
+  slug      String     @default(uuid())
   excerpt   String?
   order     Int?
   layout    Json[]
@@ -257,9 +257,11 @@ model Page {
   site      Site       @relation(fields: [siteId], references: [id], onDelete: Cascade)
   userId    String?    @db.ObjectId
   user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   // virtual relations (manual linking)
   // These aren't real foreign keys, just convenience for TypeScript typing
   // You’ll manually query related pages/users using the IDs
+  @@unique([slug, siteId])
 }
 
 enum PageStatus {
