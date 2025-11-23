@@ -395,12 +395,12 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
           <Sidebar onAddComponent={handleAddComponent} onUpdateNode={handleUpdateNode} onDeleteNode={handleDeleteNode} />
 
           <div className="flex-1 bg-muted/10 overflow-hidden flex flex-col relative">
-            <div className="overflow-auto">
+            <div className="overflow-auto ">
               <div
                 className={`bg-background shadow-sm border min-h-fit transition-all duration-300 ${deviceMode === "mobile"
-                  ? "w-[375px]"
+                  ? "w-[375px] mx-auto"
                   : deviceMode === "tablet"
-                    ? "w-[768px]"
+                    ? "w-3xl mx-auto"
                     : "w-full max-w-full"
                   }`}
               >
