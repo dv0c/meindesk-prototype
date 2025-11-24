@@ -14,7 +14,7 @@ export async function GET(
   const { siteId } = await params
   const { searchParams } = new URL(req.url)
   const limitParam = searchParams.get("limit")
-  const limit = limitParam ? parseInt(limitParam, 20) : 20 // default to 10 results
+  const parsedLimit = limitParam ? parseInt(limitParam, 10) : 20
 
   try {
     const session = await getAuthSession()
@@ -40,8 +40,8 @@ export async function GET(
           },
         },
       },
-      orderBy: { createdAt: "desc" },
-      take: limit, // here's your limit
+      orderBy: { createdAt: "desc", },
+      ...(parsedLimit > 0 ? { take: parsedLimit } : {}), // no limit if 0
     })
 
     if (!articles.length) {

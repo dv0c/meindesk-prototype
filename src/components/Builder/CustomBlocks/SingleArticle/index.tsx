@@ -1,13 +1,12 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import { EditorComponent } from "./_comps/EditorComponent";
-import { SingleArticleComponent } from "./_comps/SingleArticle";
-import { useIsEditorMode } from "@/lib/BuilderMode";
-import { useEffect, useState } from "react";
-import { Article } from "@prisma/client";
 import { useTeam } from "@/hooks/useTeam";
+import { useIsEditorMode } from "@/lib/BuilderMode";
+import { Article } from "@prisma/client";
 import axios from "axios";
+import { usePathname } from "next/navigation";
+import { ReactNode, useEffect, useState } from "react";
+import { SingleArticleComponent } from "./_comps/SingleArticle";
 
 export interface SingleArticleProps {
     showCover?: boolean;
@@ -20,9 +19,11 @@ export interface SingleArticleProps {
     padding?: string;
     align?: "left" | "center" | "right";
     slug?: string; // allow direct slug override
+    children?: ReactNode
+    [key: string]: any
 }
 
-export const SingleArticle = ({ slug: propSlug, padding = "1rem", align = "left", ...props }: SingleArticleProps) => {
+export const SingleArticle = ({ children, slug: propSlug, padding, align = "left", ...props }: SingleArticleProps) => {
     const pathname = usePathname();
     const isEditorMode = useIsEditorMode();
     const { team, loading: teamLoading } = useTeam(undefined, !isEditorMode ? "tenant" : "");
@@ -91,5 +92,5 @@ export const SingleArticle = ({ slug: propSlug, padding = "1rem", align = "left"
     }
 
 
-    return <SingleArticleComponent article={article as Article} {...props} />;
+    return <SingleArticleComponent children={children} padding={padding} article={article as Article} {...props} />;
 };

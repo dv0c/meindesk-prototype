@@ -26,7 +26,7 @@ export function useArticle({ onSuccess, onError }: UseArticleOptions = {}) {
 
       setLoading(true)
       try {
-        const res = await axios.get(`/api/team/${teamId}/articles`)
+        const res = await axios.get(`/api/team/${teamId}/articles?limit=0`)
         setArticles(res.data)
         onSuccess?.(res.data)
         return res.data

@@ -24,6 +24,7 @@ export async function GET() {
       props: [
         { name: "columns", type: "number", label: "Columns", defaultValue: 2 },
         { name: "gap", type: "number", label: "Gap (0-16)", defaultValue: 4 },
+        { name: "rows", type: "number", label: "Rows (0-16)", defaultValue: 2 },
         {
           name: "padding",
           type: "number",
@@ -539,7 +540,7 @@ export async function GET() {
     },
     {
       name: "ArticleList",
-      category: "content",
+      category: "Articles",
       allowChildren: false,
       props: [
         {
@@ -740,7 +741,7 @@ export async function GET() {
     {
       name: "SingleArticle",
       category: "Articles",
-      allowChildren: false,
+      allowChildren: true,
       props: [
         {
           name: "showCover",
@@ -753,6 +754,11 @@ export async function GET() {
           type: "string",
           label: "Cover Height",
           defaultValue: "400px",
+        },
+        {
+          name: "backgroundColor",
+          type: "color",
+          label: "Background Color",
         },
         {
           name: "titleTag",

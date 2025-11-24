@@ -1,21 +1,11 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { Copy, Edit, Eye, MoreHorizontal, Trash, Trash2 } from 'lucide-react'
 import Image from "next/image"
-import Link from "next/link"
 import { useRouter } from 'next/navigation'
-import { MoreHorizontal, Edit, Eye, Trash, Copy, Trash2 } from 'lucide-react'
+import { useEffect, useMemo, useState } from "react"
 
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -24,13 +14,21 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, ChevronLeft, ChevronRight } from 'lucide-react'
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
+import { ChevronLeft, ChevronRight, Search } from 'lucide-react'
 import { toast } from "sonner"
 
 import { useArticle } from "@/hooks/use-article"
 import { useTeam } from "@/hooks/useTeam"
-import { Skeleton } from "./ui/skeleton"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "./ui/alert-dialog"
 
 const statusColors = {

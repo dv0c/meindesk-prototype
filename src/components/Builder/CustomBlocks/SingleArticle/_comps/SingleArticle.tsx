@@ -3,8 +3,9 @@
 import { useTeam } from "@/hooks/useTeam";
 import { Article } from "@prisma/client";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import Image from "next/image";
+import { useIsEditorMode } from "@/lib/BuilderMode";
 
 interface SingleArticleComponentProps {
   showCover?: boolean;
@@ -13,10 +14,14 @@ interface SingleArticleComponentProps {
   showExcerpt?: boolean;
   showCategories?: boolean;
   showMetadata?: boolean;
+  backgroundColor?: string;
   contentFallback?: "json" | "none";
   padding?: string;
   align?: "left" | "center" | "right";
-  article: Article
+  article: Article;
+  children?: ReactNode,
+  [key: string]: any
+
 }
 
 export const SingleArticleComponent: React.FC<SingleArticleComponentProps> = ({
@@ -28,59 +33,63 @@ export const SingleArticleComponent: React.FC<SingleArticleComponentProps> = ({
   showMetadata = true,
   contentFallback = "json",
   padding = "24px",
+  backgroundColor,
+  children,
   align = "left",
-  article
+  article,
+  ...props
 }) => {
-
+  const isEditorMode = useIsEditorMode()
   const TitleTag = titleTag;
+  const titleSizeClasses =
+    titleTag === "h1"
+      ? "text-2xl sm:text-3xl md:text-5xl" // Largest for H1
+      : titleTag === "h2"
+        ? "text-xl sm:text-2xl md:text-4xl" // Medium for H2
+        : "text-lg sm:text-xl md:text-3xl"; // Smallest for H3
+
+  // 2. Define classes for the cover/hero area (overlay text)
+  const heroTitleClasses = `text-[#f1e6df] text-center font-bold flex justify-center items-center w-full h-full drop-shadow-lg ${titleSizeClasses}`;
 
   return (
-    <article style={{ maxWidth: "900px", margin: "0 auto", padding, fontFamily: "Georgia, serif" }}>
-      {/* Header with image on the right */}
-      <div style={{ display: "flex", gap: "24px", marginBottom: "24px", alignItems: "flex-start" }}>
-        <div style={{ flex: 1 }}>
-          <TitleTag style={{ fontSize: "2.5rem", lineHeight: "1.2", marginBottom: "16px" }}>
-            {article?.title}
+    <article {...props}
+      className="mx-auto font-serif"
+      style={{ padding }}
+    >
+      {/* Thumbnail */}
+      {article.cover && showCover && (
+        <div className={`relative h-[${coverHeight || '30vh'}] bg-black/30 w-full`}>
+          <TitleTag className={`z-20 max-w-xl mx-auto relative ${heroTitleClasses}`}>
+            {article.title}
           </TitleTag>
-
-          {showExcerpt && article.excerpt && (
-            <p style={{ fontSize: "1.125rem", color: "#555", marginBottom: "16px" }}>{article.excerpt}</p>
-          )}
-
-          {showCategories && article.categories.length > 0 && (
-            <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "16px" }}>
-              {article.categories.map((c) => (
-                <span key={c} style={{ background: "#f0f0f0", padding: "6px 12px", borderRadius: "12px", fontSize: "0.875rem" }}>
-                  {c}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {showMetadata && (
-            <div style={{ color: "#888", fontSize: "0.85rem", marginBottom: "16px" }}>
-              <span>Author: {article.authorId}</span> •{" "}
-              <span>Created: {new Date(article.createdAt).toLocaleDateString()}</span> •{" "}
-              <span>Updated: {new Date(article.updateAt).toLocaleDateString()}</span>
-            </div>
-          )}
+          <Image
+            priority
+            alt={article.title}
+            src={article.cover || "/SIMA_1-02 .webp"}
+            className="object-cover object-center brightness-60 z-1 select-none"
+            fill
+            draggable="false"
+          />
+        </div>
+      )}
+      <div className="pt-10" style={{ backgroundColor: backgroundColor }}>
+        {/* EXCERPT */}
+        <div>
+          {article.excerpt}
         </div>
 
-        {showCover && article.cover && (
-          <div style={{ width: "320px", height: "180px", position: "relative" }}>
-            <Image src={article.cover} alt={article.title} fill style={{ objectFit: "cover", borderRadius: "8px" }} />
+
+
+        {/* CONTENT */}
+        {article.html && (
+          <div dangerouslySetInnerHTML={{ __html: article.html }} />
+        )}
+        {children || (
+          <div style={{ color: "#9ca3af", fontStyle: "italic" }}>
+            {isEditorMode ? "Add content components here..." : null}
           </div>
         )}
       </div>
-
-      {/* Content */}
-      <section style={{ lineHeight: "1.8", fontSize: "1.1rem", color: "#222" }}>
-        {article.html ? (
-          <div dangerouslySetInnerHTML={{ __html: article.html }} />
-        ) : contentFallback === "json" ? (
-          <pre>{JSON.stringify(article.content, null, 2)}</pre>
-        ) : null}
-      </section>
     </article>
   );
 };

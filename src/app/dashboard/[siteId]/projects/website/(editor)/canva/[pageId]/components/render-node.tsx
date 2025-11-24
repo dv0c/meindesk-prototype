@@ -94,30 +94,49 @@ export function RenderNode({
     />
   ) : null
 
+    const renderedChildren =
+    node.children && node.children.length > 0 ? (
+      node.type === "Slideshow" ? (
+        node.children.map((child) => (
+          <RenderNode
+            key={child.id}
+            node={child}
+            isEditor={isEditor}
+            onSelect={onSelect}
+            isSelected={isSelected}
+            onContextMenu={onContextMenu}
+          />
+        ))
+      ) : node.type === "Grid" ? (
+        node.children.map((child) => (
+          <RenderNode
+            key={child.id}
+            node={child}
+            isEditor={isEditor}
+            onSelect={onSelect}
+            isSelected={isSelected}
+            onContextMenu={onContextMenu}
+          />
+        ))
+      ) : (
+        <SortableContext items={node.children.map((child) => child.id)} strategy={verticalListSortingStrategy}>
+          {node.children.map((child) => (
+            <RenderNode
+              key={child.id}
+              node={child}
+              isEditor={isEditor}
+              onSelect={onSelect}
+              isSelected={isSelected}
+              onContextMenu={onContextMenu}
+            />
+          ))}
+        </SortableContext>
+      )
+    ) : undefined
+
+
   // Render children recursively
-  const renderedChildren = node.children?.map(child => (
-    <RenderNode
-      key={child.id}
-      node={child}
-      isEditor={isEditor}
-      onSelect={onSelect}
-      isSelected={isSelected}
-      onContextMenu={onContextMenu}
-    />
-  ))
-
-  // Wrap children in SortableContext if container
-  let childrenToRender: React.ReactNode = renderedChildren
-  if (renderedChildren && renderedChildren.length > 0 && node.type !== "Slideshow" && node.type !== "Tabs") {
-    childrenToRender = (
-      <SortableContext items={node.children!.map(c => c.id)} strategy={verticalListSortingStrategy}>
-        {renderedChildren}
-      </SortableContext>
-    )
-  }
-
-  // Node content
-  const nodeContent = (
+  const content = (
     <>
       {CustomStyle}
       <Suspense
@@ -129,26 +148,18 @@ export function RenderNode({
       >
         <Component
           {...node.props}
-          className={cn(node.props.className || "", node.className || "")}
+          className={`${node.props.className || ""} ${node.className || ""}`}
           style={node.style}
           onClick={handleClick}
           data-node-id={node.id}
+          data-editor-mode={isEditor}
         >
-          {childrenToRender}
+          {renderedChildren}
         </Component>
       </Suspense>
     </>
   )
 
-  // Portal sticky/fixed nodes outside scroll container
-  const isStickyOrFixed =
-    node.style?.position === "sticky" || node.style?.position === "fixed"
-
-  if (isStickyOrFixed && typeof document !== "undefined") {
-    return createPortal(nodeContent, document.body)
-  }
-
-  // Wrap in DraggableWrapper in editor mode
   if (isEditor) {
     return (
       <DraggableWrapper
@@ -158,14 +169,14 @@ export function RenderNode({
         onContextMenu={onContextMenu}
         data={{
           type: "component",
-          isContainer: !!node.children?.length,
+          isContainer: !!node.children && node.children.length > 0,
           component: node,
         }}
       >
-        {nodeContent}
+        {content}
       </DraggableWrapper>
     )
   }
 
-  return <div data-node-id={node.id}>{nodeContent}</div>
+  return <div data-node-id={node.id}>{content}</div>
 }
