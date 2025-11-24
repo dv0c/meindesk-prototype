@@ -6,6 +6,7 @@ import axios from "axios";
 import React, { ReactNode, useEffect, useState } from "react";
 import Image from "next/image";
 import { useIsEditorMode } from "@/lib/BuilderMode";
+import { cn } from "@/lib/utils";
 
 interface SingleArticleComponentProps {
   showCover?: boolean;
@@ -19,6 +20,7 @@ interface SingleArticleComponentProps {
   padding?: string;
   align?: "left" | "center" | "right";
   article: Article;
+  contentPadding?: string;
   children?: ReactNode,
   [key: string]: any
 
@@ -37,6 +39,7 @@ export const SingleArticleComponent: React.FC<SingleArticleComponentProps> = ({
   children,
   align = "left",
   article,
+  contentPadding,
   ...props
 }) => {
   const isEditorMode = useIsEditorMode()
@@ -73,23 +76,23 @@ export const SingleArticleComponent: React.FC<SingleArticleComponentProps> = ({
         </div>
       )}
       <div className="pt-10" style={{ backgroundColor: backgroundColor }}>
+        <div style={{padding:contentPadding}} className={cn('flex flex-col', align === "left" ? "items-start" : align === "center" ? "items-center" : 'items-end')}>
         {/* EXCERPT */}
         <div>
           {article.excerpt}
         </div>
 
-
-
         {/* CONTENT */}
         {article.html && (
-          <div dangerouslySetInnerHTML={{ __html: article.html }} />
-        )}
-        {children || (
-          <div style={{ color: "#9ca3af", fontStyle: "italic" }}>
-            {isEditorMode ? "Add content components here..." : null}
-          </div>
+          <div className="prose prose-xl prose-invert" dangerouslySetInnerHTML={{ __html: article.html }} />
         )}
       </div>
-    </article>
+      {children || (
+        <div style={{ color: "#9ca3af", fontStyle: "italic" }}>
+          {isEditorMode ? "Add content components here..." : null}
+        </div>
+      )}
+    </div>
+    </article >
   );
 };

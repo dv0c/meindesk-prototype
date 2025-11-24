@@ -92,5 +92,5 @@ export const SingleArticle = ({ children, slug: propSlug, padding, align = "left
     }
 
 
-    return <SingleArticleComponent children={children} padding={padding} article={article as Article} {...props} />;
+    return <SingleArticleComponent align={align} children={children} padding={padding} article={article as Article} {...props} />;
 };

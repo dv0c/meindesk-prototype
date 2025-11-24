@@ -22,7 +22,7 @@ export function Sidebar({ onAddComponent, onUpdateNode, onDeleteNode }: SidebarP
   return (
     <div className="w-[340px] border-r bg-background flex flex-col h-full shadow-sm z-20 animate-in slide-in-from-left duration-300">
       {selectedNode ? (
-        <div className="flex flex-col h-full animate-in slide-in-from-left-10 duration-200">
+        <div className="flex flex-col h-full pb-10 animate-in slide-in-from-left-10 duration-200">
           <div className="border-b p-3 flex items-center justify-between bg-muted/30">
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => selectNode(null)}>

@@ -806,6 +806,12 @@ export async function GET() {
           defaultValue: "16px",
         },
         {
+          name: "contentPadding",
+          type: "string",
+          label: "Content Padding",
+          defaultValue: "0px",
+        },
+        {
           name: "align",
           type: "select",
           label: "Content Alignment",
