@@ -15,8 +15,8 @@ export default function ClientPreview({ tenantId, page }: ClientPreviewProps) {
   }, [tenantId])
 
   return (
-    <div className="min-h-screen bg-background">
-      <main className="">
+    <div className="bg-background ">
+      <main>
         {page.layout.length === 0 ? (
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
@@ -25,11 +25,14 @@ export default function ClientPreview({ tenantId, page }: ClientPreviewProps) {
             </div>
           </div>
         ) : (
-          <div className="space-y-4">
-            {page.layout.map((node) => (
-              <RenderNode key={node.id} node={node} />
-            ))}
+          <div >
+            <main className="">
+              {page.layout.map((node) => (
+                <RenderNode key={node.id} node={node} />
+              ))}
+            </main>
           </div>
+
         )}
       </main>
     </div>

@@ -6,11 +6,13 @@ import { Loader2 } from "lucide-react"
 import { useTeam } from "@/hooks/useTeam"
 import axios from "axios"
 import Image from "./Image"
+import Link from "next/link"
 
 interface Article {
   id: string
   title: string
   excerpt: string
+  slug: string
   author: {
     name: string | null
   }
@@ -94,7 +96,7 @@ export default function ArticleList({
       <CardContent>
         <div className="space-y-4">
           {articles.map((article) => (
-            <div
+            <Link href={`/article/${article.slug}`}
               key={article.id}
               className="border-b pb-4 last:border-0 last:pb-0 flex flex-col sm:flex-row gap-3"
             >
@@ -118,7 +120,7 @@ export default function ArticleList({
                   <span>{new Date(article.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </CardContent>

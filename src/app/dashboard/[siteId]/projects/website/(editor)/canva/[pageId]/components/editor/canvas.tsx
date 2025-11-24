@@ -27,10 +27,10 @@ export function Canvas({ nodes, selectedNodeId, onSelectNode, onContextMenu }: C
     <div
       ref={setNodeRef}
       className={`
-        min-h-full p-6 transition-colors relative
-        ${isOver ? "bg-primary/5" : ""}
-        ${nodes.length === 0 ? "flex items-center justify-center" : ""}
-      `}
+    relative min-h-full p-6 transition-colors overflow-auto
+    ${isOver ? "bg-primary/5" : ""} 
+    ${nodes.length === 0 ? "flex items-center justify-center" : ""} 
+  `}
     >
       {nodes.length === 0 ? (
         <div className="text-center space-y-4 max-w-sm mx-auto p-8 border-2 border-dashed rounded-xl">
@@ -46,7 +46,7 @@ export function Canvas({ nodes, selectedNodeId, onSelectNode, onContextMenu }: C
         </div>
       ) : (
         <SortableContext items={nodes.map((n) => n.id)} strategy={verticalListSortingStrategy}>
-          <div className="space-y-1 relative">
+          <div className="space-y-1">
             {nodes.map((node) => (
               <RenderNode
                 key={node.id}

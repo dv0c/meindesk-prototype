@@ -75,11 +75,5 @@ export default async function TenantLayout({ children }: { children: React.React
   const initialMode = site.defaultThemePreference === 'dark' ? 'dark' : 'light';
 
   // 5. Render with Theme Provider
-  return (
-    <TenantThemeProvider themeData={tenantTheme} initialMode={initialMode}>
-      <main className="min-h-screen bg-background text-foreground">
-        {children}
-      </main>
-    </TenantThemeProvider>
-  );
+  return children
 }

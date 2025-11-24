@@ -2,11 +2,12 @@
 
 import type React from "react"
 import dynamic from "next/dynamic"
-import type { LayoutNode } from "@/lib/types"
-import { Suspense, Children, isValidElement } from "react"
+import { Suspense } from "react"
 import { DraggableWrapper } from "./editor/draggable-wrapper"
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { cn } from "@/lib/utils"
+import { createPortal } from "react-dom"
+import type { LayoutNode } from "@/lib/types"
 
 interface RenderNodeProps {
   node: LayoutNode
@@ -16,6 +17,7 @@ interface RenderNodeProps {
   onContextMenu?: (e: React.MouseEvent, id: string) => void
 }
 
+// Dynamic component map
 const componentMap: Record<string, React.ComponentType<any>> = {
   Container: dynamic(() => import("./ui/editor/Container")),
   Grid: dynamic(() => import("./ui/editor/Grid")),
@@ -34,12 +36,21 @@ const componentMap: Record<string, React.ComponentType<any>> = {
   Spacer: dynamic(() => import("./ui/editor/Spacer")),
   Divider: dynamic(() => import("./ui/editor/Divider")),
   Footer: dynamic(() => import("./ui/editor/Footer")),
-  Newsletter: dynamic(() => import("./ui/editor/Newsletter").then(mod => ({ default: mod.Newsletter }))),
-  Stats: dynamic(() => import("./ui/editor/Stats").then(mod => ({ default: mod.Stats }))),
-  TeamMember: dynamic(() => import("./ui/editor/TeamMember").then(mod => ({ default: mod.TeamMember }))),
-  Tabs: dynamic(() => import("./ui/editor/Tabs").then(mod => ({ default: mod.Tabs }))),
+  Newsletter: dynamic(() =>
+    import("./ui/editor/Newsletter").then(mod => ({ default: mod.Newsletter }))
+  ),
+  Stats: dynamic(() =>
+    import("./ui/editor/Stats").then(mod => ({ default: mod.Stats }))
+  ),
+  TeamMember: dynamic(() =>
+    import("./ui/editor/TeamMember").then(mod => ({ default: mod.TeamMember }))
+  ),
+  Tabs: dynamic(() =>
+    import("./ui/editor/Tabs").then(mod => ({ default: mod.Tabs }))
+  ),
   Navbar: dynamic(() => import("./ui/editor/Navbar")),
-  Navbar2: dynamic(() => import("@/components/Builder/CustomBlocks/Navbar"))
+  Navbar2: dynamic(() => import("@/components/Builder/CustomBlocks/Navbar")),
+  SingleArticle: dynamic(() => import("@/components/Builder/CustomBlocks/SingleArticle").then(mod => ({ default: mod.SingleArticle }))),
 }
 
 export function RenderNode({
@@ -74,6 +85,7 @@ export function RenderNode({
     }
   }
 
+  // Apply custom CSS
   const CustomStyle = node.customCss ? (
     <style
       dangerouslySetInnerHTML={{
@@ -82,7 +94,7 @@ export function RenderNode({
     />
   ) : null
 
-  // Render children nodes recursively
+  // Render children recursively
   const renderedChildren = node.children?.map(child => (
     <RenderNode
       key={child.id}
@@ -94,13 +106,9 @@ export function RenderNode({
     />
   ))
 
-  // Decide how to pass children depending on type
-  let childrenToRender: React.ReactNode
-  if (node.type === "Slideshow" || node.type === "Tabs") {
-    // Pass children directly for Tabs and Slideshow
-    childrenToRender = renderedChildren
-  } else if (renderedChildren && renderedChildren.length > 0) {
-    // Wrap in SortableContext for other container types
+  // Wrap children in SortableContext if container
+  let childrenToRender: React.ReactNode = renderedChildren
+  if (renderedChildren && renderedChildren.length > 0 && node.type !== "Slideshow" && node.type !== "Tabs") {
     childrenToRender = (
       <SortableContext items={node.children!.map(c => c.id)} strategy={verticalListSortingStrategy}>
         {renderedChildren}
@@ -108,7 +116,8 @@ export function RenderNode({
     )
   }
 
-  const content = (
+  // Node content
+  const nodeContent = (
     <>
       {CustomStyle}
       <Suspense
@@ -131,6 +140,15 @@ export function RenderNode({
     </>
   )
 
+  // Portal sticky/fixed nodes outside scroll container
+  const isStickyOrFixed =
+    node.style?.position === "sticky" || node.style?.position === "fixed"
+
+  if (isStickyOrFixed && typeof document !== "undefined") {
+    return createPortal(nodeContent, document.body)
+  }
+
+  // Wrap in DraggableWrapper in editor mode
   if (isEditor) {
     return (
       <DraggableWrapper
@@ -144,10 +162,10 @@ export function RenderNode({
           component: node,
         }}
       >
-        {content}
+        {nodeContent}
       </DraggableWrapper>
     )
   }
 
-  return <div data-node-id={node.id}>{content}</div>
+  return <div data-node-id={node.id}>{nodeContent}</div>
 }

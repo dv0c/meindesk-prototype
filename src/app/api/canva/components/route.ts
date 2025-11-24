@@ -737,6 +737,81 @@ export async function GET() {
         },
       ],
     },
+    {
+      name: "SingleArticle",
+      category: "Articles",
+      allowChildren: false,
+      props: [
+        {
+          name: "showCover",
+          type: "boolean",
+          label: "Show Cover Image",
+          defaultValue: true,
+        },
+        {
+          name: "coverHeight",
+          type: "string",
+          label: "Cover Height",
+          defaultValue: "400px",
+        },
+        {
+          name: "titleTag",
+          type: "select",
+          label: "Title Tag",
+          defaultValue: "h1",
+          options: [
+            { label: "H1", value: "h1" },
+            { label: "H2", value: "h2" },
+            { label: "H3", value: "h3" },
+          ],
+        },
+        {
+          name: "showExcerpt",
+          type: "boolean",
+          label: "Show Excerpt",
+          defaultValue: true,
+        },
+        {
+          name: "showCategories",
+          type: "boolean",
+          label: "Show Categories",
+          defaultValue: true,
+        },
+        {
+          name: "showMetadata",
+          type: "boolean",
+          label: "Show Metadata",
+          defaultValue: true,
+        },
+        {
+          name: "contentFallback",
+          type: "select",
+          label: "Fallback Content",
+          defaultValue: "json",
+          options: [
+            { label: "JSON", value: "json" },
+            { label: "Nothing", value: "none" },
+          ],
+        },
+        {
+          name: "padding",
+          type: "string",
+          label: "Container Padding",
+          defaultValue: "16px",
+        },
+        {
+          name: "align",
+          type: "select",
+          label: "Content Alignment",
+          defaultValue: "left",
+          options: [
+            { label: "Left", value: "left" },
+            { label: "Center", value: "center" },
+            { label: "Right", value: "right" },
+          ],
+        },
+      ],
+    },
   ];
 
   return NextResponse.json(components);

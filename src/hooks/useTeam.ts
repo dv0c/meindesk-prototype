@@ -2,7 +2,7 @@
 
 import axios from "axios"
 import { usePathname, useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 
 export interface Site {
   id: string
@@ -39,6 +39,7 @@ export function useTeam(fallbackId?: string, tenantPrefix?: string) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [siteId, setSiteId] = useState<string | null>(null)
+  const attemptedIds = useRef<Set<string>>(new Set())
 
   // ------------------------------
   // Resolve site ID
@@ -77,27 +78,47 @@ export function useTeam(fallbackId?: string, tenantPrefix?: string) {
     if (!siteId) return
     let cancelled = false
 
-    const fetchTeam = async () => {
+    const fetchTeam = async (idToUse: string) => {
       setLoading(true)
       setError(null)
 
       try {
         // Determine API route
         const apiUrl = tenantPrefix
-          ? fallbackId // explicit fallback: /api/v1/tenant/12345
-            ? `/api/v1/${siteId}`
-            : `/api/v1/${siteId}/` // useTeam(undefined, "tenant")
-          : `/api/team/${siteId}` // default useTeam()
+          ? fallbackId
+            ? `/api/v1/${idToUse}`
+            : `/api/v1/${idToUse}/`
+          : `/api/team/${idToUse}`
 
         const res = await axios.get<{ site: Site }>(apiUrl)
         if (!cancelled) {
           setTeam(res.data.site)
+          attemptedIds.current.add(idToUse)
           if (typeof window !== "undefined") {
             localStorage.setItem(LOCAL_STORAGE_KEY, res.data.site.id)
           }
+          setError(null)
         }
       } catch (err: any) {
         if (!cancelled) {
+          attemptedIds.current.add(idToUse)
+
+          // Retry using localStorage if we haven't tried it yet
+          if (typeof window !== "undefined") {
+            const storedId = localStorage.getItem(LOCAL_STORAGE_KEY)
+            if (storedId && !attemptedIds.current.has(storedId)) {
+              fetchTeam(storedId)
+              return
+            }
+          }
+
+          // Retry using fallbackId if available and not attempted
+          if (fallbackId && !attemptedIds.current.has(fallbackId)) {
+            fetchTeam(fallbackId)
+            return
+          }
+
+          // No more fallbacks — set error
           setError(err.response?.data?.error || err.message || "Failed to fetch site")
           setTeam(null)
         }
@@ -106,7 +127,8 @@ export function useTeam(fallbackId?: string, tenantPrefix?: string) {
       }
     }
 
-    fetchTeam()
+    fetchTeam(siteId)
+
     return () => {
       cancelled = true
     }

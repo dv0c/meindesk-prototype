@@ -19,26 +19,11 @@ interface NavbarProps {
 }
 
 export const Navbar = ({
-  logoText = "WebsiteName",
+  logoText = "WebsiteName   ",
   align = "right",
   sticky = true,
   darkMode = false,
-  links = [
-    { label: "ΑΡΧΙΚΗ", href: "/" },
-    { label: "ΥΠΗΡΕΣΙΕΣ", href: "/services" },
-    { label: "ΒΙΟΓΡΑΦΙΚΟ", href: "/bio" },
-    {
-      label: "ΑΡΘΡΑ",
-      href: "/articles",
-      submenu: [
-        { label: "Παιδιά και Έφηβοι", href: "/articles/paidia-kai-efivoi" },
-        { label: "Όλα τα Άρθρα", href: "/articles" },
-      ],
-    },
-    { label: "ΟΜΑΔΕΣ", href: "/groups" },
-    { label: "ΕΚΔΗΛΩΣΕΙΣ", href: "/events" },
-    { label: "ΕΠΙΚΟΙΝΩΝΙΑ", href: "/contact" },
-  ],
+  links = []
 }: NavbarProps) => {
   const alignment =
     align === "left"
@@ -50,7 +35,7 @@ export const Navbar = ({
   return (
     <nav
       className={cn(
-        "inset-x-4 h-16 border max-w-(--breakpoint-xl) mx-auto rounded-full transition-colors",
+        "inset-x-4 h-16  border max-w-(--breakpoint-xl) mx-auto rounded-full transition-colors",
         sticky && "sticky top-6 z-50",
         darkMode ? "bg-zinc-900 text-white" : "bg-background text-foreground"
       )}

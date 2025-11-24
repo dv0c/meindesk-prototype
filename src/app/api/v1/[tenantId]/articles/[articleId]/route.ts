@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { getAuthSession } from "@/lib/auth";
 
 export const runtime = "nodejs";
 
 // -------------------------------------------------------
-// GET – Fetch a single article by ID
+// GET – Fetch a single article by slug or ID
 // -------------------------------------------------------
 export async function GET(
   req: NextRequest,
@@ -15,21 +14,13 @@ export async function GET(
     const { articleId } = await params;
 
     const article = await db.article.findUnique({
-      where: { id: articleId, status: "PUBLISHED" },
+      where: { slug: articleId, status: "PUBLISHED" },
       include: {
         author: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            image: true,
-          },
+          select: { id: true, name: true, email: true, image: true },
         },
         site: {
-          select: {
-            id: true,
-            title: true,
-          },
+          select: { id: true, title: true },
         },
       },
     });
