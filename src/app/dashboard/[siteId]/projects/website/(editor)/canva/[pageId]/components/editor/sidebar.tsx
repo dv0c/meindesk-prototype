@@ -46,7 +46,7 @@ export function Sidebar({ onAddComponent, onUpdateNode, onDeleteNode }: SidebarP
               >
                 <LayoutGrid className="w-4 h-4 mr-2" />
                 ELEMENTS
-              </TabsTrigger>
+              </TabsTrigger>  
               <TabsTrigger
                 value="global"
                 className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none h-full px-0 pb-0"

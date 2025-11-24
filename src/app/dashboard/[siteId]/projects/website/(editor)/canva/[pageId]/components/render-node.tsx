@@ -51,6 +51,7 @@ const componentMap: Record<string, React.ComponentType<any>> = {
   Navbar: dynamic(() => import("./ui/editor/Navbar")),
   Navbar2: dynamic(() => import("@/components/Builder/CustomBlocks/Navbar")),
   SingleArticle: dynamic(() => import("@/components/Builder/CustomBlocks/SingleArticle").then(mod => ({ default: mod.SingleArticle }))),
+  SingleArticle2: dynamic(() => import("@/components/Builder/CustomBlocks/Templates/SingleArticle2")),
 }
 
 export function RenderNode({
