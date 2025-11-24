@@ -38,7 +38,8 @@ const componentMap: Record<string, React.ComponentType<any>> = {
   Stats: dynamic(() => import("./ui/editor/Stats").then(mod => ({ default: mod.Stats }))),
   TeamMember: dynamic(() => import("./ui/editor/TeamMember").then(mod => ({ default: mod.TeamMember }))),
   Tabs: dynamic(() => import("./ui/editor/Tabs").then(mod => ({ default: mod.Tabs }))),
-  Navbar: dynamic(() => import("./ui/editor/Navbar"))
+  Navbar: dynamic(() => import("./ui/editor/Navbar")),
+  Navbar2: dynamic(() => import("@/components/Builder/CustomBlocks/Navbar"))
 }
 
 export function RenderNode({

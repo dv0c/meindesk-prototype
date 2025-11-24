@@ -10,7 +10,7 @@ import { LayersPanel } from "./components/editor/layers-panel"
 import { Button } from "./components/ui/button"
 import { createNode, generateNodeId } from "@/lib/component-registry"
 import type { ComponentDefinition, LayoutNode } from "@/lib/types"
-import { Save, Eye, Home, Undo, Redo, Smartphone, Monitor, Tablet, Layers, ArrowLeft } from "lucide-react"
+import { Save, Eye, Home, Undo, Redo, Smartphone, Monitor, Tablet, Layers, ArrowLeft, ChevronLeft, SidebarClose } from "lucide-react"
 import Link from "next/link"
 import {
   DndContext,
@@ -47,6 +47,7 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
   const [pageName, setPageName] = useState<string>("Sample Page")
   const [pageSlug, setPageSlug] = useState<string>()
   const [isSaving, setSaving] = useState(false)
+  const [showSidebar, setShowSidebar] = useState(true)
   const [activeDragItem, setActiveDragItem] = useState<ComponentDefinition | null>(null)
   const [deviceMode, setDeviceMode] = useState<"desktop" | "tablet" | "mobile">("desktop")
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; nodeId: string } | null>(null)
@@ -361,6 +362,15 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
           {/* Right: Actions */}
           <div className="flex items-center gap-2">
             <Button
+              variant={showSidebar ? "secondary" : "ghost"}
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setShowSidebar(!showSidebar)}
+              title="Toggle Sidebar"
+            >
+              <SidebarClose className="h-4 w-4" />
+            </Button>
+            <Button
               variant={showLayersPanel ? "secondary" : "ghost"}
               size="icon"
               className="h-8 w-8"
@@ -368,12 +378,13 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
             >
               <Layers className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
+
+            {/* <Button variant="ghost" size="icon" className="h-8 w-8">
               <Undo className="h-4 w-4" />
             </Button>
             <Button variant="ghost" size="icon" className="h-8 w-8">
               <Redo className="h-4 w-4" />
-            </Button>
+            </Button> */}
             <div className="h-6 w-px bg-border mx-2" />
             <Button variant="outline" size="sm" onClick={clearCanvas}>
               Clear
@@ -392,8 +403,13 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
         </header>
 
         <div className="flex-1 flex h-full overflow-hidden">
-          <Sidebar onAddComponent={handleAddComponent} onUpdateNode={handleUpdateNode} onDeleteNode={handleDeleteNode} />
-
+          {showSidebar && (
+            <Sidebar
+              onAddComponent={handleAddComponent}
+              onUpdateNode={handleUpdateNode}
+              onDeleteNode={handleDeleteNode}
+            />
+          )}
           <div className="flex-1 bg-muted/10 h-full overflow-hidden flex flex-col relative">
             <div className="overflow-auto h-full ">
               <div

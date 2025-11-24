@@ -20,7 +20,7 @@ export function Sidebar({ onAddComponent, onUpdateNode, onDeleteNode }: SidebarP
   const selectedNode = selectedNodeId ? findNode(selectedNodeId) : null
 
   return (
-    <div className="w-[340px] border-r bg-background flex flex-col h-full shadow-sm z-20">
+    <div className="w-[340px] border-r bg-background flex flex-col h-full shadow-sm z-20 animate-in slide-in-from-left duration-300">
       {selectedNode ? (
         <div className="flex flex-col h-full animate-in slide-in-from-left-10 duration-200">
           <div className="border-b p-3 flex items-center justify-between bg-muted/30">
