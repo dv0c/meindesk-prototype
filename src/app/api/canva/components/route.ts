@@ -293,6 +293,12 @@ export async function GET() {
             { label: "Destructive", value: "destructive" },
           ],
         },
+        {
+          name: "href",
+          type: "string",
+          label: "Link URL",
+          defaultValue: "#",
+        },
       ],
     },
     {
