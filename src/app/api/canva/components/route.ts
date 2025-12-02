@@ -39,26 +39,26 @@ export async function GET() {
         },
       ],
     },
-    {
-      name: "HtmlContainer",
-      category: "layout",
-      allowChildren: true,
-      props: [
-        { name: "tag", type: "string", label: "HTML Tag", defaultValue: "div" },
-        {
-          name: "className",
-          type: "string",
-          label: "CSS Classes",
-          defaultValue: "",
-        },
-        {
-          name: "styles",
-          type: "string",
-          label: "Custom Styles (CSS)",
-          defaultValue: "",
-        },
-      ],
-    },
+    // {
+    //   name: "HtmlContainer",
+    //   category: "layout",
+    //   allowChildren: true,
+    //   props: [
+    //     { name: "tag", type: "string", label: "HTML Tag", defaultValue: "div" },
+    //     {
+    //       name: "className",
+    //       type: "string",
+    //       label: "CSS Classes",
+    //       defaultValue: "",
+    //     },
+    //     {
+    //       name: "styles",
+    //       type: "string",
+    //       label: "Custom Styles (CSS)",
+    //       defaultValue: "",
+    //     },
+    //   ],
+    // },
     {
       name: "Hero",
       category: "layout",
