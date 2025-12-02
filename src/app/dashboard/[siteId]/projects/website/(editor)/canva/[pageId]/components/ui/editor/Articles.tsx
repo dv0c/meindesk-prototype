@@ -26,7 +26,7 @@ interface ArticleListProps {
   limit?: number
 }
 
-export default function ArticleList({
+export default function Articles({
   title = "Latest Articles",
   thumbnail = false,
   limit = 10,

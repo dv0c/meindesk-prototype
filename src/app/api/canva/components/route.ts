@@ -271,7 +271,7 @@ export async function GET() {
       ],
     },
     {
-      name: "EditorButton",
+      name: "Button",
       category: "basic",
       allowChildren: false,
       props: [
@@ -539,7 +539,7 @@ export async function GET() {
       ],
     },
     {
-      name: "ArticleList",
+      name: "Articles",
       category: "Articles",
       allowChildren: false,
       props: [
@@ -739,7 +739,7 @@ export async function GET() {
       ],
     },
     {
-      name: "SingleArticle1",
+      name: "SingleArticle",
       category: "Templates",
       allowChildren: true,
       props: [

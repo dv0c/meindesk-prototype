@@ -1,13 +1,11 @@
 "use client"
 
-import type React from "react"
+import type { LayoutNode } from "@/lib/types"
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import dynamic from "next/dynamic"
+import type React from "react"
 import { Suspense } from "react"
 import { DraggableWrapper } from "./editor/draggable-wrapper"
-import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
-import { cn } from "@/lib/utils"
-import { createPortal } from "react-dom"
-import type { LayoutNode } from "@/lib/types"
 
 interface RenderNodeProps {
   node: LayoutNode
@@ -21,10 +19,9 @@ interface RenderNodeProps {
 const componentMap: Record<string, React.ComponentType<any>> = {
   Container: dynamic(() => import("./ui/editor/Container")),
   Grid: dynamic(() => import("./ui/editor/Grid")),
-  HtmlContainer: dynamic(() => import("./ui/editor/HtmlContainer")),
-  EditorButton: dynamic(() => import("./ui/editor/EditorButton")),
+  Button: dynamic(() => import("./ui/editor/Button")),
   Slideshow: dynamic(() => import("./ui/editor/Slideshow")),
-  ArticleList: dynamic(() => import("./ui/editor/ArticleList")),
+  Articles: dynamic(() => import("./ui/editor/Articles")),
   Hero: dynamic(() => import("./ui/editor/Hero")),
   Heading: dynamic(() => import("./ui/editor/Heading")),
   Text: dynamic(() => import("./ui/editor/Text")),
@@ -51,7 +48,6 @@ const componentMap: Record<string, React.ComponentType<any>> = {
   Navbar: dynamic(() => import("./ui/editor/Navbar")),
   Navbar2: dynamic(() => import("@/components/Builder/CustomBlocks/Navbar")),
   SingleArticle: dynamic(() => import("@/components/Builder/CustomBlocks/SingleArticle").then(mod => ({ default: mod.SingleArticle }))),
-  SingleArticle2: dynamic(() => import("@/components/Builder/CustomBlocks/Templates/SingleArticle2")),
 }
 
 export function RenderNode({

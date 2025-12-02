@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button as B } from "@/components/ui/button"
 import type { CSSProperties } from "react"
 
 interface EditorButtonProps {
@@ -9,7 +9,7 @@ interface EditorButtonProps {
   [key: string]: any
 }
 
-export default function EditorButton({
+export default function Button({
   text = "Click me",
   variant = "default",
   className,
@@ -17,8 +17,8 @@ export default function EditorButton({
   ...props
 }: EditorButtonProps) {
   return (
-    <Button variant={variant} className={className} style={style} {...props}>
+    <B variant={variant} className={className} style={style} {...props}>
       {text}
-    </Button>
+    </B>
   )
 }
