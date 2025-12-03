@@ -29,8 +29,8 @@ export const Navbar = ({
     align === "left"
       ? "justify-start"
       : align === "center"
-      ? "justify-center"
-      : "justify-end";
+        ? "justify-center"
+        : "justify-end";
 
   return (
     <nav
@@ -49,21 +49,6 @@ export const Navbar = ({
         </div>
 
         <div className="flex items-center gap-3">
-          <Button
-            variant={darkMode ? "secondary" : "outline"}
-            className="hidden sm:inline-flex rounded-full"
-          >
-            Sign In
-          </Button>
-          <Button
-            className={cn(
-              "rounded-full",
-              darkMode && "bg-white text-black hover:bg-zinc-200"
-            )}
-          >
-            Get Started
-          </Button>
-
           {/* Mobile Menu */}
           <div className="md:hidden">
             <NavigationSheet links={links} logoText={logoText} />
