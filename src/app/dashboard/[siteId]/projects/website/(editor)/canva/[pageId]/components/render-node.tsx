@@ -107,7 +107,7 @@ export function RenderNode({ node, isEditor = false, onSelect, isSelected = fals
   const hasChildren = node.children && node.children.length > 0
 
   const renderedChildren = hasChildren ? (
-    node.type === "Slideshow" ? (
+    node.type === "Slideshow" && node.children ? (
       node.children.map((child) => (
         <RenderNode
           key={child.id}
