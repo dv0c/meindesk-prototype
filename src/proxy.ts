@@ -5,7 +5,7 @@ import { db } from "./lib/db";
 const APP_BASE_DOMAIN = process.env.NODE_ENV === "development" ? "localhost:3000" : "meindesk.gr";
 const DEFAULT_TENANT_SUBDOMAIN = "prototype"; // The slug for the default tenant app
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const url = req.nextUrl.clone();
   const host = req.headers.get("host") || "";
 
