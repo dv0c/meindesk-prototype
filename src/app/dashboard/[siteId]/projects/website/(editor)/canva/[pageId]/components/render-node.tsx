@@ -48,15 +48,27 @@ const componentMap: Record<string, React.ComponentType<any>> = {
   Navbar: dynamic(() => import("./ui/editor/Navbar")),
   Navbar2: dynamic(() => import("@/components/Builder/CustomBlocks/Navbar")),
   SingleArticle: dynamic(() => import("@/components/Builder/CustomBlocks/SingleArticle").then(mod => ({ default: mod.SingleArticle }))),
+  Badge: dynamic(() => import("@/components/Builder/CustomBlocks/Badge")),
+  Avatar: dynamic(() => import("@/components/Builder/CustomBlocks/Avatar")),
+  Input: dynamic(() => import("@/components/Builder/CustomBlocks/Input")),
+  Textarea: dynamic(() => import("@/components/Builder/CustomBlocks/Textarea")),
+  Select: dynamic(() => import("@/components/Builder/CustomBlocks/Select")),
+  Checkbox: dynamic(() => import("@/components/Builder/CustomBlocks/Checkbox")),
+  Switch: dynamic(() => import("@/components/Builder/CustomBlocks/Switch")),
+  Slider: dynamic(() => import("@/components/Builder/CustomBlocks/Slider")),
+  Progress: dynamic(() => import("@/components/Builder/CustomBlocks/Progress")),
+  Separator: dynamic(() => import("@/components/Builder/CustomBlocks/Separator")),
+  Skeleton: dynamic(() => import("@/components/Builder/CustomBlocks/Skeleton")),
+  Spinner: dynamic(() => import("@/components/Builder/CustomBlocks/Spinner")),
+  Table: dynamic(() => import("@/components/Builder/CustomBlocks/Table")),
+  Breadcrumb: dynamic(() => import("@/components/Builder/CustomBlocks/Breadcrumb")),
+  Kbd: dynamic(() => import("@/components/Builder/CustomBlocks/Kbd")),
+  Alert: dynamic(() => import("@/components/Builder/CustomBlocks/Alert").then((mod) => ({ default: mod.Alert }))),
+
+
 }
 
-export function RenderNode({
-  node,
-  isEditor = false,
-  onSelect,
-  isSelected = false,
-  onContextMenu,
-}: RenderNodeProps) {
+export function RenderNode({ node, isEditor = false, onSelect, isSelected = false, onContextMenu }: RenderNodeProps) {
   const Component = componentMap[node.type]
 
   if (!Component) {
@@ -75,6 +87,7 @@ export function RenderNode({
 
     if (!isEditor && node.script) {
       try {
+        // Safe-ish execution
         new Function(node.script)()
       } catch (err) {
         console.error("Error executing script for node", node.id, err)
@@ -82,7 +95,6 @@ export function RenderNode({
     }
   }
 
-  // Apply custom CSS
   const CustomStyle = node.customCss ? (
     <style
       dangerouslySetInnerHTML={{
@@ -91,10 +103,35 @@ export function RenderNode({
     />
   ) : null
 
-    const renderedChildren =
-    node.children && node.children.length > 0 ? (
-      node.type === "Slideshow" ? (
-        node.children.map((child) => (
+  const allowsChildren = node.children !== undefined
+  const hasChildren = node.children && node.children.length > 0
+
+  const renderedChildren = hasChildren ? (
+    node.type === "Slideshow" ? (
+      node.children.map((child) => (
+        <RenderNode
+          key={child.id}
+          node={child}
+          isEditor={isEditor}
+          onSelect={onSelect}
+          isSelected={isSelected}
+          onContextMenu={onContextMenu}
+        />
+      ))
+    ) : node.type === "Grid" ? (
+      node.children?.map((child) => (
+        <RenderNode
+          key={child.id}
+          node={child}
+          isEditor={isEditor}
+          onSelect={onSelect}
+          isSelected={isSelected}
+          onContextMenu={onContextMenu}
+        />
+      ))
+    ) : (
+      <SortableContext items={node.children?.map((child) => child.id)} strategy={verticalListSortingStrategy}>
+        {node.children?.map((child) => (
           <RenderNode
             key={child.id}
             node={child}
@@ -103,36 +140,16 @@ export function RenderNode({
             isSelected={isSelected}
             onContextMenu={onContextMenu}
           />
-        ))
-      ) : node.type === "Grid" ? (
-        node.children.map((child) => (
-          <RenderNode
-            key={child.id}
-            node={child}
-            isEditor={isEditor}
-            onSelect={onSelect}
-            isSelected={isSelected}
-            onContextMenu={onContextMenu}
-          />
-        ))
-      ) : (
-        <SortableContext items={node.children.map((child) => child.id)} strategy={verticalListSortingStrategy}>
-          {node.children.map((child) => (
-            <RenderNode
-              key={child.id}
-              node={child}
-              isEditor={isEditor}
-              onSelect={onSelect}
-              isSelected={isSelected}
-              onContextMenu={onContextMenu}
-            />
-          ))}
-        </SortableContext>
-      )
+        ))}
+      </SortableContext>
+    )
+  ) : // Show drop indicator for empty containers in editor mode
+    isEditor && allowsChildren ? (
+      <div className="min-h-[60px] rounded-md border-2 border-dashed border-muted-foreground/20 flex items-center justify-center text-xs text-muted-foreground">
+        Drop components here
+      </div>
     ) : undefined
 
-
-  // Render children recursively
   const content = (
     <>
       {CustomStyle}
@@ -164,9 +181,10 @@ export function RenderNode({
         isSelected={isSelected}
         onSelect={onSelect}
         onContextMenu={onContextMenu}
+        isContainer={allowsChildren}
         data={{
           type: "component",
-          isContainer: !!node.children && node.children.length > 0,
+          isContainer: allowsChildren,
           component: node,
         }}
       >
