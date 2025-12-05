@@ -20,7 +20,7 @@ export default async function Page({ params }: { params: { siteId: string } }) {
             <p className="text-muted-foreground">Site not found.</p>
         </div>
     }
-    return <PageWrapper title="Pages" action={<CreatePageButton siteId={params.siteId} />} >
+    return <PageWrapper title="Pages" action={<CreatePageButton siteId={siteId} />} >
         <PagesTable />
     </PageWrapper>
 }
