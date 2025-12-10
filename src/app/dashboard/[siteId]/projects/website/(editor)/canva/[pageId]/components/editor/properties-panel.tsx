@@ -125,7 +125,7 @@ export function PropertiesPanel({ selectedNode, onUpdateNode, onDeleteNode }: Pr
                     <Label htmlFor={prop.name} className="text-xs">
                       {prop.label}
                     </Label>
-                    {renderPropInput(prop, selectedNode.props[prop.name], handlePropChange, handleOpenGallery)}
+                    {renderPropInput(prop, selectedNode.props[prop.name], handlePropChange, handleOpenGallery, selectedNode.props)}
                   </div>
                 ))}
               </div>
@@ -538,7 +538,8 @@ function renderPropInput(
   prop: PropDefinition,
   value: any,
   onChange: (propName: string, value: any) => void,
-  onOpenGallery?: (propName: string) => void
+  onOpenGallery?: (propName: string) => void,
+  allProps: Record<string, any> = {}
 ) {
   switch (prop.type) {
     case "string":
@@ -686,7 +687,8 @@ function renderPropInput(
                             field,
                             item[field.key],
                             (key, val) => handleChange(idx, field.key, val),
-                            onOpenGallery
+                            onOpenGallery,
+                            item // Nested props context is the item itself
                           )}
                         </div>
                       ) : (
@@ -792,6 +794,49 @@ function renderPropInput(
         </div>
       )
 
+    case "spacing":
+      return (
+        <div className="grid grid-cols-2 gap-2">
+          {["Top", "Right", "Bottom", "Left"].map((side) => {
+            // Construct key e.g. logoMarginTop
+            const key = `${prop.name}${side}`
+            return (
+              <Input
+                key={side}
+                className="h-8"
+                placeholder={side}
+                value={allProps[key] || ""}
+                onChange={(e) => onChange(key, e.target.value)}
+              />
+            )
+          })}
+        </div>
+      )
+
+    case "dimensions":
+      // Supports Width and Height derived from prefix e.g. logoSizeWidth, logoSizeHeight
+      return (
+        <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-1">
+            <span className="text-[10px] text-muted-foreground uppercase">Width</span>
+            <Input
+              className="h-8"
+              placeholder="Auto"
+              value={allProps[`${prop.name}Width`] || ""}
+              onChange={(e) => onChange(`${prop.name}Width`, e.target.value)}
+            />
+          </div>
+          <div className="space-y-1">
+            <span className="text-[10px] text-muted-foreground uppercase">Height</span>
+            <Input
+              className="h-8"
+              placeholder="Auto"
+              value={allProps[`${prop.name}Height`] || ""}
+              onChange={(e) => onChange(`${prop.name}Height`, e.target.value)}
+            />
+          </div>
+        </div>
+      )
     default:
       return <Input id={prop.name} value={value || ""} disabled />
   }

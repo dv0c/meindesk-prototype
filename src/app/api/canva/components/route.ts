@@ -584,6 +584,50 @@ export async function GET() {
 
     // Media Components
     {
+      name: "ImageGrid",
+      category: "media",
+      allowChildren: false,
+      props: [
+        {
+          name: "images",
+          type: "json",
+          label: "Images",
+          schema: [
+             { key: "src", label: "Image", type: "image" }
+          ],
+          defaultValue: [
+            { src: "/placeholder.svg?height=400&width=400" },
+            { src: "/placeholder.svg?height=400&width=400" },
+            { src: "/placeholder.svg?height=400&width=400" },
+          ],
+        },
+        {
+          name: "columns",
+          type: "number",
+          label: "Columns",
+          defaultValue: 3,
+        },
+        {
+          name: "gap",
+          type: "number",
+          label: "Gap",
+          defaultValue: 4,
+        },
+        {
+            name: "aspectRatio",
+            type: "select",
+            label: "Aspect Ratio",
+            defaultValue: "square",
+            options: [
+                { label: "Square", value: "square" },
+                { label: "Video (16:9)", value: "video" },
+                { label: "Portrait (3:4)", value: "portrait" },
+                { label: "Auto", value: "auto" },
+            ]
+        }
+      ],
+    },
+    {
       name: "Slideshow",
       category: "media",
       allowChildren: true, // Enable children for component-based slides
@@ -613,6 +657,43 @@ export async function GET() {
       category: "navigation",
       allowChildren: false,
       props: [
+        {
+          name: "logo",
+          type: "image",
+          label: "Logo Image",
+          defaultValue: "",
+        },
+        {
+          name: "logoSize",
+          type: "dimensions",
+          label: "Size",
+          defaultValue: "auto", 
+        },
+        {
+          name: "logoMargin",
+          type: "spacing",
+          label: "Margin",
+          defaultValue: "0px",
+        },
+        {
+          name: "logoPadding",
+          type: "spacing",
+          label: "Padding",
+          defaultValue: "0px",
+        },
+        {
+          name: "logoObjectFit",
+          type: "select",
+          label: "Logo Fit",
+          defaultValue: "contain",
+             options: [
+            { label: "Contain", value: "contain" },
+            { label: "Cover", value: "cover" },
+            { label: "Fill", value: "fill" },
+            { label: "None", value: "none" },
+            { label: "Scale Down", value: "scale-down" },
+          ],
+        },
         {
           name: "logoText",
           type: "string",
@@ -883,109 +964,6 @@ export async function GET() {
             { label: "Numbered", value: "numbered" },
             { label: "Classic", value: "classic" },
           ],
-        },
-      ],
-    },
-    {
-      name: "SingleArticle2",
-      category: "Templates",
-      allowChildren: false,
-      props: [
-        {
-          name: "siteLogoText",
-          type: "string",
-          label: "Site Logo Text",
-          defaultValue: "ΝΑΥΤΕΜΠΟΡΙΚΗ",
-        },
-        {
-          name: "categoryLabel",
-          type: "string",
-          label: "Category Label",
-          defaultValue: "ΚΟΣΜΟΣ",
-        },
-        {
-          name: "categoryColor",
-          type: "color",
-          label: "Category Color",
-          defaultValue: "#d32f2f",
-        },
-        {
-          name: "title",
-          type: "string",
-          label: "Article Title",
-          defaultValue: "Article Title",
-        },
-        {
-          name: "subtitle",
-          type: "string",
-          label: "Subtitle",
-          defaultValue: "",
-        },
-        {
-          name: "publishDate",
-          type: "string",
-          label: "Publish Date",
-          defaultValue: "24/11/2025 14:30",
-        },
-        {
-          name: "author",
-          type: "string",
-          label: "Author",
-          defaultValue: "Naftemporiki.gr",
-        },
-        {
-          name: "readTime",
-          type: "string",
-          label: "Read Time",
-          defaultValue: "3 λεπτά ανάγνωση",
-        },
-        {
-          name: "mainImage",
-          type: "string",
-          label: "Main Image URL",
-          defaultValue: "/placeholder.svg?height=600&width=1200",
-        },
-        {
-          name: "mainImageCredit",
-          type: "string",
-          label: "Image Credit",
-          defaultValue: "Φωτογραφία: Reuters",
-        },
-        {
-          name: "accentColor",
-          type: "color",
-          label: "Accent Color",
-          defaultValue: "#d32f2f",
-        },
-        {
-          name: "backgroundColor",
-          type: "color",
-          label: "Background Color",
-          defaultValue: "#ffffff",
-        },
-        {
-          name: "textColor",
-          type: "color",
-          label: "Text Color",
-          defaultValue: "#212121",
-        },
-        {
-          name: "linkColor",
-          type: "color",
-          label: "Link Color",
-          defaultValue: "#1976d2",
-        },
-        {
-          name: "borderColor",
-          type: "color",
-          label: "Border Color",
-          defaultValue: "#e0e0e0",
-        },
-        {
-          name: "headerBgColor",
-          type: "color",
-          label: "Header Background",
-          defaultValue: "#1a1a1a",
         },
       ],
     },

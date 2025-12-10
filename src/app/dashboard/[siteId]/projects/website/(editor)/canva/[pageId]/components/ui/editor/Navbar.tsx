@@ -12,7 +12,21 @@ export interface NavLink {
 }
 
 export interface NavbarProps {
+  logo?: string
   logoText?: string
+  logoSizeWidth?: string
+  logoSizeHeight?: string
+  // Granular Margin
+  logoMarginTop?: string
+  logoMarginRight?: string
+  logoMarginBottom?: string
+  logoMarginLeft?: string
+  // Granular Padding
+  logoPaddingTop?: string
+  logoPaddingRight?: string
+  logoPaddingBottom?: string
+  logoPaddingLeft?: string
+  logoObjectFit?: "contain" | "cover" | "fill" | "none" | "scale-down"
   links?: NavLink[]
   sticky?: boolean
   style?: "split" | "centered" | "glassmorphism" | "floating" | "underline" | "sidebar"
@@ -22,7 +36,20 @@ export interface NavbarProps {
 }
 
 export default function Navbar({
+  logo,
   logoText = "Website Name",
+  logoSizeWidth = "auto",
+  logoSizeHeight = "32px",
+  // Default all granular props to "0px" or "auto" as needed, usually 0 for spacing
+  logoMarginTop = "0px",
+  logoMarginRight = "0px",
+  logoMarginBottom = "0px",
+  logoMarginLeft = "0px",
+  logoPaddingTop = "0px",
+  logoPaddingRight = "0px",
+  logoPaddingBottom = "0px",
+  logoPaddingLeft = "0px",
+  logoObjectFit = "contain",
   links = [],
   sticky = false,
   style = "split",
@@ -39,6 +66,20 @@ export default function Navbar({
     color: customTextColor || undefined,
   }
 
+  const logoStyle: React.CSSProperties = {
+    width: logoSizeWidth,
+    height: logoSizeHeight,
+    marginTop: logoMarginTop,
+    marginRight: logoMarginRight,
+    marginBottom: logoMarginBottom,
+    marginLeft: logoMarginLeft,
+    paddingTop: logoPaddingTop,
+    paddingRight: logoPaddingRight,
+    paddingBottom: logoPaddingBottom,
+    paddingLeft: logoPaddingLeft,
+    objectFit: logoObjectFit,
+  }
+
   // Accent color for hovers/active states
   const accentStyle = {
     '--accent-color': accentColor,
@@ -51,6 +92,26 @@ export default function Navbar({
   // Dropdown "bridge" to fix hover gap - transparent pseudo element
   const dropdownBridge = "before:absolute before:-top-4 before:left-0 before:w-full before:h-4 before:content-['']"
 
+  const Logo = () => (
+    <Link href="/" className="flex-shrink-0">
+      {logo ? (
+        <img src={logo} alt={logoText} style={logoStyle} className="object-contain" />
+      ) : (
+        <span className="text-2xl font-bold">{logoText}</span>
+      )}
+    </Link>
+  )
+
+  const CenteredLogo = () => (
+    <Link href="/" className="inline-block mb-6">
+      {logo ? (
+        <img src={logo} alt={logoText} style={logoStyle} className="mx-auto" />
+      ) : (
+        <span className="text-3xl font-bold tracking-tight">{logoText}</span>
+      )}
+    </Link>
+  )
+
   // Split Layout - Logo left, Links center, CTA right
   if (style === "split") {
     return (
@@ -61,9 +122,8 @@ export default function Navbar({
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
-            <Link href="/" className="text-2xl font-bold flex-shrink-0">
-              {logoText}
-            </Link>
+            {/* Logo */}
+            <Logo />
 
             {/* Center Links - Desktop */}
             <div className="hidden lg:flex items-center space-x-8 absolute left-1/2 -translate-x-1/2">
@@ -142,9 +202,7 @@ export default function Navbar({
       >
         <div className="max-w-4xl mx-auto px-6 py-6 text-center">
           {/* Logo */}
-          <Link href="/" className="text-3xl font-bold tracking-tight inline-block mb-6">
-            {logoText}
-          </Link>
+          <Logo />
 
           {/* Links */}
           <div className="hidden md:flex items-center justify-center space-x-8 border-t border-b py-4 border-gray-200 dark:border-gray-700">
@@ -211,9 +269,7 @@ export default function Navbar({
       >
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between h-16">
-            <Link href="/" className="text-xl font-bold">
-              {logoText}
-            </Link>
+            <Logo />
 
             <div className="hidden md:flex items-center space-x-6">
               {links.map((item, idx) => (
@@ -276,9 +332,7 @@ export default function Navbar({
           style={navStyle}
         >
           <div className="flex items-center justify-between h-14">
-            <Link href="/" className="text-lg font-bold">
-              {logoText}
-            </Link>
+            <Logo />
 
             <div className="hidden md:flex items-center space-x-6">
               {links.map((item, idx) => (
@@ -341,9 +395,7 @@ export default function Navbar({
       >
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between h-16 border-b-2" style={{ borderColor: backgroundColor ? 'rgba(0,0,0,0.1)' : undefined }}>
-            <Link href="/" className="text-xl font-bold">
-              {logoText}
-            </Link>
+            <Logo />
 
             <div className="hidden md:flex items-center space-x-1">
               {links.map((item, idx) => (
@@ -419,9 +471,7 @@ export default function Navbar({
               <Menu size={24} />
             </button>
 
-            <Link href="/" className="text-xl font-bold">
-              {logoText}
-            </Link>
+            <Logo />
 
             <button onClick={() => setSidebarOpen(!sidebarOpen)} className="hidden lg:block">
               <Menu size={24} />
@@ -447,7 +497,11 @@ export default function Navbar({
       >
         <div className="p-6">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold">{logoText}</h2>
+            {logo ? (
+              <img src={logo} alt={logoText} style={logoStyle} className="object-contain" />
+            ) : (
+              <h2 className="text-2xl font-bold">{logoText}</h2>
+            )}
             <button onClick={() => setSidebarOpen(false)}>
               <X size={24} />
             </button>

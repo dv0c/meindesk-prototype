@@ -58,6 +58,7 @@ const componentMap: Record<string, React.ComponentType<any>> = {
   Alert: dynamic(() => import("@/components/Builder/CustomBlocks/Alert").then(m => ({ default: m.Alert })), { ssr: false }),
   Gallery: dynamic(() => import("@/components/Builder/CustomBlocks/Gallery"), { ssr: false }),
   MostPopular: dynamic(() => import("@/components/Builder/CustomBlocks/MostPopular"), { ssr: false }),
+  ImageGrid: dynamic(() => import("./ui/editor/ImageGrid"), { ssr: false }),
 }
 
 
