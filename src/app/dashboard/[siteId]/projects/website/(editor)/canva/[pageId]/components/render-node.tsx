@@ -57,6 +57,7 @@ const componentMap: Record<string, React.ComponentType<any>> = {
   Kbd: dynamic(() => import("@/components/Builder/CustomBlocks/Kbd"), { ssr: false }),
   Alert: dynamic(() => import("@/components/Builder/CustomBlocks/Alert").then(m => ({ default: m.Alert })), { ssr: false }),
   Gallery: dynamic(() => import("@/components/Builder/CustomBlocks/Gallery"), { ssr: false }),
+  MostPopular: dynamic(() => import("@/components/Builder/CustomBlocks/MostPopular"), { ssr: false }),
 }
 
 

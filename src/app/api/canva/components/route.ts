@@ -843,6 +843,25 @@ export async function GET() {
       ],
     },
     {
+      name: "MostPopular",
+      category: "Articles",
+      allowChildren: false,
+      props: [
+        {
+          name: "title",
+          type: "string",
+          label: "Section Title",
+          defaultValue: "MOST POPULAR",
+        },
+        {
+          name: "limit",
+          type: "number",
+          label: "Number of Articles",
+          defaultValue: 5,
+        },
+      ],
+    },
+    {
       name: "SingleArticle2",
       category: "Templates",
       allowChildren: false,

@@ -1,6 +1,6 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 
 import type { ReactNode, CSSProperties } from "react"
 import { cn } from "@/lib/utils"
@@ -124,28 +124,79 @@ export default function Grid({
   }, [draggingIndex, gap, localColumnWidths, nodeId, isEditorMode, updateNode])
 
   const childIds = Array.isArray(children)
-    ? children.filter((child) => child?.key).map((child) => child.key as string)
-    : children?.key
+    ? children.filter((child) => React.isValidElement(child) && child.key).map((child) => (child as React.ReactElement).key as string)
+    : React.isValidElement(children) && children.key
       ? [children.key as string]
       : []
 
   const gridTemplateColumns = localColumnWidths.map((width) => `${width}fr`).join(" ")
+
+  // Generate responsive grid styles that preserve column width ratios
+  const getResponsiveGridStyles = (): CSSProperties => {
+    const baseStyles: CSSProperties = {
+      gap: `${gap * 0.25}rem`,
+      padding: `${padding * 0.25}rem`,
+      ...style,
+    }
+
+    // In editor mode, always show the full configured grid
+    if (isEditorMode) {
+      return {
+        ...baseStyles,
+        gridTemplateColumns,
+      }
+    }
+
+    // For preview/published mode, create responsive breakpoints
+    // while preserving the custom column width ratios
+    const columnCount = localColumnWidths.length
+
+    // Generate grid templates for different screen sizes
+    let mobileGrid = '1fr' // Mobile: always 1 column
+    let tabletGrid = gridTemplateColumns // Tablet: default to all columns
+    let desktopGrid = gridTemplateColumns // Desktop: all columns
+
+    if (columnCount === 2) {
+      // 2 columns: mobile = 1, tablet+ = 2 with ratio preserved
+      tabletGrid = gridTemplateColumns
+    } else if (columnCount === 3) {
+      // 3 columns: mobile = 1, tablet = 2 (first two with preserved ratio), desktop = 3
+      const firstTwo = localColumnWidths.slice(0, 2)
+      const totalRatio = firstTwo.reduce((sum, w) => sum + w, 0)
+      tabletGrid = firstTwo.map(w => `${w}fr`).join(' ')
+    } else if (columnCount >= 4) {
+      // 4+ columns: mobile = 1, tablet = 2 (first two with preserved ratio), desktop = all
+      const firstTwo = localColumnWidths.slice(0, 2)
+      tabletGrid = firstTwo.map(w => `${w}fr`).join(' ')
+    }
+
+    // Use CSS custom properties for media query support
+    return {
+      ...baseStyles,
+      ['--grid-mobile' as string]: mobileGrid,
+      ['--grid-tablet' as string]: tabletGrid,
+      ['--grid-desktop' as string]: desktopGrid,
+      // Default to mobile on small screens
+      gridTemplateColumns: mobileGrid,
+    }
+  }
 
   return (
     <div
       ref={(node) => {
         setNodeRef(node)
         if (node) {
-          ;(gridRef as any).current = node
+          ; (gridRef as any).current = node
         }
       }}
-      className={cn("grid w-full transition-colors relative", isOver && "ring-2 ring-primary/50", className)}
-      style={{
-        gridTemplateColumns,
-        gap: `${gap * 0.25}rem`,
-        padding: `${padding * 0.25}rem`,
-        ...style,
-      }}
+      className={cn(
+        "grid w-full transition-colors relative",
+        isOver && "ring-2 ring-primary/50",
+        // Apply responsive grid columns via Tailwind arbitrary values
+        !isEditorMode && localColumnWidths.length > 1 && "sm:!grid-cols-[var(--grid-tablet)] lg:!grid-cols-[var(--grid-desktop)]",
+        className
+      )}
+      style={getResponsiveGridStyles()}
       {...props}
     >
       {children && childIds.length > 0 ? (
@@ -170,10 +221,9 @@ export default function Grid({
                 "flex items-center justify-center transition-all",
               )}
               style={{
-                left: `calc(${
-                  localColumnWidths.slice(0, index + 1).reduce((sum, fr) => sum + fr, 0) /
+                left: `calc(${localColumnWidths.slice(0, index + 1).reduce((sum, fr) => sum + fr, 0) /
                   localColumnWidths.reduce((sum, fr) => sum + fr, 0)
-                } * (100% - ${gap * 0.25 * (localColumnWidths.length - 1)}rem) + ${gap * 0.25 * (index + 1)}rem + ${padding * 0.25}rem)`,
+                  } * (100% - ${gap * 0.25 * (localColumnWidths.length - 1)}rem) + ${gap * 0.25 * (index + 1)}rem + ${padding * 0.25}rem)`,
                 width: "16px",
                 transform: "translateX(-50%)",
               }}
