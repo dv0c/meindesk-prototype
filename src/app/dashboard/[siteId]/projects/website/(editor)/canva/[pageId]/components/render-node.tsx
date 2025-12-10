@@ -17,56 +17,48 @@ interface RenderNodeProps {
 
 // Dynamic component map
 const componentMap: Record<string, React.ComponentType<any>> = {
-  Container: dynamic(() => import("./ui/editor/Container")),
-  Grid: dynamic(() => import("./ui/editor/Grid")),
-  Button: dynamic(() => import("./ui/editor/Button")),
-  Slideshow: dynamic(() => import("./ui/editor/Slideshow")),
-  Articles: dynamic(() => import("./ui/editor/Articles")),
-  Hero: dynamic(() => import("./ui/editor/Hero")),
-  Heading: dynamic(() => import("./ui/editor/Heading")),
-  Text: dynamic(() => import("./ui/editor/Text")),
-  Features: dynamic(() => import("./ui/editor/Features")),
-  CallToAction: dynamic(() => import("./ui/editor/CallToAction")),
-  Testimonial: dynamic(() => import("./ui/editor/Testimonial")),
-  Pricing: dynamic(() => import("./ui/editor/Pricing")),
-  Image: dynamic(() => import("./ui/editor/Image")),
-  Spacer: dynamic(() => import("./ui/editor/Spacer")),
-  Divider: dynamic(() => import("./ui/editor/Divider")),
-  Footer: dynamic(() => import("./ui/editor/Footer")),
-  Newsletter: dynamic(() =>
-    import("./ui/editor/Newsletter").then(mod => ({ default: mod.Newsletter }))
-  ),
-  Stats: dynamic(() =>
-    import("./ui/editor/Stats").then(mod => ({ default: mod.Stats }))
-  ),
-  TeamMember: dynamic(() =>
-    import("./ui/editor/TeamMember").then(mod => ({ default: mod.TeamMember }))
-  ),
-  Tabs: dynamic(() =>
-    import("./ui/editor/Tabs").then(mod => ({ default: mod.Tabs }))
-  ),
-  Navbar: dynamic(() => import("./ui/editor/Navbar")),
-  Navbar2: dynamic(() => import("@/components/Builder/CustomBlocks/Navbar")),
-  SingleArticle: dynamic(() => import("@/components/Builder/CustomBlocks/SingleArticle").then(mod => ({ default: mod.SingleArticle }))),
-  Badge: dynamic(() => import("@/components/Builder/CustomBlocks/Badge")),
-  Avatar: dynamic(() => import("@/components/Builder/CustomBlocks/Avatar")),
-  Input: dynamic(() => import("@/components/Builder/CustomBlocks/Input")),
-  Textarea: dynamic(() => import("@/components/Builder/CustomBlocks/Textarea")),
-  Select: dynamic(() => import("@/components/Builder/CustomBlocks/Select")),
-  Checkbox: dynamic(() => import("@/components/Builder/CustomBlocks/Checkbox")),
-  Switch: dynamic(() => import("@/components/Builder/CustomBlocks/Switch")),
-  Slider: dynamic(() => import("@/components/Builder/CustomBlocks/Slider")),
-  Progress: dynamic(() => import("@/components/Builder/CustomBlocks/Progress")),
-  Separator: dynamic(() => import("@/components/Builder/CustomBlocks/Separator")),
-  Skeleton: dynamic(() => import("@/components/Builder/CustomBlocks/Skeleton")),
-  Spinner: dynamic(() => import("@/components/Builder/CustomBlocks/Spinner")),
-  Table: dynamic(() => import("@/components/Builder/CustomBlocks/Table")),
-  Breadcrumb: dynamic(() => import("@/components/Builder/CustomBlocks/Breadcrumb")),
-  Kbd: dynamic(() => import("@/components/Builder/CustomBlocks/Kbd")),
-  Alert: dynamic(() => import("@/components/Builder/CustomBlocks/Alert").then((mod) => ({ default: mod.Alert }))),
-  Gallery: dynamic(() => import("@/components/Builder/CustomBlocks/Gallery")),
-
+  Container: dynamic(() => import("./ui/editor/Container"), { ssr: false }),
+  Grid: dynamic(() => import("./ui/editor/Grid"), { ssr: false }),
+  Button: dynamic(() => import("./ui/editor/Button"), { ssr: false }),
+  Slideshow: dynamic(() => import("./ui/editor/Slideshow"), { ssr: false }),
+  Articles: dynamic(() => import("./ui/editor/Articles"), { ssr: false }),
+  Hero: dynamic(() => import("./ui/editor/Hero"), { ssr: false }),
+  Heading: dynamic(() => import("./ui/editor/Heading"), { ssr: false }),
+  Text: dynamic(() => import("./ui/editor/Text"), { ssr: false }),
+  Features: dynamic(() => import("./ui/editor/Features"), { ssr: false }),
+  CallToAction: dynamic(() => import("./ui/editor/CallToAction"), { ssr: false }),
+  Testimonial: dynamic(() => import("./ui/editor/Testimonial"), { ssr: false }),
+  Pricing: dynamic(() => import("./ui/editor/Pricing"), { ssr: false }),
+  Image: dynamic(() => import("./ui/editor/Image"), { ssr: false }),
+  Spacer: dynamic(() => import("./ui/editor/Spacer"), { ssr: false }),
+  Divider: dynamic(() => import("./ui/editor/Divider"), { ssr: false }),
+  Footer: dynamic(() => import("./ui/editor/Footer"), { ssr: false }),
+  Newsletter: dynamic(() => import("./ui/editor/Newsletter").then(m => ({ default: m.Newsletter })), { ssr: false }),
+  Stats: dynamic(() => import("./ui/editor/Stats").then(m => ({ default: m.Stats })), { ssr: false }),
+  TeamMember: dynamic(() => import("./ui/editor/TeamMember").then(m => ({ default: m.TeamMember })), { ssr: false }),
+  Tabs: dynamic(() => import("./ui/editor/Tabs").then(m => ({ default: m.Tabs })), { ssr: false }),
+  Navbar: dynamic(() => import("./ui/editor/Navbar"), { ssr: false }),
+  Navbar2: dynamic(() => import("@/components/Builder/CustomBlocks/Navbar"), { ssr: false }),
+  SingleArticle: dynamic(() => import("@/components/Builder/CustomBlocks/SingleArticle").then(m => ({ default: m.SingleArticle })), { ssr: false }),
+  Badge: dynamic(() => import("@/components/Builder/CustomBlocks/Badge"), { ssr: false }),
+  Avatar: dynamic(() => import("@/components/Builder/CustomBlocks/Avatar"), { ssr: false }),
+  Input: dynamic(() => import("@/components/Builder/CustomBlocks/Input"), { ssr: false }),
+  Textarea: dynamic(() => import("@/components/Builder/CustomBlocks/Textarea"), { ssr: false }),
+  Select: dynamic(() => import("@/components/Builder/CustomBlocks/Select"), { ssr: false }),
+  Checkbox: dynamic(() => import("@/components/Builder/CustomBlocks/Checkbox"), { ssr: false }),
+  Switch: dynamic(() => import("@/components/Builder/CustomBlocks/Switch"), { ssr: false }),
+  Slider: dynamic(() => import("@/components/Builder/CustomBlocks/Slider"), { ssr: false }),
+  Progress: dynamic(() => import("@/components/Builder/CustomBlocks/Progress"), { ssr: false }),
+  Separator: dynamic(() => import("@/components/Builder/CustomBlocks/Separator"), { ssr: false }),
+  Skeleton: dynamic(() => import("@/components/Builder/CustomBlocks/Skeleton"), { ssr: false }),
+  Spinner: dynamic(() => import("@/components/Builder/CustomBlocks/Spinner"), { ssr: false }),
+  Table: dynamic(() => import("@/components/Builder/CustomBlocks/Table"), { ssr: false }),
+  Breadcrumb: dynamic(() => import("@/components/Builder/CustomBlocks/Breadcrumb"), { ssr: false }),
+  Kbd: dynamic(() => import("@/components/Builder/CustomBlocks/Kbd"), { ssr: false }),
+  Alert: dynamic(() => import("@/components/Builder/CustomBlocks/Alert").then(m => ({ default: m.Alert })), { ssr: false }),
+  Gallery: dynamic(() => import("@/components/Builder/CustomBlocks/Gallery"), { ssr: false }),
 }
+
 
 export function RenderNode({ node, isEditor = false, onSelect, isSelected = false, onContextMenu }: RenderNodeProps) {
   const Component = componentMap[node.type]
@@ -160,10 +152,13 @@ export function RenderNode({ node, isEditor = false, onSelect, isSelected = fals
           </div>
         }
       >
+
+        {/*  {...(node.props.style === undefined && node.style ? { style: node.style } : {})} */}
+        {/* This is for the style to be applied to the component (e.x Articles.tsx) */}
         <Component
           {...node.props}
           className={`${node.props.className || ""} ${node.className || ""}`}
-          style={node.style}
+          {...(node.props.style === undefined && node.style ? { style: node.style } : {})}
           onClick={handleClick}
           data-node-id={node.id}
           data-editor-mode={isEditor}

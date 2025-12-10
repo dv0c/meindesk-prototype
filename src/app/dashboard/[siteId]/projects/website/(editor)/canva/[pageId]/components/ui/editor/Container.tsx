@@ -15,7 +15,7 @@ export default function Container({ className, children, style, ...props }: Cont
   return (
     <div
       className={cn(
-        "rounded-lg border bg-card p-6 transition-all duration-200",
+        "bg-transparent p-6 transition-all duration-200",
         isEditorMode && !children && "min-h-[120px] flex items-center justify-center",
         className,
       )}

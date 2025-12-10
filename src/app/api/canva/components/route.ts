@@ -567,6 +567,18 @@ export async function GET() {
           label: "Articles limit",
           defaultValue: 10,
         },
+        {
+          name: "style",
+          type: "select",
+          label: "Layout Style",
+          defaultValue: "magazine",
+          options: [
+            { label: "Magazine", value: "magazine" },
+            { label: "Boxed", value: "boxed" },
+            { label: "Simple", value: "simple" },
+            { label: "Minimal", value: "minimal" },
+          ],
+        },
       ],
     },
 

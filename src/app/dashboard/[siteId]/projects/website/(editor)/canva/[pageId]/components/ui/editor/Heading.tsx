@@ -22,8 +22,7 @@ export default function Heading({
   ...props
 }: HeadingProps) {
   const Tag = level
-  const baseClass = `font-bold text-${align} ${
-    level === "h1"
+  const baseClass = `font-bold text-${align} ${level === "h1"
       ? "text-5xl"
       : level === "h2"
         ? "text-4xl"
@@ -34,7 +33,7 @@ export default function Heading({
             : level === "h5"
               ? "text-xl"
               : "text-lg"
-  }`
+    }`
 
   return (
     <Tag className={cn(baseClass, className)} style={{ ...(color ? { color } : {}), ...style }} {...props}>

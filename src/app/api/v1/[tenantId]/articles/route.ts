@@ -27,12 +27,6 @@ export async function GET(
             image: true,
           },
         },
-        site: {
-          select: {
-            id: true,
-            title: true,
-          },
-        },
       },
       orderBy: { createdAt: "desc" },
       take: limit, // here's your limit
