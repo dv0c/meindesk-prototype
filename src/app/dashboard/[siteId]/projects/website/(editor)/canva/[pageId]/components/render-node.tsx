@@ -64,7 +64,7 @@ const componentMap: Record<string, React.ComponentType<any>> = {
   Breadcrumb: dynamic(() => import("@/components/Builder/CustomBlocks/Breadcrumb")),
   Kbd: dynamic(() => import("@/components/Builder/CustomBlocks/Kbd")),
   Alert: dynamic(() => import("@/components/Builder/CustomBlocks/Alert").then((mod) => ({ default: mod.Alert }))),
-
+  Gallery: dynamic(() => import("@/components/Builder/CustomBlocks/Gallery")),
 
 }
 

@@ -63,7 +63,7 @@ export async function GET(
 // -------------------------------------------------------
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { articleId: string } }
+  { params }: { params: { articleId: string; siteId: string } }
 ) {
   try {
     const session = await getAuthSession();
@@ -97,6 +97,7 @@ export async function PATCH(
       const existing = await db.article.findFirst({
         where: {
           slug: updateData.slug,
+          siteId: params.siteId,
           NOT: { id: articleId }, // exclude current article
         },
       });

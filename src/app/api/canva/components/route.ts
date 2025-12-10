@@ -655,6 +655,23 @@ export async function GET() {
         },
       ],
     },
+    {
+      name: "Gallery",
+      category: "",
+      allowChildren: false,
+      props: [
+        {
+          name: "items",
+          type: "image",
+          label: "Gallery Items",
+          // Note: In a real editor, this 'array' type would usually link to
+          // a sub-editor or collection management interface.
+        },
+        // Note: The 'renderItem' prop is a render function and typically wouldn't be
+        // exposed as a simple property in a JSON/visual editor like this.
+        // The editor assumes a default item rendering template.
+      ],
+    },
   ];
 
   return NextResponse.json(components);

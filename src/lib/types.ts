@@ -44,7 +44,7 @@ export interface ComponentDefinition {
 
 export interface PropDefinition {
   name: string;
-  type: "string" | "number" | "boolean" | "select" | "color" | "url" | "json";
+  type: "string" | "number" | "boolean" | "select" | "color" | "url" | "json" | "media" | "image";
   label: string;
   schema?: any;
   defaultValue?: any;

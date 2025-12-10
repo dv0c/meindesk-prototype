@@ -206,7 +206,7 @@ model Article {
   siteId String @db.ObjectId
 
   title String
-  slug  String @unique @default(uuid())
+  slug  String @default(uuid())
 
   excerpt String?
   content Json?
@@ -231,6 +231,7 @@ model Article {
   metadata Json?
 
   @@index([slug, id])
+  @@unique([slug, siteId])
 }
 
 enum ArticleStatus {

@@ -8,13 +8,17 @@ export const runtime = "nodejs";
 // -------------------------------------------------------
 export async function GET(
   req: NextRequest,
-  { params }: { params: { articleId: string } }
+  { params }: { params: { tenantId: string; articleId: string } }
 ) {
   try {
-    const { articleId } = await params;
-
-    const article = await db.article.findUnique({
-      where: { slug: articleId, status: "PUBLISHED" },
+    const { articleId, tenantId } = await params;
+    // Assuming tenantId is the siteId (based on other v1 routes)
+    const article = await db.article.findFirst({
+      where: { 
+        slug: articleId, 
+        siteId: tenantId,
+        status: "PUBLISHED" 
+      },
       include: {
         author: {
           select: { id: true, name: true, email: true, image: true },
