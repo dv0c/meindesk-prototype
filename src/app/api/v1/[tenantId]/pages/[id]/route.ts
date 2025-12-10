@@ -55,7 +55,7 @@ export async function GET(
 
     // Fallback: if not found, search by slug
     if (!page) {
-      page = await db.page.findUnique({ where: { slug: id } });
+      page = await db.page.findFirst({ where: { slug: id } });
     }
 
     if (!page) {

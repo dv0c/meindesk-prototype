@@ -13,21 +13,46 @@ export async function GET(
   try {
     const { articleId, tenantId } = await params;
     // Assuming tenantId is the siteId (based on other v1 routes)
-    const article = await db.article.findFirst({
-      where: { 
-        slug: articleId, 
-        siteId: tenantId,
-        status: "PUBLISHED" 
-      },
-      include: {
-        author: {
-          select: { id: true, name: true, email: true, image: true },
+    // Check if articleId looks like a valid MongoDB ObjectId
+    const isObjectId = /^[0-9a-fA-F]{24}$/.test(articleId);
+    
+    let article;
+
+    if (isObjectId) {
+      article = await db.article.findFirst({
+        where: { 
+          id: articleId, 
+          siteId: tenantId, 
+          // status: "PUBLISHED" // temporarily allow all statuses
         },
-        site: {
-          select: { id: true, title: true },
+        include: {
+          author: {
+            select: { id: true, name: true, email: true, image: true },
+          },
+          site: {
+            select: { id: true, title: true },
+          },
         },
-      },
-    });
+      });
+    }
+
+    if (!article) {
+      article = await db.article.findFirst({
+        where: { 
+          slug: articleId, 
+          siteId: tenantId,
+          // status: "PUBLISHED" 
+        },
+        include: {
+          author: {
+            select: { id: true, name: true, email: true, image: true },
+          },
+          site: {
+            select: { id: true, title: true },
+          },
+        },
+      });
+    }
 
     if (!article) {
       return NextResponse.json({ error: "Article not found" }, { status: 404 });

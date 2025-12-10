@@ -20,15 +20,15 @@ export default async function TenantPage({
   if (!tenant) notFound()
 
   // 2. Get the specific page under that tenant
-//   const pageRecord = await db.page.findFirst({
-//     where: { slug, siteId: tenantId },
-//     select: { id: true },
-//   })
-//   if (!pageRecord) notFound()
+  //   const pageRecord = await db.page.findFirst({
+  //     where: { slug, siteId: tenantId },
+  //     select: { id: true },
+  //   })
+  //   if (!pageRecord) notFound()
 
   // 3. Fetch through API for consistent rendering logic
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
-  const response = await fetch(`${baseUrl}/api/v1/${tenant.id}/pages/692428924c306f1412b5014c`, {
+  const response = await fetch(`${baseUrl}/api/v1/${tenant.id}/pages/6939c71a369bc5884631bf49`, {
     cache: "no-store",
   })
 
