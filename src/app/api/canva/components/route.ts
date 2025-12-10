@@ -695,6 +695,17 @@ export async function GET() {
           ],
         },
         {
+          name: "logoAlignment",
+          type: "select",
+          label: "Logo Position",
+          defaultValue: "left",
+          options: [
+            { label: "Left", value: "left" },
+            { label: "Center", value: "center" },
+            { label: "Right", value: "right" },
+          ],
+        },
+        {
           name: "logoText",
           type: "string",
           label: "Logo Text",

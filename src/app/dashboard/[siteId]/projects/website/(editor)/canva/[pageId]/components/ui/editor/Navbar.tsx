@@ -16,6 +16,7 @@ export interface NavbarProps {
   logoText?: string
   logoSizeWidth?: string
   logoSizeHeight?: string
+  logoAlignment?: "left" | "center" | "right"
   // Granular Margin
   logoMarginTop?: string
   logoMarginRight?: string
@@ -40,6 +41,7 @@ export default function Navbar({
   logoText = "Website Name",
   logoSizeWidth = "auto",
   logoSizeHeight = "32px",
+  logoAlignment = "left",
   // Default all granular props to "0px" or "auto" as needed, usually 0 for spacing
   logoMarginTop = "0px",
   logoMarginRight = "0px",
@@ -120,62 +122,73 @@ export default function Navbar({
         style={navStyle}
       >
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center justify-between h-20">
-            {/* Logo */}
-            {/* Logo */}
-            <Logo />
+          <div className="flex items-center h-20">
+            {/* Left Column */}
+            <div className="flex-1 flex justify-start items-center">
+              {logoAlignment === "left" && <Logo />}
+            </div>
 
-            {/* Center Links - Desktop */}
-            <div className="hidden lg:flex items-center space-x-8 absolute left-1/2 -translate-x-1/2">
-              {links.slice(0, -1).map((item, idx) => (
-                <div key={idx} className="relative group">
-                  {item.submenu ? (
-                    <>
-                      <button
-                        className="transition-colors font-medium flex items-center gap-1 hover:text-[var(--accent-color)]"
+            {/* Center Column */}
+            <div className="flex shrink-0 items-center gap-8">
+              {logoAlignment === "center" && <Logo />}
+
+              {/* Desktop Links - Now static flex items */}
+              <div className="hidden lg:flex items-center space-x-8">
+                {links.slice(0, -1).map((item, idx) => (
+                  <div key={idx} className="relative group">
+                    {item.submenu ? (
+                      <>
+                        <button
+                          className="transition-colors font-medium flex items-center gap-1 hover:text-[var(--accent-color)]"
+                          style={accentStyle}
+                        >
+                          {item.label}
+                          <ChevronDown size={16} />
+                        </button>
+                        <div className={`absolute top-full left-0 mt-2 ${dropdownBridge} bg-white dark:bg-gray-800 shadow-xl rounded-lg py-2 min-w-[200px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all pointer-events-none group-hover:pointer-events-auto border dark:border-gray-700 z-50`}>
+                          {item.submenu.map((sub, subIdx) => (
+                            <Link key={subIdx} href={sub.href} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm">
+                              {sub.label}
+                            </Link>
+                          ))}
+                        </div>
+                      </>
+                    ) : (
+                      <Link
+                        href={item.href}
+                        className="transition-colors font-medium hover:text-[var(--accent-color)]"
                         style={accentStyle}
                       >
                         {item.label}
-                        <ChevronDown size={16} />
-                      </button>
-                      <div className={`absolute top-full left-0 mt-2 ${dropdownBridge} bg-white dark:bg-gray-800 shadow-xl rounded-lg py-2 min-w-[200px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all pointer-events-none group-hover:pointer-events-auto border dark:border-gray-700`}>
-                        {item.submenu.map((sub, subIdx) => (
-                          <Link key={subIdx} href={sub.href} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm">
-                            {sub.label}
-                          </Link>
-                        ))}
-                      </div>
-                    </>
-                  ) : (
-                    <Link
-                      href={item.href}
-                      className="transition-colors font-medium hover:text-[var(--accent-color)]"
-                      style={accentStyle}
-                    >
-                      {item.label}
-                    </Link>
-                  )}
-                </div>
-              ))}
+                      </Link>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* CTA Button */}
-            <div className="hidden lg:flex items-center gap-4">
-              {links.length > 0 && links[links.length - 1] && (
-                <Link
-                  href={links[links.length - 1].href}
-                  className="px-6 py-2.5 rounded-full font-semibold transition-all hover:scale-105 text-white"
-                  style={{ backgroundColor: accentColor }}
-                >
-                  {links[links.length - 1].label}
-                </Link>
-              )}
-            </div>
+            {/* Right Column */}
+            <div className="flex-1 flex justify-end items-center gap-4">
+              {logoAlignment === "right" && <Logo />}
 
-            {/* Mobile Menu Button */}
-            <button onClick={() => setMobileOpen(!mobileOpen)} className="lg:hidden">
-              {mobileOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+              {/* CTA Button */}
+              <div className="hidden lg:flex items-center">
+                {links.length > 0 && links[links.length - 1] && (
+                  <Link
+                    href={links[links.length - 1].href}
+                    className="px-6 py-2.5 rounded-full font-semibold transition-all hover:scale-105 text-white"
+                    style={{ backgroundColor: accentColor }}
+                  >
+                    {links[links.length - 1].label}
+                  </Link>
+                )}
+              </div>
+
+              {/* Mobile Menu Button */}
+              <button onClick={() => setMobileOpen(!mobileOpen)} className="lg:hidden">
+                {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
           </div>
         </div>
 
