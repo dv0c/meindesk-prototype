@@ -308,7 +308,7 @@ export async function GET() {
       props: [
         {
           name: "src",
-          type: "string",
+          type: "image",
           label: "Image URL",
           defaultValue: "/placeholder.svg?height=400&width=600",
         },

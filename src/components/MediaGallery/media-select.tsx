@@ -22,7 +22,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { UploadCloud, ImageIcon, Search, Trash2, Check } from "lucide-react"
 import { CldUploadButton } from "next-cloudinary"
 
-interface MediaItem {
+export interface MediaItem {
   id: string
   url: string
   alt?: string

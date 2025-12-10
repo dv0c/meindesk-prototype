@@ -5,6 +5,7 @@ import { useParams } from "next/navigation"
 import NextImage from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -39,7 +40,11 @@ import { formatTimeLeft } from "@/lib/utils"
 import type { Media } from "@/types/media-gallery"
 import { ScrollArea } from "../ui/scroll-area"
 
-export function MediaGalleryClient() {
+interface MediaGalleryClientProps {
+  onSelect?: (url: string) => void
+}
+
+export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
   const params = useParams()
   const siteId = params.siteId as string
 
@@ -244,8 +249,8 @@ export function MediaGalleryClient() {
           uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "esiln4yu"}
         >
           <Button disabled={isUploading}>
-              {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UploadCloud className="mr-2 h-4 w-4" />}
-              Upload Images
+            {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UploadCloud className="mr-2 h-4 w-4" />}
+            Upload Images
           </Button>
         </CldUploadButton>
       </div>
@@ -294,7 +299,10 @@ export function MediaGalleryClient() {
               {filteredItems.map((item) => (
                 <Card key={item.public_id} className="group p-0 overflow-hidden">
                   <CardContent className="p-0">
-                    <div className="relative aspect-square">
+                    <div
+                      className={cn("relative aspect-square", onSelect && "cursor-pointer")}
+                      onClick={() => onSelect && onSelect(item.url)}
+                    >
                       <NextImage
                         src={item.url}
                         alt={item.alt || item.name || "Image"}
@@ -302,41 +310,43 @@ export function MediaGalleryClient() {
                         className="object-cover transition-transform "
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="secondary" size="icon" className="h-8 w-8">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => window.open(item.url, "_blank")}>
-                              <Eye className="mr-2 h-4 w-4" />
-                              View
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => copyToClipboard(item.url)}>
-                              <Copy className="mr-2 h-4 w-4" />
-                              Copy URL
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => downloadImage(item.url, item.name || "image")}>
-                              <Download className="mr-2 h-4 w-4" />
-                              Download
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => handleDeleteClick(item)}
-                              className="text-destructive"
-                              disabled={isDeleting === item.public_id}
-                            >
-                              {isDeleting === item.public_id ? (
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              ) : (
-                                <Trash2 className="mr-2 h-4 w-4" />
-                              )}
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
+                      {!onSelect && (
+                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="secondary" size="icon" className="h-8 w-8">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); window.open(item.url, "_blank") }}>
+                                <Eye className="mr-2 h-4 w-4" />
+                                View
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); copyToClipboard(item.url) }}>
+                                <Copy className="mr-2 h-4 w-4" />
+                                Copy URL
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); downloadImage(item.url, item.name || "image") }}>
+                                <Download className="mr-2 h-4 w-4" />
+                                Download
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={(e) => { e.stopPropagation(); handleDeleteClick(item) }}
+                                className="text-destructive"
+                                disabled={isDeleting === item.public_id}
+                              >
+                                {isDeleting === item.public_id ? (
+                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                ) : (
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                )}
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      )}
                     </div>
                     <div className="p-3">
                       <p className="text-sm font-medium truncate" title={item.name || item.public_id}>
