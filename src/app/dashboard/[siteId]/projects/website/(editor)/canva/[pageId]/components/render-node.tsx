@@ -130,7 +130,7 @@ export function RenderNode({ node, isEditor = false, onSelect, isSelected = fals
         />
       ))
     ) : (
-      <SortableContext items={node.children?.map((child) => child.id)} strategy={verticalListSortingStrategy}>
+      <SortableContext items={node.children?.map((child) => child.id) ?? []} strategy={verticalListSortingStrategy}>
         {node.children?.map((child) => (
           <RenderNode
             key={child.id}

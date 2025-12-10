@@ -3,9 +3,7 @@ import type { ComponentDefinition } from "@/lib/types";
 
 export async function GET() {
   const components: ComponentDefinition[] = [
-    // ========================
-    // MAIN FILE COMPONENTS
-    // ========================
+    // Layout Components
     {
       name: "Container",
       category: "layout",
@@ -16,37 +14,6 @@ export async function GET() {
           type: "string",
           label: "CSS Classes",
           defaultValue: "p-4",
-        },
-      ],
-    },
-    {
-      name: "Button",
-      category: "basic",
-      allowChildren: false,
-      props: [
-        {
-          name: "text",
-          type: "string",
-          label: "Button Text",
-          defaultValue: "Click me",
-        },
-        {
-          name: "variant",
-          type: "select",
-          label: "Variant",
-          defaultValue: "default",
-          options: [
-            { label: "Default", value: "default" },
-            { label: "Secondary", value: "secondary" },
-            { label: "Outline", value: "outline" },
-            { label: "Destructive", value: "destructive" },
-          ],
-        },
-        {
-          name: "href",
-          type: "string",
-          label: "Link URL",
-          defaultValue: "#",
         },
       ],
     },
@@ -72,6 +39,26 @@ export async function GET() {
         },
       ],
     },
+    // {
+    //   name: "HtmlContainer",
+    //   category: "layout",
+    //   allowChildren: true,
+    //   props: [
+    //     { name: "tag", type: "string", label: "HTML Tag", defaultValue: "div" },
+    //     {
+    //       name: "className",
+    //       type: "string",
+    //       label: "CSS Classes",
+    //       defaultValue: "",
+    //     },
+    //     {
+    //       name: "styles",
+    //       type: "string",
+    //       label: "Custom Styles (CSS)",
+    //       defaultValue: "",
+    //     },
+    //   ],
+    // },
     {
       name: "Hero",
       category: "layout",
@@ -204,6 +191,8 @@ export async function GET() {
         },
       ],
     },
+
+    // Basic Components
     {
       name: "Heading",
       category: "basic",
@@ -281,106 +270,283 @@ export async function GET() {
         },
       ],
     },
-
     {
-      name: "Accordion",
-      category: "content",
+      name: "Button",
+      category: "basic",
       allowChildren: false,
       props: [
         {
-          name: "items",
+          name: "text",
           type: "string",
-          label: "Items (JSON)",
-          defaultValue: JSON.stringify([
-            {
-              title: "Is it accessible?",
-              content: "Yes. It adheres to the WAI-ARIA design pattern.",
-            },
-            {
-              title: "Is it styled?",
-              content: "Yes. It comes with default styles.",
-            },
-          ]),
+          label: "Button Text",
+          defaultValue: "Click me",
+        },
+        {
+          name: "variant",
+          type: "select",
+          label: "Variant",
+          defaultValue: "default",
+          options: [
+            { label: "Default", value: "default" },
+            { label: "Secondary", value: "secondary" },
+            { label: "Outline", value: "outline" },
+            { label: "Destructive", value: "destructive" },
+          ],
+        },
+        {
+          name: "href",
+          type: "string",
+          label: "Link URL",
+          defaultValue: "#",
         },
       ],
     },
     {
-      name: "Card",
+      name: "Image",
+      category: "basic",
+      allowChildren: false,
+      props: [
+        {
+          name: "src",
+          type: "string",
+          label: "Image URL",
+          defaultValue: "/placeholder.svg?height=400&width=600",
+        },
+        {
+          name: "alt",
+          type: "string",
+          label: "Alt Text",
+          defaultValue: "Image",
+        },
+        { name: "width", type: "string", label: "Width", defaultValue: "100%" },
+        {
+          name: "height",
+          type: "string",
+          label: "Height",
+          defaultValue: "auto",
+        },
+        {
+          name: "rounded",
+          type: "boolean",
+          label: "Rounded",
+          defaultValue: false,
+        },
+      ],
+    },
+    {
+      name: "Spacer",
+      category: "basic",
+      allowChildren: false,
+      props: [
+        {
+          name: "height",
+          type: "number",
+          label: "Height (px)",
+          defaultValue: 40,
+        },
+      ],
+    },
+    {
+      name: "Divider",
+      category: "basic",
+      allowChildren: false,
+      props: [
+        {
+          name: "spacing",
+          type: "number",
+          label: "Spacing (px)",
+          defaultValue: 20,
+        },
+      ],
+    },
+
+    // Content Components
+    {
+      name: "Testimonial",
       category: "content",
-      allowChildren: true,
+      allowChildren: false,
+      props: [
+        {
+          name: "quote",
+          type: "string",
+          label: "Quote",
+          defaultValue:
+            "This product has completely transformed how we work. Highly recommended!",
+        },
+        {
+          name: "author",
+          type: "string",
+          label: "Author",
+          defaultValue: "John Doe",
+        },
+        {
+          name: "role",
+          type: "string",
+          label: "Role",
+          defaultValue: "CEO, Company Inc.",
+        },
+        {
+          name: "avatarUrl",
+          type: "string",
+          label: "Avatar URL",
+          defaultValue: "",
+        },
+      ],
+    },
+    {
+      name: "Pricing",
+      category: "content",
+      allowChildren: false,
       props: [
         {
           name: "title",
           type: "string",
-          label: "Title",
-          defaultValue: "Card Title",
+          label: "Plan Title",
+          defaultValue: "Pro Plan",
+        },
+        { name: "price", type: "string", label: "Price", defaultValue: "$29" },
+        {
+          name: "period",
+          type: "string",
+          label: "Period",
+          defaultValue: "per month",
         },
         {
           name: "description",
           type: "string",
           label: "Description",
-          defaultValue: "Card description",
+          defaultValue: "Perfect for growing businesses",
+        },
+        {
+          name: "buttonText",
+          type: "string",
+          label: "Button Text",
+          defaultValue: "Get Started",
         },
       ],
     },
     {
-      name: "Alert",
-      category: "content",
+      name: "Newsletter",
+      category: "conversion",
       allowChildren: false,
       props: [
-        {
-          name: "type",
-          type: "select",
-          label: "Type",
-          defaultValue: "info",
-          options: [
-            { label: "Info", value: "info" },
-            { label: "Success", value: "success" },
-            { label: "Warning", value: "warning" },
-            { label: "Error", value: "error" },
-          ],
-        },
         {
           name: "title",
           type: "string",
           label: "Title",
-          defaultValue: "Alert Title",
+          defaultValue: "Subscribe to our Newsletter",
         },
         {
-          name: "message",
+          name: "description",
           type: "string",
-          label: "Message",
-          defaultValue: "This is an alert",
+          label: "Description",
+          defaultValue: "Get the latest updates delivered to your inbox.",
+        },
+        {
+          name: "placeholder",
+          type: "string",
+          label: "Placeholder",
+          defaultValue: "Enter your email",
+        },
+        {
+          name: "buttonText",
+          type: "string",
+          label: "Button Text",
+          defaultValue: "Subscribe",
         },
       ],
     },
     {
-      name: "Timeline",
+      name: "ContactForm",
+      category: "conversion",
+      allowChildren: false,
+      props: [
+        {
+          name: "title",
+          type: "string",
+          label: "Title",
+          defaultValue: "Contact Us",
+        },
+        {
+          name: "submitText",
+          type: "string",
+          label: "Submit Button Text",
+          defaultValue: "Send Message",
+        },
+      ],
+    },
+    {
+      name: "TeamMember",
       category: "content",
       allowChildren: false,
       props: [
         {
-          name: "items",
+          name: "name",
           type: "string",
-          label: "Timeline Items (JSON)",
-          defaultValue: JSON.stringify([
-            {
-              title: "Started",
-              description: "Founded the company",
-              date: "2020",
-            },
-            {
-              title: "First Launch",
-              description: "Launched our first product",
-              date: "2021",
-            },
-          ]),
+          label: "Name",
+          defaultValue: "John Doe",
+        },
+        {
+          name: "role",
+          type: "string",
+          label: "Role",
+          defaultValue: "Co-founder & CEO",
+        },
+        {
+          name: "bio",
+          type: "string",
+          label: "Bio",
+          defaultValue: "Passionate about building great products",
+        },
+        {
+          name: "image",
+          type: "string",
+          label: "Image URL",
+          defaultValue: "/placeholder.svg?height=400&width=400",
+        },
+      ],
+    },
+    {
+      name: "Stats",
+      category: "content",
+      allowChildren: false,
+      props: [
+        {
+          name: "stats",
+          type: "json",
+          label: "Stats",
+          schema: [
+            { key: "label", label: "Label", type: "string" },
+            { key: "value", label: "Value", type: "string" },
+          ],
+          defaultValue: [
+            { label: "Happy Customers", value: "10K+" },
+            { label: "Projects Completed", value: "500+" },
+          ],
+        },
+      ],
+    },
+    {
+      name: "Tabs",
+      category: "content",
+      allowChildren: true,
+      props: [
+        {
+          name: "tabs",
+          type: "json",
+          label: "Tabs",
+          schema: [{ key: "label", label: "Label", type: "string" }],
+          defaultValue: [
+            { label: "Tab 1" },
+            { label: "Tab 2" },
+            { label: "Tab 3" },
+          ],
         },
       ],
     },
     {
       name: "Articles",
-      category: "content",
+      category: "Articles",
       allowChildren: false,
       props: [
         {
@@ -389,11 +555,284 @@ export async function GET() {
           label: "Section Title",
           defaultValue: "Latest Articles",
         },
+        {
+          name: "thumbnail",
+          type: "boolean",
+          label: "Thumbnail",
+          defaultValue: false,
+        },
+        {
+          name: "limit",
+          type: "number",
+          label: "Articles limit",
+          defaultValue: 10,
+        },
+      ],
+    },
+
+    // Media Components
+    {
+      name: "Slideshow",
+      category: "media",
+      allowChildren: true, // Enable children for component-based slides
+      props: [
+        {
+          name: "autoplay",
+          type: "boolean",
+          label: "Autoplay",
+          defaultValue: true,
+        },
+        {
+          name: "interval",
+          type: "number",
+          label: "Interval (ms)",
+          defaultValue: 3000,
+        },
+        {
+          name: "currIndex",
+          type: "number",
+          label: "Current Index",
+          defaultValue: 0,
+        },
+      ],
+    },
+    {
+      name: "Navbar",
+      category: "navigation",
+      allowChildren: false,
+      props: [
+        {
+          name: "logoText",
+          type: "string",
+          label: "Logo Text",
+          defaultValue: "Sophia Platanisioti",
+        },
+        {
+          name: "align",
+          type: "select",
+          label: "Menu Alignment",
+          options: [
+            { label: "Left", value: "left" },
+            { label: "Center", value: "center" },
+            { label: "Right", value: "right" },
+          ],
+          defaultValue: "right",
+        },
+        {
+          name: "sticky",
+          type: "boolean",
+          label: "Sticky Header",
+          defaultValue: true,
+        },
+        {
+          name: "darkMode",
+          type: "boolean",
+          label: "Dark Mode",
+          defaultValue: false,
+        },
+        {
+          name: "links",
+          type: "json",
+          label: "Navigation Links",
+          schema: [
+            { key: "label", label: "Label", type: "string" },
+            { key: "href", label: "URL", type: "string" },
+            {
+              key: "submenu",
+              label: "Submenu",
+              type: "json",
+              // Keep it editable as plain JSON to bypass your builder’s depth limit
+              schema: [
+                { key: "label", label: "Label", type: "string" },
+                { key: "href", label: "URL", type: "string" },
+              ],
+            },
+          ],
+          defaultValue: [
+            { label: "ΑΡΧΙΚΗ", href: "/" },
+            { label: "ΥΠΗΡΕΣΙΕΣ", href: "/services" },
+            { label: "ΒΙΟΓΡΑΦΙΚΟ", href: "/bio" },
+            {
+              label: "ΑΡΘΡΑ",
+              href: "/articles",
+              submenu: [
+                {
+                  label: "Παιδιά και Έφηβοι",
+                  href: "/articles/paidia-kai-efivoi",
+                },
+                { label: "Όλα τα Άρθρα", href: "/articles" },
+              ],
+            },
+            { label: "ΟΜΑΔΕΣ", href: "/groups" },
+            { label: "ΕΚΔΗΛΩΣΕΙΣ", href: "/events" },
+            { label: "ΕΠΙΚΟΙΝΩΝΙΑ", href: "/contact" },
+          ],
+        },
+      ],
+    },
+    {
+      name: "Navbar2",
+      category: "navigation",
+      allowChildren: false,
+      props: [
+        {
+          name: "logoText",
+          type: "string",
+          label: "Logo Text",
+          defaultValue: "Sophia Platanisioti",
+        },
+        {
+          name: "align",
+          type: "select",
+          label: "Menu Alignment",
+          options: [
+            { label: "Left", value: "left" },
+            { label: "Center", value: "center" },
+            { label: "Right", value: "right" },
+          ],
+          defaultValue: "right",
+        },
+        {
+          name: "sticky",
+          type: "boolean",
+          label: "Sticky Header",
+          defaultValue: true,
+        },
+        {
+          name: "darkMode",
+          type: "boolean",
+          label: "Dark Mode",
+          defaultValue: false,
+        },
+        {
+          name: "links",
+          type: "json",
+          label: "Navigation Links",
+          schema: [
+            { key: "label", label: "Label", type: "string" },
+            { key: "href", label: "URL", type: "string" },
+            {
+              key: "submenu",
+              label: "Submenu",
+              type: "json",
+              // Keep it editable as plain JSON to bypass your builder’s depth limit
+              schema: [
+                { key: "label", label: "Label", type: "string" },
+                { key: "href", label: "URL", type: "string" },
+              ],
+            },
+          ],
+          defaultValue: [
+            { label: "ΑΡΧΙΚΗ", href: "/" },
+            { label: "ΥΠΗΡΕΣΙΕΣ", href: "/services" },
+            { label: "ΒΙΟΓΡΑΦΙΚΟ", href: "/bio" },
+            {
+              label: "ΑΡΘΡΑ",
+              href: "/articles",
+              submenu: [
+                {
+                  label: "Παιδιά και Έφηβοι",
+                  href: "/articles/paidia-kai-efivoi",
+                },
+                { label: "Όλα τα Άρθρα", href: "/articles" },
+              ],
+            },
+            { label: "ΟΜΑΔΕΣ", href: "/groups" },
+            { label: "ΕΚΔΗΛΩΣΕΙΣ", href: "/events" },
+            { label: "ΕΠΙΚΟΙΝΩΝΙΑ", href: "/contact" },
+          ],
+        },
       ],
     },
     {
       name: "SingleArticle",
-      category: "content",
+      category: "Templates",
+      allowChildren: true,
+      props: [
+        {
+          name: "showCover",
+          type: "boolean",
+          label: "Show Cover Image",
+          defaultValue: true,
+        },
+        {
+          name: "coverHeight",
+          type: "string",
+          label: "Cover Height",
+          defaultValue: "400px",
+        },
+        {
+          name: "backgroundColor",
+          type: "color",
+          label: "Background Color",
+        },
+        {
+          name: "titleTag",
+          type: "select",
+          label: "Title Tag",
+          defaultValue: "h1",
+          options: [
+            { label: "H1", value: "h1" },
+            { label: "H2", value: "h2" },
+            { label: "H3", value: "h3" },
+          ],
+        },
+        {
+          name: "showExcerpt",
+          type: "boolean",
+          label: "Show Excerpt",
+          defaultValue: true,
+        },
+        {
+          name: "showCategories",
+          type: "boolean",
+          label: "Show Categories",
+          defaultValue: true,
+        },
+        {
+          name: "showMetadata",
+          type: "boolean",
+          label: "Show Metadata",
+          defaultValue: true,
+        },
+        {
+          name: "contentFallback",
+          type: "select",
+          label: "Fallback Content",
+          defaultValue: "json",
+          options: [
+            { label: "JSON", value: "json" },
+            { label: "Nothing", value: "none" },
+          ],
+        },
+        {
+          name: "padding",
+          type: "string",
+          label: "Container Padding",
+          defaultValue: "16px",
+        },
+        {
+          name: "contentPadding",
+          type: "string",
+          label: "Content Padding",
+          defaultValue: "0px",
+        },
+        {
+          name: "align",
+          type: "select",
+          label: "Content Alignment",
+          defaultValue: "left",
+          options: [
+            { label: "Left", value: "left" },
+            { label: "Center", value: "center" },
+            { label: "Right", value: "right" },
+          ],
+        },
+      ],
+    },
+    {
+      name: "SingleArticle2",
+      category: "Templates",
       allowChildren: false,
       props: [
         {
@@ -410,7 +849,7 @@ export async function GET() {
         },
         {
           name: "categoryColor",
-          type: "string",
+          type: "color",
           label: "Category Color",
           defaultValue: "#d32f2f",
         },
@@ -420,256 +859,78 @@ export async function GET() {
           label: "Article Title",
           defaultValue: "Article Title",
         },
-      ],
-    },
-    {
-      name: "Input",
-      category: "forms",
-      allowChildren: false,
-      props: [
-        { name: "label", type: "string", label: "Label", defaultValue: "" },
         {
-          name: "placeholder",
+          name: "subtitle",
           type: "string",
-          label: "Placeholder",
-          defaultValue: "Enter text...",
+          label: "Subtitle",
+          defaultValue: "",
         },
-        { name: "type", type: "string", label: "Type", defaultValue: "text" },
-      ],
-    },
-    {
-      name: "Textarea",
-      category: "forms",
-      allowChildren: false,
-      props: [
-        { name: "label", type: "string", label: "Label", defaultValue: "" },
         {
-          name: "placeholder",
+          name: "publishDate",
           type: "string",
-          label: "Placeholder",
-          defaultValue: "Enter text...",
+          label: "Publish Date",
+          defaultValue: "24/11/2025 14:30",
         },
-        { name: "rows", type: "number", label: "Rows", defaultValue: 4 },
-      ],
-    },
-    {
-      name: "Select",
-      category: "forms",
-      allowChildren: false,
-      props: [
-        { name: "label", type: "string", label: "Label", defaultValue: "" },
         {
-          name: "placeholder",
+          name: "author",
           type: "string",
-          label: "Placeholder",
-          defaultValue: "Select an option",
+          label: "Author",
+          defaultValue: "Naftemporiki.gr",
         },
         {
-          name: "options",
+          name: "readTime",
           type: "string",
-          label: "Options (comma-separated)",
-          defaultValue: "Option 1,Option 2,Option 3",
+          label: "Read Time",
+          defaultValue: "3 λεπτά ανάγνωση",
         },
-      ],
-    },
-    {
-      name: "Checkbox",
-      category: "forms",
-      allowChildren: false,
-      props: [
         {
-          name: "label",
+          name: "mainImage",
           type: "string",
-          label: "Label",
-          defaultValue: "Checkbox",
+          label: "Main Image URL",
+          defaultValue: "/placeholder.svg?height=600&width=1200",
         },
         {
-          name: "checked",
-          type: "boolean",
-          label: "Checked",
-          defaultValue: false,
-        },
-      ],
-    },
-    {
-      name: "Switch",
-      category: "forms",
-      allowChildren: false,
-      props: [
-        {
-          name: "label",
+          name: "mainImageCredit",
           type: "string",
-          label: "Label",
-          defaultValue: "Switch",
+          label: "Image Credit",
+          defaultValue: "Φωτογραφία: Reuters",
         },
         {
-          name: "checked",
-          type: "boolean",
-          label: "Checked",
-          defaultValue: false,
-        },
-      ],
-    },
-    {
-      name: "Slider",
-      category: "forms",
-      allowChildren: false,
-      props: [
-        { name: "label", type: "string", label: "Label", defaultValue: "" },
-        { name: "min", type: "number", label: "Min", defaultValue: 0 },
-        { name: "max", type: "number", label: "Max", defaultValue: 100 },
-        { name: "step", type: "number", label: "Step", defaultValue: 1 },
-        {
-          name: "defaultValue",
-          type: "number",
-          label: "Default Value",
-          defaultValue: 50,
-        },
-      ],
-    },
-    {
-      name: "Badge",
-      category: "ui",
-      allowChildren: true,
-      props: [
-        { name: "text", type: "string", label: "Text", defaultValue: "Badge" },
-        {
-          name: "variant",
-          type: "select",
-          label: "Variant",
-          defaultValue: "default",
-          options: [
-            { label: "Default", value: "default" },
-            { label: "Secondary", value: "secondary" },
-            { label: "Destructive", value: "destructive" },
-            { label: "Outline", value: "outline" },
-          ],
-        },
-      ],
-    },
-    {
-      name: "Avatar",
-      category: "ui",
-      allowChildren: false,
-      props: [
-        { name: "src", type: "string", label: "Image URL", defaultValue: "" },
-        {
-          name: "alt",
-          type: "string",
-          label: "Alt Text",
-          defaultValue: "Avatar",
+          name: "accentColor",
+          type: "color",
+          label: "Accent Color",
+          defaultValue: "#d32f2f",
         },
         {
-          name: "fallback",
-          type: "string",
-          label: "Fallback Text",
-          defaultValue: "U",
+          name: "backgroundColor",
+          type: "color",
+          label: "Background Color",
+          defaultValue: "#ffffff",
         },
-      ],
-    },
-    {
-      name: "Progress",
-      category: "ui",
-      allowChildren: false,
-      props: [
         {
-          name: "value",
-          type: "number",
-          label: "Value (0-100)",
-          defaultValue: 50,
+          name: "textColor",
+          type: "color",
+          label: "Text Color",
+          defaultValue: "#212121",
         },
-      ],
-    },
-    {
-      name: "Separator",
-      category: "ui",
-      allowChildren: false,
-      props: [
         {
-          name: "orientation",
-          type: "select",
-          label: "Orientation",
-          defaultValue: "horizontal",
-          options: [
-            { label: "Horizontal", value: "horizontal" },
-            { label: "Vertical", value: "vertical" },
-          ],
+          name: "linkColor",
+          type: "color",
+          label: "Link Color",
+          defaultValue: "#1976d2",
         },
-      ],
-    },
-    {
-      name: "Skeleton",
-      category: "ui",
-      allowChildren: false,
-      props: [
-        { name: "width", type: "string", label: "Width", defaultValue: "100%" },
         {
-          name: "height",
-          type: "string",
-          label: "Height",
-          defaultValue: "20px",
+          name: "borderColor",
+          type: "color",
+          label: "Border Color",
+          defaultValue: "#e0e0e0",
         },
-      ],
-    },
-    {
-      name: "Spinner",
-      category: "ui",
-      allowChildren: false,
-      props: [
         {
-          name: "size",
-          type: "select",
-          label: "Size",
-          defaultValue: "md",
-          options: [
-            { label: "Small", value: "sm" },
-            { label: "Medium", value: "md" },
-            { label: "Large", value: "lg" },
-          ],
+          name: "headerBgColor",
+          type: "color",
+          label: "Header Background",
+          defaultValue: "#1a1a1a",
         },
-      ],
-    },
-    {
-      name: "Breadcrumb",
-      category: "ui",
-      allowChildren: false,
-      props: [
-        {
-          name: "items",
-          type: "string",
-          label: "Items (comma-separated)",
-          defaultValue: "Home,Products,Category",
-        },
-      ],
-    },
-    {
-      name: "Kbd",
-      category: "ui",
-      allowChildren: false,
-      props: [
-        {
-          name: "keys",
-          type: "string",
-          label: "Keys (comma-separated)",
-          defaultValue: "Ctrl,C",
-        },
-      ],
-    },
-    {
-      name: "Gallery",
-      category: "",
-      allowChildren: false,
-      props: [
-        {
-          name: "items",
-          type: "image",
-          label: "Gallery Items",
-          // Note: In a real editor, this 'array' type would usually link to
-          // a sub-editor or collection management interface.
-        },
-        // Note: The 'renderItem' prop is a render function and typically wouldn't be
-        // exposed as a simple property in a JSON/visual editor like this.
-        // The editor assumes a default item rendering template.
       ],
     },
   ];
