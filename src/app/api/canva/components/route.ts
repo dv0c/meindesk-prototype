@@ -42,8 +42,11 @@ export async function GET(req: Request) {
           }
 
           // Ensure it has a unique name or careful about overriding
-          // For now, we assume distinct names or acceptable override
-          components.push(dynamicComponent);
+          // Only add if not already present in the list
+          const exists = components.some(c => c.name === dynamicComponent.name);
+          if (!exists) {
+            components.push(dynamicComponent);
+          }
         });
       });
     } catch (error) {

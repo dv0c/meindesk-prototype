@@ -373,7 +373,7 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
             </Button>
             <div className="h-6 w-px bg-border mx-2" />
             <div className="flex items-center gap-3">
-              <Input size={pageName.length} maxLength={30} onChange={(e) => setPageName(e.target.value)} value={pageName.length ? pageName : "Untitled"} defaultValue={pageName || "Untitled"} className=" bg-background block border-none" />
+              <Input size={pageName.length || 8} maxLength={30} onChange={(e) => setPageName(e.target.value)} value={pageName || ""} placeholder="Untitled" className=" bg-background block border-none" />
               <span className="text-xs text-muted-foreground">Draft</span>
             </div>
           </div>
