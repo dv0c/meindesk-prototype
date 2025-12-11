@@ -67,6 +67,7 @@ export async function createSite(formData: FormData) {
         data: {
           title: "Home",
           slug: "home",
+          status: "PUBLISHED",
           siteId: site.id,
           locked: true
         },
@@ -76,6 +77,7 @@ export async function createSite(formData: FormData) {
         data: {
           title: "article",
           slug: "article",
+          status: "PUBLISHED",
           siteId: site.id,
           locked: true
         },
