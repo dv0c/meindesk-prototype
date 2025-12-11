@@ -1,11 +1,9 @@
 // app/[tenantId]/layout.tsx (or whichever path your middleware rewrites to)
 
-import { db } from "@/lib/db";
+import { getCachedSiteDetails, getCachedSiteIdBySubdomain } from "@/lib/actions/helpers/cached-tenant";
+import { Theme } from '@/types/site-theme'; // Assuming you placed the Theme type here
 import { headers } from "next/headers";
 import { notFound } from 'next/navigation';
-import { Theme } from '@/types/site-theme'; // Assuming you placed the Theme type here
-import { TenantThemeProvider } from "@/components/TenantThemeProvider";
-import { getCachedSiteDetails, getCachedSiteIdBySubdomain } from "@/lib/actions/helpers/cached-tenant";
 
 // Define the shape of the site data we need
 type SiteData = {
