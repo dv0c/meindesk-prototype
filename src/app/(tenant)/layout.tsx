@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { notFound } from 'next/navigation';
 import { Theme } from '@/types/site-theme'; // Assuming you placed the Theme type here
 import { TenantThemeProvider } from "@/components/TenantThemeProvider";
+import { getCachedSiteDetails, getCachedSiteIdBySubdomain } from "@/lib/actions/helpers/cached-tenant";
 
 // Define the shape of the site data we need
 type SiteData = {
@@ -28,18 +29,18 @@ export default async function TenantLayout({ children }: { children: React.React
 
   // 2. Fetch Site Data
   try {
+    let siteIdToFetch = null;
+
     if (tenantLookupId) {
-      site = await db.site.findUnique({
-        where: isDefaultTenant
-          ? { subdomain: tenantLookupId }
-          : { id: tenantLookupId },
-        select: {
-          title: true,
-          theme: true,
-          defaultThemePreference: true,
-          // Include other layout-level fields (logo, etc.) here
-        }
-      });
+      if (isDefaultTenant) {
+        siteIdToFetch = await getCachedSiteIdBySubdomain(tenantLookupId);
+      } else {
+        siteIdToFetch = tenantLookupId;
+      }
+    }
+
+    if (siteIdToFetch) {
+      site = await getCachedSiteDetails(siteIdToFetch);
     }
   } catch (error) {
     console.error("Database query failed in TenantLayout:", error);

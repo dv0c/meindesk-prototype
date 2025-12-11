@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "./lib/db";
+import { getCachedSiteIdBySubdomain } from "./lib/actions/helpers/cached-tenant";
 
 // Define your application's base domain here
 const APP_BASE_DOMAIN = process.env.NODE_ENV === "development" ? "localhost:3000" : "meindesk.gr";
@@ -18,9 +19,9 @@ export async function proxy(req: NextRequest) {
   // Logic to determine if a subdomain exists
   if (isLocalhost) {
     if (hostParts.length > 1 && !hostParts[0].includes(':')) {
-        subdomain = hostParts[0];
+      subdomain = hostParts[0];
     } else {
-        isNakedDomain = true;
+      isNakedDomain = true;
     }
   } else if (hostParts.length > 2) {
     subdomain = hostParts[0];
@@ -31,28 +32,25 @@ export async function proxy(req: NextRequest) {
   // Normalize and exclude 'www'
   const normalizedSubdomain = subdomain ? subdomain.toLowerCase() : null;
   const isWWW = normalizedSubdomain === "www";
-  
+
   // 2. Handle Naked Domain (Main/Marketing Site)
   if (isNakedDomain || isWWW) {
     // Allows the request to proceed to /page.tsx or other main app routes.
     const res = NextResponse.next();
-    res.headers.set("x-tenant", "default-site"); 
+    res.headers.set("x-tenant", "default-site");
     return res;
   }
-  
+
   // 3. Handle Tenant (Prototype or Custom)
   let tenantId: string | null = null;
   const isPrototypeTenant = normalizedSubdomain === DEFAULT_TENANT_SUBDOMAIN;
 
   // normalizedSubdomain is guaranteed non-null here
   try {
-    const site = await db.site.findUnique({
-      where: { subdomain: normalizedSubdomain! },
-      select: { id: true },
-    });
+    const id = await getCachedSiteIdBySubdomain(normalizedSubdomain!);
 
-    if (site) {
-      tenantId = site.id;
+    if (id) {
+      tenantId = id;
     }
   } catch (err) {
     console.error("Tenant database resolution failed:", err);
@@ -63,7 +61,7 @@ export async function proxy(req: NextRequest) {
   if (!tenantId) {
     // Tenant (Prototype or Custom) not found in DB
     console.log(`Tenant '${normalizedSubdomain}' not found. Showing 404.`);
-    
+
     // Return a 404 for any subdomain that doesn't exist in the DB.
     return new NextResponse("Tenant Not Found", { status: 404 });
   }
