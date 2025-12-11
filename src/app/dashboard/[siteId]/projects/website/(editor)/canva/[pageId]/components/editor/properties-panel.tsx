@@ -554,6 +554,16 @@ function renderPropInput(
         />
       )
 
+    case "textarea":
+      return (
+        <Textarea
+          id={prop.name}
+          className="min-h-[100px] font-sans text-sm"
+          value={value || ""}
+          onChange={(e) => onChange(prop.name, e.target.value)}
+        />
+      )
+
     case "number":
       return (
         <Input

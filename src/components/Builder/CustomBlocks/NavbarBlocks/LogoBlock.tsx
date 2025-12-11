@@ -38,7 +38,7 @@ export default function LogoBlock({
     }
 
     const alignClasses = {
-        left: "mr-auto",
+        left: "mr-0",
         center: "mx-auto",
         right: "ml-auto",
     }

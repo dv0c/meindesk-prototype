@@ -12,9 +12,10 @@ interface CanvasProps {
   selectedNodeId: string | null
   onSelectNode: (id: string) => void
   onContextMenu?: (e: React.MouseEvent, id: string) => void
+  validComponentNames?: string[]
 }
 
-export function Canvas({ nodes, selectedNodeId, onSelectNode, onContextMenu }: CanvasProps) {
+export function Canvas({ nodes, selectedNodeId, onSelectNode, onContextMenu, validComponentNames }: CanvasProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: "canvas-root",
     data: {
@@ -55,6 +56,7 @@ export function Canvas({ nodes, selectedNodeId, onSelectNode, onContextMenu }: C
                 onSelect={onSelectNode}
                 isSelected={node.id === selectedNodeId}
                 onContextMenu={onContextMenu}
+                validComponentNames={validComponentNames}
               />
             ))}
           </div>

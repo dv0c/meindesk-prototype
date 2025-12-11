@@ -145,11 +145,12 @@ model Site {
   subscriptionId String?       @db.ObjectId
 
   // --- Embedded/Referenced Content ---
-  category       Category[]
-  Article        Article[]
-  Page           Page[]
-  RSS            Rss[]
-  AnalyticsEvent AnalyticsEvent[]
+  category        Category[]
+  Article         Article[]
+  Page            Page[]
+  RSS             Rss[]
+  AnalyticsEvent  AnalyticsEvent[]
+  installedThemes SiteTheme[]
 
   // Optional: Add a custom index for performance on frequently queried fields
   @@index([userId])
@@ -324,4 +325,46 @@ model RssItem {
   createdAt   DateTime  @default(now())
 
   rss Rss @relation(fields: [rssId], references: [id], onDelete: Cascade)
+}
+
+// --- Theme Store Models ---
+
+model Theme {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String
+  thumbnail   String?
+  price       Float    @default(0)
+  isPremium   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  blocks      ThemeBlock[]
+  installedIn SiteTheme[]
+}
+
+model ThemeBlock {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  themeId String @db.ObjectId
+
+  // The internal component name (e.g. "Navbar", "Hero", "SpecialFeature")
+  componentName String
+
+  // Metadata for the builder to recognize it (props, category, etc.)
+  // This allows us to dynamically register it in the builder
+  componentDefinition Json
+
+  theme Theme @relation(fields: [themeId], references: [id], onDelete: Cascade)
+}
+
+model SiteTheme {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  siteId      String   @db.ObjectId
+  themeId     String   @db.ObjectId
+  installedAt DateTime @default(now())
+
+  site  Site  @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  theme Theme @relation(fields: [themeId], references: [id], onDelete: Cascade)
+
+  @@unique([siteId, themeId])
 }

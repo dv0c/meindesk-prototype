@@ -83,6 +83,21 @@ export type Rss = $Result.DefaultSelection<Prisma.$RssPayload>
  * 
  */
 export type RssItem = $Result.DefaultSelection<Prisma.$RssItemPayload>
+/**
+ * Model Theme
+ * 
+ */
+export type Theme = $Result.DefaultSelection<Prisma.$ThemePayload>
+/**
+ * Model ThemeBlock
+ * 
+ */
+export type ThemeBlock = $Result.DefaultSelection<Prisma.$ThemeBlockPayload>
+/**
+ * Model SiteTheme
+ * 
+ */
+export type SiteTheme = $Result.DefaultSelection<Prisma.$SiteThemePayload>
 
 /**
  * Enums
@@ -157,7 +172,7 @@ export const ArticleSourceType: typeof $Enums.ArticleSourceType
  */
 export class PrismaClient<
   ClientOptions extends Prisma.PrismaClientOptions = Prisma.PrismaClientOptions,
-  U = 'log' extends keyof ClientOptions ? ClientOptions['log'] extends Array<Prisma.LogLevel | Prisma.LogDefinition> ? Prisma.GetEvents<ClientOptions['log']> : never : never,
+  const U = 'log' extends keyof ClientOptions ? ClientOptions['log'] extends Array<Prisma.LogLevel | Prisma.LogDefinition> ? Prisma.GetEvents<ClientOptions['log']> : never : never,
   ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs
 > {
   [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['other'] }
@@ -189,13 +204,6 @@ export class PrismaClient<
    * Disconnect from the database
    */
   $disconnect(): $Utils.JsPromise<void>;
-
-  /**
-   * Add a middleware
-   * @deprecated since 4.16.0. For new code, prefer client extensions instead.
-   * @see https://pris.ly/d/extensions
-   */
-  $use(cb: Prisma.Middleware): void
 
 /**
    * Allows the running of a sequence of read/write operations that are guaranteed to either succeed or fail as a whole.
@@ -372,6 +380,36 @@ export class PrismaClient<
     * ```
     */
   get rssItem(): Prisma.RssItemDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.theme`: Exposes CRUD operations for the **Theme** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Themes
+    * const themes = await prisma.theme.findMany()
+    * ```
+    */
+  get theme(): Prisma.ThemeDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.themeBlock`: Exposes CRUD operations for the **ThemeBlock** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ThemeBlocks
+    * const themeBlocks = await prisma.themeBlock.findMany()
+    * ```
+    */
+  get themeBlock(): Prisma.ThemeBlockDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.siteTheme`: Exposes CRUD operations for the **SiteTheme** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SiteThemes
+    * const siteThemes = await prisma.siteTheme.findMany()
+    * ```
+    */
+  get siteTheme(): Prisma.SiteThemeDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -430,8 +468,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 6.6.0
-   * Query Engine version: f676762280b54cd07c770017ed3711ddde35f37a
+   * Prisma Client JS version: 6.19.0
+   * Query Engine version: 2ba551f319ab1df4bc874a89965d8b3641056773
    */
   export type PrismaVersion = {
     client: string
@@ -444,6 +482,7 @@ export namespace Prisma {
    */
 
 
+  export import Bytes = runtime.Bytes
   export import JsonObject = runtime.JsonObject
   export import JsonArray = runtime.JsonArray
   export import JsonValue = runtime.JsonValue
@@ -825,7 +864,10 @@ export namespace Prisma {
     Article: 'Article',
     Page: 'Page',
     Rss: 'Rss',
-    RssItem: 'RssItem'
+    RssItem: 'RssItem',
+    Theme: 'Theme',
+    ThemeBlock: 'ThemeBlock',
+    SiteTheme: 'SiteTheme'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -844,7 +886,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "account" | "session" | "verificationToken" | "category" | "site" | "features" | "subscription" | "billingHistory" | "analyticsEvent" | "article" | "page" | "rss" | "rssItem"
+      modelProps: "user" | "account" | "session" | "verificationToken" | "category" | "site" | "features" | "subscription" | "billingHistory" | "analyticsEvent" | "article" | "page" | "rss" | "rssItem" | "theme" | "themeBlock" | "siteTheme"
       txIsolationLevel: never
     }
     model: {
@@ -1884,6 +1926,228 @@ export namespace Prisma {
           }
         }
       }
+      Theme: {
+        payload: Prisma.$ThemePayload<ExtArgs>
+        fields: Prisma.ThemeFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ThemeFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ThemeFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemePayload>
+          }
+          findFirst: {
+            args: Prisma.ThemeFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ThemeFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemePayload>
+          }
+          findMany: {
+            args: Prisma.ThemeFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemePayload>[]
+          }
+          create: {
+            args: Prisma.ThemeCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemePayload>
+          }
+          createMany: {
+            args: Prisma.ThemeCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.ThemeDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemePayload>
+          }
+          update: {
+            args: Prisma.ThemeUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemePayload>
+          }
+          deleteMany: {
+            args: Prisma.ThemeDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ThemeUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ThemeUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemePayload>
+          }
+          aggregate: {
+            args: Prisma.ThemeAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTheme>
+          }
+          groupBy: {
+            args: Prisma.ThemeGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ThemeGroupByOutputType>[]
+          }
+          findRaw: {
+            args: Prisma.ThemeFindRawArgs<ExtArgs>
+            result: JsonObject
+          }
+          aggregateRaw: {
+            args: Prisma.ThemeAggregateRawArgs<ExtArgs>
+            result: JsonObject
+          }
+          count: {
+            args: Prisma.ThemeCountArgs<ExtArgs>
+            result: $Utils.Optional<ThemeCountAggregateOutputType> | number
+          }
+        }
+      }
+      ThemeBlock: {
+        payload: Prisma.$ThemeBlockPayload<ExtArgs>
+        fields: Prisma.ThemeBlockFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ThemeBlockFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemeBlockPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ThemeBlockFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemeBlockPayload>
+          }
+          findFirst: {
+            args: Prisma.ThemeBlockFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemeBlockPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ThemeBlockFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemeBlockPayload>
+          }
+          findMany: {
+            args: Prisma.ThemeBlockFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemeBlockPayload>[]
+          }
+          create: {
+            args: Prisma.ThemeBlockCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemeBlockPayload>
+          }
+          createMany: {
+            args: Prisma.ThemeBlockCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.ThemeBlockDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemeBlockPayload>
+          }
+          update: {
+            args: Prisma.ThemeBlockUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemeBlockPayload>
+          }
+          deleteMany: {
+            args: Prisma.ThemeBlockDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ThemeBlockUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ThemeBlockUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ThemeBlockPayload>
+          }
+          aggregate: {
+            args: Prisma.ThemeBlockAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateThemeBlock>
+          }
+          groupBy: {
+            args: Prisma.ThemeBlockGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ThemeBlockGroupByOutputType>[]
+          }
+          findRaw: {
+            args: Prisma.ThemeBlockFindRawArgs<ExtArgs>
+            result: JsonObject
+          }
+          aggregateRaw: {
+            args: Prisma.ThemeBlockAggregateRawArgs<ExtArgs>
+            result: JsonObject
+          }
+          count: {
+            args: Prisma.ThemeBlockCountArgs<ExtArgs>
+            result: $Utils.Optional<ThemeBlockCountAggregateOutputType> | number
+          }
+        }
+      }
+      SiteTheme: {
+        payload: Prisma.$SiteThemePayload<ExtArgs>
+        fields: Prisma.SiteThemeFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SiteThemeFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteThemePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SiteThemeFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteThemePayload>
+          }
+          findFirst: {
+            args: Prisma.SiteThemeFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteThemePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SiteThemeFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteThemePayload>
+          }
+          findMany: {
+            args: Prisma.SiteThemeFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteThemePayload>[]
+          }
+          create: {
+            args: Prisma.SiteThemeCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteThemePayload>
+          }
+          createMany: {
+            args: Prisma.SiteThemeCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.SiteThemeDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteThemePayload>
+          }
+          update: {
+            args: Prisma.SiteThemeUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteThemePayload>
+          }
+          deleteMany: {
+            args: Prisma.SiteThemeDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SiteThemeUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.SiteThemeUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteThemePayload>
+          }
+          aggregate: {
+            args: Prisma.SiteThemeAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSiteTheme>
+          }
+          groupBy: {
+            args: Prisma.SiteThemeGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SiteThemeGroupByOutputType>[]
+          }
+          findRaw: {
+            args: Prisma.SiteThemeFindRawArgs<ExtArgs>
+            result: JsonObject
+          }
+          aggregateRaw: {
+            args: Prisma.SiteThemeAggregateRawArgs<ExtArgs>
+            result: JsonObject
+          }
+          count: {
+            args: Prisma.SiteThemeCountArgs<ExtArgs>
+            result: $Utils.Optional<SiteThemeCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1915,16 +2179,24 @@ export namespace Prisma {
     /**
      * @example
      * ```
-     * // Defaults to stdout
+     * // Shorthand for `emit: 'stdout'`
      * log: ['query', 'info', 'warn', 'error']
      * 
-     * // Emit as events
+     * // Emit as events only
      * log: [
-     *   { emit: 'stdout', level: 'query' },
-     *   { emit: 'stdout', level: 'info' },
-     *   { emit: 'stdout', level: 'warn' }
-     *   { emit: 'stdout', level: 'error' }
+     *   { emit: 'event', level: 'query' },
+     *   { emit: 'event', level: 'info' },
+     *   { emit: 'event', level: 'warn' }
+     *   { emit: 'event', level: 'error' }
      * ]
+     * 
+     * / Emit as events and log to stdout
+     * og: [
+     *  { emit: 'stdout', level: 'query' },
+     *  { emit: 'stdout', level: 'info' },
+     *  { emit: 'stdout', level: 'warn' }
+     *  { emit: 'stdout', level: 'error' }
+     * 
      * ```
      * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/logging#the-log-option).
      */
@@ -1969,6 +2241,9 @@ export namespace Prisma {
     page?: PageOmit
     rss?: RssOmit
     rssItem?: RssItemOmit
+    theme?: ThemeOmit
+    themeBlock?: ThemeBlockOmit
+    siteTheme?: SiteThemeOmit
   }
 
   /* Types for Logging */
@@ -1978,10 +2253,15 @@ export namespace Prisma {
     emit: 'stdout' | 'event'
   }
 
-  export type GetLogType<T extends LogLevel | LogDefinition> = T extends LogDefinition ? T['emit'] extends 'event' ? T['level'] : never : never
-  export type GetEvents<T extends any> = T extends Array<LogLevel | LogDefinition> ?
-    GetLogType<T[0]> | GetLogType<T[1]> | GetLogType<T[2]> | GetLogType<T[3]>
-    : never
+  export type CheckIsLogLevel<T> = T extends LogLevel ? T : never;
+
+  export type GetLogType<T> = CheckIsLogLevel<
+    T extends LogDefinition ? T['level'] : T
+  >;
+
+  export type GetEvents<T extends any[]> = T extends Array<LogLevel | LogDefinition>
+    ? GetLogType<T[number]>
+    : never;
 
   export type QueryEvent = {
     timestamp: Date
@@ -2021,25 +2301,6 @@ export namespace Prisma {
     | 'runCommandRaw'
     | 'findRaw'
     | 'groupBy'
-
-  /**
-   * These options are being passed into the middleware as "params"
-   */
-  export type MiddlewareParams = {
-    model?: ModelName
-    action: PrismaAction
-    args: any
-    dataPath: string[]
-    runInTransaction: boolean
-  }
-
-  /**
-   * The `T` type makes sure, that the `return proceed` is not forgotten in the middleware implementation
-   */
-  export type Middleware<T = any> = (
-    params: MiddlewareParams,
-    next: (params: MiddlewareParams) => $Utils.JsPromise<T>,
-  ) => $Utils.JsPromise<T>
 
   // tested in getLogLevel.test.ts
   export function getLogLevel(log: Array<LogLevel | LogDefinition>): LogLevel | undefined;
@@ -2153,6 +2414,7 @@ export namespace Prisma {
     Page: number
     RSS: number
     AnalyticsEvent: number
+    installedThemes: number
   }
 
   export type SiteCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2161,6 +2423,7 @@ export namespace Prisma {
     Page?: boolean | SiteCountOutputTypeCountPageArgs
     RSS?: boolean | SiteCountOutputTypeCountRSSArgs
     AnalyticsEvent?: boolean | SiteCountOutputTypeCountAnalyticsEventArgs
+    installedThemes?: boolean | SiteCountOutputTypeCountInstalledThemesArgs
   }
 
   // Custom InputTypes
@@ -2207,6 +2470,13 @@ export namespace Prisma {
    */
   export type SiteCountOutputTypeCountAnalyticsEventArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: AnalyticsEventWhereInput
+  }
+
+  /**
+   * SiteCountOutputType without action
+   */
+  export type SiteCountOutputTypeCountInstalledThemesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteThemeWhereInput
   }
 
 
@@ -2309,6 +2579,46 @@ export namespace Prisma {
    */
   export type RssCountOutputTypeCountRssItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: RssItemWhereInput
+  }
+
+
+  /**
+   * Count Type ThemeCountOutputType
+   */
+
+  export type ThemeCountOutputType = {
+    blocks: number
+    installedIn: number
+  }
+
+  export type ThemeCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    blocks?: boolean | ThemeCountOutputTypeCountBlocksArgs
+    installedIn?: boolean | ThemeCountOutputTypeCountInstalledInArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * ThemeCountOutputType without action
+   */
+  export type ThemeCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ThemeCountOutputType
+     */
+    select?: ThemeCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * ThemeCountOutputType without action
+   */
+  export type ThemeCountOutputTypeCountBlocksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ThemeBlockWhereInput
+  }
+
+  /**
+   * ThemeCountOutputType without action
+   */
+  export type ThemeCountOutputTypeCountInstalledInArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteThemeWhereInput
   }
 
 
@@ -7936,6 +8246,7 @@ export namespace Prisma {
     Page?: boolean | Site$PageArgs<ExtArgs>
     RSS?: boolean | Site$RSSArgs<ExtArgs>
     AnalyticsEvent?: boolean | Site$AnalyticsEventArgs<ExtArgs>
+    installedThemes?: boolean | Site$installedThemesArgs<ExtArgs>
     _count?: boolean | SiteCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["site"]>
 
@@ -7975,6 +8286,7 @@ export namespace Prisma {
     Page?: boolean | Site$PageArgs<ExtArgs>
     RSS?: boolean | Site$RSSArgs<ExtArgs>
     AnalyticsEvent?: boolean | Site$AnalyticsEventArgs<ExtArgs>
+    installedThemes?: boolean | Site$installedThemesArgs<ExtArgs>
     _count?: boolean | SiteCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -7989,6 +8301,7 @@ export namespace Prisma {
       Page: Prisma.$PagePayload<ExtArgs>[]
       RSS: Prisma.$RssPayload<ExtArgs>[]
       AnalyticsEvent: Prisma.$AnalyticsEventPayload<ExtArgs>[]
+      installedThemes: Prisma.$SiteThemePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -8383,6 +8696,7 @@ export namespace Prisma {
     Page<T extends Site$PageArgs<ExtArgs> = {}>(args?: Subset<T, Site$PageArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     RSS<T extends Site$RSSArgs<ExtArgs> = {}>(args?: Subset<T, Site$RSSArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RssPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     AnalyticsEvent<T extends Site$AnalyticsEventArgs<ExtArgs> = {}>(args?: Subset<T, Site$AnalyticsEventArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AnalyticsEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    installedThemes<T extends Site$installedThemesArgs<ExtArgs> = {}>(args?: Subset<T, Site$installedThemesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteThemePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8977,6 +9291,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: AnalyticsEventScalarFieldEnum | AnalyticsEventScalarFieldEnum[]
+  }
+
+  /**
+   * Site.installedThemes
+   */
+  export type Site$installedThemesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteTheme
+     */
+    select?: SiteThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteTheme
+     */
+    omit?: SiteThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteThemeInclude<ExtArgs> | null
+    where?: SiteThemeWhereInput
+    orderBy?: SiteThemeOrderByWithRelationInput | SiteThemeOrderByWithRelationInput[]
+    cursor?: SiteThemeWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SiteThemeScalarFieldEnum | SiteThemeScalarFieldEnum[]
   }
 
   /**
@@ -17616,6 +17954,3042 @@ export namespace Prisma {
 
 
   /**
+   * Model Theme
+   */
+
+  export type AggregateTheme = {
+    _count: ThemeCountAggregateOutputType | null
+    _avg: ThemeAvgAggregateOutputType | null
+    _sum: ThemeSumAggregateOutputType | null
+    _min: ThemeMinAggregateOutputType | null
+    _max: ThemeMaxAggregateOutputType | null
+  }
+
+  export type ThemeAvgAggregateOutputType = {
+    price: number | null
+  }
+
+  export type ThemeSumAggregateOutputType = {
+    price: number | null
+  }
+
+  export type ThemeMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+    description: string | null
+    thumbnail: string | null
+    price: number | null
+    isPremium: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ThemeMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+    description: string | null
+    thumbnail: string | null
+    price: number | null
+    isPremium: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ThemeCountAggregateOutputType = {
+    id: number
+    name: number
+    description: number
+    thumbnail: number
+    price: number
+    isPremium: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ThemeAvgAggregateInputType = {
+    price?: true
+  }
+
+  export type ThemeSumAggregateInputType = {
+    price?: true
+  }
+
+  export type ThemeMinAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+    thumbnail?: true
+    price?: true
+    isPremium?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ThemeMaxAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+    thumbnail?: true
+    price?: true
+    isPremium?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ThemeCountAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+    thumbnail?: true
+    price?: true
+    isPremium?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ThemeAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Theme to aggregate.
+     */
+    where?: ThemeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Themes to fetch.
+     */
+    orderBy?: ThemeOrderByWithRelationInput | ThemeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ThemeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Themes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Themes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Themes
+    **/
+    _count?: true | ThemeCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ThemeAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ThemeSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ThemeMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ThemeMaxAggregateInputType
+  }
+
+  export type GetThemeAggregateType<T extends ThemeAggregateArgs> = {
+        [P in keyof T & keyof AggregateTheme]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTheme[P]>
+      : GetScalarType<T[P], AggregateTheme[P]>
+  }
+
+
+
+
+  export type ThemeGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ThemeWhereInput
+    orderBy?: ThemeOrderByWithAggregationInput | ThemeOrderByWithAggregationInput[]
+    by: ThemeScalarFieldEnum[] | ThemeScalarFieldEnum
+    having?: ThemeScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ThemeCountAggregateInputType | true
+    _avg?: ThemeAvgAggregateInputType
+    _sum?: ThemeSumAggregateInputType
+    _min?: ThemeMinAggregateInputType
+    _max?: ThemeMaxAggregateInputType
+  }
+
+  export type ThemeGroupByOutputType = {
+    id: string
+    name: string
+    description: string
+    thumbnail: string | null
+    price: number
+    isPremium: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: ThemeCountAggregateOutputType | null
+    _avg: ThemeAvgAggregateOutputType | null
+    _sum: ThemeSumAggregateOutputType | null
+    _min: ThemeMinAggregateOutputType | null
+    _max: ThemeMaxAggregateOutputType | null
+  }
+
+  type GetThemeGroupByPayload<T extends ThemeGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ThemeGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ThemeGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ThemeGroupByOutputType[P]>
+            : GetScalarType<T[P], ThemeGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ThemeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    description?: boolean
+    thumbnail?: boolean
+    price?: boolean
+    isPremium?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    blocks?: boolean | Theme$blocksArgs<ExtArgs>
+    installedIn?: boolean | Theme$installedInArgs<ExtArgs>
+    _count?: boolean | ThemeCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["theme"]>
+
+
+
+  export type ThemeSelectScalar = {
+    id?: boolean
+    name?: boolean
+    description?: boolean
+    thumbnail?: boolean
+    price?: boolean
+    isPremium?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ThemeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "thumbnail" | "price" | "isPremium" | "createdAt" | "updatedAt", ExtArgs["result"]["theme"]>
+  export type ThemeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    blocks?: boolean | Theme$blocksArgs<ExtArgs>
+    installedIn?: boolean | Theme$installedInArgs<ExtArgs>
+    _count?: boolean | ThemeCountOutputTypeDefaultArgs<ExtArgs>
+  }
+
+  export type $ThemePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Theme"
+    objects: {
+      blocks: Prisma.$ThemeBlockPayload<ExtArgs>[]
+      installedIn: Prisma.$SiteThemePayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      name: string
+      description: string
+      thumbnail: string | null
+      price: number
+      isPremium: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["theme"]>
+    composites: {}
+  }
+
+  type ThemeGetPayload<S extends boolean | null | undefined | ThemeDefaultArgs> = $Result.GetResult<Prisma.$ThemePayload, S>
+
+  type ThemeCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ThemeFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ThemeCountAggregateInputType | true
+    }
+
+  export interface ThemeDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Theme'], meta: { name: 'Theme' } }
+    /**
+     * Find zero or one Theme that matches the filter.
+     * @param {ThemeFindUniqueArgs} args - Arguments to find a Theme
+     * @example
+     * // Get one Theme
+     * const theme = await prisma.theme.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ThemeFindUniqueArgs>(args: SelectSubset<T, ThemeFindUniqueArgs<ExtArgs>>): Prisma__ThemeClient<$Result.GetResult<Prisma.$ThemePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Theme that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ThemeFindUniqueOrThrowArgs} args - Arguments to find a Theme
+     * @example
+     * // Get one Theme
+     * const theme = await prisma.theme.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ThemeFindUniqueOrThrowArgs>(args: SelectSubset<T, ThemeFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ThemeClient<$Result.GetResult<Prisma.$ThemePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Theme that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ThemeFindFirstArgs} args - Arguments to find a Theme
+     * @example
+     * // Get one Theme
+     * const theme = await prisma.theme.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ThemeFindFirstArgs>(args?: SelectSubset<T, ThemeFindFirstArgs<ExtArgs>>): Prisma__ThemeClient<$Result.GetResult<Prisma.$ThemePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Theme that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ThemeFindFirstOrThrowArgs} args - Arguments to find a Theme
+     * @example
+     * // Get one Theme
+     * const theme = await prisma.theme.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ThemeFindFirstOrThrowArgs>(args?: SelectSubset<T, ThemeFindFirstOrThrowArgs<ExtArgs>>): Prisma__ThemeClient<$Result.GetResult<Prisma.$ThemePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Themes that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ThemeFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Themes
+     * const themes = await prisma.theme.findMany()
+     * 
+     * // Get first 10 Themes
+     * const themes = await prisma.theme.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const themeWithIdOnly = await prisma.theme.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ThemeFindManyArgs>(args?: SelectSubset<T, ThemeFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ThemePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Theme.
+     * @param {ThemeCreateArgs} args - Arguments to create a Theme.
+     * @example
+     * // Create one Theme
+     * const Theme = await prisma.theme.create({
+     *   data: {
+     *     // ... data to create a Theme
+     *   }
+     * })
+     * 
+     */
+    create<T extends ThemeCreateArgs>(args: SelectSubset<T, ThemeCreateArgs<ExtArgs>>): Prisma__ThemeClient<$Result.GetResult<Prisma.$ThemePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Themes.
+     * @param {ThemeCreateManyArgs} args - Arguments to create many Themes.
+     * @example
+     * // Create many Themes
+     * const theme = await prisma.theme.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ThemeCreateManyArgs>(args?: SelectSubset<T, ThemeCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a Theme.
+     * @param {ThemeDeleteArgs} args - Arguments to delete one Theme.
+     * @example
+     * // Delete one Theme
+     * const Theme = await prisma.theme.delete({
+     *   where: {
+     *     // ... filter to delete one Theme
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ThemeDeleteArgs>(args: SelectSubset<T, ThemeDeleteArgs<ExtArgs>>): Prisma__ThemeClient<$Result.GetResult<Prisma.$ThemePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Theme.
+     * @param {ThemeUpdateArgs} args - Arguments to update one Theme.
+     * @example
+     * // Update one Theme
+     * const theme = await prisma.theme.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ThemeUpdateArgs>(args: SelectSubset<T, ThemeUpdateArgs<ExtArgs>>): Prisma__ThemeClient<$Result.GetResult<Prisma.$ThemePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Themes.
+     * @param {ThemeDeleteManyArgs} args - Arguments to filter Themes to delete.
+     * @example
+     * // Delete a few Themes
+     * const { count } = await prisma.theme.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ThemeDeleteManyArgs>(args?: SelectSubset<T, ThemeDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Themes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ThemeUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Themes
+     * const theme = await prisma.theme.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ThemeUpdateManyArgs>(args: SelectSubset<T, ThemeUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Theme.
+     * @param {ThemeUpsertArgs} args - Arguments to update or create a Theme.
+     * @example
+     * // Update or create a Theme
+     * const theme = await prisma.theme.upsert({
+     *   create: {
+     *     // ... data to create a Theme
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Theme we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ThemeUpsertArgs>(args: SelectSubset<T, ThemeUpsertArgs<ExtArgs>>): Prisma__ThemeClient<$Result.GetResult<Prisma.$ThemePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Themes that matches the filter.
+     * @param {ThemeFindRawArgs} args - Select which filters you would like to apply.
+     * @example
+     * const theme = await prisma.theme.findRaw({
+     *   filter: { age: { $gt: 25 } }
+     * })
+     */
+    findRaw(args?: ThemeFindRawArgs): Prisma.PrismaPromise<JsonObject>
+
+    /**
+     * Perform aggregation operations on a Theme.
+     * @param {ThemeAggregateRawArgs} args - Select which aggregations you would like to apply.
+     * @example
+     * const theme = await prisma.theme.aggregateRaw({
+     *   pipeline: [
+     *     { $match: { status: "registered" } },
+     *     { $group: { _id: "$country", total: { $sum: 1 } } }
+     *   ]
+     * })
+     */
+    aggregateRaw(args?: ThemeAggregateRawArgs): Prisma.PrismaPromise<JsonObject>
+
+
+    /**
+     * Count the number of Themes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ThemeCountArgs} args - Arguments to filter Themes to count.
+     * @example
+     * // Count the number of Themes
+     * const count = await prisma.theme.count({
+     *   where: {
+     *     // ... the filter for the Themes we want to count
+     *   }
+     * })
+    **/
+    count<T extends ThemeCountArgs>(
+      args?: Subset<T, ThemeCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ThemeCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Theme.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ThemeAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ThemeAggregateArgs>(args: Subset<T, ThemeAggregateArgs>): Prisma.PrismaPromise<GetThemeAggregateType<T>>
+
+    /**
+     * Group by Theme.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ThemeGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ThemeGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ThemeGroupByArgs['orderBy'] }
+        : { orderBy?: ThemeGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ThemeGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetThemeGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Theme model
+   */
+  readonly fields: ThemeFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Theme.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ThemeClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    blocks<T extends Theme$blocksArgs<ExtArgs> = {}>(args?: Subset<T, Theme$blocksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ThemeBlockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    installedIn<T extends Theme$installedInArgs<ExtArgs> = {}>(args?: Subset<T, Theme$installedInArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteThemePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Theme model
+   */
+  interface ThemeFieldRefs {
+    readonly id: FieldRef<"Theme", 'String'>
+    readonly name: FieldRef<"Theme", 'String'>
+    readonly description: FieldRef<"Theme", 'String'>
+    readonly thumbnail: FieldRef<"Theme", 'String'>
+    readonly price: FieldRef<"Theme", 'Float'>
+    readonly isPremium: FieldRef<"Theme", 'Boolean'>
+    readonly createdAt: FieldRef<"Theme", 'DateTime'>
+    readonly updatedAt: FieldRef<"Theme", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Theme findUnique
+   */
+  export type ThemeFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Theme
+     */
+    select?: ThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Theme
+     */
+    omit?: ThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeInclude<ExtArgs> | null
+    /**
+     * Filter, which Theme to fetch.
+     */
+    where: ThemeWhereUniqueInput
+  }
+
+  /**
+   * Theme findUniqueOrThrow
+   */
+  export type ThemeFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Theme
+     */
+    select?: ThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Theme
+     */
+    omit?: ThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeInclude<ExtArgs> | null
+    /**
+     * Filter, which Theme to fetch.
+     */
+    where: ThemeWhereUniqueInput
+  }
+
+  /**
+   * Theme findFirst
+   */
+  export type ThemeFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Theme
+     */
+    select?: ThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Theme
+     */
+    omit?: ThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeInclude<ExtArgs> | null
+    /**
+     * Filter, which Theme to fetch.
+     */
+    where?: ThemeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Themes to fetch.
+     */
+    orderBy?: ThemeOrderByWithRelationInput | ThemeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Themes.
+     */
+    cursor?: ThemeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Themes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Themes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Themes.
+     */
+    distinct?: ThemeScalarFieldEnum | ThemeScalarFieldEnum[]
+  }
+
+  /**
+   * Theme findFirstOrThrow
+   */
+  export type ThemeFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Theme
+     */
+    select?: ThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Theme
+     */
+    omit?: ThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeInclude<ExtArgs> | null
+    /**
+     * Filter, which Theme to fetch.
+     */
+    where?: ThemeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Themes to fetch.
+     */
+    orderBy?: ThemeOrderByWithRelationInput | ThemeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Themes.
+     */
+    cursor?: ThemeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Themes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Themes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Themes.
+     */
+    distinct?: ThemeScalarFieldEnum | ThemeScalarFieldEnum[]
+  }
+
+  /**
+   * Theme findMany
+   */
+  export type ThemeFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Theme
+     */
+    select?: ThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Theme
+     */
+    omit?: ThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeInclude<ExtArgs> | null
+    /**
+     * Filter, which Themes to fetch.
+     */
+    where?: ThemeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Themes to fetch.
+     */
+    orderBy?: ThemeOrderByWithRelationInput | ThemeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Themes.
+     */
+    cursor?: ThemeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Themes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Themes.
+     */
+    skip?: number
+    distinct?: ThemeScalarFieldEnum | ThemeScalarFieldEnum[]
+  }
+
+  /**
+   * Theme create
+   */
+  export type ThemeCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Theme
+     */
+    select?: ThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Theme
+     */
+    omit?: ThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Theme.
+     */
+    data: XOR<ThemeCreateInput, ThemeUncheckedCreateInput>
+  }
+
+  /**
+   * Theme createMany
+   */
+  export type ThemeCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Themes.
+     */
+    data: ThemeCreateManyInput | ThemeCreateManyInput[]
+  }
+
+  /**
+   * Theme update
+   */
+  export type ThemeUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Theme
+     */
+    select?: ThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Theme
+     */
+    omit?: ThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Theme.
+     */
+    data: XOR<ThemeUpdateInput, ThemeUncheckedUpdateInput>
+    /**
+     * Choose, which Theme to update.
+     */
+    where: ThemeWhereUniqueInput
+  }
+
+  /**
+   * Theme updateMany
+   */
+  export type ThemeUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Themes.
+     */
+    data: XOR<ThemeUpdateManyMutationInput, ThemeUncheckedUpdateManyInput>
+    /**
+     * Filter which Themes to update
+     */
+    where?: ThemeWhereInput
+    /**
+     * Limit how many Themes to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Theme upsert
+   */
+  export type ThemeUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Theme
+     */
+    select?: ThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Theme
+     */
+    omit?: ThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Theme to update in case it exists.
+     */
+    where: ThemeWhereUniqueInput
+    /**
+     * In case the Theme found by the `where` argument doesn't exist, create a new Theme with this data.
+     */
+    create: XOR<ThemeCreateInput, ThemeUncheckedCreateInput>
+    /**
+     * In case the Theme was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ThemeUpdateInput, ThemeUncheckedUpdateInput>
+  }
+
+  /**
+   * Theme delete
+   */
+  export type ThemeDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Theme
+     */
+    select?: ThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Theme
+     */
+    omit?: ThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeInclude<ExtArgs> | null
+    /**
+     * Filter which Theme to delete.
+     */
+    where: ThemeWhereUniqueInput
+  }
+
+  /**
+   * Theme deleteMany
+   */
+  export type ThemeDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Themes to delete
+     */
+    where?: ThemeWhereInput
+    /**
+     * Limit how many Themes to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Theme findRaw
+   */
+  export type ThemeFindRawArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The query predicate filter. If unspecified, then all documents in the collection will match the predicate. ${@link https://docs.mongodb.com/manual/reference/operator/query MongoDB Docs}.
+     */
+    filter?: InputJsonValue
+    /**
+     * Additional options to pass to the `find` command ${@link https://docs.mongodb.com/manual/reference/command/find/#command-fields MongoDB Docs}.
+     */
+    options?: InputJsonValue
+  }
+
+  /**
+   * Theme aggregateRaw
+   */
+  export type ThemeAggregateRawArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * An array of aggregation stages to process and transform the document stream via the aggregation pipeline. ${@link https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline MongoDB Docs}.
+     */
+    pipeline?: InputJsonValue[]
+    /**
+     * Additional options to pass to the `aggregate` command ${@link https://docs.mongodb.com/manual/reference/command/aggregate/#command-fields MongoDB Docs}.
+     */
+    options?: InputJsonValue
+  }
+
+  /**
+   * Theme.blocks
+   */
+  export type Theme$blocksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ThemeBlock
+     */
+    select?: ThemeBlockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ThemeBlock
+     */
+    omit?: ThemeBlockOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeBlockInclude<ExtArgs> | null
+    where?: ThemeBlockWhereInput
+    orderBy?: ThemeBlockOrderByWithRelationInput | ThemeBlockOrderByWithRelationInput[]
+    cursor?: ThemeBlockWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ThemeBlockScalarFieldEnum | ThemeBlockScalarFieldEnum[]
+  }
+
+  /**
+   * Theme.installedIn
+   */
+  export type Theme$installedInArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteTheme
+     */
+    select?: SiteThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteTheme
+     */
+    omit?: SiteThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteThemeInclude<ExtArgs> | null
+    where?: SiteThemeWhereInput
+    orderBy?: SiteThemeOrderByWithRelationInput | SiteThemeOrderByWithRelationInput[]
+    cursor?: SiteThemeWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SiteThemeScalarFieldEnum | SiteThemeScalarFieldEnum[]
+  }
+
+  /**
+   * Theme without action
+   */
+  export type ThemeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Theme
+     */
+    select?: ThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Theme
+     */
+    omit?: ThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ThemeBlock
+   */
+
+  export type AggregateThemeBlock = {
+    _count: ThemeBlockCountAggregateOutputType | null
+    _min: ThemeBlockMinAggregateOutputType | null
+    _max: ThemeBlockMaxAggregateOutputType | null
+  }
+
+  export type ThemeBlockMinAggregateOutputType = {
+    id: string | null
+    themeId: string | null
+    componentName: string | null
+  }
+
+  export type ThemeBlockMaxAggregateOutputType = {
+    id: string | null
+    themeId: string | null
+    componentName: string | null
+  }
+
+  export type ThemeBlockCountAggregateOutputType = {
+    id: number
+    themeId: number
+    componentName: number
+    componentDefinition: number
+    _all: number
+  }
+
+
+  export type ThemeBlockMinAggregateInputType = {
+    id?: true
+    themeId?: true
+    componentName?: true
+  }
+
+  export type ThemeBlockMaxAggregateInputType = {
+    id?: true
+    themeId?: true
+    componentName?: true
+  }
+
+  export type ThemeBlockCountAggregateInputType = {
+    id?: true
+    themeId?: true
+    componentName?: true
+    componentDefinition?: true
+    _all?: true
+  }
+
+  export type ThemeBlockAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ThemeBlock to aggregate.
+     */
+    where?: ThemeBlockWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ThemeBlocks to fetch.
+     */
+    orderBy?: ThemeBlockOrderByWithRelationInput | ThemeBlockOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ThemeBlockWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ThemeBlocks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ThemeBlocks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ThemeBlocks
+    **/
+    _count?: true | ThemeBlockCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ThemeBlockMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ThemeBlockMaxAggregateInputType
+  }
+
+  export type GetThemeBlockAggregateType<T extends ThemeBlockAggregateArgs> = {
+        [P in keyof T & keyof AggregateThemeBlock]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateThemeBlock[P]>
+      : GetScalarType<T[P], AggregateThemeBlock[P]>
+  }
+
+
+
+
+  export type ThemeBlockGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ThemeBlockWhereInput
+    orderBy?: ThemeBlockOrderByWithAggregationInput | ThemeBlockOrderByWithAggregationInput[]
+    by: ThemeBlockScalarFieldEnum[] | ThemeBlockScalarFieldEnum
+    having?: ThemeBlockScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ThemeBlockCountAggregateInputType | true
+    _min?: ThemeBlockMinAggregateInputType
+    _max?: ThemeBlockMaxAggregateInputType
+  }
+
+  export type ThemeBlockGroupByOutputType = {
+    id: string
+    themeId: string
+    componentName: string
+    componentDefinition: JsonValue
+    _count: ThemeBlockCountAggregateOutputType | null
+    _min: ThemeBlockMinAggregateOutputType | null
+    _max: ThemeBlockMaxAggregateOutputType | null
+  }
+
+  type GetThemeBlockGroupByPayload<T extends ThemeBlockGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ThemeBlockGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ThemeBlockGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ThemeBlockGroupByOutputType[P]>
+            : GetScalarType<T[P], ThemeBlockGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ThemeBlockSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    themeId?: boolean
+    componentName?: boolean
+    componentDefinition?: boolean
+    theme?: boolean | ThemeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["themeBlock"]>
+
+
+
+  export type ThemeBlockSelectScalar = {
+    id?: boolean
+    themeId?: boolean
+    componentName?: boolean
+    componentDefinition?: boolean
+  }
+
+  export type ThemeBlockOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "themeId" | "componentName" | "componentDefinition", ExtArgs["result"]["themeBlock"]>
+  export type ThemeBlockInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    theme?: boolean | ThemeDefaultArgs<ExtArgs>
+  }
+
+  export type $ThemeBlockPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ThemeBlock"
+    objects: {
+      theme: Prisma.$ThemePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      themeId: string
+      componentName: string
+      componentDefinition: Prisma.JsonValue
+    }, ExtArgs["result"]["themeBlock"]>
+    composites: {}
+  }
+
+  type ThemeBlockGetPayload<S extends boolean | null | undefined | ThemeBlockDefaultArgs> = $Result.GetResult<Prisma.$ThemeBlockPayload, S>
+
+  type ThemeBlockCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ThemeBlockFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ThemeBlockCountAggregateInputType | true
+    }
+
+  export interface ThemeBlockDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ThemeBlock'], meta: { name: 'ThemeBlock' } }
+    /**
+     * Find zero or one ThemeBlock that matches the filter.
+     * @param {ThemeBlockFindUniqueArgs} args - Arguments to find a ThemeBlock
+     * @example
+     * // Get one ThemeBlock
+     * const themeBlock = await prisma.themeBlock.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ThemeBlockFindUniqueArgs>(args: SelectSubset<T, ThemeBlockFindUniqueArgs<ExtArgs>>): Prisma__ThemeBlockClient<$Result.GetResult<Prisma.$ThemeBlockPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ThemeBlock that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ThemeBlockFindUniqueOrThrowArgs} args - Arguments to find a ThemeBlock
+     * @example
+     * // Get one ThemeBlock
+     * const themeBlock = await prisma.themeBlock.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ThemeBlockFindUniqueOrThrowArgs>(args: SelectSubset<T, ThemeBlockFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ThemeBlockClient<$Result.GetResult<Prisma.$ThemeBlockPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ThemeBlock that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ThemeBlockFindFirstArgs} args - Arguments to find a ThemeBlock
+     * @example
+     * // Get one ThemeBlock
+     * const themeBlock = await prisma.themeBlock.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ThemeBlockFindFirstArgs>(args?: SelectSubset<T, ThemeBlockFindFirstArgs<ExtArgs>>): Prisma__ThemeBlockClient<$Result.GetResult<Prisma.$ThemeBlockPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ThemeBlock that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ThemeBlockFindFirstOrThrowArgs} args - Arguments to find a ThemeBlock
+     * @example
+     * // Get one ThemeBlock
+     * const themeBlock = await prisma.themeBlock.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ThemeBlockFindFirstOrThrowArgs>(args?: SelectSubset<T, ThemeBlockFindFirstOrThrowArgs<ExtArgs>>): Prisma__ThemeBlockClient<$Result.GetResult<Prisma.$ThemeBlockPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ThemeBlocks that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ThemeBlockFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ThemeBlocks
+     * const themeBlocks = await prisma.themeBlock.findMany()
+     * 
+     * // Get first 10 ThemeBlocks
+     * const themeBlocks = await prisma.themeBlock.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const themeBlockWithIdOnly = await prisma.themeBlock.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ThemeBlockFindManyArgs>(args?: SelectSubset<T, ThemeBlockFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ThemeBlockPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ThemeBlock.
+     * @param {ThemeBlockCreateArgs} args - Arguments to create a ThemeBlock.
+     * @example
+     * // Create one ThemeBlock
+     * const ThemeBlock = await prisma.themeBlock.create({
+     *   data: {
+     *     // ... data to create a ThemeBlock
+     *   }
+     * })
+     * 
+     */
+    create<T extends ThemeBlockCreateArgs>(args: SelectSubset<T, ThemeBlockCreateArgs<ExtArgs>>): Prisma__ThemeBlockClient<$Result.GetResult<Prisma.$ThemeBlockPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ThemeBlocks.
+     * @param {ThemeBlockCreateManyArgs} args - Arguments to create many ThemeBlocks.
+     * @example
+     * // Create many ThemeBlocks
+     * const themeBlock = await prisma.themeBlock.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ThemeBlockCreateManyArgs>(args?: SelectSubset<T, ThemeBlockCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a ThemeBlock.
+     * @param {ThemeBlockDeleteArgs} args - Arguments to delete one ThemeBlock.
+     * @example
+     * // Delete one ThemeBlock
+     * const ThemeBlock = await prisma.themeBlock.delete({
+     *   where: {
+     *     // ... filter to delete one ThemeBlock
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ThemeBlockDeleteArgs>(args: SelectSubset<T, ThemeBlockDeleteArgs<ExtArgs>>): Prisma__ThemeBlockClient<$Result.GetResult<Prisma.$ThemeBlockPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ThemeBlock.
+     * @param {ThemeBlockUpdateArgs} args - Arguments to update one ThemeBlock.
+     * @example
+     * // Update one ThemeBlock
+     * const themeBlock = await prisma.themeBlock.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ThemeBlockUpdateArgs>(args: SelectSubset<T, ThemeBlockUpdateArgs<ExtArgs>>): Prisma__ThemeBlockClient<$Result.GetResult<Prisma.$ThemeBlockPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ThemeBlocks.
+     * @param {ThemeBlockDeleteManyArgs} args - Arguments to filter ThemeBlocks to delete.
+     * @example
+     * // Delete a few ThemeBlocks
+     * const { count } = await prisma.themeBlock.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ThemeBlockDeleteManyArgs>(args?: SelectSubset<T, ThemeBlockDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ThemeBlocks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ThemeBlockUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ThemeBlocks
+     * const themeBlock = await prisma.themeBlock.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ThemeBlockUpdateManyArgs>(args: SelectSubset<T, ThemeBlockUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one ThemeBlock.
+     * @param {ThemeBlockUpsertArgs} args - Arguments to update or create a ThemeBlock.
+     * @example
+     * // Update or create a ThemeBlock
+     * const themeBlock = await prisma.themeBlock.upsert({
+     *   create: {
+     *     // ... data to create a ThemeBlock
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ThemeBlock we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ThemeBlockUpsertArgs>(args: SelectSubset<T, ThemeBlockUpsertArgs<ExtArgs>>): Prisma__ThemeBlockClient<$Result.GetResult<Prisma.$ThemeBlockPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ThemeBlocks that matches the filter.
+     * @param {ThemeBlockFindRawArgs} args - Select which filters you would like to apply.
+     * @example
+     * const themeBlock = await prisma.themeBlock.findRaw({
+     *   filter: { age: { $gt: 25 } }
+     * })
+     */
+    findRaw(args?: ThemeBlockFindRawArgs): Prisma.PrismaPromise<JsonObject>
+
+    /**
+     * Perform aggregation operations on a ThemeBlock.
+     * @param {ThemeBlockAggregateRawArgs} args - Select which aggregations you would like to apply.
+     * @example
+     * const themeBlock = await prisma.themeBlock.aggregateRaw({
+     *   pipeline: [
+     *     { $match: { status: "registered" } },
+     *     { $group: { _id: "$country", total: { $sum: 1 } } }
+     *   ]
+     * })
+     */
+    aggregateRaw(args?: ThemeBlockAggregateRawArgs): Prisma.PrismaPromise<JsonObject>
+
+
+    /**
+     * Count the number of ThemeBlocks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ThemeBlockCountArgs} args - Arguments to filter ThemeBlocks to count.
+     * @example
+     * // Count the number of ThemeBlocks
+     * const count = await prisma.themeBlock.count({
+     *   where: {
+     *     // ... the filter for the ThemeBlocks we want to count
+     *   }
+     * })
+    **/
+    count<T extends ThemeBlockCountArgs>(
+      args?: Subset<T, ThemeBlockCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ThemeBlockCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ThemeBlock.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ThemeBlockAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ThemeBlockAggregateArgs>(args: Subset<T, ThemeBlockAggregateArgs>): Prisma.PrismaPromise<GetThemeBlockAggregateType<T>>
+
+    /**
+     * Group by ThemeBlock.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ThemeBlockGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ThemeBlockGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ThemeBlockGroupByArgs['orderBy'] }
+        : { orderBy?: ThemeBlockGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ThemeBlockGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetThemeBlockGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ThemeBlock model
+   */
+  readonly fields: ThemeBlockFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ThemeBlock.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ThemeBlockClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    theme<T extends ThemeDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ThemeDefaultArgs<ExtArgs>>): Prisma__ThemeClient<$Result.GetResult<Prisma.$ThemePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ThemeBlock model
+   */
+  interface ThemeBlockFieldRefs {
+    readonly id: FieldRef<"ThemeBlock", 'String'>
+    readonly themeId: FieldRef<"ThemeBlock", 'String'>
+    readonly componentName: FieldRef<"ThemeBlock", 'String'>
+    readonly componentDefinition: FieldRef<"ThemeBlock", 'Json'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ThemeBlock findUnique
+   */
+  export type ThemeBlockFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ThemeBlock
+     */
+    select?: ThemeBlockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ThemeBlock
+     */
+    omit?: ThemeBlockOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeBlockInclude<ExtArgs> | null
+    /**
+     * Filter, which ThemeBlock to fetch.
+     */
+    where: ThemeBlockWhereUniqueInput
+  }
+
+  /**
+   * ThemeBlock findUniqueOrThrow
+   */
+  export type ThemeBlockFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ThemeBlock
+     */
+    select?: ThemeBlockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ThemeBlock
+     */
+    omit?: ThemeBlockOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeBlockInclude<ExtArgs> | null
+    /**
+     * Filter, which ThemeBlock to fetch.
+     */
+    where: ThemeBlockWhereUniqueInput
+  }
+
+  /**
+   * ThemeBlock findFirst
+   */
+  export type ThemeBlockFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ThemeBlock
+     */
+    select?: ThemeBlockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ThemeBlock
+     */
+    omit?: ThemeBlockOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeBlockInclude<ExtArgs> | null
+    /**
+     * Filter, which ThemeBlock to fetch.
+     */
+    where?: ThemeBlockWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ThemeBlocks to fetch.
+     */
+    orderBy?: ThemeBlockOrderByWithRelationInput | ThemeBlockOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ThemeBlocks.
+     */
+    cursor?: ThemeBlockWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ThemeBlocks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ThemeBlocks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ThemeBlocks.
+     */
+    distinct?: ThemeBlockScalarFieldEnum | ThemeBlockScalarFieldEnum[]
+  }
+
+  /**
+   * ThemeBlock findFirstOrThrow
+   */
+  export type ThemeBlockFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ThemeBlock
+     */
+    select?: ThemeBlockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ThemeBlock
+     */
+    omit?: ThemeBlockOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeBlockInclude<ExtArgs> | null
+    /**
+     * Filter, which ThemeBlock to fetch.
+     */
+    where?: ThemeBlockWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ThemeBlocks to fetch.
+     */
+    orderBy?: ThemeBlockOrderByWithRelationInput | ThemeBlockOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ThemeBlocks.
+     */
+    cursor?: ThemeBlockWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ThemeBlocks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ThemeBlocks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ThemeBlocks.
+     */
+    distinct?: ThemeBlockScalarFieldEnum | ThemeBlockScalarFieldEnum[]
+  }
+
+  /**
+   * ThemeBlock findMany
+   */
+  export type ThemeBlockFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ThemeBlock
+     */
+    select?: ThemeBlockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ThemeBlock
+     */
+    omit?: ThemeBlockOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeBlockInclude<ExtArgs> | null
+    /**
+     * Filter, which ThemeBlocks to fetch.
+     */
+    where?: ThemeBlockWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ThemeBlocks to fetch.
+     */
+    orderBy?: ThemeBlockOrderByWithRelationInput | ThemeBlockOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ThemeBlocks.
+     */
+    cursor?: ThemeBlockWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ThemeBlocks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ThemeBlocks.
+     */
+    skip?: number
+    distinct?: ThemeBlockScalarFieldEnum | ThemeBlockScalarFieldEnum[]
+  }
+
+  /**
+   * ThemeBlock create
+   */
+  export type ThemeBlockCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ThemeBlock
+     */
+    select?: ThemeBlockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ThemeBlock
+     */
+    omit?: ThemeBlockOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeBlockInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ThemeBlock.
+     */
+    data: XOR<ThemeBlockCreateInput, ThemeBlockUncheckedCreateInput>
+  }
+
+  /**
+   * ThemeBlock createMany
+   */
+  export type ThemeBlockCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ThemeBlocks.
+     */
+    data: ThemeBlockCreateManyInput | ThemeBlockCreateManyInput[]
+  }
+
+  /**
+   * ThemeBlock update
+   */
+  export type ThemeBlockUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ThemeBlock
+     */
+    select?: ThemeBlockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ThemeBlock
+     */
+    omit?: ThemeBlockOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeBlockInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ThemeBlock.
+     */
+    data: XOR<ThemeBlockUpdateInput, ThemeBlockUncheckedUpdateInput>
+    /**
+     * Choose, which ThemeBlock to update.
+     */
+    where: ThemeBlockWhereUniqueInput
+  }
+
+  /**
+   * ThemeBlock updateMany
+   */
+  export type ThemeBlockUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ThemeBlocks.
+     */
+    data: XOR<ThemeBlockUpdateManyMutationInput, ThemeBlockUncheckedUpdateManyInput>
+    /**
+     * Filter which ThemeBlocks to update
+     */
+    where?: ThemeBlockWhereInput
+    /**
+     * Limit how many ThemeBlocks to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ThemeBlock upsert
+   */
+  export type ThemeBlockUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ThemeBlock
+     */
+    select?: ThemeBlockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ThemeBlock
+     */
+    omit?: ThemeBlockOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeBlockInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ThemeBlock to update in case it exists.
+     */
+    where: ThemeBlockWhereUniqueInput
+    /**
+     * In case the ThemeBlock found by the `where` argument doesn't exist, create a new ThemeBlock with this data.
+     */
+    create: XOR<ThemeBlockCreateInput, ThemeBlockUncheckedCreateInput>
+    /**
+     * In case the ThemeBlock was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ThemeBlockUpdateInput, ThemeBlockUncheckedUpdateInput>
+  }
+
+  /**
+   * ThemeBlock delete
+   */
+  export type ThemeBlockDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ThemeBlock
+     */
+    select?: ThemeBlockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ThemeBlock
+     */
+    omit?: ThemeBlockOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeBlockInclude<ExtArgs> | null
+    /**
+     * Filter which ThemeBlock to delete.
+     */
+    where: ThemeBlockWhereUniqueInput
+  }
+
+  /**
+   * ThemeBlock deleteMany
+   */
+  export type ThemeBlockDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ThemeBlocks to delete
+     */
+    where?: ThemeBlockWhereInput
+    /**
+     * Limit how many ThemeBlocks to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ThemeBlock findRaw
+   */
+  export type ThemeBlockFindRawArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The query predicate filter. If unspecified, then all documents in the collection will match the predicate. ${@link https://docs.mongodb.com/manual/reference/operator/query MongoDB Docs}.
+     */
+    filter?: InputJsonValue
+    /**
+     * Additional options to pass to the `find` command ${@link https://docs.mongodb.com/manual/reference/command/find/#command-fields MongoDB Docs}.
+     */
+    options?: InputJsonValue
+  }
+
+  /**
+   * ThemeBlock aggregateRaw
+   */
+  export type ThemeBlockAggregateRawArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * An array of aggregation stages to process and transform the document stream via the aggregation pipeline. ${@link https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline MongoDB Docs}.
+     */
+    pipeline?: InputJsonValue[]
+    /**
+     * Additional options to pass to the `aggregate` command ${@link https://docs.mongodb.com/manual/reference/command/aggregate/#command-fields MongoDB Docs}.
+     */
+    options?: InputJsonValue
+  }
+
+  /**
+   * ThemeBlock without action
+   */
+  export type ThemeBlockDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ThemeBlock
+     */
+    select?: ThemeBlockSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ThemeBlock
+     */
+    omit?: ThemeBlockOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ThemeBlockInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SiteTheme
+   */
+
+  export type AggregateSiteTheme = {
+    _count: SiteThemeCountAggregateOutputType | null
+    _min: SiteThemeMinAggregateOutputType | null
+    _max: SiteThemeMaxAggregateOutputType | null
+  }
+
+  export type SiteThemeMinAggregateOutputType = {
+    id: string | null
+    siteId: string | null
+    themeId: string | null
+    installedAt: Date | null
+  }
+
+  export type SiteThemeMaxAggregateOutputType = {
+    id: string | null
+    siteId: string | null
+    themeId: string | null
+    installedAt: Date | null
+  }
+
+  export type SiteThemeCountAggregateOutputType = {
+    id: number
+    siteId: number
+    themeId: number
+    installedAt: number
+    _all: number
+  }
+
+
+  export type SiteThemeMinAggregateInputType = {
+    id?: true
+    siteId?: true
+    themeId?: true
+    installedAt?: true
+  }
+
+  export type SiteThemeMaxAggregateInputType = {
+    id?: true
+    siteId?: true
+    themeId?: true
+    installedAt?: true
+  }
+
+  export type SiteThemeCountAggregateInputType = {
+    id?: true
+    siteId?: true
+    themeId?: true
+    installedAt?: true
+    _all?: true
+  }
+
+  export type SiteThemeAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SiteTheme to aggregate.
+     */
+    where?: SiteThemeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteThemes to fetch.
+     */
+    orderBy?: SiteThemeOrderByWithRelationInput | SiteThemeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SiteThemeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteThemes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteThemes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SiteThemes
+    **/
+    _count?: true | SiteThemeCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SiteThemeMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SiteThemeMaxAggregateInputType
+  }
+
+  export type GetSiteThemeAggregateType<T extends SiteThemeAggregateArgs> = {
+        [P in keyof T & keyof AggregateSiteTheme]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSiteTheme[P]>
+      : GetScalarType<T[P], AggregateSiteTheme[P]>
+  }
+
+
+
+
+  export type SiteThemeGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteThemeWhereInput
+    orderBy?: SiteThemeOrderByWithAggregationInput | SiteThemeOrderByWithAggregationInput[]
+    by: SiteThemeScalarFieldEnum[] | SiteThemeScalarFieldEnum
+    having?: SiteThemeScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SiteThemeCountAggregateInputType | true
+    _min?: SiteThemeMinAggregateInputType
+    _max?: SiteThemeMaxAggregateInputType
+  }
+
+  export type SiteThemeGroupByOutputType = {
+    id: string
+    siteId: string
+    themeId: string
+    installedAt: Date
+    _count: SiteThemeCountAggregateOutputType | null
+    _min: SiteThemeMinAggregateOutputType | null
+    _max: SiteThemeMaxAggregateOutputType | null
+  }
+
+  type GetSiteThemeGroupByPayload<T extends SiteThemeGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SiteThemeGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SiteThemeGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SiteThemeGroupByOutputType[P]>
+            : GetScalarType<T[P], SiteThemeGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SiteThemeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    siteId?: boolean
+    themeId?: boolean
+    installedAt?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    theme?: boolean | ThemeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["siteTheme"]>
+
+
+
+  export type SiteThemeSelectScalar = {
+    id?: boolean
+    siteId?: boolean
+    themeId?: boolean
+    installedAt?: boolean
+  }
+
+  export type SiteThemeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "siteId" | "themeId" | "installedAt", ExtArgs["result"]["siteTheme"]>
+  export type SiteThemeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    theme?: boolean | ThemeDefaultArgs<ExtArgs>
+  }
+
+  export type $SiteThemePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SiteTheme"
+    objects: {
+      site: Prisma.$SitePayload<ExtArgs>
+      theme: Prisma.$ThemePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      siteId: string
+      themeId: string
+      installedAt: Date
+    }, ExtArgs["result"]["siteTheme"]>
+    composites: {}
+  }
+
+  type SiteThemeGetPayload<S extends boolean | null | undefined | SiteThemeDefaultArgs> = $Result.GetResult<Prisma.$SiteThemePayload, S>
+
+  type SiteThemeCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SiteThemeFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SiteThemeCountAggregateInputType | true
+    }
+
+  export interface SiteThemeDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SiteTheme'], meta: { name: 'SiteTheme' } }
+    /**
+     * Find zero or one SiteTheme that matches the filter.
+     * @param {SiteThemeFindUniqueArgs} args - Arguments to find a SiteTheme
+     * @example
+     * // Get one SiteTheme
+     * const siteTheme = await prisma.siteTheme.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SiteThemeFindUniqueArgs>(args: SelectSubset<T, SiteThemeFindUniqueArgs<ExtArgs>>): Prisma__SiteThemeClient<$Result.GetResult<Prisma.$SiteThemePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SiteTheme that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SiteThemeFindUniqueOrThrowArgs} args - Arguments to find a SiteTheme
+     * @example
+     * // Get one SiteTheme
+     * const siteTheme = await prisma.siteTheme.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SiteThemeFindUniqueOrThrowArgs>(args: SelectSubset<T, SiteThemeFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SiteThemeClient<$Result.GetResult<Prisma.$SiteThemePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SiteTheme that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteThemeFindFirstArgs} args - Arguments to find a SiteTheme
+     * @example
+     * // Get one SiteTheme
+     * const siteTheme = await prisma.siteTheme.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SiteThemeFindFirstArgs>(args?: SelectSubset<T, SiteThemeFindFirstArgs<ExtArgs>>): Prisma__SiteThemeClient<$Result.GetResult<Prisma.$SiteThemePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SiteTheme that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteThemeFindFirstOrThrowArgs} args - Arguments to find a SiteTheme
+     * @example
+     * // Get one SiteTheme
+     * const siteTheme = await prisma.siteTheme.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SiteThemeFindFirstOrThrowArgs>(args?: SelectSubset<T, SiteThemeFindFirstOrThrowArgs<ExtArgs>>): Prisma__SiteThemeClient<$Result.GetResult<Prisma.$SiteThemePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SiteThemes that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteThemeFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SiteThemes
+     * const siteThemes = await prisma.siteTheme.findMany()
+     * 
+     * // Get first 10 SiteThemes
+     * const siteThemes = await prisma.siteTheme.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const siteThemeWithIdOnly = await prisma.siteTheme.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SiteThemeFindManyArgs>(args?: SelectSubset<T, SiteThemeFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteThemePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SiteTheme.
+     * @param {SiteThemeCreateArgs} args - Arguments to create a SiteTheme.
+     * @example
+     * // Create one SiteTheme
+     * const SiteTheme = await prisma.siteTheme.create({
+     *   data: {
+     *     // ... data to create a SiteTheme
+     *   }
+     * })
+     * 
+     */
+    create<T extends SiteThemeCreateArgs>(args: SelectSubset<T, SiteThemeCreateArgs<ExtArgs>>): Prisma__SiteThemeClient<$Result.GetResult<Prisma.$SiteThemePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SiteThemes.
+     * @param {SiteThemeCreateManyArgs} args - Arguments to create many SiteThemes.
+     * @example
+     * // Create many SiteThemes
+     * const siteTheme = await prisma.siteTheme.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SiteThemeCreateManyArgs>(args?: SelectSubset<T, SiteThemeCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a SiteTheme.
+     * @param {SiteThemeDeleteArgs} args - Arguments to delete one SiteTheme.
+     * @example
+     * // Delete one SiteTheme
+     * const SiteTheme = await prisma.siteTheme.delete({
+     *   where: {
+     *     // ... filter to delete one SiteTheme
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SiteThemeDeleteArgs>(args: SelectSubset<T, SiteThemeDeleteArgs<ExtArgs>>): Prisma__SiteThemeClient<$Result.GetResult<Prisma.$SiteThemePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SiteTheme.
+     * @param {SiteThemeUpdateArgs} args - Arguments to update one SiteTheme.
+     * @example
+     * // Update one SiteTheme
+     * const siteTheme = await prisma.siteTheme.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SiteThemeUpdateArgs>(args: SelectSubset<T, SiteThemeUpdateArgs<ExtArgs>>): Prisma__SiteThemeClient<$Result.GetResult<Prisma.$SiteThemePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SiteThemes.
+     * @param {SiteThemeDeleteManyArgs} args - Arguments to filter SiteThemes to delete.
+     * @example
+     * // Delete a few SiteThemes
+     * const { count } = await prisma.siteTheme.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SiteThemeDeleteManyArgs>(args?: SelectSubset<T, SiteThemeDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SiteThemes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteThemeUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SiteThemes
+     * const siteTheme = await prisma.siteTheme.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SiteThemeUpdateManyArgs>(args: SelectSubset<T, SiteThemeUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one SiteTheme.
+     * @param {SiteThemeUpsertArgs} args - Arguments to update or create a SiteTheme.
+     * @example
+     * // Update or create a SiteTheme
+     * const siteTheme = await prisma.siteTheme.upsert({
+     *   create: {
+     *     // ... data to create a SiteTheme
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SiteTheme we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SiteThemeUpsertArgs>(args: SelectSubset<T, SiteThemeUpsertArgs<ExtArgs>>): Prisma__SiteThemeClient<$Result.GetResult<Prisma.$SiteThemePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SiteThemes that matches the filter.
+     * @param {SiteThemeFindRawArgs} args - Select which filters you would like to apply.
+     * @example
+     * const siteTheme = await prisma.siteTheme.findRaw({
+     *   filter: { age: { $gt: 25 } }
+     * })
+     */
+    findRaw(args?: SiteThemeFindRawArgs): Prisma.PrismaPromise<JsonObject>
+
+    /**
+     * Perform aggregation operations on a SiteTheme.
+     * @param {SiteThemeAggregateRawArgs} args - Select which aggregations you would like to apply.
+     * @example
+     * const siteTheme = await prisma.siteTheme.aggregateRaw({
+     *   pipeline: [
+     *     { $match: { status: "registered" } },
+     *     { $group: { _id: "$country", total: { $sum: 1 } } }
+     *   ]
+     * })
+     */
+    aggregateRaw(args?: SiteThemeAggregateRawArgs): Prisma.PrismaPromise<JsonObject>
+
+
+    /**
+     * Count the number of SiteThemes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteThemeCountArgs} args - Arguments to filter SiteThemes to count.
+     * @example
+     * // Count the number of SiteThemes
+     * const count = await prisma.siteTheme.count({
+     *   where: {
+     *     // ... the filter for the SiteThemes we want to count
+     *   }
+     * })
+    **/
+    count<T extends SiteThemeCountArgs>(
+      args?: Subset<T, SiteThemeCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SiteThemeCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SiteTheme.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteThemeAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SiteThemeAggregateArgs>(args: Subset<T, SiteThemeAggregateArgs>): Prisma.PrismaPromise<GetSiteThemeAggregateType<T>>
+
+    /**
+     * Group by SiteTheme.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteThemeGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SiteThemeGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SiteThemeGroupByArgs['orderBy'] }
+        : { orderBy?: SiteThemeGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SiteThemeGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSiteThemeGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SiteTheme model
+   */
+  readonly fields: SiteThemeFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SiteTheme.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SiteThemeClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    site<T extends SiteDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SiteDefaultArgs<ExtArgs>>): Prisma__SiteClient<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    theme<T extends ThemeDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ThemeDefaultArgs<ExtArgs>>): Prisma__ThemeClient<$Result.GetResult<Prisma.$ThemePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SiteTheme model
+   */
+  interface SiteThemeFieldRefs {
+    readonly id: FieldRef<"SiteTheme", 'String'>
+    readonly siteId: FieldRef<"SiteTheme", 'String'>
+    readonly themeId: FieldRef<"SiteTheme", 'String'>
+    readonly installedAt: FieldRef<"SiteTheme", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SiteTheme findUnique
+   */
+  export type SiteThemeFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteTheme
+     */
+    select?: SiteThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteTheme
+     */
+    omit?: SiteThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteThemeInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteTheme to fetch.
+     */
+    where: SiteThemeWhereUniqueInput
+  }
+
+  /**
+   * SiteTheme findUniqueOrThrow
+   */
+  export type SiteThemeFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteTheme
+     */
+    select?: SiteThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteTheme
+     */
+    omit?: SiteThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteThemeInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteTheme to fetch.
+     */
+    where: SiteThemeWhereUniqueInput
+  }
+
+  /**
+   * SiteTheme findFirst
+   */
+  export type SiteThemeFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteTheme
+     */
+    select?: SiteThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteTheme
+     */
+    omit?: SiteThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteThemeInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteTheme to fetch.
+     */
+    where?: SiteThemeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteThemes to fetch.
+     */
+    orderBy?: SiteThemeOrderByWithRelationInput | SiteThemeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SiteThemes.
+     */
+    cursor?: SiteThemeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteThemes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteThemes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteThemes.
+     */
+    distinct?: SiteThemeScalarFieldEnum | SiteThemeScalarFieldEnum[]
+  }
+
+  /**
+   * SiteTheme findFirstOrThrow
+   */
+  export type SiteThemeFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteTheme
+     */
+    select?: SiteThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteTheme
+     */
+    omit?: SiteThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteThemeInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteTheme to fetch.
+     */
+    where?: SiteThemeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteThemes to fetch.
+     */
+    orderBy?: SiteThemeOrderByWithRelationInput | SiteThemeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SiteThemes.
+     */
+    cursor?: SiteThemeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteThemes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteThemes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteThemes.
+     */
+    distinct?: SiteThemeScalarFieldEnum | SiteThemeScalarFieldEnum[]
+  }
+
+  /**
+   * SiteTheme findMany
+   */
+  export type SiteThemeFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteTheme
+     */
+    select?: SiteThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteTheme
+     */
+    omit?: SiteThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteThemeInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteThemes to fetch.
+     */
+    where?: SiteThemeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteThemes to fetch.
+     */
+    orderBy?: SiteThemeOrderByWithRelationInput | SiteThemeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SiteThemes.
+     */
+    cursor?: SiteThemeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteThemes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteThemes.
+     */
+    skip?: number
+    distinct?: SiteThemeScalarFieldEnum | SiteThemeScalarFieldEnum[]
+  }
+
+  /**
+   * SiteTheme create
+   */
+  export type SiteThemeCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteTheme
+     */
+    select?: SiteThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteTheme
+     */
+    omit?: SiteThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteThemeInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SiteTheme.
+     */
+    data: XOR<SiteThemeCreateInput, SiteThemeUncheckedCreateInput>
+  }
+
+  /**
+   * SiteTheme createMany
+   */
+  export type SiteThemeCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SiteThemes.
+     */
+    data: SiteThemeCreateManyInput | SiteThemeCreateManyInput[]
+  }
+
+  /**
+   * SiteTheme update
+   */
+  export type SiteThemeUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteTheme
+     */
+    select?: SiteThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteTheme
+     */
+    omit?: SiteThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteThemeInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SiteTheme.
+     */
+    data: XOR<SiteThemeUpdateInput, SiteThemeUncheckedUpdateInput>
+    /**
+     * Choose, which SiteTheme to update.
+     */
+    where: SiteThemeWhereUniqueInput
+  }
+
+  /**
+   * SiteTheme updateMany
+   */
+  export type SiteThemeUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SiteThemes.
+     */
+    data: XOR<SiteThemeUpdateManyMutationInput, SiteThemeUncheckedUpdateManyInput>
+    /**
+     * Filter which SiteThemes to update
+     */
+    where?: SiteThemeWhereInput
+    /**
+     * Limit how many SiteThemes to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SiteTheme upsert
+   */
+  export type SiteThemeUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteTheme
+     */
+    select?: SiteThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteTheme
+     */
+    omit?: SiteThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteThemeInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SiteTheme to update in case it exists.
+     */
+    where: SiteThemeWhereUniqueInput
+    /**
+     * In case the SiteTheme found by the `where` argument doesn't exist, create a new SiteTheme with this data.
+     */
+    create: XOR<SiteThemeCreateInput, SiteThemeUncheckedCreateInput>
+    /**
+     * In case the SiteTheme was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SiteThemeUpdateInput, SiteThemeUncheckedUpdateInput>
+  }
+
+  /**
+   * SiteTheme delete
+   */
+  export type SiteThemeDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteTheme
+     */
+    select?: SiteThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteTheme
+     */
+    omit?: SiteThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteThemeInclude<ExtArgs> | null
+    /**
+     * Filter which SiteTheme to delete.
+     */
+    where: SiteThemeWhereUniqueInput
+  }
+
+  /**
+   * SiteTheme deleteMany
+   */
+  export type SiteThemeDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SiteThemes to delete
+     */
+    where?: SiteThemeWhereInput
+    /**
+     * Limit how many SiteThemes to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SiteTheme findRaw
+   */
+  export type SiteThemeFindRawArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The query predicate filter. If unspecified, then all documents in the collection will match the predicate. ${@link https://docs.mongodb.com/manual/reference/operator/query MongoDB Docs}.
+     */
+    filter?: InputJsonValue
+    /**
+     * Additional options to pass to the `find` command ${@link https://docs.mongodb.com/manual/reference/command/find/#command-fields MongoDB Docs}.
+     */
+    options?: InputJsonValue
+  }
+
+  /**
+   * SiteTheme aggregateRaw
+   */
+  export type SiteThemeAggregateRawArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * An array of aggregation stages to process and transform the document stream via the aggregation pipeline. ${@link https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline MongoDB Docs}.
+     */
+    pipeline?: InputJsonValue[]
+    /**
+     * Additional options to pass to the `aggregate` command ${@link https://docs.mongodb.com/manual/reference/command/aggregate/#command-fields MongoDB Docs}.
+     */
+    options?: InputJsonValue
+  }
+
+  /**
+   * SiteTheme without action
+   */
+  export type SiteThemeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteTheme
+     */
+    select?: SiteThemeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteTheme
+     */
+    omit?: SiteThemeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteThemeInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -17851,6 +21225,40 @@ export namespace Prisma {
   };
 
   export type RssItemScalarFieldEnum = (typeof RssItemScalarFieldEnum)[keyof typeof RssItemScalarFieldEnum]
+
+
+  export const ThemeScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    description: 'description',
+    thumbnail: 'thumbnail',
+    price: 'price',
+    isPremium: 'isPremium',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ThemeScalarFieldEnum = (typeof ThemeScalarFieldEnum)[keyof typeof ThemeScalarFieldEnum]
+
+
+  export const ThemeBlockScalarFieldEnum: {
+    id: 'id',
+    themeId: 'themeId',
+    componentName: 'componentName',
+    componentDefinition: 'componentDefinition'
+  };
+
+  export type ThemeBlockScalarFieldEnum = (typeof ThemeBlockScalarFieldEnum)[keyof typeof ThemeBlockScalarFieldEnum]
+
+
+  export const SiteThemeScalarFieldEnum: {
+    id: 'id',
+    siteId: 'siteId',
+    themeId: 'themeId',
+    installedAt: 'installedAt'
+  };
+
+  export type SiteThemeScalarFieldEnum = (typeof SiteThemeScalarFieldEnum)[keyof typeof SiteThemeScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -18420,6 +21828,7 @@ export namespace Prisma {
     Page?: PageListRelationFilter
     RSS?: RssListRelationFilter
     AnalyticsEvent?: AnalyticsEventListRelationFilter
+    installedThemes?: SiteThemeListRelationFilter
   }
 
   export type SiteOrderByWithRelationInput = {
@@ -18452,6 +21861,7 @@ export namespace Prisma {
     Page?: PageOrderByRelationAggregateInput
     RSS?: RssOrderByRelationAggregateInput
     AnalyticsEvent?: AnalyticsEventOrderByRelationAggregateInput
+    installedThemes?: SiteThemeOrderByRelationAggregateInput
   }
 
   export type SiteWhereUniqueInput = Prisma.AtLeast<{
@@ -18487,6 +21897,7 @@ export namespace Prisma {
     Page?: PageListRelationFilter
     RSS?: RssListRelationFilter
     AnalyticsEvent?: AnalyticsEventListRelationFilter
+    installedThemes?: SiteThemeListRelationFilter
   }, "id" | "subdomain" | "url">
 
   export type SiteOrderByWithAggregationInput = {
@@ -19250,6 +22661,185 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"RssItem"> | Date | string
   }
 
+  export type ThemeWhereInput = {
+    AND?: ThemeWhereInput | ThemeWhereInput[]
+    OR?: ThemeWhereInput[]
+    NOT?: ThemeWhereInput | ThemeWhereInput[]
+    id?: StringFilter<"Theme"> | string
+    name?: StringFilter<"Theme"> | string
+    description?: StringFilter<"Theme"> | string
+    thumbnail?: StringNullableFilter<"Theme"> | string | null
+    price?: FloatFilter<"Theme"> | number
+    isPremium?: BoolFilter<"Theme"> | boolean
+    createdAt?: DateTimeFilter<"Theme"> | Date | string
+    updatedAt?: DateTimeFilter<"Theme"> | Date | string
+    blocks?: ThemeBlockListRelationFilter
+    installedIn?: SiteThemeListRelationFilter
+  }
+
+  export type ThemeOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    thumbnail?: SortOrder
+    price?: SortOrder
+    isPremium?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    blocks?: ThemeBlockOrderByRelationAggregateInput
+    installedIn?: SiteThemeOrderByRelationAggregateInput
+  }
+
+  export type ThemeWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: ThemeWhereInput | ThemeWhereInput[]
+    OR?: ThemeWhereInput[]
+    NOT?: ThemeWhereInput | ThemeWhereInput[]
+    name?: StringFilter<"Theme"> | string
+    description?: StringFilter<"Theme"> | string
+    thumbnail?: StringNullableFilter<"Theme"> | string | null
+    price?: FloatFilter<"Theme"> | number
+    isPremium?: BoolFilter<"Theme"> | boolean
+    createdAt?: DateTimeFilter<"Theme"> | Date | string
+    updatedAt?: DateTimeFilter<"Theme"> | Date | string
+    blocks?: ThemeBlockListRelationFilter
+    installedIn?: SiteThemeListRelationFilter
+  }, "id">
+
+  export type ThemeOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    thumbnail?: SortOrder
+    price?: SortOrder
+    isPremium?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ThemeCountOrderByAggregateInput
+    _avg?: ThemeAvgOrderByAggregateInput
+    _max?: ThemeMaxOrderByAggregateInput
+    _min?: ThemeMinOrderByAggregateInput
+    _sum?: ThemeSumOrderByAggregateInput
+  }
+
+  export type ThemeScalarWhereWithAggregatesInput = {
+    AND?: ThemeScalarWhereWithAggregatesInput | ThemeScalarWhereWithAggregatesInput[]
+    OR?: ThemeScalarWhereWithAggregatesInput[]
+    NOT?: ThemeScalarWhereWithAggregatesInput | ThemeScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Theme"> | string
+    name?: StringWithAggregatesFilter<"Theme"> | string
+    description?: StringWithAggregatesFilter<"Theme"> | string
+    thumbnail?: StringNullableWithAggregatesFilter<"Theme"> | string | null
+    price?: FloatWithAggregatesFilter<"Theme"> | number
+    isPremium?: BoolWithAggregatesFilter<"Theme"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"Theme"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Theme"> | Date | string
+  }
+
+  export type ThemeBlockWhereInput = {
+    AND?: ThemeBlockWhereInput | ThemeBlockWhereInput[]
+    OR?: ThemeBlockWhereInput[]
+    NOT?: ThemeBlockWhereInput | ThemeBlockWhereInput[]
+    id?: StringFilter<"ThemeBlock"> | string
+    themeId?: StringFilter<"ThemeBlock"> | string
+    componentName?: StringFilter<"ThemeBlock"> | string
+    componentDefinition?: JsonFilter<"ThemeBlock">
+    theme?: XOR<ThemeScalarRelationFilter, ThemeWhereInput>
+  }
+
+  export type ThemeBlockOrderByWithRelationInput = {
+    id?: SortOrder
+    themeId?: SortOrder
+    componentName?: SortOrder
+    componentDefinition?: SortOrder
+    theme?: ThemeOrderByWithRelationInput
+  }
+
+  export type ThemeBlockWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: ThemeBlockWhereInput | ThemeBlockWhereInput[]
+    OR?: ThemeBlockWhereInput[]
+    NOT?: ThemeBlockWhereInput | ThemeBlockWhereInput[]
+    themeId?: StringFilter<"ThemeBlock"> | string
+    componentName?: StringFilter<"ThemeBlock"> | string
+    componentDefinition?: JsonFilter<"ThemeBlock">
+    theme?: XOR<ThemeScalarRelationFilter, ThemeWhereInput>
+  }, "id">
+
+  export type ThemeBlockOrderByWithAggregationInput = {
+    id?: SortOrder
+    themeId?: SortOrder
+    componentName?: SortOrder
+    componentDefinition?: SortOrder
+    _count?: ThemeBlockCountOrderByAggregateInput
+    _max?: ThemeBlockMaxOrderByAggregateInput
+    _min?: ThemeBlockMinOrderByAggregateInput
+  }
+
+  export type ThemeBlockScalarWhereWithAggregatesInput = {
+    AND?: ThemeBlockScalarWhereWithAggregatesInput | ThemeBlockScalarWhereWithAggregatesInput[]
+    OR?: ThemeBlockScalarWhereWithAggregatesInput[]
+    NOT?: ThemeBlockScalarWhereWithAggregatesInput | ThemeBlockScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ThemeBlock"> | string
+    themeId?: StringWithAggregatesFilter<"ThemeBlock"> | string
+    componentName?: StringWithAggregatesFilter<"ThemeBlock"> | string
+    componentDefinition?: JsonWithAggregatesFilter<"ThemeBlock">
+  }
+
+  export type SiteThemeWhereInput = {
+    AND?: SiteThemeWhereInput | SiteThemeWhereInput[]
+    OR?: SiteThemeWhereInput[]
+    NOT?: SiteThemeWhereInput | SiteThemeWhereInput[]
+    id?: StringFilter<"SiteTheme"> | string
+    siteId?: StringFilter<"SiteTheme"> | string
+    themeId?: StringFilter<"SiteTheme"> | string
+    installedAt?: DateTimeFilter<"SiteTheme"> | Date | string
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+    theme?: XOR<ThemeScalarRelationFilter, ThemeWhereInput>
+  }
+
+  export type SiteThemeOrderByWithRelationInput = {
+    id?: SortOrder
+    siteId?: SortOrder
+    themeId?: SortOrder
+    installedAt?: SortOrder
+    site?: SiteOrderByWithRelationInput
+    theme?: ThemeOrderByWithRelationInput
+  }
+
+  export type SiteThemeWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    siteId_themeId?: SiteThemeSiteIdThemeIdCompoundUniqueInput
+    AND?: SiteThemeWhereInput | SiteThemeWhereInput[]
+    OR?: SiteThemeWhereInput[]
+    NOT?: SiteThemeWhereInput | SiteThemeWhereInput[]
+    siteId?: StringFilter<"SiteTheme"> | string
+    themeId?: StringFilter<"SiteTheme"> | string
+    installedAt?: DateTimeFilter<"SiteTheme"> | Date | string
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+    theme?: XOR<ThemeScalarRelationFilter, ThemeWhereInput>
+  }, "id" | "siteId_themeId">
+
+  export type SiteThemeOrderByWithAggregationInput = {
+    id?: SortOrder
+    siteId?: SortOrder
+    themeId?: SortOrder
+    installedAt?: SortOrder
+    _count?: SiteThemeCountOrderByAggregateInput
+    _max?: SiteThemeMaxOrderByAggregateInput
+    _min?: SiteThemeMinOrderByAggregateInput
+  }
+
+  export type SiteThemeScalarWhereWithAggregatesInput = {
+    AND?: SiteThemeScalarWhereWithAggregatesInput | SiteThemeScalarWhereWithAggregatesInput[]
+    OR?: SiteThemeScalarWhereWithAggregatesInput[]
+    NOT?: SiteThemeScalarWhereWithAggregatesInput | SiteThemeScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SiteTheme"> | string
+    siteId?: StringWithAggregatesFilter<"SiteTheme"> | string
+    themeId?: StringWithAggregatesFilter<"SiteTheme"> | string
+    installedAt?: DateTimeWithAggregatesFilter<"SiteTheme"> | Date | string
+  }
+
   export type UserCreateInput = {
     id?: string
     name: string
@@ -19673,6 +23263,7 @@ export namespace Prisma {
     Page?: PageCreateNestedManyWithoutSiteInput
     RSS?: RssCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateInput = {
@@ -19702,6 +23293,7 @@ export namespace Prisma {
     Page?: PageUncheckedCreateNestedManyWithoutSiteInput
     RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUpdateInput = {
@@ -19730,6 +23322,7 @@ export namespace Prisma {
     Page?: PageUpdateManyWithoutSiteNestedInput
     RSS?: RssUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateInput = {
@@ -19758,6 +23351,7 @@ export namespace Prisma {
     Page?: PageUncheckedUpdateManyWithoutSiteNestedInput
     RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteCreateManyInput = {
@@ -20586,6 +24180,174 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ThemeCreateInput = {
+    id?: string
+    name: string
+    description: string
+    thumbnail?: string | null
+    price?: number
+    isPremium?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    blocks?: ThemeBlockCreateNestedManyWithoutThemeInput
+    installedIn?: SiteThemeCreateNestedManyWithoutThemeInput
+  }
+
+  export type ThemeUncheckedCreateInput = {
+    id?: string
+    name: string
+    description: string
+    thumbnail?: string | null
+    price?: number
+    isPremium?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    blocks?: ThemeBlockUncheckedCreateNestedManyWithoutThemeInput
+    installedIn?: SiteThemeUncheckedCreateNestedManyWithoutThemeInput
+  }
+
+  export type ThemeUpdateInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    isPremium?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    blocks?: ThemeBlockUpdateManyWithoutThemeNestedInput
+    installedIn?: SiteThemeUpdateManyWithoutThemeNestedInput
+  }
+
+  export type ThemeUncheckedUpdateInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    isPremium?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    blocks?: ThemeBlockUncheckedUpdateManyWithoutThemeNestedInput
+    installedIn?: SiteThemeUncheckedUpdateManyWithoutThemeNestedInput
+  }
+
+  export type ThemeCreateManyInput = {
+    id?: string
+    name: string
+    description: string
+    thumbnail?: string | null
+    price?: number
+    isPremium?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ThemeUpdateManyMutationInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    isPremium?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ThemeUncheckedUpdateManyInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    isPremium?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ThemeBlockCreateInput = {
+    id?: string
+    componentName: string
+    componentDefinition: InputJsonValue
+    theme: ThemeCreateNestedOneWithoutBlocksInput
+  }
+
+  export type ThemeBlockUncheckedCreateInput = {
+    id?: string
+    themeId: string
+    componentName: string
+    componentDefinition: InputJsonValue
+  }
+
+  export type ThemeBlockUpdateInput = {
+    componentName?: StringFieldUpdateOperationsInput | string
+    componentDefinition?: InputJsonValue | InputJsonValue
+    theme?: ThemeUpdateOneRequiredWithoutBlocksNestedInput
+  }
+
+  export type ThemeBlockUncheckedUpdateInput = {
+    themeId?: StringFieldUpdateOperationsInput | string
+    componentName?: StringFieldUpdateOperationsInput | string
+    componentDefinition?: InputJsonValue | InputJsonValue
+  }
+
+  export type ThemeBlockCreateManyInput = {
+    id?: string
+    themeId: string
+    componentName: string
+    componentDefinition: InputJsonValue
+  }
+
+  export type ThemeBlockUpdateManyMutationInput = {
+    componentName?: StringFieldUpdateOperationsInput | string
+    componentDefinition?: InputJsonValue | InputJsonValue
+  }
+
+  export type ThemeBlockUncheckedUpdateManyInput = {
+    themeId?: StringFieldUpdateOperationsInput | string
+    componentName?: StringFieldUpdateOperationsInput | string
+    componentDefinition?: InputJsonValue | InputJsonValue
+  }
+
+  export type SiteThemeCreateInput = {
+    id?: string
+    installedAt?: Date | string
+    site: SiteCreateNestedOneWithoutInstalledThemesInput
+    theme: ThemeCreateNestedOneWithoutInstalledInInput
+  }
+
+  export type SiteThemeUncheckedCreateInput = {
+    id?: string
+    siteId: string
+    themeId: string
+    installedAt?: Date | string
+  }
+
+  export type SiteThemeUpdateInput = {
+    installedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    site?: SiteUpdateOneRequiredWithoutInstalledThemesNestedInput
+    theme?: ThemeUpdateOneRequiredWithoutInstalledInNestedInput
+  }
+
+  export type SiteThemeUncheckedUpdateInput = {
+    siteId?: StringFieldUpdateOperationsInput | string
+    themeId?: StringFieldUpdateOperationsInput | string
+    installedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SiteThemeCreateManyInput = {
+    id?: string
+    siteId: string
+    themeId: string
+    installedAt?: Date | string
+  }
+
+  export type SiteThemeUpdateManyMutationInput = {
+    installedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SiteThemeUncheckedUpdateManyInput = {
+    siteId?: StringFieldUpdateOperationsInput | string
+    themeId?: StringFieldUpdateOperationsInput | string
+    installedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -21094,11 +24856,21 @@ export namespace Prisma {
     none?: AnalyticsEventWhereInput
   }
 
+  export type SiteThemeListRelationFilter = {
+    every?: SiteThemeWhereInput
+    some?: SiteThemeWhereInput
+    none?: SiteThemeWhereInput
+  }
+
   export type RssOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
   export type AnalyticsEventOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SiteThemeOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -21699,6 +25471,132 @@ export namespace Prisma {
     createdAt?: SortOrder
   }
 
+  export type ThemeBlockListRelationFilter = {
+    every?: ThemeBlockWhereInput
+    some?: ThemeBlockWhereInput
+    none?: ThemeBlockWhereInput
+  }
+
+  export type ThemeBlockOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ThemeCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    thumbnail?: SortOrder
+    price?: SortOrder
+    isPremium?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ThemeAvgOrderByAggregateInput = {
+    price?: SortOrder
+  }
+
+  export type ThemeMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    thumbnail?: SortOrder
+    price?: SortOrder
+    isPremium?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ThemeMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    thumbnail?: SortOrder
+    price?: SortOrder
+    isPremium?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ThemeSumOrderByAggregateInput = {
+    price?: SortOrder
+  }
+  export type JsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+  }
+
+  export type ThemeScalarRelationFilter = {
+    is?: ThemeWhereInput
+    isNot?: ThemeWhereInput
+  }
+
+  export type ThemeBlockCountOrderByAggregateInput = {
+    id?: SortOrder
+    themeId?: SortOrder
+    componentName?: SortOrder
+    componentDefinition?: SortOrder
+  }
+
+  export type ThemeBlockMaxOrderByAggregateInput = {
+    id?: SortOrder
+    themeId?: SortOrder
+    componentName?: SortOrder
+  }
+
+  export type ThemeBlockMinOrderByAggregateInput = {
+    id?: SortOrder
+    themeId?: SortOrder
+    componentName?: SortOrder
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
+  }
+
+  export type SiteThemeSiteIdThemeIdCompoundUniqueInput = {
+    siteId: string
+    themeId: string
+  }
+
+  export type SiteThemeCountOrderByAggregateInput = {
+    id?: SortOrder
+    siteId?: SortOrder
+    themeId?: SortOrder
+    installedAt?: SortOrder
+  }
+
+  export type SiteThemeMaxOrderByAggregateInput = {
+    id?: SortOrder
+    siteId?: SortOrder
+    themeId?: SortOrder
+    installedAt?: SortOrder
+  }
+
+  export type SiteThemeMinOrderByAggregateInput = {
+    id?: SortOrder
+    siteId?: SortOrder
+    themeId?: SortOrder
+    installedAt?: SortOrder
+  }
+
   export type SessionCreateNestedManyWithoutUserInput = {
     create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
     connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
@@ -22141,6 +26039,13 @@ export namespace Prisma {
     connect?: AnalyticsEventWhereUniqueInput | AnalyticsEventWhereUniqueInput[]
   }
 
+  export type SiteThemeCreateNestedManyWithoutSiteInput = {
+    create?: XOR<SiteThemeCreateWithoutSiteInput, SiteThemeUncheckedCreateWithoutSiteInput> | SiteThemeCreateWithoutSiteInput[] | SiteThemeUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SiteThemeCreateOrConnectWithoutSiteInput | SiteThemeCreateOrConnectWithoutSiteInput[]
+    createMany?: SiteThemeCreateManySiteInputEnvelope
+    connect?: SiteThemeWhereUniqueInput | SiteThemeWhereUniqueInput[]
+  }
+
   export type CategoryUncheckedCreateNestedManyWithoutSiteInput = {
     create?: XOR<CategoryCreateWithoutSiteInput, CategoryUncheckedCreateWithoutSiteInput> | CategoryCreateWithoutSiteInput[] | CategoryUncheckedCreateWithoutSiteInput[]
     connectOrCreate?: CategoryCreateOrConnectWithoutSiteInput | CategoryCreateOrConnectWithoutSiteInput[]
@@ -22174,6 +26079,13 @@ export namespace Prisma {
     connectOrCreate?: AnalyticsEventCreateOrConnectWithoutSiteInput | AnalyticsEventCreateOrConnectWithoutSiteInput[]
     createMany?: AnalyticsEventCreateManySiteInputEnvelope
     connect?: AnalyticsEventWhereUniqueInput | AnalyticsEventWhereUniqueInput[]
+  }
+
+  export type SiteThemeUncheckedCreateNestedManyWithoutSiteInput = {
+    create?: XOR<SiteThemeCreateWithoutSiteInput, SiteThemeUncheckedCreateWithoutSiteInput> | SiteThemeCreateWithoutSiteInput[] | SiteThemeUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SiteThemeCreateOrConnectWithoutSiteInput | SiteThemeCreateOrConnectWithoutSiteInput[]
+    createMany?: SiteThemeCreateManySiteInputEnvelope
+    connect?: SiteThemeWhereUniqueInput | SiteThemeWhereUniqueInput[]
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -22284,6 +26196,20 @@ export namespace Prisma {
     deleteMany?: AnalyticsEventScalarWhereInput | AnalyticsEventScalarWhereInput[]
   }
 
+  export type SiteThemeUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<SiteThemeCreateWithoutSiteInput, SiteThemeUncheckedCreateWithoutSiteInput> | SiteThemeCreateWithoutSiteInput[] | SiteThemeUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SiteThemeCreateOrConnectWithoutSiteInput | SiteThemeCreateOrConnectWithoutSiteInput[]
+    upsert?: SiteThemeUpsertWithWhereUniqueWithoutSiteInput | SiteThemeUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: SiteThemeCreateManySiteInputEnvelope
+    set?: SiteThemeWhereUniqueInput | SiteThemeWhereUniqueInput[]
+    disconnect?: SiteThemeWhereUniqueInput | SiteThemeWhereUniqueInput[]
+    delete?: SiteThemeWhereUniqueInput | SiteThemeWhereUniqueInput[]
+    connect?: SiteThemeWhereUniqueInput | SiteThemeWhereUniqueInput[]
+    update?: SiteThemeUpdateWithWhereUniqueWithoutSiteInput | SiteThemeUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: SiteThemeUpdateManyWithWhereWithoutSiteInput | SiteThemeUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: SiteThemeScalarWhereInput | SiteThemeScalarWhereInput[]
+  }
+
   export type CategoryUncheckedUpdateManyWithoutSiteNestedInput = {
     create?: XOR<CategoryCreateWithoutSiteInput, CategoryUncheckedCreateWithoutSiteInput> | CategoryCreateWithoutSiteInput[] | CategoryUncheckedCreateWithoutSiteInput[]
     connectOrCreate?: CategoryCreateOrConnectWithoutSiteInput | CategoryCreateOrConnectWithoutSiteInput[]
@@ -22352,6 +26278,20 @@ export namespace Prisma {
     update?: AnalyticsEventUpdateWithWhereUniqueWithoutSiteInput | AnalyticsEventUpdateWithWhereUniqueWithoutSiteInput[]
     updateMany?: AnalyticsEventUpdateManyWithWhereWithoutSiteInput | AnalyticsEventUpdateManyWithWhereWithoutSiteInput[]
     deleteMany?: AnalyticsEventScalarWhereInput | AnalyticsEventScalarWhereInput[]
+  }
+
+  export type SiteThemeUncheckedUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<SiteThemeCreateWithoutSiteInput, SiteThemeUncheckedCreateWithoutSiteInput> | SiteThemeCreateWithoutSiteInput[] | SiteThemeUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SiteThemeCreateOrConnectWithoutSiteInput | SiteThemeCreateOrConnectWithoutSiteInput[]
+    upsert?: SiteThemeUpsertWithWhereUniqueWithoutSiteInput | SiteThemeUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: SiteThemeCreateManySiteInputEnvelope
+    set?: SiteThemeWhereUniqueInput | SiteThemeWhereUniqueInput[]
+    disconnect?: SiteThemeWhereUniqueInput | SiteThemeWhereUniqueInput[]
+    delete?: SiteThemeWhereUniqueInput | SiteThemeWhereUniqueInput[]
+    connect?: SiteThemeWhereUniqueInput | SiteThemeWhereUniqueInput[]
+    update?: SiteThemeUpdateWithWhereUniqueWithoutSiteInput | SiteThemeUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: SiteThemeUpdateManyWithWhereWithoutSiteInput | SiteThemeUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: SiteThemeScalarWhereInput | SiteThemeScalarWhereInput[]
   }
 
   export type SiteCreateNestedManyWithoutFeaturesInput = {
@@ -22697,6 +26637,132 @@ export namespace Prisma {
     update?: XOR<XOR<RssUpdateToOneWithWhereWithoutRssItemsInput, RssUpdateWithoutRssItemsInput>, RssUncheckedUpdateWithoutRssItemsInput>
   }
 
+  export type ThemeBlockCreateNestedManyWithoutThemeInput = {
+    create?: XOR<ThemeBlockCreateWithoutThemeInput, ThemeBlockUncheckedCreateWithoutThemeInput> | ThemeBlockCreateWithoutThemeInput[] | ThemeBlockUncheckedCreateWithoutThemeInput[]
+    connectOrCreate?: ThemeBlockCreateOrConnectWithoutThemeInput | ThemeBlockCreateOrConnectWithoutThemeInput[]
+    createMany?: ThemeBlockCreateManyThemeInputEnvelope
+    connect?: ThemeBlockWhereUniqueInput | ThemeBlockWhereUniqueInput[]
+  }
+
+  export type SiteThemeCreateNestedManyWithoutThemeInput = {
+    create?: XOR<SiteThemeCreateWithoutThemeInput, SiteThemeUncheckedCreateWithoutThemeInput> | SiteThemeCreateWithoutThemeInput[] | SiteThemeUncheckedCreateWithoutThemeInput[]
+    connectOrCreate?: SiteThemeCreateOrConnectWithoutThemeInput | SiteThemeCreateOrConnectWithoutThemeInput[]
+    createMany?: SiteThemeCreateManyThemeInputEnvelope
+    connect?: SiteThemeWhereUniqueInput | SiteThemeWhereUniqueInput[]
+  }
+
+  export type ThemeBlockUncheckedCreateNestedManyWithoutThemeInput = {
+    create?: XOR<ThemeBlockCreateWithoutThemeInput, ThemeBlockUncheckedCreateWithoutThemeInput> | ThemeBlockCreateWithoutThemeInput[] | ThemeBlockUncheckedCreateWithoutThemeInput[]
+    connectOrCreate?: ThemeBlockCreateOrConnectWithoutThemeInput | ThemeBlockCreateOrConnectWithoutThemeInput[]
+    createMany?: ThemeBlockCreateManyThemeInputEnvelope
+    connect?: ThemeBlockWhereUniqueInput | ThemeBlockWhereUniqueInput[]
+  }
+
+  export type SiteThemeUncheckedCreateNestedManyWithoutThemeInput = {
+    create?: XOR<SiteThemeCreateWithoutThemeInput, SiteThemeUncheckedCreateWithoutThemeInput> | SiteThemeCreateWithoutThemeInput[] | SiteThemeUncheckedCreateWithoutThemeInput[]
+    connectOrCreate?: SiteThemeCreateOrConnectWithoutThemeInput | SiteThemeCreateOrConnectWithoutThemeInput[]
+    createMany?: SiteThemeCreateManyThemeInputEnvelope
+    connect?: SiteThemeWhereUniqueInput | SiteThemeWhereUniqueInput[]
+  }
+
+  export type ThemeBlockUpdateManyWithoutThemeNestedInput = {
+    create?: XOR<ThemeBlockCreateWithoutThemeInput, ThemeBlockUncheckedCreateWithoutThemeInput> | ThemeBlockCreateWithoutThemeInput[] | ThemeBlockUncheckedCreateWithoutThemeInput[]
+    connectOrCreate?: ThemeBlockCreateOrConnectWithoutThemeInput | ThemeBlockCreateOrConnectWithoutThemeInput[]
+    upsert?: ThemeBlockUpsertWithWhereUniqueWithoutThemeInput | ThemeBlockUpsertWithWhereUniqueWithoutThemeInput[]
+    createMany?: ThemeBlockCreateManyThemeInputEnvelope
+    set?: ThemeBlockWhereUniqueInput | ThemeBlockWhereUniqueInput[]
+    disconnect?: ThemeBlockWhereUniqueInput | ThemeBlockWhereUniqueInput[]
+    delete?: ThemeBlockWhereUniqueInput | ThemeBlockWhereUniqueInput[]
+    connect?: ThemeBlockWhereUniqueInput | ThemeBlockWhereUniqueInput[]
+    update?: ThemeBlockUpdateWithWhereUniqueWithoutThemeInput | ThemeBlockUpdateWithWhereUniqueWithoutThemeInput[]
+    updateMany?: ThemeBlockUpdateManyWithWhereWithoutThemeInput | ThemeBlockUpdateManyWithWhereWithoutThemeInput[]
+    deleteMany?: ThemeBlockScalarWhereInput | ThemeBlockScalarWhereInput[]
+  }
+
+  export type SiteThemeUpdateManyWithoutThemeNestedInput = {
+    create?: XOR<SiteThemeCreateWithoutThemeInput, SiteThemeUncheckedCreateWithoutThemeInput> | SiteThemeCreateWithoutThemeInput[] | SiteThemeUncheckedCreateWithoutThemeInput[]
+    connectOrCreate?: SiteThemeCreateOrConnectWithoutThemeInput | SiteThemeCreateOrConnectWithoutThemeInput[]
+    upsert?: SiteThemeUpsertWithWhereUniqueWithoutThemeInput | SiteThemeUpsertWithWhereUniqueWithoutThemeInput[]
+    createMany?: SiteThemeCreateManyThemeInputEnvelope
+    set?: SiteThemeWhereUniqueInput | SiteThemeWhereUniqueInput[]
+    disconnect?: SiteThemeWhereUniqueInput | SiteThemeWhereUniqueInput[]
+    delete?: SiteThemeWhereUniqueInput | SiteThemeWhereUniqueInput[]
+    connect?: SiteThemeWhereUniqueInput | SiteThemeWhereUniqueInput[]
+    update?: SiteThemeUpdateWithWhereUniqueWithoutThemeInput | SiteThemeUpdateWithWhereUniqueWithoutThemeInput[]
+    updateMany?: SiteThemeUpdateManyWithWhereWithoutThemeInput | SiteThemeUpdateManyWithWhereWithoutThemeInput[]
+    deleteMany?: SiteThemeScalarWhereInput | SiteThemeScalarWhereInput[]
+  }
+
+  export type ThemeBlockUncheckedUpdateManyWithoutThemeNestedInput = {
+    create?: XOR<ThemeBlockCreateWithoutThemeInput, ThemeBlockUncheckedCreateWithoutThemeInput> | ThemeBlockCreateWithoutThemeInput[] | ThemeBlockUncheckedCreateWithoutThemeInput[]
+    connectOrCreate?: ThemeBlockCreateOrConnectWithoutThemeInput | ThemeBlockCreateOrConnectWithoutThemeInput[]
+    upsert?: ThemeBlockUpsertWithWhereUniqueWithoutThemeInput | ThemeBlockUpsertWithWhereUniqueWithoutThemeInput[]
+    createMany?: ThemeBlockCreateManyThemeInputEnvelope
+    set?: ThemeBlockWhereUniqueInput | ThemeBlockWhereUniqueInput[]
+    disconnect?: ThemeBlockWhereUniqueInput | ThemeBlockWhereUniqueInput[]
+    delete?: ThemeBlockWhereUniqueInput | ThemeBlockWhereUniqueInput[]
+    connect?: ThemeBlockWhereUniqueInput | ThemeBlockWhereUniqueInput[]
+    update?: ThemeBlockUpdateWithWhereUniqueWithoutThemeInput | ThemeBlockUpdateWithWhereUniqueWithoutThemeInput[]
+    updateMany?: ThemeBlockUpdateManyWithWhereWithoutThemeInput | ThemeBlockUpdateManyWithWhereWithoutThemeInput[]
+    deleteMany?: ThemeBlockScalarWhereInput | ThemeBlockScalarWhereInput[]
+  }
+
+  export type SiteThemeUncheckedUpdateManyWithoutThemeNestedInput = {
+    create?: XOR<SiteThemeCreateWithoutThemeInput, SiteThemeUncheckedCreateWithoutThemeInput> | SiteThemeCreateWithoutThemeInput[] | SiteThemeUncheckedCreateWithoutThemeInput[]
+    connectOrCreate?: SiteThemeCreateOrConnectWithoutThemeInput | SiteThemeCreateOrConnectWithoutThemeInput[]
+    upsert?: SiteThemeUpsertWithWhereUniqueWithoutThemeInput | SiteThemeUpsertWithWhereUniqueWithoutThemeInput[]
+    createMany?: SiteThemeCreateManyThemeInputEnvelope
+    set?: SiteThemeWhereUniqueInput | SiteThemeWhereUniqueInput[]
+    disconnect?: SiteThemeWhereUniqueInput | SiteThemeWhereUniqueInput[]
+    delete?: SiteThemeWhereUniqueInput | SiteThemeWhereUniqueInput[]
+    connect?: SiteThemeWhereUniqueInput | SiteThemeWhereUniqueInput[]
+    update?: SiteThemeUpdateWithWhereUniqueWithoutThemeInput | SiteThemeUpdateWithWhereUniqueWithoutThemeInput[]
+    updateMany?: SiteThemeUpdateManyWithWhereWithoutThemeInput | SiteThemeUpdateManyWithWhereWithoutThemeInput[]
+    deleteMany?: SiteThemeScalarWhereInput | SiteThemeScalarWhereInput[]
+  }
+
+  export type ThemeCreateNestedOneWithoutBlocksInput = {
+    create?: XOR<ThemeCreateWithoutBlocksInput, ThemeUncheckedCreateWithoutBlocksInput>
+    connectOrCreate?: ThemeCreateOrConnectWithoutBlocksInput
+    connect?: ThemeWhereUniqueInput
+  }
+
+  export type ThemeUpdateOneRequiredWithoutBlocksNestedInput = {
+    create?: XOR<ThemeCreateWithoutBlocksInput, ThemeUncheckedCreateWithoutBlocksInput>
+    connectOrCreate?: ThemeCreateOrConnectWithoutBlocksInput
+    upsert?: ThemeUpsertWithoutBlocksInput
+    connect?: ThemeWhereUniqueInput
+    update?: XOR<XOR<ThemeUpdateToOneWithWhereWithoutBlocksInput, ThemeUpdateWithoutBlocksInput>, ThemeUncheckedUpdateWithoutBlocksInput>
+  }
+
+  export type SiteCreateNestedOneWithoutInstalledThemesInput = {
+    create?: XOR<SiteCreateWithoutInstalledThemesInput, SiteUncheckedCreateWithoutInstalledThemesInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutInstalledThemesInput
+    connect?: SiteWhereUniqueInput
+  }
+
+  export type ThemeCreateNestedOneWithoutInstalledInInput = {
+    create?: XOR<ThemeCreateWithoutInstalledInInput, ThemeUncheckedCreateWithoutInstalledInInput>
+    connectOrCreate?: ThemeCreateOrConnectWithoutInstalledInInput
+    connect?: ThemeWhereUniqueInput
+  }
+
+  export type SiteUpdateOneRequiredWithoutInstalledThemesNestedInput = {
+    create?: XOR<SiteCreateWithoutInstalledThemesInput, SiteUncheckedCreateWithoutInstalledThemesInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutInstalledThemesInput
+    upsert?: SiteUpsertWithoutInstalledThemesInput
+    connect?: SiteWhereUniqueInput
+    update?: XOR<XOR<SiteUpdateToOneWithWhereWithoutInstalledThemesInput, SiteUpdateWithoutInstalledThemesInput>, SiteUncheckedUpdateWithoutInstalledThemesInput>
+  }
+
+  export type ThemeUpdateOneRequiredWithoutInstalledInNestedInput = {
+    create?: XOR<ThemeCreateWithoutInstalledInInput, ThemeUncheckedCreateWithoutInstalledInInput>
+    connectOrCreate?: ThemeCreateOrConnectWithoutInstalledInInput
+    upsert?: ThemeUpsertWithoutInstalledInInput
+    connect?: ThemeWhereUniqueInput
+    update?: XOR<XOR<ThemeUpdateToOneWithWhereWithoutInstalledInInput, ThemeUpdateWithoutInstalledInInput>, ThemeUncheckedUpdateWithoutInstalledInInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -23000,6 +27066,17 @@ export namespace Prisma {
     _min?: NestedEnumPageStatusFilter<$PrismaModel>
     _max?: NestedEnumPageStatusFilter<$PrismaModel>
   }
+  export type NestedJsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+  }
 
   export type SessionCreateWithoutUserInput = {
     id?: string
@@ -23085,6 +27162,7 @@ export namespace Prisma {
     Page?: PageCreateNestedManyWithoutSiteInput
     RSS?: RssCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutUserInput = {
@@ -23113,6 +27191,7 @@ export namespace Prisma {
     Page?: PageUncheckedCreateNestedManyWithoutSiteInput
     RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutUserInput = {
@@ -23730,6 +27809,7 @@ export namespace Prisma {
     Page?: PageCreateNestedManyWithoutSiteInput
     RSS?: RssCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutCategoryInput = {
@@ -23758,6 +27838,7 @@ export namespace Prisma {
     Page?: PageUncheckedCreateNestedManyWithoutSiteInput
     RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutCategoryInput = {
@@ -23844,6 +27925,7 @@ export namespace Prisma {
     Page?: PageUpdateManyWithoutSiteNestedInput
     RSS?: RssUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutCategoryInput = {
@@ -23871,6 +27953,7 @@ export namespace Prisma {
     Page?: PageUncheckedUpdateManyWithoutSiteNestedInput
     RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutCategoryInput = {
@@ -24210,6 +28293,27 @@ export namespace Prisma {
     data: AnalyticsEventCreateManySiteInput | AnalyticsEventCreateManySiteInput[]
   }
 
+  export type SiteThemeCreateWithoutSiteInput = {
+    id?: string
+    installedAt?: Date | string
+    theme: ThemeCreateNestedOneWithoutInstalledInInput
+  }
+
+  export type SiteThemeUncheckedCreateWithoutSiteInput = {
+    id?: string
+    themeId: string
+    installedAt?: Date | string
+  }
+
+  export type SiteThemeCreateOrConnectWithoutSiteInput = {
+    where: SiteThemeWhereUniqueInput
+    create: XOR<SiteThemeCreateWithoutSiteInput, SiteThemeUncheckedCreateWithoutSiteInput>
+  }
+
+  export type SiteThemeCreateManySiteInputEnvelope = {
+    data: SiteThemeCreateManySiteInput | SiteThemeCreateManySiteInput[]
+  }
+
   export type UserUpsertWithoutSiteInput = {
     update: XOR<UserUpdateWithoutSiteInput, UserUncheckedUpdateWithoutSiteInput>
     create: XOR<UserCreateWithoutSiteInput, UserUncheckedCreateWithoutSiteInput>
@@ -24435,6 +28539,32 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"AnalyticsEvent"> | Date | string
   }
 
+  export type SiteThemeUpsertWithWhereUniqueWithoutSiteInput = {
+    where: SiteThemeWhereUniqueInput
+    update: XOR<SiteThemeUpdateWithoutSiteInput, SiteThemeUncheckedUpdateWithoutSiteInput>
+    create: XOR<SiteThemeCreateWithoutSiteInput, SiteThemeUncheckedCreateWithoutSiteInput>
+  }
+
+  export type SiteThemeUpdateWithWhereUniqueWithoutSiteInput = {
+    where: SiteThemeWhereUniqueInput
+    data: XOR<SiteThemeUpdateWithoutSiteInput, SiteThemeUncheckedUpdateWithoutSiteInput>
+  }
+
+  export type SiteThemeUpdateManyWithWhereWithoutSiteInput = {
+    where: SiteThemeScalarWhereInput
+    data: XOR<SiteThemeUpdateManyMutationInput, SiteThemeUncheckedUpdateManyWithoutSiteInput>
+  }
+
+  export type SiteThemeScalarWhereInput = {
+    AND?: SiteThemeScalarWhereInput | SiteThemeScalarWhereInput[]
+    OR?: SiteThemeScalarWhereInput[]
+    NOT?: SiteThemeScalarWhereInput | SiteThemeScalarWhereInput[]
+    id?: StringFilter<"SiteTheme"> | string
+    siteId?: StringFilter<"SiteTheme"> | string
+    themeId?: StringFilter<"SiteTheme"> | string
+    installedAt?: DateTimeFilter<"SiteTheme"> | Date | string
+  }
+
   export type SiteCreateWithoutFeaturesInput = {
     id?: string
     subdomain: string
@@ -24461,6 +28591,7 @@ export namespace Prisma {
     Page?: PageCreateNestedManyWithoutSiteInput
     RSS?: RssCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutFeaturesInput = {
@@ -24489,6 +28620,7 @@ export namespace Prisma {
     Page?: PageUncheckedCreateNestedManyWithoutSiteInput
     RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutFeaturesInput = {
@@ -24585,6 +28717,7 @@ export namespace Prisma {
     Page?: PageCreateNestedManyWithoutSiteInput
     RSS?: RssCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutSubscriptionInput = {
@@ -24613,6 +28746,7 @@ export namespace Prisma {
     Page?: PageUncheckedCreateNestedManyWithoutSiteInput
     RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutSubscriptionInput = {
@@ -24838,6 +28972,7 @@ export namespace Prisma {
     Article?: ArticleCreateNestedManyWithoutSiteInput
     Page?: PageCreateNestedManyWithoutSiteInput
     RSS?: RssCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutAnalyticsEventInput = {
@@ -24866,6 +29001,7 @@ export namespace Prisma {
     Article?: ArticleUncheckedCreateNestedManyWithoutSiteInput
     Page?: PageUncheckedCreateNestedManyWithoutSiteInput
     RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutAnalyticsEventInput = {
@@ -24909,6 +29045,7 @@ export namespace Prisma {
     Article?: ArticleUpdateManyWithoutSiteNestedInput
     Page?: PageUpdateManyWithoutSiteNestedInput
     RSS?: RssUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutAnalyticsEventInput = {
@@ -24936,6 +29073,7 @@ export namespace Prisma {
     Article?: ArticleUncheckedUpdateManyWithoutSiteNestedInput
     Page?: PageUncheckedUpdateManyWithoutSiteNestedInput
     RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteCreateWithoutArticleInput = {
@@ -24964,6 +29102,7 @@ export namespace Prisma {
     Page?: PageCreateNestedManyWithoutSiteInput
     RSS?: RssCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutArticleInput = {
@@ -24992,6 +29131,7 @@ export namespace Prisma {
     Page?: PageUncheckedCreateNestedManyWithoutSiteInput
     RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutArticleInput = {
@@ -25078,6 +29218,7 @@ export namespace Prisma {
     Page?: PageUpdateManyWithoutSiteNestedInput
     RSS?: RssUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutArticleInput = {
@@ -25105,6 +29246,7 @@ export namespace Prisma {
     Page?: PageUncheckedUpdateManyWithoutSiteNestedInput
     RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutArticleInput = {
@@ -25180,6 +29322,7 @@ export namespace Prisma {
     Article?: ArticleCreateNestedManyWithoutSiteInput
     RSS?: RssCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutPageInput = {
@@ -25208,6 +29351,7 @@ export namespace Prisma {
     Article?: ArticleUncheckedCreateNestedManyWithoutSiteInput
     RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutPageInput = {
@@ -25294,6 +29438,7 @@ export namespace Prisma {
     Article?: ArticleUpdateManyWithoutSiteNestedInput
     RSS?: RssUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutPageInput = {
@@ -25321,6 +29466,7 @@ export namespace Prisma {
     Article?: ArticleUncheckedUpdateManyWithoutSiteNestedInput
     RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutPageInput = {
@@ -25396,6 +29542,7 @@ export namespace Prisma {
     Article?: ArticleCreateNestedManyWithoutSiteInput
     Page?: PageCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutRSSInput = {
@@ -25424,6 +29571,7 @@ export namespace Prisma {
     Article?: ArticleUncheckedCreateNestedManyWithoutSiteInput
     Page?: PageUncheckedCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutRSSInput = {
@@ -25506,6 +29654,7 @@ export namespace Prisma {
     Article?: ArticleUpdateManyWithoutSiteNestedInput
     Page?: PageUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutRSSInput = {
@@ -25533,6 +29682,7 @@ export namespace Prisma {
     Article?: ArticleUncheckedUpdateManyWithoutSiteNestedInput
     Page?: PageUncheckedUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type RssItemUpsertWithWhereUniqueWithoutRssInput = {
@@ -25630,6 +29780,344 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     autoImport?: BoolFieldUpdateOperationsInput | boolean
+  }
+
+  export type ThemeBlockCreateWithoutThemeInput = {
+    id?: string
+    componentName: string
+    componentDefinition: InputJsonValue
+  }
+
+  export type ThemeBlockUncheckedCreateWithoutThemeInput = {
+    id?: string
+    componentName: string
+    componentDefinition: InputJsonValue
+  }
+
+  export type ThemeBlockCreateOrConnectWithoutThemeInput = {
+    where: ThemeBlockWhereUniqueInput
+    create: XOR<ThemeBlockCreateWithoutThemeInput, ThemeBlockUncheckedCreateWithoutThemeInput>
+  }
+
+  export type ThemeBlockCreateManyThemeInputEnvelope = {
+    data: ThemeBlockCreateManyThemeInput | ThemeBlockCreateManyThemeInput[]
+  }
+
+  export type SiteThemeCreateWithoutThemeInput = {
+    id?: string
+    installedAt?: Date | string
+    site: SiteCreateNestedOneWithoutInstalledThemesInput
+  }
+
+  export type SiteThemeUncheckedCreateWithoutThemeInput = {
+    id?: string
+    siteId: string
+    installedAt?: Date | string
+  }
+
+  export type SiteThemeCreateOrConnectWithoutThemeInput = {
+    where: SiteThemeWhereUniqueInput
+    create: XOR<SiteThemeCreateWithoutThemeInput, SiteThemeUncheckedCreateWithoutThemeInput>
+  }
+
+  export type SiteThemeCreateManyThemeInputEnvelope = {
+    data: SiteThemeCreateManyThemeInput | SiteThemeCreateManyThemeInput[]
+  }
+
+  export type ThemeBlockUpsertWithWhereUniqueWithoutThemeInput = {
+    where: ThemeBlockWhereUniqueInput
+    update: XOR<ThemeBlockUpdateWithoutThemeInput, ThemeBlockUncheckedUpdateWithoutThemeInput>
+    create: XOR<ThemeBlockCreateWithoutThemeInput, ThemeBlockUncheckedCreateWithoutThemeInput>
+  }
+
+  export type ThemeBlockUpdateWithWhereUniqueWithoutThemeInput = {
+    where: ThemeBlockWhereUniqueInput
+    data: XOR<ThemeBlockUpdateWithoutThemeInput, ThemeBlockUncheckedUpdateWithoutThemeInput>
+  }
+
+  export type ThemeBlockUpdateManyWithWhereWithoutThemeInput = {
+    where: ThemeBlockScalarWhereInput
+    data: XOR<ThemeBlockUpdateManyMutationInput, ThemeBlockUncheckedUpdateManyWithoutThemeInput>
+  }
+
+  export type ThemeBlockScalarWhereInput = {
+    AND?: ThemeBlockScalarWhereInput | ThemeBlockScalarWhereInput[]
+    OR?: ThemeBlockScalarWhereInput[]
+    NOT?: ThemeBlockScalarWhereInput | ThemeBlockScalarWhereInput[]
+    id?: StringFilter<"ThemeBlock"> | string
+    themeId?: StringFilter<"ThemeBlock"> | string
+    componentName?: StringFilter<"ThemeBlock"> | string
+    componentDefinition?: JsonFilter<"ThemeBlock">
+  }
+
+  export type SiteThemeUpsertWithWhereUniqueWithoutThemeInput = {
+    where: SiteThemeWhereUniqueInput
+    update: XOR<SiteThemeUpdateWithoutThemeInput, SiteThemeUncheckedUpdateWithoutThemeInput>
+    create: XOR<SiteThemeCreateWithoutThemeInput, SiteThemeUncheckedCreateWithoutThemeInput>
+  }
+
+  export type SiteThemeUpdateWithWhereUniqueWithoutThemeInput = {
+    where: SiteThemeWhereUniqueInput
+    data: XOR<SiteThemeUpdateWithoutThemeInput, SiteThemeUncheckedUpdateWithoutThemeInput>
+  }
+
+  export type SiteThemeUpdateManyWithWhereWithoutThemeInput = {
+    where: SiteThemeScalarWhereInput
+    data: XOR<SiteThemeUpdateManyMutationInput, SiteThemeUncheckedUpdateManyWithoutThemeInput>
+  }
+
+  export type ThemeCreateWithoutBlocksInput = {
+    id?: string
+    name: string
+    description: string
+    thumbnail?: string | null
+    price?: number
+    isPremium?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    installedIn?: SiteThemeCreateNestedManyWithoutThemeInput
+  }
+
+  export type ThemeUncheckedCreateWithoutBlocksInput = {
+    id?: string
+    name: string
+    description: string
+    thumbnail?: string | null
+    price?: number
+    isPremium?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    installedIn?: SiteThemeUncheckedCreateNestedManyWithoutThemeInput
+  }
+
+  export type ThemeCreateOrConnectWithoutBlocksInput = {
+    where: ThemeWhereUniqueInput
+    create: XOR<ThemeCreateWithoutBlocksInput, ThemeUncheckedCreateWithoutBlocksInput>
+  }
+
+  export type ThemeUpsertWithoutBlocksInput = {
+    update: XOR<ThemeUpdateWithoutBlocksInput, ThemeUncheckedUpdateWithoutBlocksInput>
+    create: XOR<ThemeCreateWithoutBlocksInput, ThemeUncheckedCreateWithoutBlocksInput>
+    where?: ThemeWhereInput
+  }
+
+  export type ThemeUpdateToOneWithWhereWithoutBlocksInput = {
+    where?: ThemeWhereInput
+    data: XOR<ThemeUpdateWithoutBlocksInput, ThemeUncheckedUpdateWithoutBlocksInput>
+  }
+
+  export type ThemeUpdateWithoutBlocksInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    isPremium?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    installedIn?: SiteThemeUpdateManyWithoutThemeNestedInput
+  }
+
+  export type ThemeUncheckedUpdateWithoutBlocksInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    isPremium?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    installedIn?: SiteThemeUncheckedUpdateManyWithoutThemeNestedInput
+  }
+
+  export type SiteCreateWithoutInstalledThemesInput = {
+    id?: string
+    subdomain: string
+    url: string
+    views?: number
+    limitViews?: number
+    title: string
+    description?: string | null
+    logo?: string | null
+    theme?: InputJsonValue | null
+    status?: string
+    defaultThemePreference?: string
+    template_schema?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    home_Id?: string | null
+    privacy_policy_id?: string | null
+    cookies_id?: string | null
+    terms_id?: string | null
+    user?: UserCreateNestedOneWithoutSiteInput
+    features?: FeaturesCreateNestedOneWithoutSiteInput
+    subscription?: SubscriptionCreateNestedOneWithoutSiteInput
+    category?: CategoryCreateNestedManyWithoutSiteInput
+    Article?: ArticleCreateNestedManyWithoutSiteInput
+    Page?: PageCreateNestedManyWithoutSiteInput
+    RSS?: RssCreateNestedManyWithoutSiteInput
+    AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteUncheckedCreateWithoutInstalledThemesInput = {
+    id?: string
+    subdomain: string
+    url: string
+    views?: number
+    limitViews?: number
+    title: string
+    description?: string | null
+    logo?: string | null
+    theme?: InputJsonValue | null
+    status?: string
+    defaultThemePreference?: string
+    template_schema?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    home_Id?: string | null
+    privacy_policy_id?: string | null
+    cookies_id?: string | null
+    terms_id?: string | null
+    userId?: string | null
+    featuresId?: string | null
+    subscriptionId?: string | null
+    category?: CategoryUncheckedCreateNestedManyWithoutSiteInput
+    Article?: ArticleUncheckedCreateNestedManyWithoutSiteInput
+    Page?: PageUncheckedCreateNestedManyWithoutSiteInput
+    RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
+    AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteCreateOrConnectWithoutInstalledThemesInput = {
+    where: SiteWhereUniqueInput
+    create: XOR<SiteCreateWithoutInstalledThemesInput, SiteUncheckedCreateWithoutInstalledThemesInput>
+  }
+
+  export type ThemeCreateWithoutInstalledInInput = {
+    id?: string
+    name: string
+    description: string
+    thumbnail?: string | null
+    price?: number
+    isPremium?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    blocks?: ThemeBlockCreateNestedManyWithoutThemeInput
+  }
+
+  export type ThemeUncheckedCreateWithoutInstalledInInput = {
+    id?: string
+    name: string
+    description: string
+    thumbnail?: string | null
+    price?: number
+    isPremium?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    blocks?: ThemeBlockUncheckedCreateNestedManyWithoutThemeInput
+  }
+
+  export type ThemeCreateOrConnectWithoutInstalledInInput = {
+    where: ThemeWhereUniqueInput
+    create: XOR<ThemeCreateWithoutInstalledInInput, ThemeUncheckedCreateWithoutInstalledInInput>
+  }
+
+  export type SiteUpsertWithoutInstalledThemesInput = {
+    update: XOR<SiteUpdateWithoutInstalledThemesInput, SiteUncheckedUpdateWithoutInstalledThemesInput>
+    create: XOR<SiteCreateWithoutInstalledThemesInput, SiteUncheckedCreateWithoutInstalledThemesInput>
+    where?: SiteWhereInput
+  }
+
+  export type SiteUpdateToOneWithWhereWithoutInstalledThemesInput = {
+    where?: SiteWhereInput
+    data: XOR<SiteUpdateWithoutInstalledThemesInput, SiteUncheckedUpdateWithoutInstalledThemesInput>
+  }
+
+  export type SiteUpdateWithoutInstalledThemesInput = {
+    subdomain?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    views?: IntFieldUpdateOperationsInput | number
+    limitViews?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    theme?: InputJsonValue | InputJsonValue | null
+    status?: StringFieldUpdateOperationsInput | string
+    defaultThemePreference?: StringFieldUpdateOperationsInput | string
+    template_schema?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_Id?: NullableStringFieldUpdateOperationsInput | string | null
+    privacy_policy_id?: NullableStringFieldUpdateOperationsInput | string | null
+    cookies_id?: NullableStringFieldUpdateOperationsInput | string | null
+    terms_id?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneWithoutSiteNestedInput
+    features?: FeaturesUpdateOneWithoutSiteNestedInput
+    subscription?: SubscriptionUpdateOneWithoutSiteNestedInput
+    category?: CategoryUpdateManyWithoutSiteNestedInput
+    Article?: ArticleUpdateManyWithoutSiteNestedInput
+    Page?: PageUpdateManyWithoutSiteNestedInput
+    RSS?: RssUpdateManyWithoutSiteNestedInput
+    AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
+  }
+
+  export type SiteUncheckedUpdateWithoutInstalledThemesInput = {
+    subdomain?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    views?: IntFieldUpdateOperationsInput | number
+    limitViews?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    theme?: InputJsonValue | InputJsonValue | null
+    status?: StringFieldUpdateOperationsInput | string
+    defaultThemePreference?: StringFieldUpdateOperationsInput | string
+    template_schema?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_Id?: NullableStringFieldUpdateOperationsInput | string | null
+    privacy_policy_id?: NullableStringFieldUpdateOperationsInput | string | null
+    cookies_id?: NullableStringFieldUpdateOperationsInput | string | null
+    terms_id?: NullableStringFieldUpdateOperationsInput | string | null
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    featuresId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: CategoryUncheckedUpdateManyWithoutSiteNestedInput
+    Article?: ArticleUncheckedUpdateManyWithoutSiteNestedInput
+    Page?: PageUncheckedUpdateManyWithoutSiteNestedInput
+    RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
+    AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
+  }
+
+  export type ThemeUpsertWithoutInstalledInInput = {
+    update: XOR<ThemeUpdateWithoutInstalledInInput, ThemeUncheckedUpdateWithoutInstalledInInput>
+    create: XOR<ThemeCreateWithoutInstalledInInput, ThemeUncheckedCreateWithoutInstalledInInput>
+    where?: ThemeWhereInput
+  }
+
+  export type ThemeUpdateToOneWithWhereWithoutInstalledInInput = {
+    where?: ThemeWhereInput
+    data: XOR<ThemeUpdateWithoutInstalledInInput, ThemeUncheckedUpdateWithoutInstalledInInput>
+  }
+
+  export type ThemeUpdateWithoutInstalledInInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    isPremium?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    blocks?: ThemeBlockUpdateManyWithoutThemeNestedInput
+  }
+
+  export type ThemeUncheckedUpdateWithoutInstalledInInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
+    price?: FloatFieldUpdateOperationsInput | number
+    isPremium?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    blocks?: ThemeBlockUncheckedUpdateManyWithoutThemeNestedInput
   }
 
   export type SessionCreateManyUserInput = {
@@ -25813,6 +30301,7 @@ export namespace Prisma {
     Page?: PageUpdateManyWithoutSiteNestedInput
     RSS?: RssUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutUserInput = {
@@ -25840,6 +30329,7 @@ export namespace Prisma {
     Page?: PageUncheckedUpdateManyWithoutSiteNestedInput
     RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateManyWithoutUserInput = {
@@ -26103,6 +30593,12 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type SiteThemeCreateManySiteInput = {
+    id?: string
+    themeId: string
+    installedAt?: Date | string
+  }
+
   export type CategoryUpdateWithoutSiteInput = {
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
@@ -26300,6 +30796,21 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type SiteThemeUpdateWithoutSiteInput = {
+    installedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    theme?: ThemeUpdateOneRequiredWithoutInstalledInNestedInput
+  }
+
+  export type SiteThemeUncheckedUpdateWithoutSiteInput = {
+    themeId?: StringFieldUpdateOperationsInput | string
+    installedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SiteThemeUncheckedUpdateManyWithoutSiteInput = {
+    themeId?: StringFieldUpdateOperationsInput | string
+    installedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type SiteCreateManyFeaturesInput = {
     id?: string
     subdomain: string
@@ -26348,6 +30859,7 @@ export namespace Prisma {
     Page?: PageUpdateManyWithoutSiteNestedInput
     RSS?: RssUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutFeaturesInput = {
@@ -26375,6 +30887,7 @@ export namespace Prisma {
     Page?: PageUncheckedUpdateManyWithoutSiteNestedInput
     RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateManyWithoutFeaturesInput = {
@@ -26457,6 +30970,7 @@ export namespace Prisma {
     Page?: PageUpdateManyWithoutSiteNestedInput
     RSS?: RssUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutSubscriptionInput = {
@@ -26484,6 +30998,7 @@ export namespace Prisma {
     Page?: PageUncheckedUpdateManyWithoutSiteNestedInput
     RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateManyWithoutSubscriptionInput = {
@@ -26590,6 +31105,48 @@ export namespace Prisma {
     categories?: RssItemUpdatecategoriesInput | string[]
     guid?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ThemeBlockCreateManyThemeInput = {
+    id?: string
+    componentName: string
+    componentDefinition: InputJsonValue
+  }
+
+  export type SiteThemeCreateManyThemeInput = {
+    id?: string
+    siteId: string
+    installedAt?: Date | string
+  }
+
+  export type ThemeBlockUpdateWithoutThemeInput = {
+    componentName?: StringFieldUpdateOperationsInput | string
+    componentDefinition?: InputJsonValue | InputJsonValue
+  }
+
+  export type ThemeBlockUncheckedUpdateWithoutThemeInput = {
+    componentName?: StringFieldUpdateOperationsInput | string
+    componentDefinition?: InputJsonValue | InputJsonValue
+  }
+
+  export type ThemeBlockUncheckedUpdateManyWithoutThemeInput = {
+    componentName?: StringFieldUpdateOperationsInput | string
+    componentDefinition?: InputJsonValue | InputJsonValue
+  }
+
+  export type SiteThemeUpdateWithoutThemeInput = {
+    installedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    site?: SiteUpdateOneRequiredWithoutInstalledThemesNestedInput
+  }
+
+  export type SiteThemeUncheckedUpdateWithoutThemeInput = {
+    siteId?: StringFieldUpdateOperationsInput | string
+    installedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SiteThemeUncheckedUpdateManyWithoutThemeInput = {
+    siteId?: StringFieldUpdateOperationsInput | string
+    installedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

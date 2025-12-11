@@ -5,7 +5,7 @@ import { unstable_cache } from "next/cache";
  * Validates if a string is a valid MongoDB ObjectID
  * MongoDB ObjectIDs are 24-character hex strings
  */
-function isValidObjectId(id: string): boolean {
+export function isValidObjectId(id: string): boolean {
     if (!id || typeof id !== 'string') return false;
     // MongoDB ObjectIDs are exactly 24 characters and contain only hex digits
     return /^[0-9a-fA-F]{24}$/.test(id);

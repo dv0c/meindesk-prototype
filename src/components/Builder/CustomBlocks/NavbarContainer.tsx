@@ -13,6 +13,7 @@ interface NavbarContainerProps {
     borderBottom?: boolean
     borderColor?: string
     maxWidth?: "full" | "container" | "narrow"
+    justifyContent?: "start" | "center" | "end" | "between"
     className?: string
     children?: React.ReactNode
 }
@@ -27,6 +28,7 @@ export default function NavbarContainer({
     borderBottom = true,
     borderColor = "#e5e7eb",
     maxWidth = "container",
+    justifyContent = "between",
     className = "",
     children,
 }: NavbarContainerProps) {
@@ -35,6 +37,16 @@ export default function NavbarContainer({
         container: "container mx-auto",
         narrow: "max-w-4xl mx-auto",
     }
+
+    const justifyClasses = {
+        start: "justify-start",
+        center: "justify-center",
+        end: "justify-end",
+        between: "justify-between",
+    }
+
+    // Ensure we have a valid justify value, defaulting to 'start' for manual control
+    const activeJustify = justifyContent || "start";
 
     return (
         <nav
@@ -54,7 +66,7 @@ export default function NavbarContainer({
             }}
         >
             <div className={cn("h-full", maxWidthClass[maxWidth])}>
-                <div className="flex items-center justify-between gap-4 h-full">
+                <div className={cn("flex items-center w-full gap-4 h-full", justifyClasses[activeJustify])}>
                     {children}
                 </div>
             </div>

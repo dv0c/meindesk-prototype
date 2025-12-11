@@ -6,6 +6,9 @@ import dynamic from "next/dynamic"
 import type React from "react"
 import { Suspense } from "react"
 import { DraggableWrapper } from "./editor/draggable-wrapper"
+import { useBuilderStore } from "@/lib/store"
+import { AlertTriangle, Trash2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 interface RenderNodeProps {
   node: LayoutNode
@@ -13,6 +16,7 @@ interface RenderNodeProps {
   onSelect?: (id: string) => void
   isSelected?: boolean
   onContextMenu?: (e: React.MouseEvent, id: string) => void
+  validComponentNames?: string[]
 }
 
 // Dynamic component map
@@ -68,18 +72,63 @@ const componentMap: Record<string, React.ComponentType<any>> = {
   FooterBlock: dynamic(() => import("@/components/Builder/CustomBlocks/FooterBlock"), { ssr: false }),
   SectionDivider: dynamic(() => import("@/components/Builder/CustomBlocks/SectionDivider"), { ssr: false }),
   ContactInfo: dynamic(() => import("@/components/Builder/CustomBlocks/ContactInfo"), { ssr: false }),
+  SplitHero: dynamic(() => import("@/components/Builder/CustomBlocks/SplitHero"), { ssr: false }),
 }
 
 
-export function RenderNode({ node, isEditor = false, onSelect, isSelected = false, onContextMenu }: RenderNodeProps) {
+export function RenderNode({ node, isEditor = false, onSelect, isSelected = false, onContextMenu, validComponentNames }: RenderNodeProps) {
   const Component = componentMap[node.type]
 
-  if (!Component) {
-    return (
-      <div className="p-4 border border-destructive bg-destructive/10 rounded-md">
-        <p className="text-sm text-destructive">Component "{node.type}" not found</p>
-      </div>
-    )
+  const { removeNode } = useBuilderStore()
+
+  // Check if component exists AND if it's in the allowed list (if list is provided - only in editor)
+  const isAllowed = isEditor && validComponentNames ? validComponentNames.includes(node.type) : true
+  // We treat it as missing if:
+  // 1. It's not in our code map (Component is undefined)
+  // 2. OR it is in code map but explicitly not allowed by API (isAllowed is false)
+  const isMissing = !Component || !isAllowed
+
+  if (isMissing) {
+    if (isEditor) {
+      return (
+        <DraggableWrapper
+          id={node.id}
+          isSelected={isSelected}
+          onSelect={onSelect}
+          onContextMenu={onContextMenu}
+          isContainer={false}
+          data={{ type: "component", isContainer: false, component: node }}
+        >
+          <div className="p-6 border rounded-lg flex flex-col items-center justify-center gap-3 text-center min-h-[150px] shadow-sm">
+            <div className="h-10 w-10  rounded-full bg-red-500/20 flex items-center justify-center ">
+              <AlertTriangle className="h-5 w-5" />
+            </div>
+            <div className="space-y-1">
+              <h4 className="font-semibold ">Theme Component Missing</h4>
+              <p className="text-sm text-muted-foreground max-w-[260px]">
+                The block <span className="font-mono underline font-semibold">{node.type}</span> is part of a theme that’s not currently installed.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8  border-[#CE7E5A] hover:bg-[#DDC57A]/30 hover:text-[#D34E4E] transition-colors"
+              onClick={(e) => {
+                e.stopPropagation()
+                removeNode(node.id)
+              }}
+            >
+              <Trash2 className="mr-2 h-3.5 w-3.5" />
+              Remove Block
+            </Button>
+          </div>
+
+        </DraggableWrapper>
+      )
+    }
+
+    // In preview/live mode, render nothing or a hidden element to avoid breaking layout
+    return null
   }
 
   const handleClick = (e: React.MouseEvent) => {
@@ -119,6 +168,7 @@ export function RenderNode({ node, isEditor = false, onSelect, isSelected = fals
           onSelect={onSelect}
           isSelected={isSelected}
           onContextMenu={onContextMenu}
+          validComponentNames={validComponentNames}
         />
       ))
     ) : node.type === "Grid" ? (
@@ -130,6 +180,7 @@ export function RenderNode({ node, isEditor = false, onSelect, isSelected = fals
           onSelect={onSelect}
           isSelected={isSelected}
           onContextMenu={onContextMenu}
+          validComponentNames={validComponentNames}
         />
       ))
     ) : (
@@ -142,6 +193,7 @@ export function RenderNode({ node, isEditor = false, onSelect, isSelected = fals
             onSelect={onSelect}
             isSelected={isSelected}
             onContextMenu={onContextMenu}
+            validComponentNames={validComponentNames}
           />
         ))}
       </SortableContext>

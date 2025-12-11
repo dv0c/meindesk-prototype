@@ -3,6 +3,7 @@
 import { notFound } from "next/navigation"
 import { db } from "@/lib/db"
 import type { PageData } from "@/lib/types"
+import { isValidObjectId } from "@/lib/actions/helpers/cached-tenant"
 import ClientPreview from "./ClientPreview"
 
 interface PreviewPageProps {
@@ -11,6 +12,8 @@ interface PreviewPageProps {
 
 export default async function Page({ params }: PreviewPageProps) {
   const { tenantId } = await params
+
+  if (!isValidObjectId(tenantId)) notFound()
 
   // Fetch tenant/site
   const tenant = await db.site.findUnique({

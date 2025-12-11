@@ -13,9 +13,10 @@ interface SidebarProps {
   onAddComponent: (component: ComponentDefinition) => void
   onUpdateNode: (updates: Partial<import("@/lib/types").LayoutNode>) => void
   onDeleteNode: () => void
+  siteId?: string
 }
 
-export function Sidebar({ onAddComponent, onUpdateNode, onDeleteNode }: SidebarProps) {
+export function Sidebar({ onAddComponent, onUpdateNode, onDeleteNode, siteId }: SidebarProps) {
   const { selectedNodeId, selectNode, findNode } = useBuilderStore()
   const selectedNode = selectedNodeId ? findNode(selectedNodeId) : null
 
@@ -46,7 +47,7 @@ export function Sidebar({ onAddComponent, onUpdateNode, onDeleteNode }: SidebarP
               >
                 <LayoutGrid className="w-4 h-4 mr-2" />
                 ELEMENTS
-              </TabsTrigger>  
+              </TabsTrigger>
               <TabsTrigger
                 value="global"
                 className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none h-full px-0 pb-0"
@@ -59,7 +60,7 @@ export function Sidebar({ onAddComponent, onUpdateNode, onDeleteNode }: SidebarP
 
           <TabsContent value="elements" className="flex-1 mt-0 overflow-hidden">
             <div className="h-full overflow-y-auto">
-              <ComponentPalette onAddComponent={onAddComponent} />
+              <ComponentPalette onAddComponent={onAddComponent} siteId={siteId} />
             </div>
           </TabsContent>
 

@@ -21,6 +21,8 @@ interface NavigationBlockProps {
     textColor?: string
     hoverColor?: string
     align?: "left" | "center" | "right"
+    marginLeft?: string
+    marginRight?: string
     className?: string
 }
 
@@ -44,6 +46,8 @@ export default function NavigationBlock({
     textColor,
     hoverColor,
     align = "center",
+    marginLeft = "0",
+    marginRight = "0",
     className = "",
 }: NavigationBlockProps) {
     const [openSubmenu, setOpenSubmenu] = useState<number | null>(null)
@@ -74,7 +78,7 @@ export default function NavigationBlock({
     }
 
     const alignClasses = {
-        left: "mr-auto",
+        left: "mr-0",
         center: "mx-auto",
         right: "ml-auto",
     }
@@ -90,7 +94,11 @@ export default function NavigationBlock({
                 alignClasses[align],
                 className
             )}
-            style={{ color: textColor }}
+            style={{
+                color: textColor,
+                marginLeft: marginLeft !== "0" ? marginLeft : undefined,
+                marginRight: marginRight !== "0" ? marginRight : undefined,
+            }}
         >
             {links.map((link, index) => (
                 <div

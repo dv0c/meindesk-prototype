@@ -53,6 +53,7 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; nodeId: string } | null>(null)
   const [showLayersPanel, setShowLayersPanel] = useState(false)
   const [loading, setLoading] = useState(true) // <--- Loading state
+  const [validComponentNames, setValidComponentNames] = useState<string[]>([])
 
   const {
     nodes,
@@ -75,7 +76,18 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
 
   useEffect(() => {
     loadPage()
+    loadComponents()
   }, [])
+
+  async function loadComponents() {
+    try {
+      const { getAvailableComponents } = await import("@/lib/component-registry")
+      const components = await getAvailableComponents(tenantId as string)
+      setValidComponentNames(components.map(c => c.name))
+    } catch (error) {
+      console.error("Failed to load components:", error)
+    }
+  }
 
   async function loadPage() {
     setLoading(true)
@@ -301,7 +313,7 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
     try {
       // Fetch the component definition
       const { getAvailableComponents } = await import("@/lib/component-registry")
-      const components = await getAvailableComponents()
+      const components = await getAvailableComponents(tenantId)
       const componentDef = components.find(c => c.name === componentType)
 
       if (!componentDef) {
@@ -443,11 +455,18 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
               onAddComponent={handleAddComponent}
               onUpdateNode={handleUpdateNode}
               onDeleteNode={handleDeleteNode}
+              siteId={tenantId}
             />
           )}
           <div className="flex-1 bg-muted/10 h-full overflow-hidden flex flex-col relative">
             <div className="overflow-auto h-full ">
               <div
+                onClickCapture={(e) => {
+                  const target = e.target as HTMLElement
+                  if (target.closest("a")) {
+                    e.preventDefault()
+                  }
+                }}
                 className={`bg-background shadow-sm border h-fit transition-all duration-300 ${nodes.length ? "min-h-full h-fit" : "h-full"} ${deviceMode === "mobile"
                   ? "w-[375px] mx-auto"
                   : deviceMode === "tablet"
@@ -460,6 +479,7 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
                   selectedNodeId={selectedNodeId}
                   onSelectNode={selectNode}
                   onContextMenu={handleContextMenu}
+                  validComponentNames={validComponentNames}
                 />
               </div>
             </div>

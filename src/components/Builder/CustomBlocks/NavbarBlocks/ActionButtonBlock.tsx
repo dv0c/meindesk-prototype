@@ -30,7 +30,7 @@ export default function ActionButtonBlock({
     className = "",
 }: ActionButtonBlockProps) {
     const alignClasses = {
-        left: "mr-auto",
+        left: "mr-0",
         center: "mx-auto",
         right: "ml-auto",
     }

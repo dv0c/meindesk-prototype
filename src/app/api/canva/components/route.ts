@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import type { ComponentDefinition } from "@/lib/types";
+import { db } from "@/lib/db";
 
-export async function GET() {
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const siteId = searchParams.get("siteId");
+
   const components: ComponentDefinition[] = [
     // Layout Components
     {
@@ -731,7 +735,7 @@ export async function GET() {
           name: "accentColor",
           type: "color",
           label: "Accent Color",
-          defaultValue: "#3b82f6",
+          defaultValue: "var(--primary)",
         },
         {
           name: "style",
@@ -746,80 +750,6 @@ export async function GET() {
             { label: "Underline Active", value: "underline" },
             { label: "Sidebar", value: "sidebar" },
           ],
-        },
-        {
-          name: "links",
-          type: "json",
-          label: "Navigation Links",
-          schema: [
-            { key: "label", label: "Label", type: "string" },
-            { key: "href", label: "URL", type: "string" },
-            {
-              key: "submenu",
-              label: "Submenu",
-              type: "json",
-              // Keep it editable as plain JSON to bypass your builder’s depth limit
-              schema: [
-                { key: "label", label: "Label", type: "string" },
-                { key: "href", label: "URL", type: "string" },
-              ],
-            },
-          ],
-          defaultValue: [
-            { label: "ΑΡΧΙΚΗ", href: "/" },
-            { label: "ΥΠΗΡΕΣΙΕΣ", href: "/services" },
-            { label: "ΒΙΟΓΡΑΦΙΚΟ", href: "/bio" },
-            {
-              label: "ΑΡΘΡΑ",
-              href: "/articles",
-              submenu: [
-                {
-                  label: "Παιδιά και Έφηβοι",
-                  href: "/articles/paidia-kai-efivoi",
-                },
-                { label: "Όλα τα Άρθρα", href: "/articles" },
-              ],
-            },
-            { label: "ΟΜΑΔΕΣ", href: "/groups" },
-            { label: "ΕΚΔΗΛΩΣΕΙΣ", href: "/events" },
-            { label: "ΕΠΙΚΟΙΝΩΝΙΑ", href: "/contact" },
-          ],
-        },
-      ],
-    },
-    {
-      name: "Navbar2",
-      category: "navigation",
-      allowChildren: false,
-      props: [
-        {
-          name: "logoText",
-          type: "string",
-          label: "Logo Text",
-          defaultValue: "Sophia Platanisioti",
-        },
-        {
-          name: "align",
-          type: "select",
-          label: "Menu Alignment",
-          options: [
-            { label: "Left", value: "left" },
-            { label: "Center", value: "center" },
-            { label: "Right", value: "right" },
-          ],
-          defaultValue: "right",
-        },
-        {
-          name: "sticky",
-          type: "boolean",
-          label: "Sticky Header",
-          defaultValue: true,
-        },
-        {
-          name: "darkMode",
-          type: "boolean",
-          label: "Dark Mode",
-          defaultValue: false,
         },
         {
           name: "links",
@@ -1151,6 +1081,18 @@ export async function GET() {
             { label: "Narrow", value: "narrow" },
           ],
         },
+        {
+          name: "justifyContent",
+          type: "select",
+          label: "Content Justification",
+          defaultValue: "start",
+          options: [
+            { label: "Space Between", value: "between" },
+            { label: "Start (Manual Align)", value: "start" },
+            { label: "Center", value: "center" },
+            { label: "End", value: "end" },
+          ],
+        },
       ],
     },
     {
@@ -1306,6 +1248,18 @@ export async function GET() {
             { label: "Center", value: "center" },
             { label: "Right", value: "right" },
           ],
+        },
+        {
+          name: "marginLeft",
+          type: "spacing",
+          label: "Margin Left",
+          defaultValue: "0px",
+        },
+        {
+          name: "marginRight",
+          type: "spacing",
+          label: "Margin Right",
+          defaultValue: "0px",
         },
       ],
     },
@@ -1689,8 +1643,107 @@ export async function GET() {
         },
       ],
     },
-
+    {
+      name: "SplitHero",
+      category: "layout",
+      allowChildren: false,
+      props: [
+        {
+          name: "image",
+          type: "image",
+          label: "Image",
+          defaultValue: "",
+        },
+        {
+          name: "imageAlt",
+          type: "string",
+          label: "Image Alt Text",
+          defaultValue: "Hero image",
+        },
+        {
+          name: "content",
+          type: "textarea",
+          label: "Content (use double line breaks for paragraphs)",
+          defaultValue: "Your content here. Add multiple paragraphs separated by double line breaks.",
+        },
+        {
+          name: "imagePosition",
+          type: "select",
+          label: "Image Position",
+          defaultValue: "left",
+          options: [
+            { label: "Left", value: "left" },
+            { label: "Right", value: "right" },
+          ],
+        },
+        {
+          name: "backgroundColor",
+          type: "color",
+          label: "Background Color",
+          defaultValue: "#E8DFD8",
+        },
+        {
+          name: "textColor",
+          type: "color",
+          label: "Text Color",
+          defaultValue: "#2C2C2C",
+        },
+        {
+          name: "padding",
+          type: "spacing",
+          label: "Padding",
+          defaultValue: "80px 40px",
+        },
+        {
+          name: "gap",
+          type: "spacing",
+          label: "Gap Between Columns",
+          defaultValue: "60px",
+        },
+        {
+          name: "verticalAlign",
+          type: "select",
+          label: "Vertical Alignment",
+          defaultValue: "center",
+          options: [
+            { label: "Top", value: "top" },
+            { label: "Center", value: "center" },
+            { label: "Bottom", value: "bottom" },
+          ],
+        },
+      ],
+    },
   ];
+
+  if (siteId) {
+    try {
+      // Fetch installed themes with their blocks
+      const installedThemes = await db.siteTheme.findMany({
+        where: { siteId },
+        include: {
+          theme: {
+            include: {
+              blocks: true,
+            },
+          },
+        },
+      });
+
+      // Flatten blocks from all installed themes
+      installedThemes.forEach((st) => {
+        st.theme.blocks.forEach((block) => {
+          // You might want to prevent duplicates or collision
+          const dynamicComponent = block.componentDefinition as any as ComponentDefinition;
+
+          // Ensure it has a unique name or careful about overriding
+          // For now, we assume distinct names or acceptable override
+          components.push(dynamicComponent);
+        });
+      });
+    } catch (error) {
+      console.error("Error fetching theme blocks:", error)
+    }
+  }
 
   return NextResponse.json(components);
 }

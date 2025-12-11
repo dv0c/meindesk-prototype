@@ -10,20 +10,21 @@ import { DraggablePaletteItem } from "./draggable-palette-item"
 
 interface ComponentPaletteProps {
   onAddComponent: (component: ComponentDefinition) => void
+  siteId?: string
 }
 
-export function ComponentPalette({ onAddComponent }: ComponentPaletteProps) {
+export function ComponentPalette({ onAddComponent, siteId }: ComponentPaletteProps) {
   const [components, setComponents] = useState<ComponentDefinition[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
 
   useEffect(() => {
     loadComponents()
-  }, [])
+  }, [siteId])
 
   async function loadComponents() {
     setLoading(true)
-    const data = await getAvailableComponents()
+    const data = await getAvailableComponents(siteId)
     setComponents(data)
     setLoading(false)
   }

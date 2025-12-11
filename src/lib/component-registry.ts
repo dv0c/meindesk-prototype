@@ -3,15 +3,20 @@ import type { ComponentDefinition } from "./types"
 // Component registry cache
 let componentCache: ComponentDefinition[] | null = null
 
-export async function getAvailableComponents(): Promise<ComponentDefinition[]> {
-  if (componentCache) {
-    return componentCache
-  }
+export async function getAvailableComponents(siteId?: string): Promise<ComponentDefinition[]> {
+  // If we want to support caching with siteId, we'd need a map. 
+  // For now, let's keep it simple: if siteId is provided, we fetch fresh.
+  // Or we can simple invalidate cache if we want.
 
+  // A simple strategy: append siteId to query
   try {
-    const response = await fetch(`/api/canva/components`)
+    const url = siteId
+      ? `/api/canva/components?siteId=${siteId}`
+      : `/api/canva/components`
+
+    const response = await fetch(url)
     const components = await response.json()
-    componentCache = components
+    componentCache = components // Note: this effectively caches the last fetched set
     return components
   } catch (error) {
     console.error("Failed to fetch components:", error)
