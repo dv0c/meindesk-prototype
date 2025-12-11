@@ -17,7 +17,7 @@ interface ThemeSwitcherProps {
 }
 
 export default function ThemeSwitcher({
-    variant = "button",
+    variant = "icon",
     size = "md",
     showLabel = true,
     lightLabel = "Light",

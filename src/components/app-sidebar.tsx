@@ -108,6 +108,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       icon: Globe,
       isActive: false,
       items: [
+        { title: "Theme Store", url: "/store" },
         { title: "Features", url: "/projects/website/features" },
         { title: "Analytics", url: "/projects/website/analytics" },
         { title: "Subscription", url: "/projects/website/subscription" },

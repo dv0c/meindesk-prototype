@@ -1,9 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useTheme } from "next-themes";
-import Link from "next/link";
-import { useRouter, useParams } from "next/navigation";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -13,10 +10,6 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Loader2, Eye } from "lucide-react";
 import {
     Dialog,
     DialogContent,
@@ -24,7 +17,13 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs } from "@/components/ui/tabs";
+import { Eye, Loader2, Search } from "lucide-react";
+import { useTheme } from "next-themes";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface Theme {
     id: string;
@@ -125,11 +124,7 @@ export default function ThemeStorePage() {
                         Discover and install new components and layouts for your site.
                     </p>
                 </div>
-                <div className="flex items-center gap-2">
-                    <Link href={`/dashboard/${siteId}/projects/website`}>
-                        <Button variant="outline">Back to Editor</Button>
-                    </Link>
-                </div>
+
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
@@ -143,11 +138,11 @@ export default function ThemeStorePage() {
                     />
                 </div>
                 <Tabs defaultValue="all" value={filter} onValueChange={setFilter}>
-                    <TabsList>
+                    {/* <TabsList>
                         <TabsTrigger value="all">All</TabsTrigger>
                         <TabsTrigger value="premium">Premium</TabsTrigger>
                         <TabsTrigger value="free">Free</TabsTrigger>
-                    </TabsList>
+                    </TabsList> */}
                 </Tabs>
             </div>
 
@@ -196,6 +191,7 @@ export default function ThemeStorePage() {
                                 </Button>
                                 <Button
                                     className="w-full"
+                                    variant={theme.installed ? "destructive" : "default"}
                                     onClick={() => handleInstall(theme)}
                                     disabled={installing === theme.id}
                                 >

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "./lib/db";
 import { getCachedSiteIdBySubdomain } from "./lib/actions/helpers/cached-tenant";
+import { getToken } from "next-auth/jwt";
 
 // Define your application's base domain here
 const APP_BASE_DOMAIN = process.env.NODE_ENV === "development" ? "localhost:3000" : "meindesk.gr";
@@ -8,6 +9,15 @@ const DEFAULT_TENANT_SUBDOMAIN = "prototype"; // The slug for the default tenant
 
 export async function proxy(req: NextRequest) {
   const url = req.nextUrl.clone();
+
+  // Protect Admin Routes
+  if (url.pathname.startsWith("/admin/themes")) {
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    if (!token || token.role !== "ADMIN") {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+  }
+
   const host = req.headers.get("host") || "";
 
   // 1. Identify Subdomain
