@@ -104,6 +104,34 @@ export async function SubscriptionCard({ siteId }: { siteId: string }) {
           </div>
         </div>
 
+        {/* Features List */}
+        {data?.features && (
+          <div className="pt-4 border-t border-border">
+            <p className="text-sm font-medium mb-3">Included Features</p>
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-y-2 gap-x-4">
+              {['analytics', 'articles', 'pages', 'categories', 'media', 'rss'].map((featureKey) => {
+                const isEnabled = (data.features as any)[featureKey] === true;
+                return (
+                  <div key={featureKey} className="flex items-center gap-2 text-sm">
+                    <div className={`w-2 h-2 rounded-full ${isEnabled ? "bg-green-500" : "bg-gray-300"}`} />
+                    <span className={isEnabled ? "text-foreground" : "text-muted-foreground line-through"}>
+                      {featureKey.charAt(0).toUpperCase() + featureKey.slice(1)}
+                    </span>
+                  </div>
+                )
+              })}
+              <div className="flex items-center gap-2 text-sm">
+                <div className="w-2 h-2 rounded-full bg-blue-500" />
+                <span>Views Limit: {data.features.viewslimit}</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <div className="w-2 h-2 rounded-full bg-blue-500" />
+                <span>API Rate: {data.features.ratelimit}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="pt-4 border-t border-border">
           <div className="bg-muted/50 rounded-lg p-4">
             <p className="text-sm text-muted-foreground mb-2">Payment Method</p>

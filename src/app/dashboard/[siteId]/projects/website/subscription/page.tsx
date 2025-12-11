@@ -3,11 +3,29 @@ import { SubscriptionCard } from "@/components/subscription/subscription-card"
 import { WebsiteInfo } from "@/components/subscription/website-info"
 import { getSite } from "@/lib/actions/helpers/site"
 import { getActiveTeam } from "@/lib/actions/helpers/team"
+import { db } from "@/lib/db"
+import { AdminPaymentControls } from "@/components/subscription/admin-payment-controls"
 
 const page = async ({ params }: { params: { siteId: string } }) => {
-  const {siteId} = await params
+  const { siteId } = await params
   const data = await getActiveTeam(siteId)
   if (!data) return <div>Site not found</div>
+
+  let history: any[] = []
+  if (data.subscription) {
+    // Manually query billing history
+    // We use 'any' to bypass TS error since client might not be generated yet
+    try {
+      history = await (db as any).billingHistory.findMany({
+        where: { subscriptionId: data.subscription.id },
+        orderBy: { date: 'desc' }
+      })
+    } catch (e) {
+      console.warn("Could not fetch billing history (possibly db schema mismatch or no table):", e)
+      history = []
+    }
+  }
+
   return <div>
     <div className="min-h-screen bg-background">
       <main className="container mx-auto px-4 py-8 max-w-5xl">
@@ -24,7 +42,13 @@ const page = async ({ params }: { params: { siteId: string } }) => {
           <SubscriptionCard siteId={siteId} />
         </div>
 
-        <BillingHistory />
+        <BillingHistory history={history} />
+
+        {data.subscription && (
+          <>
+            <AdminPaymentControls subscriptionId={data.subscription.id} />
+          </>
+        )}
       </main>
     </div>
   </div>

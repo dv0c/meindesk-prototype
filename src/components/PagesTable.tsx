@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { MoreHorizontal, Edit, Eye, Trash, Copy, Search, ChevronLeft, ChevronRight } from "lucide-react"
+import { MoreHorizontal, Edit, Eye, Trash, Copy, Search, ChevronLeft, ChevronRight, Lock } from "lucide-react"
 
 import {
   Table,
@@ -162,7 +162,14 @@ export function PagesTable() {
                       router.push(`/dashboard/${team?.id}/projects/website/canva/${page.id}/`)
                     }}
                   >
-                    <TableCell className="font-medium py-3 text-sm">{page.title}</TableCell>
+                    <TableCell className="font-medium py-3 text-sm">
+                      <div className="flex items-center gap-2">
+                        {page.locked && (
+                          <Lock className="h-4 w-4 mr-2 text-muted-foreground" />
+                        )}
+                        {page.title}
+                      </div>
+                    </TableCell>
                     <TableCell className="font-mono text-xs text-muted-foreground py-3">{page.slug}</TableCell>
                     <TableCell className="py-3">
                       <Badge variant={statusColors[page.status] as any} className="text-xs">
@@ -201,12 +208,14 @@ export function PagesTable() {
                           <DropdownMenuItem onClick={() => handleDuplicate(page)}>
                             <Copy className="h-4 w-4 mr-2" /> Duplicate
                           </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => confirmDelete(page)}
-                            className="text-destructive focus:text-destructive"
-                          >
-                            <Trash className="h-4 w-4 mr-2" /> Delete
-                          </DropdownMenuItem>
+                          {!page.locked && (
+                            <DropdownMenuItem
+                              onClick={() => confirmDelete(page)}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              <Trash className="h-4 w-4 mr-2" /> Delete
+                            </DropdownMenuItem>
+                          )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -247,10 +256,10 @@ export function PagesTable() {
             </div>
           </div>
         )}
-      </div>
+      </div >
 
       {/* Delete confirmation dialog */}
-      <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      < AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this page?</AlertDialogTitle>
@@ -265,7 +274,7 @@ export function PagesTable() {
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+      </AlertDialog >
     </>
   )
 }

@@ -40,9 +40,10 @@ interface SingleArticleComponentProps {
   accentColor?: string;
   dateColor?: string;
   // Data
-  article: Article;
+  article: Article & { author?: { name?: string | null } };
   contentPadding?: string;
-  children?: ReactNode,
+  children?: ReactNode;
+  childrenPosition?: "bottom" | "sidebar";
   [key: string]: any
 }
 
@@ -76,6 +77,7 @@ export const SingleArticleComponent: React.FC<SingleArticleComponentProps> = ({
 
   style = "default",
   children,
+  childrenPosition = "bottom",
   align = "left",
   article,
   contentPadding,
@@ -233,8 +235,8 @@ export const SingleArticleComponent: React.FC<SingleArticleComponentProps> = ({
           )}
 
           {/* News Body with Sidebar */}
-          <div className="flex gap-8 relative mt-6">
-            {/* Sticky Share/sidebar */}
+          <div className="flex flex-col md:flex-row gap-8 relative mt-6">
+
             <div className="hidden md:flex flex-col gap-3 sticky top-24 h-fit w-10 shrink-0">
               {/* Mock Share Icons */}
               <button className="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded flex items-center justify-center text-gray-700 font-bold text-xs">f</button>
@@ -244,12 +246,8 @@ export const SingleArticleComponent: React.FC<SingleArticleComponentProps> = ({
             </div>
 
             {/* Main Content with Drop Cap */}
-            <div className="flex-1">
-              {/* Drop Cap Logic: applied via prose modifier if possible, or we wrap first letter? 
-                      Standard clean way: CSS first-letter pseudo. 
-                      Tailwind has `prose-p:first-letter:...` but standard `prose` might capture it.
-                      We'll add a specific class for the drop cap capability.
-                  */}
+            <div className="flex-1 min-w-0">
+              {/* Drop Cap Logic */}
               <style jsx global>{`
                     .news-drop-cap > div > p:first-of-type::first-letter {
                       float: left;
@@ -267,13 +265,30 @@ export const SingleArticleComponent: React.FC<SingleArticleComponentProps> = ({
                   <div dangerouslySetInnerHTML={{ __html: article.html }} />
                 </div>
               )}
+
+              {/* Bottom Children (Only if position is bottom) */}
+              {children && childrenPosition === "bottom" && (
+                <div className="mt-8 border-t pt-8 border-dashed border-gray-700">
+                  {children}
+                </div>
+              )}
             </div>
+
+            {/* Right Sidebar (Children if sidebar position) */}
+            {children && childrenPosition === "sidebar" && (
+              <aside className="w-full md:w-80 shrink-0 space-y-8">
+                {children}
+              </aside>
+            )}
+
           </div>
         </div>
       )
     }
 
     // STANDARD Layouts (Magazine/Minimal/Card)
+    // We will wrap the Content block in a flex container if childrenPosition is sidebar.
+
     return (
       <div className={cn("flex flex-col gap-6", isMagazine ? "pt-10" : "pt-6")}>
         {/* Header for non-magazine styles */}
@@ -296,19 +311,30 @@ export const SingleArticleComponent: React.FC<SingleArticleComponentProps> = ({
           </div>
         )}
 
-        {/* HTML Content */}
-        {article.html && (
-          <div className="prose prose-lg prose-invert max-w-none" style={{ color: textColor }}>
-            {/* We can inject custom styles for prose elements here if needed via style tag or class overrides */}
-            <div dangerouslySetInnerHTML={{ __html: article.html }} />
-          </div>
-        )}
+        {/* Main Layout Area: Content + Sidebar */}
+        <div className={cn("flex flex-col gap-10", childrenPosition === "sidebar" && "md:flex-row")}>
+          {/* Article Body */}
+          <div className="flex-1 min-w-0">
+            {article.html && (
+              <div className="prose prose-lg prose-invert max-w-none" style={{ color: textColor }}>
+                <div dangerouslySetInnerHTML={{ __html: article.html }} />
+              </div>
+            )}
 
-        {children && (
-          <div className="mt-8 border-t pt-8 border-dashed border-gray-700">
-            {children}
+            {children && childrenPosition === "bottom" && (
+              <div className="mt-8 border-t pt-8 border-dashed border-gray-700">
+                {children}
+              </div>
+            )}
           </div>
-        )}
+
+          {/* Right Sidebar */}
+          {children && childrenPosition === "sidebar" && (
+            <aside className="w-full md:w-80 shrink-0 space-y-8 border-l border-gray-200 dark:border-gray-800 pl-0 md:pl-10">
+              {children}
+            </aside>
+          )}
+        </div>
       </div>
     )
   }

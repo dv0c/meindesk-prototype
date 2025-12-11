@@ -36,31 +36,51 @@ export async function createSite(formData: FormData) {
       },
     });
 
-    await db.subscription.create({
-      data: {
-        Site: {
-          connect: {
-            id: site.id,
+    await Promise.all([
+      db.subscription.create({
+        data: {
+          Site: {
+            connect: {
+              id: site.id,
+            },
           },
+          userId: session.user.id,
+          price: 20,
+          billing_cycle: "monthly",
+          plan: "Enterprise",
+          status: "Active",
+          next_billing_date: new Date(),
         },
-        userId: session.user.id,
-        price: 20,
-        billing_cycle: "monthly",
-        plan: "Enterprise",
-        status: "Active",
-        next_billing_date: new Date(),
-      },
-    });
+      }),
 
-    await db.features.create({
-      data: {
-        Site: {
-          connect: {
-            id: site.id,
+      db.features.create({
+        data: {
+          Site: {
+            connect: {
+              id: site.id,
+            },
           },
         },
-      },
-    });
+      }),
+
+      db.page.create({
+        data: {
+          title: "Home",
+          slug: "home",
+          siteId: site.id,
+          locked: true
+        },
+      }),
+
+      db.page.create({
+        data: {
+          title: "article",
+          slug: "article",
+          siteId: site.id,
+          locked: true
+        },
+      }),
+    ]);
 
     return site;
   } catch (err: any) {

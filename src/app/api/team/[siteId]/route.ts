@@ -52,7 +52,7 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: { siteId: string } }
 ) {
-  const { siteId } = params;
+  const { siteId } = await params;
 
   try {
     // 1. Get logged in user
@@ -95,7 +95,7 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: { siteId: string } }
 ) {
-  const { siteId } = params;
+  const { siteId } = await params;
 
   try {
     const session = await getAuthSession();

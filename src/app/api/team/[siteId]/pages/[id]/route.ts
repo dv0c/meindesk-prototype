@@ -1,8 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
 import { getAuthSession } from "@/lib/auth";
-import slugify from "slugify";
+import { db } from "@/lib/db";
 import generateSlug from "@/lib/generateSlug";
+import { NextRequest, NextResponse } from "next/server";
 
 type PageWithChildren = {
   id: string;
@@ -116,6 +115,14 @@ export async function PUT(
       finalSlug = body.slug;
     }
 
+
+
+    // WE DONT NEED TO LOCK THE PUT METHOD AT LEAST FOR THIS USE CASE (prevent it from deleted to use it in static pages  / , /article /articles)
+    // const isPageLocked = await db.page.findUnique({ where: { id } });
+    // if (isPageLocked?.locked) {
+    //   return NextResponse.json({ error: "Page is locked" }, { status: 403 });
+    // }
+
     // ------------------------
     // Update page
     // ------------------------
@@ -167,6 +174,11 @@ export async function DELETE(
         { status: 403 }
       );
 
+    const isPageLocked = await db.page.findUnique({ where: { id } });
+    if (isPageLocked?.locked) {
+      return NextResponse.json({ error: "Page is locked" }, { status: 403 });
+    }
+
     const site = await db.site.findUnique({
       where: { id: siteId },
       include: { user: true },
@@ -175,6 +187,7 @@ export async function DELETE(
     if (!site?.user || site.user.id !== session.user.id) {
       return NextResponse.json({ error: "Forbidden, s3302" }, { status: 403 });
     }
+
 
     await db.page.delete({ where: { id } });
     return NextResponse.json({ message: "Page deleted" }, { status: 200 });

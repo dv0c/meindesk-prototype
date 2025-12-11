@@ -986,6 +986,16 @@ export async function GET() {
             { label: "Right", value: "right" },
           ],
         },
+        {
+          name: "childrenPosition",
+          type: "select",
+          label: "Extra Content Position",
+          defaultValue: "bottom",
+          options: [
+            { label: "Bottom", value: "bottom" },
+            { label: "Right Sidebar", value: "sidebar" },
+          ],
+        },
       ],
     },
     {
