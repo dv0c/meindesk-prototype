@@ -1649,4 +1649,51 @@ export const ALL_COMPONENTS: ComponentDefinition[] = [
             },
         ],
     },
+    {
+        name: "SophiaNavBar",
+        category: "navigation",
+        allowChildren: false,
+        hidden: true,
+        props: [
+            {
+                name: "name",
+                type: "string",
+                label: "Name",
+                defaultValue: "Σοφία Πλατανησιώτη",
+            },
+            {
+                name: "title",
+                type: "string",
+                label: "Job Title",
+                defaultValue: "Σύμβουλος Ψυχικής Υγείας",
+            },
+            {
+                name: "imageSrc",
+                type: "image",
+                label: "Right Image",
+                defaultValue: "https://res.cloudinary.com/dv0c/image/upload/v1702334000/brain-flower-art_placeholder.png",
+            },
+            {
+                name: "links",
+                type: "json",
+                label: "Top Links",
+                defaultValue: [
+                    { label: "ΑΡΧΙΚΗ", href: "#" },
+                    { label: "ΥΠΗΡΕΣΙΕΣ", href: "#" },
+                    { label: "ΕΠΙΚΟΙΝΩΝΙΑ", href: "#" },
+                    { label: "ΒΙΟΓΡΑΦΙΚΟ", href: "#" },
+                    { label: "ΑΡΘΡΑ", href: "#", submenu: [{ label: "Blog", href: "#" }] },
+                ],
+            },
+            {
+                name: "bottomLinks",
+                type: "json",
+                label: "Bottom Links",
+                defaultValue: [
+                    { label: "Ομάδες Συμβουλευτικής και Αυτογνωσίας", href: "#" },
+                    { label: "ΕΚΔΗΛΩΣΕΙΣ", href: "#" },
+                ],
+            }
+        ],
+    },
 ]

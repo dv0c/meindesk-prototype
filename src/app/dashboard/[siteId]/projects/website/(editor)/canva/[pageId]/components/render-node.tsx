@@ -42,6 +42,7 @@ const componentMap: Record<string, React.ComponentType<any>> = {
   TeamMember: dynamic(() => import("./ui/editor/TeamMember").then(m => ({ default: m.TeamMember })), { ssr: false }),
   Navbar: dynamic(() => import("./ui/editor/Navbar"), { ssr: false }),
   Navbar2: dynamic(() => import("@/components/Builder/CustomBlocks/Navbar"), { ssr: false }),
+  SophiaNavBar: dynamic(() => import("@/components/Builder/CustomBlocks/SophiaNavBar"), { ssr: false }),
   SingleArticle: dynamic(() => import("@/components/Builder/CustomBlocks/SingleArticle").then(m => ({ default: m.SingleArticle })), { ssr: false }),
   Textarea: dynamic(() => import("@/components/Builder/CustomBlocks/Textarea"), { ssr: false }),
   Select: dynamic(() => import("@/components/Builder/CustomBlocks/Select"), { ssr: false }),

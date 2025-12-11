@@ -40,6 +40,7 @@ export interface ComponentDefinition {
   category: string;
   props: PropDefinition[];
   allowChildren?: boolean;
+  hidden?: boolean;
 }
 
 export interface PropDefinition {
