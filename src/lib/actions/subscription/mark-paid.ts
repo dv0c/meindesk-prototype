@@ -59,7 +59,7 @@ export async function markSubscriptionPaid({
             },
         }),
         // Add History
-        (db as any).billingHistory.create({
+        db.billingHistory.create({
             data: {
                 subscriptionId: subscriptionId,
                 amount: amount,

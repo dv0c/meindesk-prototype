@@ -16,7 +16,7 @@ const page = async ({ params }: { params: { siteId: string } }) => {
     // Manually query billing history
     // We use 'any' to bypass TS error since client might not be generated yet
     try {
-      history = await (db as any).billingHistory.findMany({
+      history = await db.billingHistory.findMany({
         where: { subscriptionId: data.subscription.id },
         orderBy: { date: 'desc' }
       })
