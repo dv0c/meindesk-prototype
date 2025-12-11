@@ -35,9 +35,9 @@ export async function proxy(req: NextRequest) {
 
   // 2. Handle Naked Domain (Main/Marketing Site)
   if (isNakedDomain || isWWW) {
-    // Allows the request to proceed to /page.tsx or other main app routes.
+    // For naked domain, pass the default tenant subdomain for lookup
     const res = NextResponse.next();
-    res.headers.set("x-tenant", "default-site");
+    res.headers.set("x-tenant", DEFAULT_TENANT_SUBDOMAIN);
     return res;
   }
 

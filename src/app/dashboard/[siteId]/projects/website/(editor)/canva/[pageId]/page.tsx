@@ -10,7 +10,7 @@ import { LayersPanel } from "./components/editor/layers-panel"
 import { Button } from "./components/ui/button"
 import { createNode, generateNodeId } from "@/lib/component-registry"
 import type { ComponentDefinition, LayoutNode } from "@/lib/types"
-import { Save, Eye, Home, Undo, Redo, Smartphone, Monitor, Tablet, Layers, ArrowLeft, ChevronLeft, SidebarClose } from "lucide-react"
+import { Save, Eye, Home, Undo, Redo, Smartphone, Monitor, Tablet, Layers, ArrowLeft, ChevronLeft, SidebarClose, Box } from "lucide-react"
 import Link from "next/link"
 import {
   DndContext,
@@ -290,6 +290,41 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
     }
   }
 
+  async function handleAddChildToNode(parentId: string, componentType: string) {
+    console.log("handleAddChildToNode:", parentId, componentType)
+    const parentNode = findNode(parentId, nodes)
+    if (!parentNode || parentNode.children === undefined) {
+      console.error("Cannot add child: parent not found or is not a container")
+      return
+    }
+
+    try {
+      // Fetch the component definition
+      const { getAvailableComponents } = await import("@/lib/component-registry")
+      const components = await getAvailableComponents()
+      const componentDef = components.find(c => c.name === componentType)
+
+      if (!componentDef) {
+        console.error("Component definition not found:", componentType)
+        return
+      }
+
+      // Create the new component node
+      const newNode = createNode(componentType, componentDef)
+
+      // Add the new node as a child
+      const updatedChildren = [...(parentNode.children || []), newNode]
+      updateNode(parentId, { children: updatedChildren })
+
+      toast("Component Added", {
+        description: `${componentType} has been added as a child`
+      })
+    } catch (error) {
+      console.error("Failed to add child component:", error)
+      toast.error("Failed to add component")
+    }
+  }
+
   // ----------------- Loading Skeleton -----------------
   if (loading) {
     return (
@@ -454,14 +489,87 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
             onSelectNode={selectNode}
             onMoveNode={moveNode}
             onClose={() => setShowLayersPanel(false)}
+            onDeleteNode={(id) => {
+              removeNode(id)
+              selectNode(null)
+              toast("Component Deleted", {
+                description: "Component has been removed from the canvas"
+              })
+            }}
+            onDuplicateNode={(id) => {
+              const node = findNode(id, nodes)
+              if (!node) return
+
+              function cloneNode(original: LayoutNode): LayoutNode {
+                return {
+                  ...original,
+                  id: generateNodeId(),
+                  children: original.children?.map(cloneNode),
+                }
+              }
+
+              const clonedNode = cloneNode(node)
+              const parentInfo = findNodeParent(id, nodes)
+              if (parentInfo && parentInfo.parent) {
+                const parent = parentInfo.parent
+                const newChildren = [...(parent.children || [])]
+                newChildren.splice(parentInfo.index + 1, 0, clonedNode)
+                updateNode(parent.id, { children: newChildren })
+              } else {
+                const rootIndex = nodes.findIndex((n) => n.id === id)
+                const newNodes = [...nodes]
+                newNodes.splice(rootIndex + 1, 0, clonedNode)
+                useBuilderStore.setState({ nodes: newNodes })
+              }
+
+              toast("Component Duplicated", {
+                description: "Component has been duplicated"
+              })
+            }}
+            onMoveNodeUp={(id) => {
+              const parentInfo = findNodeParent(id, nodes)
+              if (!parentInfo || parentInfo.index === 0) return
+
+              if (parentInfo.parent) {
+                const newChildren = [...(parentInfo.parent.children || [])]
+                const [movedNode] = newChildren.splice(parentInfo.index, 1)
+                newChildren.splice(parentInfo.index - 1, 0, movedNode)
+                updateNode(parentInfo.parent.id, { children: newChildren })
+              } else {
+                const newNodes = [...nodes]
+                const [movedNode] = newNodes.splice(parentInfo.index, 1)
+                newNodes.splice(parentInfo.index - 1, 0, movedNode)
+                useBuilderStore.setState({ nodes: newNodes })
+              }
+            }}
+            onMoveNodeDown={(id) => {
+              const parentInfo = findNodeParent(id, nodes)
+              if (!parentInfo) return
+              const siblings = parentInfo.parent ? parentInfo.parent.children || [] : nodes
+              if (parentInfo.index >= siblings.length - 1) return
+
+              if (parentInfo.parent) {
+                const newChildren = [...siblings]
+                const [movedNode] = newChildren.splice(parentInfo.index, 1)
+                newChildren.splice(parentInfo.index + 1, 0, movedNode)
+                updateNode(parentInfo.parent.id, { children: newChildren })
+              } else {
+                const newNodes = [...nodes]
+                const [movedNode] = newNodes.splice(parentInfo.index, 1)
+                newNodes.splice(parentInfo.index + 1, 0, movedNode)
+                useBuilderStore.setState({ nodes: newNodes })
+              }
+            }}
+            onAddChildToNode={handleAddChildToNode}
           />
         )}
 
-        <DragOverlay>
+        <DragOverlay dropAnimation={null}>
           {activeDragItem ? (
-            <Button variant="secondary" className="cursor-grabbing opacity-80 shadow-xl border-2 border-primary">
-              {activeDragItem.name}
-            </Button>
+            <div className="flex flex-col items-center justify-center p-3 h-24 w-36 border-2 border-primary rounded-md bg-card shadow-xl cursor-grabbing">
+              <Box className="h-6 w-6 mb-2 text-muted-foreground" />
+              <span className="text-xs text-center font-medium leading-tight">{activeDragItem.name}</span>
+            </div>
           ) : null}
         </DragOverlay>
       </div>

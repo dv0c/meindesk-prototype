@@ -22,7 +22,7 @@ const iconMap: Record<string, any> = {
 }
 
 export function DraggablePaletteItem({ component, onAdd }: DraggablePaletteItemProps) {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `palette-${component.name}`,
     data: {
       type: "palette-item",
@@ -30,16 +30,16 @@ export function DraggablePaletteItem({ component, onAdd }: DraggablePaletteItemP
     },
   })
 
-  const style = transform
-    ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-      }
-    : undefined
-
   const Icon = iconMap[component.name] || Box
 
   return (
-    <div ref={setNodeRef} style={style} {...listeners} {...attributes} className="touch-none h-full">
+    <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      className="touch-none h-full"
+      style={{ opacity: isDragging ? 0.5 : 1 }}
+    >
       <div
         className="flex flex-col items-center justify-center p-3 h-24 border rounded-md hover:border-primary hover:bg-accent/50 cursor-grab active:cursor-grabbing transition-colors bg-card"
         onClick={onAdd}

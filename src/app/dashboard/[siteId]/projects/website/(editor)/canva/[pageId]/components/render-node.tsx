@@ -59,6 +59,11 @@ const componentMap: Record<string, React.ComponentType<any>> = {
   Gallery: dynamic(() => import("@/components/Builder/CustomBlocks/Gallery"), { ssr: false }),
   MostPopular: dynamic(() => import("@/components/Builder/CustomBlocks/MostPopular"), { ssr: false }),
   ImageGrid: dynamic(() => import("./ui/editor/ImageGrid"), { ssr: false }),
+  ThemeSwitcher: dynamic(() => import("@/components/Builder/CustomBlocks/ThemeSwitcher"), { ssr: false }),
+  NavbarContainer: dynamic(() => import("@/components/Builder/CustomBlocks/NavbarContainer"), { ssr: false }),
+  LogoBlock: dynamic(() => import("@/components/Builder/CustomBlocks/NavbarBlocks/LogoBlock"), { ssr: false }),
+  NavigationBlock: dynamic(() => import("@/components/Builder/CustomBlocks/NavbarBlocks/NavigationBlock"), { ssr: false }),
+  ActionButtonBlock: dynamic(() => import("@/components/Builder/CustomBlocks/NavbarBlocks/ActionButtonBlock"), { ssr: false }),
 }
 
 

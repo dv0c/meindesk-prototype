@@ -142,16 +142,34 @@ function SortableLayerItem({
     e.preventDefault()
     e.stopPropagation()
 
-    let x = e.clientX
-    let y = e.clientY
     const menuWidth = 200
     const menuHeight = 250
+    const padding = 10
+    const offset = 5 // Small offset from cursor
 
-    if (x + menuWidth > window.innerWidth) {
-      x = window.innerWidth - menuWidth - 10
+    let x = e.clientX + offset
+    let y = e.clientY + offset
+
+    // Horizontal positioning - prefer right, but flip to left if not enough space
+    if (x + menuWidth > window.innerWidth - padding) {
+      // Not enough space on the right, show on the left
+      x = e.clientX - menuWidth - offset
+
+      // If still off-screen on the left, clamp to left edge
+      if (x < padding) {
+        x = padding
+      }
     }
-    if (y + menuHeight > window.innerHeight) {
-      y = window.innerHeight - menuHeight - 10
+
+    // Vertical positioning - prefer below, but flip to above if not enough space
+    if (y + menuHeight > window.innerHeight - padding) {
+      // Not enough space below, show above
+      y = e.clientY - menuHeight - offset
+
+      // If still off-screen at top, clamp to top edge
+      if (y < padding) {
+        y = padding
+      }
     }
 
     setContextMenu({ x, y })
@@ -161,16 +179,25 @@ function SortableLayerItem({
   useEffect(() => {
     if (!contextMenu) return
 
-    const handleClick = () => setContextMenu(null)
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      // Check if the click is outside the context menu
+      if (!target.closest('.context-menu-wrapper')) {
+        setContextMenu(null)
+      }
+    }
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") setContextMenu(null)
     }
 
-    document.addEventListener("mousedown", handleClick)
-    document.addEventListener("keydown", handleEscape)
+    // Use setTimeout to allow the current event to finish
+    setTimeout(() => {
+      document.addEventListener("mousedown", handleClickOutside)
+      document.addEventListener("keydown", handleEscape)
+    }, 0)
 
     return () => {
-      document.removeEventListener("mousedown", handleClick)
+      document.removeEventListener("mousedown", handleClickOutside)
       document.removeEventListener("keydown", handleEscape)
     }
   }, [contextMenu])
@@ -234,7 +261,7 @@ function SortableLayerItem({
       {/* Context Menu */}
       {contextMenu && (
         <div
-          className="fixed z-[9999]"
+          className="fixed z-[9999] context-menu-wrapper"
           style={{ left: contextMenu.x, top: contextMenu.y }}
           onClick={(e) => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}

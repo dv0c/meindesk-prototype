@@ -2,6 +2,16 @@ import { db } from "@/lib/db";
 import { unstable_cache } from "next/cache";
 
 /**
+ * Validates if a string is a valid MongoDB ObjectID
+ * MongoDB ObjectIDs are 24-character hex strings
+ */
+function isValidObjectId(id: string): boolean {
+    if (!id || typeof id !== 'string') return false;
+    // MongoDB ObjectIDs are exactly 24 characters and contain only hex digits
+    return /^[0-9a-fA-F]{24}$/.test(id);
+}
+
+/**
  * Cached lookup for finding a site by its subdomain.
  * Used in middleware/proxy logic to resolve tenant ID.
  * Falls back to direct query if cache is unavailable (e.g., in edge runtime)
@@ -45,6 +55,12 @@ export async function getCachedSiteIdBySubdomain(subdomain: string) {
  */
 export async function getCachedSiteDetails(siteId: string) {
     if (!siteId) return null;
+
+    // Validate that siteId is a valid MongoDB ObjectID
+    if (!isValidObjectId(siteId)) {
+        console.error(`Invalid MongoDB ObjectID: "${siteId}". ObjectIDs must be 24-character hex strings.`);
+        return null;
+    }
 
     try {
         // Try to use cache if available

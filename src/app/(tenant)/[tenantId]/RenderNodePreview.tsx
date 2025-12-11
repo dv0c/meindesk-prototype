@@ -53,6 +53,11 @@ const componentMap: Record<string, React.ComponentType<any>> = {
     Gallery: dynamic(() => import("@/components/Builder/CustomBlocks/Gallery")),
     MostPopular: dynamic(() => import("@/components/Builder/CustomBlocks/MostPopular")),
     ImageGrid: dynamic(() => import("@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ui/editor/ImageGrid")),
+    ThemeSwitcher: dynamic(() => import("@/components/Builder/CustomBlocks/ThemeSwitcher")),
+    NavbarContainer: dynamic(() => import("@/components/Builder/CustomBlocks/NavbarContainer")),
+    LogoBlock: dynamic(() => import("@/components/Builder/CustomBlocks/NavbarBlocks/LogoBlock")),
+    NavigationBlock: dynamic(() => import("@/components/Builder/CustomBlocks/NavbarBlocks/NavigationBlock")),
+    ActionButtonBlock: dynamic(() => import("@/components/Builder/CustomBlocks/NavbarBlocks/ActionButtonBlock")),
 }
 
 function RenderNodePreview({ node }: RenderNodePreviewProps) {

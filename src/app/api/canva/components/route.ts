@@ -593,7 +593,7 @@ export async function GET() {
           type: "json",
           label: "Images",
           schema: [
-             { key: "src", label: "Image", type: "image" }
+            { key: "src", label: "Image", type: "image" }
           ],
           defaultValue: [
             { src: "/placeholder.svg?height=400&width=400" },
@@ -614,16 +614,16 @@ export async function GET() {
           defaultValue: 4,
         },
         {
-            name: "aspectRatio",
-            type: "select",
-            label: "Aspect Ratio",
-            defaultValue: "square",
-            options: [
-                { label: "Square", value: "square" },
-                { label: "Video (16:9)", value: "video" },
-                { label: "Portrait (3:4)", value: "portrait" },
-                { label: "Auto", value: "auto" },
-            ]
+          name: "aspectRatio",
+          type: "select",
+          label: "Aspect Ratio",
+          defaultValue: "square",
+          options: [
+            { label: "Square", value: "square" },
+            { label: "Video (16:9)", value: "video" },
+            { label: "Portrait (3:4)", value: "portrait" },
+            { label: "Auto", value: "auto" },
+          ]
         }
       ],
     },
@@ -667,7 +667,7 @@ export async function GET() {
           name: "logoSize",
           type: "dimensions",
           label: "Size",
-          defaultValue: "auto", 
+          defaultValue: "auto",
         },
         {
           name: "logoMargin",
@@ -686,7 +686,7 @@ export async function GET() {
           type: "select",
           label: "Logo Fit",
           defaultValue: "contain",
-             options: [
+          options: [
             { label: "Contain", value: "contain" },
             { label: "Cover", value: "cover" },
             { label: "Fill", value: "fill" },
@@ -929,7 +929,7 @@ export async function GET() {
           name: "width",
           type: "dimensions",
           label: "Width / Height",
-          defaultValue: "100%", 
+          defaultValue: "100%",
         },
         {
           name: "margin",
@@ -1026,6 +1026,361 @@ export async function GET() {
             { label: "Numbered", value: "numbered" },
             { label: "Classic", value: "classic" },
           ],
+        },
+      ],
+    },
+    {
+      name: "ThemeSwitcher",
+      category: "advanced",
+      allowChildren: false,
+      props: [
+        {
+          name: "variant",
+          type: "select",
+          label: "Style",
+          defaultValue: "button",
+          options: [
+            { label: "Button", value: "button" },
+            { label: "Toggle", value: "toggle" },
+            { label: "Icon Only", value: "icon" },
+          ],
+        },
+        {
+          name: "size",
+          type: "select",
+          label: "Size",
+          defaultValue: "md",
+          options: [
+            { label: "Small", value: "sm" },
+            { label: "Medium", value: "md" },
+            { label: "Large", value: "lg" },
+          ],
+        },
+        {
+          name: "showLabel",
+          type: "boolean",
+          label: "Show Labels",
+          defaultValue: true,
+        },
+        {
+          name: "lightLabel",
+          type: "string",
+          label: "Light Mode Label",
+          defaultValue: "Light",
+        },
+        {
+          name: "darkLabel",
+          type: "string",
+          label: "Dark Mode Label",
+          defaultValue: "Dark",
+        },
+        {
+          name: "position",
+          type: "select",
+          label: "Position",
+          defaultValue: "inline",
+          options: [
+            { label: "Inline", value: "inline" },
+            { label: "Fixed Top Right", value: "fixed-top-right" },
+            { label: "Fixed Bottom Right", value: "fixed-bottom-right" },
+          ],
+        },
+      ],
+    },
+    {
+      name: "NavbarContainer",
+      category: "navbar-blocks",
+      allowChildren: true,
+      props: [
+        {
+          name: "backgroundColor",
+          type: "color",
+          label: "Background Color",
+          defaultValue: "#ffffff",
+        },
+        {
+          name: "textColor",
+          type: "color",
+          label: "Text Color",
+          defaultValue: "#000000",
+        },
+        {
+          name: "sticky",
+          type: "boolean",
+          label: "Sticky Header",
+          defaultValue: true,
+        },
+        {
+          name: "height",
+          type: "dimensions",
+          label: "Height",
+          defaultValue: "auto",
+        },
+        {
+          name: "padding",
+          type: "spacing",
+          label: "Padding",
+          defaultValue: "16px 24px",
+        },
+        {
+          name: "shadow",
+          type: "boolean",
+          label: "Shadow",
+          defaultValue: true,
+        },
+        {
+          name: "borderBottom",
+          type: "boolean",
+          label: "Bottom Border",
+          defaultValue: true,
+        },
+        {
+          name: "borderColor",
+          type: "color",
+          label: "Border Color",
+          defaultValue: "#e5e7eb",
+        },
+        {
+          name: "maxWidth",
+          type: "select",
+          label: "Max Width",
+          defaultValue: "container",
+          options: [
+            { label: "Full Width", value: "full" },
+            { label: "Container", value: "container" },
+            { label: "Narrow", value: "narrow" },
+          ],
+        },
+      ],
+    },
+    {
+      name: "LogoBlock",
+      category: "navbar-blocks",
+      allowChildren: false,
+      props: [
+        {
+          name: "logoImage",
+          type: "image",
+          label: "Logo Image",
+          defaultValue: "",
+        },
+        {
+          name: "logoText",
+          type: "string",
+          label: "Logo Text",
+          defaultValue: "Brand",
+        },
+        {
+          name: "logoSize",
+          type: "select",
+          label: "Size",
+          defaultValue: "md",
+          options: [
+            { label: "Small", value: "sm" },
+            { label: "Medium", value: "md" },
+            { label: "Large", value: "lg" },
+          ],
+        },
+        {
+          name: "href",
+          type: "string",
+          label: "Link URL",
+          defaultValue: "/",
+        },
+        {
+          name: "align",
+          type: "select",
+          label: "Alignment",
+          defaultValue: "left",
+          options: [
+            { label: "Left", value: "left" },
+            { label: "Center", value: "center" },
+            { label: "Right", value: "right" },
+          ],
+        },
+        {
+          name: "marginLeft",
+          type: "spacing",
+          label: "Margin Left",
+          defaultValue: "0px",
+        },
+        {
+          name: "marginRight",
+          type: "spacing",
+          label: "Margin Right",
+          defaultValue: "auto",
+        },
+      ],
+    },
+    {
+      name: "NavigationBlock",
+      category: "navbar-blocks",
+      allowChildren: false,
+      props: [
+        {
+          name: "links",
+          type: "json",
+          label: "Navigation Links",
+          schema: [
+            { key: "label", label: "Label", type: "string" },
+            { key: "href", label: "URL", type: "string" },
+          ],
+          defaultValue: [
+            { label: "Home", href: "/" },
+            { label: "About", href: "/about" },
+            { label: "Contact", href: "/contact" },
+          ],
+        },
+        {
+          name: "orientation",
+          type: "select",
+          label: "Orientation",
+          defaultValue: "horizontal",
+          options: [
+            { label: "Horizontal", value: "horizontal" },
+            { label: "Vertical", value: "vertical" },
+          ],
+        },
+        {
+          name: "spacing",
+          type: "select",
+          label: "Spacing",
+          defaultValue: "md",
+          options: [
+            { label: "Small", value: "sm" },
+            { label: "Medium", value: "md" },
+            { label: "Large", value: "lg" },
+          ],
+        },
+        {
+          name: "hoverStyle",
+          type: "select",
+          label: "Hover Style",
+          defaultValue: "underline",
+          options: [
+            { label: "Underline", value: "underline" },
+            { label: "Background", value: "background" },
+            { label: "Color Change", value: "color" },
+          ],
+        },
+        {
+          name: "fontSize",
+          type: "select",
+          label: "Font Size",
+          defaultValue: "base",
+          options: [
+            { label: "Small", value: "sm" },
+            { label: "Base", value: "base" },
+            { label: "Large", value: "lg" },
+          ],
+        },
+        {
+          name: "fontWeight",
+          type: "select",
+          label: "Font Weight",
+          defaultValue: "medium",
+          options: [
+            { label: "Normal", value: "normal" },
+            { label: "Medium", value: "medium" },
+            { label: "Semibold", value: "semibold" },
+            { label: "Bold", value: "bold" },
+          ],
+        },
+        {
+          name: "textColor",
+          type: "color",
+          label: "Text Color",
+        },
+        {
+          name: "hoverColor",
+          type: "color",
+          label: "Hover Color",
+        },
+        {
+          name: "align",
+          type: "select",
+          label: "Alignment",
+          defaultValue: "center",
+          options: [
+            { label: "Left", value: "left" },
+            { label: "Center", value: "center" },
+            { label: "Right", value: "right" },
+          ],
+        },
+      ],
+    },
+    {
+      name: "ActionButtonBlock",
+      category: "navbar-blocks",
+      allowChildren: false,
+      props: [
+        {
+          name: "text",
+          type: "string",
+          label: "Button Text",
+          defaultValue: "Get Started",
+        },
+        {
+          name: "variant",
+          type: "select",
+          label: "Variant",
+          defaultValue: "default",
+          options: [
+            { label: "Default", value: "default" },
+            { label: "Secondary", value: "secondary" },
+            { label: "Outline", value: "outline" },
+            { label: "Destructive", value: "destructive" },
+          ],
+        },
+        {
+          name: "href",
+          type: "string",
+          label: "Link URL",
+          defaultValue: "#",
+        },
+        {
+          name: "size",
+          type: "select",
+          label: "Size",
+          defaultValue: "default",
+          options: [
+            { label: "Small", value: "sm" },
+            { label: "Default", value: "default" },
+            { label: "Large", value: "lg" },
+          ],
+        },
+        {
+          name: "align",
+          type: "select",
+          label: "Alignment",
+          defaultValue: "right",
+          options: [
+            { label: "Left", value: "left" },
+            { label: "Center", value: "center" },
+            { label: "Right", value: "right" },
+          ],
+        },
+        {
+          name: "marginLeft",
+          type: "spacing",
+          label: "Margin Left",
+          defaultValue: "0px",
+        },
+        {
+          name: "marginRight",
+          type: "spacing",
+          label: "Margin Right",
+          defaultValue: "0px",
+        },
+        {
+          name: "backgroundColor",
+          type: "color",
+          label: "Background Color",
+        },
+        {
+          name: "textColor",
+          type: "color",
+          label: "Text Color",
         },
       ],
     },
