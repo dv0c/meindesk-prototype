@@ -4,20 +4,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { useAnalytics } from "@/hooks/useAnalytics"
 import { TrendingUp } from "lucide-react"
-import { useState } from "react"
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, Pie, PieChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 import { AnalyticsAreaChart } from "./AnalyticsAreaChart"
-import { Button } from "./ui/button"
 
-const RANGE_OPTIONS = [
-    { label: "Yesterday", value: "yesterday" },
-    { label: "Last Week", value: "lastWeek" },
-    { label: "Last Month", value: "lastMonth" },
-    { label: "Last 3 Months", value: "last3Months" },
-]
-
-export function AnalyticsCharts({ siteId }: { siteId: string }) {
-    const [range, setRange] = useState("lastMonth")
+export function AnalyticsCharts({ siteId, range }: { siteId: string; range: string }) {
     const { data, loading, error } = useAnalytics(siteId, range)
 
     if (loading) return (
@@ -66,18 +56,6 @@ export function AnalyticsCharts({ siteId }: { siteId: string }) {
 
     return (
         <div className="grid gap-6 lg:grid-cols-2">
-            <div className="lg:col-span-2 pt-2 flex gap-2">
-                {RANGE_OPTIONS.map((opt) => (
-                    <Button
-                        key={opt.value}
-                        className={`cursor-pointer ${range === opt.value ? "bg-primary-foreground text-muted-foreground" : "bg-muted hover:bg-muted-foreground hover:text-muted text-muted-foreground"
-                            }`}
-                        onClick={() => setRange(opt.value)}
-                    >
-                        {opt.label}
-                    </Button>
-                ))}
-            </div>
 
             {/* Views Over Time */}
             <div className="lg:col-span-2">
