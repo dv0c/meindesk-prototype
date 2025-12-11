@@ -64,6 +64,10 @@ const componentMap: Record<string, React.ComponentType<any>> = {
   LogoBlock: dynamic(() => import("@/components/Builder/CustomBlocks/NavbarBlocks/LogoBlock"), { ssr: false }),
   NavigationBlock: dynamic(() => import("@/components/Builder/CustomBlocks/NavbarBlocks/NavigationBlock"), { ssr: false }),
   ActionButtonBlock: dynamic(() => import("@/components/Builder/CustomBlocks/NavbarBlocks/ActionButtonBlock"), { ssr: false }),
+  HeroSection: dynamic(() => import("@/components/Builder/CustomBlocks/HeroSection"), { ssr: false }),
+  FooterBlock: dynamic(() => import("@/components/Builder/CustomBlocks/FooterBlock"), { ssr: false }),
+  SectionDivider: dynamic(() => import("@/components/Builder/CustomBlocks/SectionDivider"), { ssr: false }),
+  ContactInfo: dynamic(() => import("@/components/Builder/CustomBlocks/ContactInfo"), { ssr: false }),
 }
 
 

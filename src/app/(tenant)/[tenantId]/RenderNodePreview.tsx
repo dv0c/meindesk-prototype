@@ -58,6 +58,11 @@ const componentMap: Record<string, React.ComponentType<any>> = {
     LogoBlock: dynamic(() => import("@/components/Builder/CustomBlocks/NavbarBlocks/LogoBlock")),
     NavigationBlock: dynamic(() => import("@/components/Builder/CustomBlocks/NavbarBlocks/NavigationBlock")),
     ActionButtonBlock: dynamic(() => import("@/components/Builder/CustomBlocks/NavbarBlocks/ActionButtonBlock")),
+    HeroSection: dynamic(() => import("@/components/Builder/CustomBlocks/HeroSection")),
+    FooterBlock: dynamic(() => import("@/components/Builder/CustomBlocks/FooterBlock")),
+    SectionDivider: dynamic(() => import("@/components/Builder/CustomBlocks/SectionDivider")),
+    ContactInfo: dynamic(() => import("@/components/Builder/CustomBlocks/ContactInfo")),
+    SplitHero: dynamic(() => import("@/components/Builder/CustomBlocks/SplitHero")),
 }
 
 function RenderNodePreview({ node }: RenderNodePreviewProps) {
