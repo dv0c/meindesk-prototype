@@ -36,16 +36,17 @@ export async function fetchMetadataFromPage(url: string, fetchContent = false) {
       $('meta[name="twitter:image"]').attr("content") ||
       $('meta[name="image"]').attr("content") ||
       $('meta[name="og:image:url"]').attr("content") ||
+      $('link[rel="image_src"]').attr("href") ||
       $("img[alt]").first().attr("src") ||
-      $("img").not(".logo, .icon, .avatar").first().attr("src") ||
+      $("img").not(".logo, .icon, .avatar, [width='1'], [height='1']").first().attr("src") ||
       null;
 
     let author =
       $('meta[name="author"]').attr("content") ||
       $('meta[property="article:author"]').attr("content") ||
       $('meta[property="og:article:author"]').attr("content") ||
-      $('span[class*="author"]').first().text().trim() ||
-      $('div[class*="author"]').first().text().trim() ||
+      $('span[class*="author" i]').first().text().trim() ||
+      $('div[class*="author" i]').first().text().trim() ||
       $(".author, [rel=author], .byline, .posted-by").first().text().trim() ||
       $('a[rel="author"]').first().text().trim() ||
       null;
@@ -74,6 +75,7 @@ export async function fetchMetadataFromPage(url: string, fetchContent = false) {
       })
     );
 
+    // Extract from meta tags
     const metaKeys = [
       "keywords",
       "news_keywords",
@@ -98,6 +100,7 @@ export async function fetchMetadataFromPage(url: string, fetchContent = false) {
       }
     });
 
+    // Extract from JSON-LD
     $('script[type="application/ld+json"]').each((_, el) => {
       try {
         const json = JSON.parse($(el).contents().text());
@@ -122,7 +125,7 @@ export async function fetchMetadataFromPage(url: string, fetchContent = false) {
             }
           });
         }
-      } catch {}
+      } catch { }
     });
 
     let pubDate: string | null = null;
@@ -133,7 +136,7 @@ export async function fetchMetadataFromPage(url: string, fetchContent = false) {
           pubDate = json.datePublished;
           return false; // break
         }
-      } catch {}
+      } catch { }
     });
 
     if (!pubDate) {

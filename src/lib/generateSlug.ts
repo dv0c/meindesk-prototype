@@ -6,29 +6,45 @@ import { db } from "./db";
  * @param input - String to generate slug from.
  * @param model - Prisma model: "page" or "article".
  * @param siteId - Optional site ID to scope uniqueness.
+ * @param existingSlugs - Optional pre-fetched array of existing slugs (performance optimization).
  * @returns A unique slug.
  */
 export default async function generateSlug(
   input: string,
   model: "page" | "article",
-  siteId?: string
+  siteId?: string,
+  existingSlugs?: string[]
 ): Promise<string> {
   const baseSlug = slugify(input, { lower: true, strict: true, trim: true });
 
-  // Fetch all existing slugs for the site once
-  const existingSlugs = siteId
-    ? (
-        await db[model].findMany({
+  // Use provided slugs or fetch from DB
+  let slugList: string[];
+  if (existingSlugs !== undefined) {
+    slugList = existingSlugs;
+  } else if (siteId) {
+    if (model === "article") {
+      slugList = (
+        await db.article.findMany({
           where: { siteId },
           select: { slug: true },
         })
-      ).map((p: any) => p.slug)
-    : [];
+      ).map((p) => p.slug);
+    } else {
+      slugList = (
+        await db.page.findMany({
+          where: { siteId },
+          select: { slug: true },
+        })
+      ).map((p) => p.slug);
+    }
+  } else {
+    slugList = [];
+  }
 
   // Generate a unique slug in memory
   let slug = baseSlug;
   let suffix = 1;
-  while (existingSlugs.includes(slug)) {
+  while (slugList.includes(slug)) {
     slug = `${baseSlug}-${suffix}`;
     suffix++;
   }

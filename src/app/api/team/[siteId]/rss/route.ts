@@ -25,6 +25,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(cached.data);
 
   try {
+    // Always fetch metadata from the original target URL first
     const siteMeta = await fetchSiteMetadata(target);
     let feedData = null;
 
@@ -53,6 +54,7 @@ export async function GET(req: NextRequest) {
         });
       feedData = {
         feedUrl: target,
+        baseUrl: target,
         type: "Generator",
         title: siteMeta.title,
         description: null,
@@ -61,15 +63,22 @@ export async function GET(req: NextRequest) {
       };
     }
 
+    // If feed was detected at a different URL, fetch metadata from the baseUrl (original site)
+    let finalSiteMeta = siteMeta;
+    if (feedData.baseUrl && feedData.baseUrl !== target) {
+      console.log(`[RSS Scraper]: Fetching metadata from baseUrl: ${feedData.baseUrl}`);
+      finalSiteMeta = await fetchSiteMetadata(feedData.baseUrl);
+    }
+
     const data = {
       found: true,
       feedUrl: feedData.feedUrl,
       type: feedData.type,
-      title: feedData.title,
-      description: feedData.description,
-      image: feedData.image || siteMeta.favicon,
+      title: feedData.title || finalSiteMeta.title,
+      description: feedData.description || finalSiteMeta.description,
+      image: feedData.image || finalSiteMeta.logo || finalSiteMeta.favicon,
       itemCount: feedData.items.length,
-      site: siteMeta,
+      site: finalSiteMeta,
       items: feedData.items,
     };
 

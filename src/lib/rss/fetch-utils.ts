@@ -16,19 +16,43 @@ const BROWSER_HEADERS = {
   "Cache-Control": "max-age=0",
 };
 
-export async function safeFetch(url: string, options: RequestInit = {}) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
-  try {
-    return await fetch(url, {
-      ...options,
-      signal: controller.signal,
-      headers: { ...BROWSER_HEADERS, ...(options.headers || {}) },
-    });
-  } catch (err: any) {
-    console.error(`Fetch failed for ${url}:`, err.message);
-    return null;
-  } finally {
-    clearTimeout(timeout);
+export async function safeFetch(
+  url: string,
+  options: RequestInit = {},
+  maxRetries = 3
+) {
+  let lastError: any = null;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
+
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+        headers: { ...BROWSER_HEADERS, ...(options.headers || {}) },
+      });
+
+      clearTimeout(timeout);
+      return response;
+    } catch (err: any) {
+      clearTimeout(timeout);
+      lastError = err;
+
+      if (attempt < maxRetries) {
+        const backoffMs = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+        console.warn(
+          `Fetch attempt ${attempt}/${maxRetries} failed for ${url}: ${err.message}. Retrying in ${backoffMs}ms...`
+        );
+        await new Promise((resolve) => setTimeout(resolve, backoffMs));
+      }
+    }
   }
+
+  console.error(
+    `Fetch failed for ${url} after ${maxRetries} attempts:`,
+    lastError?.message
+  );
+  return null;
 }

@@ -1,8 +1,8 @@
 "use server";
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
-import slugify from "slugify";
 import pLimit from "p-limit";
+import { createArticleFromRss } from "./create-article-from-rss";
 
 export async function SaveRssToArticles({
   siteId,
@@ -38,6 +38,22 @@ export async function SaveRssToArticles({
 
   if (!rssItems.length) return { message: "No feed items found", created: 0 };
 
+  // Batch: Fetch all existing articles for this site to check duplicates
+  const existingArticles = await db.article.findMany({
+    where: {
+      siteId,
+      OR: [
+        { sourceType: "RSS", sourceId: { in: rssItems.map((i) => i.id) } },
+      ],
+    },
+    select: { sourceId: true, slug: true },
+  });
+
+  const existingSourceIds = new Set(
+    existingArticles.map((a) => a.sourceId).filter(Boolean)
+  );
+  const existingSlugs = existingArticles.map((a) => a.slug);
+
   const limit = pLimit(10); // concurrency limit
   let created = 0;
   let skipped = 0;
@@ -45,46 +61,25 @@ export async function SaveRssToArticles({
   await Promise.all(
     rssItems.map((item) =>
       limit(async () => {
-        const title = item.title?.trim() || "Untitled Article";
-        const slug = slugify(title, { lower: true, strict: true }).slice(0, 80);
-
-        // Check for duplicates
-        const existing = await db.article.findFirst({
-          where: {
-            siteId,
-            OR: [{ sourceId: item.id, sourceType: "RSS" }, { slug }],
-          },
-        });
-
-        if (existing) {
+        // Check if already imported by sourceId
+        if (existingSourceIds.has(item.id)) {
           skipped++;
           return;
         }
 
-        await db.article.create({
-          data: {
+        try {
+          await createArticleFromRss({
             siteId,
-            title,
-            slug,
-            excerpt: item.description?.slice(0, 250) || null,
-            html: item.content || item.description || "",
-            cover: item.thumbnail || null,
-            status: "DRAFT",
-            content: JSON.parse(
-              `{"root":{"children":[{"children":[{"detail":0,"format":8,"mode":"normal","style":"font-size: 13px;","text":"Source provided by ","type":"text","version":1},{"children":[{"detail":0,"format":8,"mode":"normal","style":"font-size: 13px;","text":"${item.site_name}","type":"text","version":1}],"direction":null,"format":"","indent":0,"type":"link","version":1,"textFormat":8,"textStyle":"font-size: 13px;","rel":"noreferrer","target":null,"title":null,"url":"${item.link}"}],"direction":null,"format":"","indent":0,"type":"paragraph","version":1,"textFormat":8,"textStyle":"font-size: 13px;"}],"direction":null,"format":"","indent":0,"type":"root","version":1,"textFormat":8,"textStyle":"font-size: 13px;"}}`
-            ),
-            sourceType: "RSS",
-            categories: item.categories,
-            sourceId: item.id,
             authorId: session.user.id,
-            metadata: {
-              link: item.link,
-              rssId,
-              importedAt: new Date().toISOString(),
-            },
-          },
-        });
-        created++;
+            rssId,
+            rssItem: item,
+            existingSlugs,
+          });
+          created++;
+        } catch (err: any) {
+          console.error(`Failed to create article from RSS item ${item.id}:`, err.message);
+          skipped++;
+        }
       })
     )
   );

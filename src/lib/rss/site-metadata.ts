@@ -8,7 +8,7 @@ export async function fetchSiteMetadata(url: string) {
     const html = await res.text();
     const $ = cheerio.load(html);
 
-    let title = 
+    let title =
       $('meta[property="og:site_name"]').attr("content")?.trim() ||
       $('meta[name="application-name"]').attr("content")?.trim() ||
       $("head > title").text().trim() ||
@@ -24,18 +24,29 @@ export async function fetchSiteMetadata(url: string) {
       }
     }
 
+    // Extract description
+    const description =
+      $('meta[property="og:description"]').attr("content")?.trim() ||
+      $('meta[name="description"]').attr("content")?.trim() ||
+      $('meta[name="twitter:description"]').attr("content")?.trim() ||
+      null;
+
     const faviconRel =
       $('link[rel="icon"]').attr("href") ||
       $('link[rel="shortcut icon"]').attr("href") ||
       $('link[rel="apple-touch-icon"]').attr("href") ||
       "/favicon.ico";
 
+    // Improved logo detection - check multiple sources
     const logo =
       $('meta[property="og:image"]').attr("content") ||
       $('meta[name="twitter:image"]').attr("content") ||
       $('meta[name="image"]').attr("content") ||
-      $('img[class*="logo"]').attr("src") ||
-      $('img[alt*="logo"]').first().attr("src") ||
+      $('link[rel="apple-touch-icon"]').attr("href") ||
+      $('img[class*="logo" i]').first().attr("src") ||
+      $('img[alt*="logo" i]').first().attr("src") ||
+      $('img[id*="logo" i]').first().attr("src") ||
+      $('[class*="logo" i] img').first().attr("src") ||
       null;
 
     let favicon: string;
@@ -49,6 +60,7 @@ export async function fetchSiteMetadata(url: string) {
 
     return {
       title: title || "Unknown Site",
+      description,
       favicon,
       logo: logoUrl,
       url,
@@ -84,6 +96,7 @@ function getDefaultSiteMetadata(url: string) {
     const title = u.hostname.replace(/^www\./, "").split(".")[0];
     return {
       title: title.charAt(0).toUpperCase() + title.slice(1),
+      description: null,
       favicon: getDefaultFavicon(url),
       logo: null,
       url,
@@ -91,6 +104,7 @@ function getDefaultSiteMetadata(url: string) {
   } catch {
     return {
       title: "Unknown Site",
+      description: null,
       favicon: "/favicon.ico",
       logo: null,
       url,

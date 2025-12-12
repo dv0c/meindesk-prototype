@@ -13,6 +13,7 @@ export async function detectRealFeed(
   siteMeta: any = {},
   maxItems = 20 // <-- limit number of items
 ) {
+  // Preserve the base URL (original site URL) for metadata purposes
   const baseUrl = target.replace(/\/(feed|rss|rss\.xml|atom\.xml)(\/)?$/, "");
   const res = await safeFetch(target);
   if (!res || !res.ok) return null;
@@ -35,7 +36,7 @@ export async function detectRealFeed(
     ) {
       try {
         candidates.add(new URL(href, baseUrl).href);
-      } catch {}
+      } catch { }
     }
   });
 
@@ -70,7 +71,7 @@ export async function detectRealFeed(
         const ytFeed = await parseYouTubeFeed(text);
         if (ytFeed) {
           if (ytFeed.items.length > maxItems) ytFeed.items = ytFeed.items.slice(0, maxItems);
-          return ytFeed;
+          return { ...ytFeed, baseUrl }; // Add baseUrl
         }
       }
 
@@ -99,6 +100,7 @@ export async function detectRealFeed(
           );
           return {
             feedUrl,
+            baseUrl, // Add original site URL
             type: "json",
             title: siteMeta.title || json.title,
             description: json.description || null,
@@ -133,13 +135,13 @@ export async function detectRealFeed(
                 meta.thumbnail ||
                 null;
               const description = item.description || item.summary || meta.description || null;
-              const pubDate = item.pubDate || item.updated || null;
-              const author = item.author?.name || meta.author || null;
+              const pubDate = item.pubDate || item.updated || item.published || null;
+              const author = item.author?.name || item.creator || meta.author || null;
               const categories = Array.isArray(item.category)
                 ? item.category
                 : item.category
-                ? [item.category]
-                : meta.categories || [];
+                  ? [item.category]
+                  : meta.categories || [];
               return {
                 title: item.title,
                 link: url,
@@ -160,6 +162,7 @@ export async function detectRealFeed(
 
         return {
           feedUrl,
+          baseUrl, // Add original site URL
           type: parsed.feed ? "atom" : "Native RSS",
           title: siteMeta.title || channel?.title,
           description: feedDescription,
