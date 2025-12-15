@@ -179,7 +179,7 @@ function NavigationLinks({ links, pathname, ulClassName }: NavigationLinksProps)
                             </div>
                         </div>
                     ) : (
-                        <Link className={cn("menu-item hover:underline transition-all", pathname === link.href && "underline!")} href={link.href}>
+                        <Link className={cn("menu-item hover:underline font-normal transition-all", pathname === link.href && "underline!")} href={link.href}>
                             {link.label}
                         </Link>
                     )}
