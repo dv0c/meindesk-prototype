@@ -63,7 +63,14 @@ export async function GET(
     }
 
     const children = await fetchChildren(page.id);
-    return NextResponse.json({ ...page, children }, { status: 200 });
+
+    // ✅ Add aggressive cache headers for CDN caching
+    return NextResponse.json(
+      { ...page, children },
+      {
+        status: 200,
+      }
+    );
   } catch (err) {
     console.error("GET /pages/:id error:", err);
     return NextResponse.json(
