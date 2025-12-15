@@ -73,7 +73,7 @@ export function ComponentPalette({ onAddComponent, siteId }: ComponentPalettePro
                   .filter((c) => c.category === category)
                   .map((component) => (
                     <DraggablePaletteItem
-                      key={component.name}
+                      key={component.themeName ? `${component.themeName}_${component.name}` : component.name}
                       component={component}
                       onAdd={() => onAddComponent(component)}
                     />

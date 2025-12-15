@@ -12,9 +12,16 @@ export async function GET(req: Request) {
 
   // Admins see everything; others see only non-hidden components
   const isAdmin = session?.user?.role === "ADMIN";
+
+  // IMPORTANT: Filter out components with themeName from ALL_COMPONENTS
+  // Theme components should ONLY come from installed themes in the database
+  const baseComponents = ALL_COMPONENTS.filter(c => !c.themeName);
+
   const components: ComponentDefinition[] = isAdmin
-    ? [...ALL_COMPONENTS]
-    : ALL_COMPONENTS.filter(c => !c.hidden);
+    ? [...baseComponents]
+    : baseComponents.filter(c => !c.hidden);
+
+  console.log(`Starting with ${components.length} base components (theme components excluded)`);
 
   if (siteId) {
     try {
@@ -31,22 +38,29 @@ export async function GET(req: Request) {
       });
 
       // Flatten blocks from all installed themes
+      console.log(`Found ${installedThemes.length} installed themes for siteId: ${siteId}`);
+
       installedThemes.forEach((st) => {
+        console.log(`Processing theme: ${st.theme.name} with ${st.theme.blocks.length} blocks`);
+
         st.theme.blocks.forEach((block) => {
-          // You might want to prevent duplicates or collision
-          const dynamicComponent = block.componentDefinition as any as ComponentDefinition;
+          // Create a copy to avoid mutating the original
+          const dynamicComponent = { ...(block.componentDefinition as any) } as ComponentDefinition;
 
           // When a component is part of an installed theme, it should be visible
           if (dynamicComponent.hidden) {
             delete dynamicComponent.hidden;
           }
 
-          // Ensure it has a unique name or careful about overriding
-          // Only add if not already present in the list
-          const exists = components.some(c => c.name === dynamicComponent.name);
-          if (!exists) {
-            components.push(dynamicComponent);
-          }
+          // Add theme name to the component (for UI display only - doesn't change component name)
+          dynamicComponent.themeName = st.theme.name;
+
+          console.log(`Added themeName "${st.theme.name}" to component: ${dynamicComponent.name}`);
+
+          // ALWAYS add theme components - don't replace base components
+          // This allows both the base "Hero" and themed "Hero (Sophia Platanisioti)" to coexist
+          components.push(dynamicComponent);
+          console.log(`✓ Component "${dynamicComponent.name}" added with theme "${st.theme.name}"`);
         });
       });
     } catch (error) {

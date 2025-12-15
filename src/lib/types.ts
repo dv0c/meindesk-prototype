@@ -9,6 +9,7 @@ export interface LayoutNode {
   customCss?: string;
   attributes?: Record<string, string>;
   script?: string;
+  themeName?: string; // Theme this component belongs to (for themed components)
 }
 
 export interface WebsiteSettings {
@@ -41,6 +42,7 @@ export interface ComponentDefinition {
   props: PropDefinition[];
   allowChildren?: boolean;
   hidden?: boolean;
+  themeName?: string; // Name of the theme this component belongs to
 }
 
 export interface PropDefinition {

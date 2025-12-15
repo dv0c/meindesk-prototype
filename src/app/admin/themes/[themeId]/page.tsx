@@ -70,8 +70,11 @@ export default function ThemeEditorPage({ params }: { params: Promise<{ themeId:
 
             // Pre-select blocks
             if (theme.blocks) {
-                const blockNames = theme.blocks.map((b: any) => b.componentName);
-                setSelectedBlocks(new Set(blockNames));
+                const blockKeys = theme.blocks.map((b: any) => {
+                    const themeName = b.componentDefinition?.themeName;
+                    return themeName ? `${themeName}::${b.componentName}` : b.componentName;
+                });
+                setSelectedBlocks(new Set(blockKeys));
             }
         } catch (error) {
             console.error("fetchThemeData error:", error);
@@ -83,12 +86,12 @@ export default function ThemeEditorPage({ params }: { params: Promise<{ themeId:
         }
     };
 
-    const handleBlockToggle = (componentName: string) => {
+    const handleBlockToggle = (componentKey: string) => {
         const next = new Set(selectedBlocks);
-        if (next.has(componentName)) {
-            next.delete(componentName);
+        if (next.has(componentKey)) {
+            next.delete(componentKey);
         } else {
-            next.add(componentName);
+            next.add(componentKey);
         }
         setSelectedBlocks(next);
     };
@@ -119,7 +122,10 @@ export default function ThemeEditorPage({ params }: { params: Promise<{ themeId:
 
             // 2. Sync Blocks
             // Filter ALL_COMPONENTS to get the full definitions of selected blocks
-            const blocksToSave = ALL_COMPONENTS.filter(c => selectedBlocks.has(c.name));
+            const blocksToSave = ALL_COMPONENTS.filter(c => {
+                const key = c.themeName ? `${c.themeName}::${c.name}` : c.name;
+                return selectedBlocks.has(key);
+            });
 
             const blocksRes = await fetch(`/api/admin/themes/${savedThemeId}/blocks`, {
                 method: "POST",
@@ -141,6 +147,10 @@ export default function ThemeEditorPage({ params }: { params: Promise<{ themeId:
     };
 
     if (loading) return <div className="p-8 flex justify-center"><Loader2 className="animate-spin" /></div>;
+
+    // Helper to create unique key for each component (includes theme name if present)
+    const getComponentKey = (component: ComponentDefinition) =>
+        component.themeName ? `${component.themeName}::${component.name}` : component.name;
 
     // Group components by category for better UI
     const componentsByCategory = ALL_COMPONENTS.reduce((acc, component) => {
@@ -279,21 +289,21 @@ export default function ThemeEditorPage({ params }: { params: Promise<{ themeId:
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                     {components.map(component => (
                                         <div
-                                            key={component.name}
+                                            key={component.themeName ? `${component.themeName}_${component.name}` : component.name}
                                             className={`
                                         flex items-start space-x-3 p-3 rounded-md border transition-colors cursor-pointer
-                                        ${selectedBlocks.has(component.name) ? "bg-primary/5 border-primary" : "hover:bg-muted/50"}
+                                        ${selectedBlocks.has(getComponentKey(component)) ? "bg-primary/5 border-primary" : "hover:bg-muted/50"}
                                     `}
-                                            onClick={() => handleBlockToggle(component.name)}
+                                            onClick={() => handleBlockToggle(getComponentKey(component))}
                                         >
                                             <Checkbox
-                                                checked={selectedBlocks.has(component.name)}
-                                                onCheckedChange={() => handleBlockToggle(component.name)}
+                                                checked={selectedBlocks.has(getComponentKey(component))}
+                                                onCheckedChange={() => handleBlockToggle(getComponentKey(component))}
                                                 className="mt-1"
                                             />
                                             <div className="grid gap-1.5 leading-none">
                                                 <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer">
-                                                    {component.name}
+                                                    {component.name}{component.themeName ? ` (${component.themeName})` : ""}
                                                 </label>
                                                 <p className="text-xs text-muted-foreground">
                                                     {component.props.length} props configured

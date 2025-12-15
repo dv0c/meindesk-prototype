@@ -262,7 +262,26 @@ const FeedPage = ({ params }: { params: { siteId: string, url: string } }) => {
 // Settings Dialog extracted
 const FeedSettings = ({ feed, autoImport, setAutoImport, currentData, siteId, myFeeds }: any) => {
     const [openDelete, setOpenDelete] = useState(false);
-    const [loading, setLoading] = useState<boolean>(false)
+    const [openEdit, setOpenEdit] = useState(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [saving, setSaving] = useState<boolean>(false);
+
+    // Controlled form state
+    const [formData, setFormData] = useState({
+        title: '',
+        description: '',
+    });
+
+    // Initialize form data when dialog opens
+    useEffect(() => {
+        if (openEdit && currentData) {
+            setFormData({
+                title: currentData.title || feed?.title || '',
+                description: currentData.description || feed?.description || '',
+            });
+        }
+    }, [openEdit, currentData, feed]);
+
     const handleDelete = async () => {
         if (!feed) return;
         try {
@@ -276,10 +295,35 @@ const FeedSettings = ({ feed, autoImport, setAutoImport, currentData, siteId, my
             toast.error(err.message || "Failed to delete feed");
         }
     };
+
+    const handleSaveEdit = async () => {
+        if (!currentData) return;
+        setSaving(true);
+        try {
+            const { UpdateFeed } = await import('@/lib/actions/helpers/update-feed');
+            await UpdateFeed({
+                feedId: currentData.id,
+                siteId,
+                data: {
+                    title: formData.title,
+                    description: formData.description,
+                },
+            });
+            toast.success("Feed settings updated successfully!");
+            setOpenEdit(false);
+            // Refresh the page to show updated data
+            setTimeout(() => location.reload(), 500);
+        } catch (err: any) {
+            console.error(err);
+            toast.error(err.message || "Failed to update feed");
+        } finally {
+            setSaving(false);
+        }
+    };
     return (
         <div className="space-y-3 space-x-3">
             <h1 className="text-lg font-semibold">Settings</h1>
-            <Dialog>
+            <Dialog open={openEdit} onOpenChange={setOpenEdit}>
                 <DialogTrigger asChild>
                     <Button variant="outline" size="sm"><Edit className="mr-2 h-4 w-4" /> Edit</Button>
                 </DialogTrigger>
@@ -292,12 +336,23 @@ const FeedSettings = ({ feed, autoImport, setAutoImport, currentData, siteId, my
                     <div className="flex flex-col gap-4 mt-4">
                         <div className="flex flex-col">
                             <Label htmlFor="feed-title">Feed Title</Label>
-                            <Input id="feed-title" defaultValue={feed?.site.title} placeholder="Feed title" />
+                            <Input
+                                id="feed-title"
+                                value={formData.title}
+                                onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                                placeholder="Feed title"
+                            />
                         </div>
 
                         <div className="flex flex-col">
                             <Label htmlFor="feed-description">Description</Label>
-                            <Textarea id="feed-description" defaultValue={feed?.description || ""} placeholder="Feed description" className="resize-none" />
+                            <Textarea
+                                id="feed-description"
+                                value={formData.description}
+                                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                                placeholder="Feed description"
+                                className="resize-none"
+                            />
                         </div>
 
                         <div className="flex items-center justify-between">
@@ -314,8 +369,11 @@ const FeedSettings = ({ feed, autoImport, setAutoImport, currentData, siteId, my
                     </div>
 
                     <DialogFooter className="mt-4 flex justify-end gap-2">
-                        <DialogClose asChild><Button variant="outline">Cancel</Button></DialogClose>
-                        <Button onClick={() => toast.success("Feed settings saved!")}>Save</Button>
+                        <DialogClose asChild><Button variant="outline" disabled={saving}>Cancel</Button></DialogClose>
+                        <Button onClick={handleSaveEdit} disabled={saving}>
+                            {saving && <Spinner className="mr-2" />}
+                            Save
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

@@ -47,5 +47,6 @@ export function createNode(type: string, component: ComponentDefinition): import
     type,
     props,
     children: component.allowChildren ? [] : undefined,
+    themeName: component.themeName, // Include theme name if present
   }
 }

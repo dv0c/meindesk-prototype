@@ -26,7 +26,7 @@ const componentMap: Record<string, React.ComponentType<any>> = {
   Button: dynamic(() => import("./ui/editor/Button"), { ssr: false }),
   Slideshow: dynamic(() => import("./ui/editor/Slideshow"), { ssr: false }),
   Articles: dynamic(() => import("./ui/editor/Articles"), { ssr: false }),
-  Hero: dynamic(() => import("./ui/editor/Hero"), { ssr: false }),
+  Hero: dynamic(() => import("./ui/editor/Hero").then(m => ({ default: m.default })), { ssr: false }),
   Heading: dynamic(() => import("./ui/editor/Heading"), { ssr: false }),
   Text: dynamic(() => import("./ui/editor/Text"), { ssr: false }),
   Features: dynamic(() => import("./ui/editor/Features"), { ssr: false }),
@@ -42,7 +42,6 @@ const componentMap: Record<string, React.ComponentType<any>> = {
   TeamMember: dynamic(() => import("./ui/editor/TeamMember").then(m => ({ default: m.TeamMember })), { ssr: false }),
   Navbar: dynamic(() => import("./ui/editor/Navbar"), { ssr: false }),
   Navbar2: dynamic(() => import("@/components/Builder/CustomBlocks/Navbar"), { ssr: false }),
-  SophiaNavBar: dynamic(() => import("@/components/Builder/CustomBlocks/SophiaNavBar"), { ssr: false }),
   SingleArticle: dynamic(() => import("@/components/Builder/CustomBlocks/SingleArticle").then(m => ({ default: m.SingleArticle })), { ssr: false }),
   Textarea: dynamic(() => import("@/components/Builder/CustomBlocks/Textarea"), { ssr: false }),
   Select: dynamic(() => import("@/components/Builder/CustomBlocks/Select"), { ssr: false }),
@@ -62,9 +61,37 @@ const componentMap: Record<string, React.ComponentType<any>> = {
   ContactInfo: dynamic(() => import("@/components/Builder/CustomBlocks/ContactInfo"), { ssr: false }),
 }
 
+// Theme component registry - allows multiple components with same name from different themes
+const themeComponentMap: Record<string, React.ComponentType<any>> = {
+  // SophiaPlatanisioti Theme
+  "Sophia Platanisioti_Hero": dynamic(() => import("@/components/Builder/CustomBlocks/Themes/SophiaPlatanisioti/Hero").then(m => ({ default: m.Hero })), { ssr: false }),
+  "Sophia Platanisioti_SophiaNavBar": dynamic(() => import("@/components/Builder/CustomBlocks/Themes/SophiaPlatanisioti/SophiaNavBar"), { ssr: false }),
+
+  // Add more themes here following the pattern: "ThemeName_ComponentName"
+  // "AnotherTheme_Hero": dynamic(() => import("@/components/Builder/CustomBlocks/Themes/AnotherTheme/Hero"), { ssr: false }),
+}
+
+// Helper function to get component - checks both maps
+function getComponent(componentType: string, themeName?: string): React.ComponentType<any> | undefined {
+  // If theme name is provided, check theme registry first
+  if (themeName) {
+    const themeKey = `${themeName}_${componentType}`
+    if (themeComponentMap[themeKey]) {
+      return themeComponentMap[themeKey]
+    }
+  }
+
+  // Fallback to regular component map
+  return componentMap[componentType]
+}
+
 
 export function RenderNode({ node, isEditor = false, onSelect, isSelected = false, onContextMenu, validComponentNames }: RenderNodeProps) {
-  const Component = componentMap[node.type]
+  // Try to get theme name from node metadata/props
+  const themeName = node.props?.themeName || (node as any).themeName
+
+  // Get component from either theme registry or base registry
+  const Component = getComponent(node.type, themeName)
 
   const { removeNode } = useBuilderStore()
 

@@ -10,6 +10,7 @@ import {
   SidebarHeader,
   useSidebar
 } from "@/components/ui/sidebar"
+import { useTeam } from "@/hooks/useTeam"
 import { useTeams } from "@/hooks/useTeams"
 import {
   FileIcon,
@@ -23,15 +24,15 @@ import {
   Rss,
   Send,
   Settings,
-  SidebarIcon
+  SidebarIcon,
+  Store
 } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
 import { NavProjects } from "./nav-projects"
+import { NavRSS } from "./nav-rss"
 import { TeamSwitcher } from "./team-switcher"
 import { Button } from "./ui/button"
 import { Skeleton } from "./ui/skeleton"
-import { useTeam } from "@/hooks/useTeam"
-import { NavRSS } from "./nav-rss"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { teams, loading: loadingTeams } = useTeams()
@@ -198,6 +199,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <NavProjects projects={filteredData.projects} />
               <NavRSS items={filteredData.rss} />
               <NavSecondary items={[
+                { title: "Community", url: `/community`, icon: Store },
                 { title: "Support", url: "#", icon: LifeBuoy },
                 { title: "Feedback", url: "#", icon: Send },
               ]} className="mt-auto" />

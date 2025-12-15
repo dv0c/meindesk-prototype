@@ -1653,6 +1653,7 @@ export const ALL_COMPONENTS: ComponentDefinition[] = [
         name: "SophiaNavBar",
         category: "navigation",
         allowChildren: false,
+        themeName: "Sophia Platanisioti",
         hidden: true,
         props: [
             {
@@ -1693,6 +1694,228 @@ export const ALL_COMPONENTS: ComponentDefinition[] = [
                     { label: "Ομάδες Συμβουλευτικής και Αυτογνωσίας", href: "#" },
                     { label: "ΕΚΔΗΛΩΣΕΙΣ", href: "#" },
                 ],
+            }
+        ],
+    },
+    {
+        name: "Hero",
+        category: "layout",
+        allowChildren: true,
+        themeName: "Sophia Platanisioti",
+        hidden: true,
+        props: [
+            {
+                name: "content",
+                type: "textarea",
+                label: "Main Content (HTML)",
+                defaultValue: "<p>Add your content here...</p>"
+            },
+            {
+                name: "thumbnail",
+                type: "image",
+                label: "Hero Image",
+                defaultValue: ""
+            },
+            {
+                name: "heading1",
+                type: "string",
+                label: "Heading 1",
+                defaultValue: "Είμαι στη διάθεσή σας για μια διαδικτυακή συνάντηση,"
+            },
+            {
+                name: "heading2",
+                type: "string",
+                label: "Heading 2",
+                defaultValue: "για να γνωριστούμε και να απαντήσω σε ό,τι σας απασχολεί."
+            },
+            {
+                name: "altText",
+                type: "string",
+                label: "Image Alt Text",
+                defaultValue: "Hero Image"
+            },
+            {
+                name: "containerPadding",
+                type: "spacing",
+                label: "Container Padding",
+                defaultValue: "px-3"
+            },
+            {
+                name: "maxWidth",
+                type: "string",
+                label: "Max Width Class",
+                defaultValue: "max-w-[52.5rem]"
+            },
+            {
+                name: "gap",
+                type: "string",
+                label: "Gap Class",
+                defaultValue: "gap-10"
+            },
+            {
+                name: "contentMarginTop",
+                type: "spacing",
+                label: "Content Top Margin",
+                defaultValue: "mt-20"
+            },
+            {
+                name: "imageMarginRight",
+                type: "spacing",
+                label: "Image Right Margin",
+                defaultValue: "mr-8"
+            },
+            {
+                name: "imageMarginBottom",
+                type: "spacing",
+                label: "Image Bottom Margin",
+                defaultValue: "mb-5"
+            },
+            {
+                name: "bottomPadding",
+                type: "spacing",
+                label: "Bottom Padding",
+                defaultValue: "pb-20"
+            },
+            {
+                name: "imageWidth",
+                type: "number",
+                label: "Image Width (px)",
+                defaultValue: 380
+            },
+            {
+                name: "imageHeight",
+                type: "number",
+                label: "Image Height (px)",
+                defaultValue: 460
+            },
+            {
+                name: "imageQuality",
+                type: "number",
+                label: "Image Quality (1-100)",
+                defaultValue: 100
+            },
+            {
+                name: "imagePosition",
+                type: "select",
+                label: "Image Position",
+                defaultValue: "left",
+                options: [
+                    { label: "Left", value: "left" },
+                    { label: "Right", value: "right" },
+                    { label: "Top", value: "top" },
+                    { label: "Bottom", value: "bottom" }
+                ]
+            },
+            {
+                name: "imageObjectFit",
+                type: "select",
+                label: "Image Object Fit",
+                defaultValue: "cover",
+                options: [
+                    { label: "Cover", value: "cover" },
+                    { label: "Contain", value: "contain" },
+                    { label: "Fill", value: "fill" },
+                    { label: "None", value: "none" },
+                    { label: "Scale Down", value: "scale-down" }
+                ]
+            },
+            {
+                name: "textColor",
+                type: "string",
+                label: "Text Color",
+                defaultValue: "text-[#5a5933]"
+            },
+            {
+                name: "headingColor",
+                type: "string",
+                label: "Heading Color",
+                defaultValue: "text-[#7f2e2d]"
+            },
+            {
+                name: "backgroundColor",
+                type: "string",
+                label: "Background Color",
+                defaultValue: ""
+            },
+            {
+                name: "dividerColor",
+                type: "string",
+                label: "Divider Color",
+                defaultValue: "border-black/30"
+            },
+            {
+                name: "fontSize",
+                type: "string",
+                label: "Font Size Class",
+                defaultValue: "text-[18px]"
+            },
+            {
+                name: "headingSize",
+                type: "string",
+                label: "Heading Size",
+                defaultValue: "text-[120%]"
+            },
+            {
+                name: "lineHeight",
+                type: "string",
+                label: "Line Height Class",
+                defaultValue: "leading-snug"
+            },
+            {
+                name: "layout",
+                type: "select",
+                label: "Layout Style",
+                defaultValue: "default",
+                options: [
+                    { label: "Default", value: "default" },
+                    { label: "Centered", value: "centered" },
+                    { label: "Wide", value: "wide" }
+                ]
+            },
+            {
+                name: "imageFloat",
+                type: "select",
+                label: "Image Float",
+                defaultValue: "left",
+                options: [
+                    { label: "Left", value: "left" },
+                    { label: "Right", value: "right" },
+                    { label: "None", value: "none" }
+                ]
+            },
+            {
+                name: "showImage",
+                type: "boolean",
+                label: "Show Image",
+                defaultValue: true
+            },
+            {
+                name: "showDivider",
+                type: "boolean",
+                label: "Show Divider",
+                defaultValue: true
+            },
+            {
+                name: "showHeadings",
+                type: "boolean",
+                label: "Show Headings Section",
+                defaultValue: true
+            },
+            {
+                name: "responsiveImageWidth",
+                type: "string",
+                label: "Responsive Image Width",
+                defaultValue: "w-full sm:w-auto"
+            },
+            {
+                name: "mobileLayout",
+                type: "select",
+                label: "Mobile Layout",
+                defaultValue: "stack",
+                options: [
+                    { label: "Stack Vertically", value: "stack" },
+                    { label: "Keep Default", value: "default" }
+                ]
             }
         ],
     },
