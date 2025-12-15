@@ -20,6 +20,7 @@ interface RenderNodeProps {
 }
 
 // Dynamic component map
+// Dynamic component map
 const componentMap: Record<string, React.ComponentType<any>> = {
   Container: dynamic(() => import("./ui/editor/Container"), { ssr: false }),
   Grid: dynamic(() => import("./ui/editor/Grid"), { ssr: false }),
@@ -40,17 +41,8 @@ const componentMap: Record<string, React.ComponentType<any>> = {
   Newsletter: dynamic(() => import("./ui/editor/Newsletter").then(m => ({ default: m.Newsletter })), { ssr: false }),
   Stats: dynamic(() => import("./ui/editor/Stats").then(m => ({ default: m.Stats })), { ssr: false }),
   TeamMember: dynamic(() => import("./ui/editor/TeamMember").then(m => ({ default: m.TeamMember })), { ssr: false }),
-  Navbar: dynamic(() => import("./ui/editor/Navbar"), { ssr: false }),
   Navbar2: dynamic(() => import("@/components/Builder/CustomBlocks/Navbar"), { ssr: false }),
   SingleArticle: dynamic(() => import("@/components/Builder/CustomBlocks/SingleArticle").then(m => ({ default: m.SingleArticle })), { ssr: false }),
-  Textarea: dynamic(() => import("@/components/Builder/CustomBlocks/Textarea"), { ssr: false }),
-  Select: dynamic(() => import("@/components/Builder/CustomBlocks/Select"), { ssr: false }),
-  Slider: dynamic(() => import("@/components/Builder/CustomBlocks/Slider"), { ssr: false }),
-  Skeleton: dynamic(() => import("@/components/Builder/CustomBlocks/Skeleton"), { ssr: false }),
-  Spinner: dynamic(() => import("@/components/Builder/CustomBlocks/Spinner"), { ssr: false }),
-  Table: dynamic(() => import("@/components/Builder/CustomBlocks/Table"), { ssr: false }),
-  Breadcrumb: dynamic(() => import("@/components/Builder/CustomBlocks/Breadcrumb"), { ssr: false }),
-  MostPopular: dynamic(() => import("@/components/Builder/CustomBlocks/MostPopular"), { ssr: false }),
   ImageGrid: dynamic(() => import("./ui/editor/ImageGrid"), { ssr: false }),
   ThemeSwitcher: dynamic(() => import("@/components/Builder/CustomBlocks/ThemeSwitcher"), { ssr: false }),
   NavbarContainer: dynamic(() => import("@/components/Builder/CustomBlocks/NavbarContainer"), { ssr: false }),
@@ -59,13 +51,14 @@ const componentMap: Record<string, React.ComponentType<any>> = {
   ActionButtonBlock: dynamic(() => import("@/components/Builder/CustomBlocks/NavbarBlocks/ActionButtonBlock"), { ssr: false }),
   HeroSection: dynamic(() => import("@/components/Builder/CustomBlocks/HeroSection"), { ssr: false }),
   ContactInfo: dynamic(() => import("@/components/Builder/CustomBlocks/ContactInfo"), { ssr: false }),
+  MostPopular: dynamic(() => import("@/components/Builder/CustomBlocks/MostPopular"), { ssr: false }),
 }
 
 // Theme component registry - allows multiple components with same name from different themes
 const themeComponentMap: Record<string, React.ComponentType<any>> = {
   // SophiaPlatanisioti Theme
   "Sophia Platanisioti_Hero": dynamic(() => import("@/components/Builder/CustomBlocks/Themes/SophiaPlatanisioti/Hero").then(m => ({ default: m.Hero })), { ssr: false }),
-  "Sophia Platanisioti_SophiaNavBar": dynamic(() => import("@/components/Builder/CustomBlocks/Themes/SophiaPlatanisioti/SophiaNavBar"), { ssr: false }),
+  "Sophia Platanisioti_Navbar": dynamic(() => import("@/components/Builder/CustomBlocks/Themes/SophiaPlatanisioti/Navbar").then(m => ({ default: m.Navbar })), { ssr: false }),
 
   // Add more themes here following the pattern: "ThemeName_ComponentName"
   // "AnotherTheme_Hero": dynamic(() => import("@/components/Builder/CustomBlocks/Themes/AnotherTheme/Hero"), { ssr: false }),

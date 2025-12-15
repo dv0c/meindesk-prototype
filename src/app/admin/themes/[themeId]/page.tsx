@@ -14,6 +14,8 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { ALL_COMPONENTS } from "@/lib/components-data";
 import { ComponentDefinition } from "@/lib/types";
+import { FontConfigurator } from "@/components/FontConfigurator";
+import type { FontConfig } from "@/lib/fonts";
 // @ts-ignore
 import { CldUploadButton, type CldUploadWidgetResults } from "next-cloudinary";
 import NextImage from "next/image";
@@ -34,6 +36,9 @@ export default function ThemeEditorPage({ params }: { params: Promise<{ themeId:
         isPremium: false,
         thumbnail: "",
     });
+
+    // Font configuration state
+    const [fonts, setFonts] = useState<FontConfig[]>([]);
 
     // Block Selection State
     // We store just the names of the selected components
@@ -67,6 +72,11 @@ export default function ThemeEditorPage({ params }: { params: Promise<{ themeId:
                 isPremium: theme.isPremium,
                 thumbnail: theme.thumbnail || "",
             });
+
+            // Load fonts if they exist
+            if (theme.fonts) {
+                setFonts(theme.fonts);
+            }
 
             // Pre-select blocks
             if (theme.blocks) {
@@ -113,7 +123,7 @@ export default function ThemeEditorPage({ params }: { params: Promise<{ themeId:
             const themeRes = await fetch(url, {
                 method,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({ ...formData, fonts }),
             });
 
             if (!themeRes.ok) throw new Error("Failed to save theme metadata");
@@ -271,6 +281,14 @@ export default function ThemeEditorPage({ params }: { params: Promise<{ themeId:
                             </div>
                         </div>
                     </div>
+                </div>
+
+                {/* Font Configuration Section */}
+                <div className="mt-6">
+                    <FontConfigurator
+                        fonts={fonts}
+                        onChange={setFonts}
+                    />
                 </div>
 
                 {/* Blocks Selection Section */}

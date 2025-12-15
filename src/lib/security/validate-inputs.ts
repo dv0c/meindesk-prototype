@@ -123,8 +123,124 @@ export function validateURL(url: string): { valid: boolean; error?: string } {
             return { valid: false, error: 'Only HTTPS URLs are allowed' };
         }
 
+
         return { valid: true };
     } catch {
         return { valid: false, error: 'Invalid URL format' };
     }
 }
+
+/**
+ * Validate SEO keywords (comma-separated)
+ */
+export function validateKeywords(keywords: string): { valid: boolean; error?: string } {
+    if (!keywords) return { valid: true };
+
+    // Check length
+    if (keywords.length > 500) {
+        return { valid: false, error: 'Keywords too long (max 500 characters)' };
+    }
+
+    // Block script-like patterns
+    if (/<script|javascript|vbscript/gi.test(keywords)) {
+        return { valid: false, error: 'Keywords contain forbidden patterns' };
+    }
+
+    return { valid: true };
+}
+
+/**
+ * Sanitize keywords
+ */
+export function sanitizeKeywords(keywords: string): string {
+    if (!keywords) return '';
+    return keywords
+        .replace(/<script[^>]*>.*?<\/script>/gi, '')
+        .replace(/[<>]/g, '')
+        .substring(0, 500);
+}
+
+/**
+ * Validate robots meta tag
+ */
+export function validateRobots(robots: string): { valid: boolean; error?: string } {
+    if (!robots) return { valid: true };
+
+    const validValues = ['index', 'noindex', 'follow', 'nofollow', 'none', 'noarchive', 'nosnippet', 'noimageindex'];
+    const parts = robots.toLowerCase().split(',').map(s => s.trim());
+
+    for (const part of parts) {
+        if (!validValues.includes(part)) {
+            return { valid: false, error: `Invalid robots value: ${part}` };
+        }
+    }
+
+    return { valid: true };
+}
+
+/**
+ * Validate Twitter handle (should start with @)
+ */
+export function validateTwitterHandle(handle: string): { valid: boolean; error?: string } {
+    if (!handle) return { valid: true };
+
+    // Twitter handles should be @username format, 1-15 characters after @
+    const twitterPattern = /^@[A-Za-z0-9_]{1,15}$/;
+
+    if (!twitterPattern.test(handle)) {
+        return { valid: false, error: 'Twitter handle must be in format @username (1-15 characters)' };
+    }
+
+    return { valid: true };
+}
+
+/**
+ * Sanitize Twitter handle
+ */
+export function sanitizeTwitterHandle(handle: string): string {
+    if (!handle) return '';
+
+    // Ensure it starts with @
+    let sanitized = handle.trim();
+    if (!sanitized.startsWith('@')) {
+        sanitized = '@' + sanitized;
+    }
+
+    // Remove invalid characters and limit length
+    return sanitized.replace(/[^@A-Za-z0-9_]/g, '').substring(0, 16); // @ + 15 chars
+}
+
+/**
+ * Validate theme mode
+ */
+export function validateThemeMode(mode: string): { valid: boolean; error?: string } {
+    if (!mode) return { valid: true };
+
+    const validModes = ['light', 'dark', 'auto'];
+
+    if (!validModes.includes(mode)) {
+        return { valid: false, error: 'Theme mode must be light, dark, or auto' };
+    }
+
+    return { valid: true };
+}
+
+/**
+ * Validate Open Graph type
+ */
+export function validateOgType(type: string): { valid: boolean; error?: string } {
+    if (!type) return { valid: true };
+
+    const validTypes = [
+        'website', 'article', 'book', 'profile', 'music.song', 'music.album',
+        'music.playlist', 'music.radio_station', 'video.movie', 'video.episode',
+        'video.tv_show', 'video.other'
+    ];
+
+    if (!validTypes.includes(type)) {
+        return { valid: false, error: 'Invalid Open Graph type' };
+    }
+
+    return { valid: true };
+}
+

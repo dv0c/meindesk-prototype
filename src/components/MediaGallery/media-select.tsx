@@ -89,46 +89,58 @@ function MediaItemCard({
 
   return (
     <div
-      className={`relative aspect-square rounded-lg overflow-hidden cursor-pointer border transition group ${isSelected ? "border-primary" : "border-transparent hover:border-muted-foreground/40"
+      className={`relative aspect-square rounded-lg overflow-hidden cursor-pointer border-2 transition-all duration-200 group ${isSelected
+          ? "border-primary shadow-lg scale-[1.02] ring-2 ring-primary/20"
+          : "border-transparent hover:border-primary/40 hover:shadow-md hover:scale-[1.02]"
         }`}
       onClick={onSelect}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <img src={media.url || "/placeholder.svg"} alt={media.alt || "Media"} className="w-full h-full object-cover" />
-      {isSelected && <div className="absolute inset-0 bg-primary/50 border-2 border-primary rounded-lg"></div>}
+      <img
+        src={media.url || "/placeholder.svg"}
+        alt={media.alt || "Media"}
+        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+      />
 
+      {/* Selected overlay */}
       {isSelected && (
-        <div className="absolute top-2 left-2 w-6 h-6 bg-primary rounded-full flex items-center justify-center z-10">
-          <Check className="h-4 w-4 text-primary-foreground" />
+        <div className="absolute inset-0 bg-primary/20 backdrop-blur-[1px] rounded-lg transition-opacity duration-200">
+          <div className="absolute top-2 left-2 w-7 h-7 bg-primary rounded-full flex items-center justify-center shadow-lg animate-in zoom-in-50 duration-200">
+            <Check className="h-4 w-4 text-primary-foreground" strokeWidth={3} />
+          </div>
         </div>
       )}
 
-      {/* Delete button */}
-      <Button
-        onClick={(e) => {
-          e.stopPropagation()
-          onDelete()
-        }}
-        className="absolute top-2 !bg-destructive right-2 p-1.5 z-10"
-        variant={'destructive'}
-        size={'icon-sm'}
-        aria-label="Delete media"
-      >
-        <Trash2 className="h-4 w-4" />
-      </Button>
+      {/* Delete button - always visible on hover */}
+      <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <Button
+          onClick={(e) => {
+            e.stopPropagation()
+            onDelete()
+          }}
+          className="!bg-destructive hover:!bg-destructive/90 shadow-lg"
+          variant={'destructive'}
+          size={'icon-sm'}
+          aria-label="Delete media"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+        </Button>
+      </div>
 
       {/* Hover tooltip with media details */}
       {showTooltip && (
-        <div className="absolute inset-0 bg-black/80 text-white p-3 flex flex-col justify-end text-xs space-y-1 z-20 pointer-events-none">
-          <p className="font-semibold truncate">{media.name || "Untitled"}</p>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent text-white p-3 flex flex-col justify-end text-xs space-y-1 z-20 pointer-events-none animate-in fade-in-0 duration-200">
+          <p className="font-semibold truncate text-sm">{media.name || "Untitled"}</p>
           {media.width && media.height && (
-            <p className="text-white/80">
+            <p className="text-white/90 text-[11px]">
               {media.width} × {media.height}px
             </p>
           )}
-          <p className="text-white/80">{formatFileSize(media.size)}</p>
-          {media.type && <p className="text-white/80 uppercase">{media.type.split("/")[1]}</p>}
+          <div className="flex items-center justify-between">
+            <p className="text-white/80">{formatFileSize(media.size)}</p>
+            {media.type && <p className="text-white/80 uppercase text-[10px]">{media.type.split("/")[1]}</p>}
+          </div>
           <p className="text-white/60 text-[10px]">{formatDate(media.createdAt)}</p>
         </div>
       )}
@@ -152,6 +164,7 @@ export default function MediaLibraryDialog({
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [mediaToDelete, setMediaToDelete] = useState<MediaItem | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
 
   const fetchMedia = useCallback(async () => {
     setIsLoading(true)
@@ -173,7 +186,15 @@ export default function MediaLibraryDialog({
   }, [isOpen, fetchMedia])
 
   useEffect(() => {
-    const filtered = mediaItems.filter((m) => m.url.toLowerCase().includes(searchTerm.toLowerCase()))
+    // Improved search: search across name, alt, and URL
+    const filtered = mediaItems.filter((m) => {
+      const searchLower = searchTerm.toLowerCase()
+      return (
+        m.name?.toLowerCase().includes(searchLower) ||
+        m.alt?.toLowerCase().includes(searchLower) ||
+        m.url.toLowerCase().includes(searchLower)
+      )
+    })
     setFilteredMediaItems(filtered)
   }, [searchTerm, mediaItems])
 
@@ -220,20 +241,6 @@ export default function MediaLibraryDialog({
   }
 
   const handleUploadSuccess = async (result: any) => {
-    // try {
-    //   await axios.post(`/api/team/${siteId}/media-gallery`, {
-    //     siteId,
-    //     url: result.info.secure_url,
-    //     publicId: result.info.public_id,
-    //   })
-    //   toast.success("Upload successful!")
-    //   fetchMedia()
-    //   setActiveTab("library")
-    // } catch (err) {
-    //   console.error(err)
-    //   toast.error("Failed to save uploaded media.")
-    //   setActiveTab("library")
-    // }
     setActiveTab("library")
     toast.success("Upload successful!")
     fetchMedia()
@@ -246,6 +253,32 @@ export default function MediaLibraryDialog({
     }
     onSelect(selectedItems)
     onClose()
+  }
+
+  // Drag and drop handlers
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDragging(false)
+    // Note: Actual file handling would need to be integrated with Cloudinary upload
+    toast.info("Please use the upload button for now")
   }
 
   return (
@@ -267,7 +300,7 @@ export default function MediaLibraryDialog({
             <TabsContent value="library" className="flex-grow overflow-hidden flex flex-col">
               <div className="relative mb-4 shrink-0">
                 <Input
-                  placeholder="Search media..."
+                  placeholder="Search by name, description, or URL..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -276,8 +309,8 @@ export default function MediaLibraryDialog({
               </div>
               <ScrollArea className="flex-grow">
                 {isLoading ? (
-                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 p-1">
-                    {[...Array(10)].map((_, i) => (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 p-1">
+                    {[...Array(12)].map((_, i) => (
                       <Skeleton key={i} className="aspect-square rounded-lg" />
                     ))}
                   </div>
@@ -288,7 +321,7 @@ export default function MediaLibraryDialog({
                     {searchTerm && <p className="text-xs text-muted-foreground">Try a different search term.</p>}
                   </div>
                 ) : (
-                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 p-1">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 p-1">
                     {filteredMediaItems.map((media) => (
                       <MediaItemCard
                         key={media.id}
@@ -302,7 +335,14 @@ export default function MediaLibraryDialog({
                 )}
               </ScrollArea>
             </TabsContent>
-            <TabsContent value="upload" className="flex-grow overflow-hidden flex flex-col items-center justify-center">
+            <TabsContent
+              value="upload"
+              className="flex-grow overflow-hidden flex flex-col items-center justify-center"
+              onDragEnter={handleDragEnter}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
               <CldUploadButton
                 options={{
                   folder: `${siteId}/uploads/`,
@@ -318,12 +358,17 @@ export default function MediaLibraryDialog({
                 }}
                 uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "esiln4yu"}
                 onSuccess={handleUploadSuccess}
-                className="w-full h-full border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center text-center cursor-pointer border-muted-foreground/30 hover:border-primary/60 transition-colors"
+                className={`w-full h-full border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 ${isDragging
+                  ? "border-primary bg-primary/5 scale-[0.98]"
+                  : "border-muted-foreground/30 hover:border-primary/60 hover:bg-accent/50"
+                  }`}
               >
                 <div className="flex flex-col items-center justify-center">
-                  <UploadCloud className="h-12 w-12 text-muted-foreground mb-3" />
-                  <p className="font-semibold">Click here to upload images</p>
-                  <p className="text-xs text-muted-foreground mt-1">Max 5MB per image. Supports JPG, PNG, GIF, WEBP.</p>
+                  <UploadCloud className={`h-16 w-16 mb-4 transition-all duration-200 ${isDragging ? "text-primary scale-110" : "text-muted-foreground"}`} />
+                  <p className="font-semibold text-lg mb-2">
+                    {isDragging ? "Drop files here" : "Click to upload or drag and drop"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Max 5MB per image. Supports JPG, PNG, GIF, WEBP.</p>
                 </div>
               </CldUploadButton>
             </TabsContent>

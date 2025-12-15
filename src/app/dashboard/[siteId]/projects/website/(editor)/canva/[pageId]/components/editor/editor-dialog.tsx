@@ -38,21 +38,36 @@ export function EditorDialog({ open, onOpenChange, value, onSave, title = "Edit 
 
     const [editorInstance, setEditorInstance] = useState<any>(null)
 
-    // Update editor state when value prop changes (e.g., on page refresh)
+    // Update editor state when dialog opens or value changes
     useEffect(() => {
+        // Only parse when dialog is opening or value changes
+        if (!open) return;
+
         try {
             const parsed = JSON.parse(value)
+            let newState = undefined;
+
             // Check if it's our structured format with editorState
             if (parsed && parsed.editorState && parsed.editorState.root) {
-                setEditorState(parsed.editorState)
+                newState = parsed.editorState
             } else if (parsed && typeof parsed === 'object' && parsed.root) {
                 // Direct Lexical state
-                setEditorState(parsed)
+                newState = parsed
+            }
+
+            if (newState) {
+                setEditorState(newState)
+
+                // Force update editor instance if it's already mounted
+                if (editorInstance) {
+                    const editorState = editorInstance.parseEditorState(newState)
+                    editorInstance.setEditorState(editorState)
+                }
             }
         } catch {
             // Not valid JSON, keep current state
         }
-    }, [value])
+    }, [value, open, editorInstance])
 
     const handleEditorReady = useCallback((editor: any) => {
         setEditorInstance(editor)

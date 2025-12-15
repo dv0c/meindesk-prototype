@@ -7,6 +7,8 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { useParams } from "next/navigation"
 import { useEffect, useState, useCallback, useRef } from "react"
 import { CheckCircle2, Loader2, AlertCircle } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Separator } from "@/components/ui/separator"
 
 export function GlobalSettingsPanel() {
   const { websiteSettings, updateWebsiteSettings } = useBuilderStore()
@@ -27,7 +29,11 @@ export function GlobalSettingsPanel() {
         body: JSON.stringify(settings),
       })
 
-      if (!response.ok) throw new Error('Failed to save')
+      if (!response.ok) {
+        const error = await response.json()
+        console.error('Save error:', error)
+        throw new Error('Failed to save')
+      }
 
       setSaveStatus('saved')
       setTimeout(() => setSaveStatus('idle'), 2000)
@@ -56,7 +62,7 @@ export function GlobalSettingsPanel() {
   }, [websiteSettings, siteId, saveSettings])
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="h-full flex flex-col">
       <div className="p-4 border-b">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold">Website Settings</h2>
@@ -83,7 +89,7 @@ export function GlobalSettingsPanel() {
           </div>
         </div>
       </div>
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1 h-full">
         <div className="p-4 space-y-6">
           {/* General Settings */}
           <div className="space-y-4">
@@ -97,11 +103,43 @@ export function GlobalSettingsPanel() {
               <Textarea
                 value={websiteSettings.description}
                 onChange={(e) => updateWebsiteSettings({ description: e.target.value })}
+                rows={3}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Favicon URL</Label>
+              <Input
+                value={websiteSettings.favicon || ''}
+                onChange={(e) => updateWebsiteSettings({ favicon: e.target.value })}
+                placeholder="https://example.com/favicon.ico"
               />
             </div>
           </div>
 
+          <Separator />
+
           {/* Theme Settings */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Theme</h3>
+            <div className="space-y-2">
+              <Label>Theme Mode</Label>
+              <Select
+                value={websiteSettings.theme.mode || 'light'}
+                onValueChange={(value) => updateWebsiteSettings({ theme: { ...websiteSettings.theme, mode: value as 'light' | 'dark' | 'auto' } })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select theme mode" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="light">Light</SelectItem>
+                  <SelectItem value="dark">Dark</SelectItem>
+                  <SelectItem value="auto">Auto (system preference)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Global Colors */}
           <div className="space-y-4">
             <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Global Colors</h3>
             <div className="grid grid-cols-2 gap-4">
@@ -110,7 +148,7 @@ export function GlobalSettingsPanel() {
                 <div className="flex gap-2">
                   <Input
                     type="color"
-                    className="w-8 h-8 p-0 border-0"
+                    className="w-12 h-9 p-1 border-0"
                     value={websiteSettings.theme.primaryColor}
                     onChange={(e) =>
                       updateWebsiteSettings({ theme: { ...websiteSettings.theme, primaryColor: e.target.value } })
@@ -129,7 +167,7 @@ export function GlobalSettingsPanel() {
                 <div className="flex gap-2">
                   <Input
                     type="color"
-                    className="w-8 h-8 p-0 border-0"
+                    className="w-12 h-9 p-1 border-0"
                     value={websiteSettings.theme.secondaryColor}
                     onChange={(e) =>
                       updateWebsiteSettings({ theme: { ...websiteSettings.theme, secondaryColor: e.target.value } })
@@ -148,7 +186,7 @@ export function GlobalSettingsPanel() {
                 <div className="flex gap-2">
                   <Input
                     type="color"
-                    className="w-8 h-8 p-0 border-0"
+                    className="w-12 h-9 p-1 border-0"
                     value={websiteSettings.theme.backgroundColor}
                     onChange={(e) =>
                       updateWebsiteSettings({ theme: { ...websiteSettings.theme, backgroundColor: e.target.value } })
@@ -158,6 +196,25 @@ export function GlobalSettingsPanel() {
                     value={websiteSettings.theme.backgroundColor}
                     onChange={(e) =>
                       updateWebsiteSettings({ theme: { ...websiteSettings.theme, backgroundColor: e.target.value } })
+                    }
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Text Color</Label>
+                <div className="flex gap-2">
+                  <Input
+                    type="color"
+                    className="w-12 h-9 p-1 border-0"
+                    value={websiteSettings.theme.textColor}
+                    onChange={(e) =>
+                      updateWebsiteSettings({ theme: { ...websiteSettings.theme, textColor: e.target.value } })
+                    }
+                  />
+                  <Input
+                    value={websiteSettings.theme.textColor}
+                    onChange={(e) =>
+                      updateWebsiteSettings({ theme: { ...websiteSettings.theme, textColor: e.target.value } })
                     }
                   />
                 </div>
@@ -179,6 +236,166 @@ export function GlobalSettingsPanel() {
               />
             </div>
           </div>
+
+          <Separator />
+
+          {/* SEO Settings */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">SEO Meta Tags</h3>
+            <div className="space-y-2">
+              <Label>Meta Title <span className="text-xs text-muted-foreground">(optional, defaults to Website Title)</span></Label>
+              <Input
+                value={websiteSettings.seo?.metaTitle || ''}
+                onChange={(e) => updateWebsiteSettings({ seo: { ...websiteSettings.seo, metaTitle: e.target.value } })}
+                placeholder="Custom title for search engines"
+                maxLength={200}
+              />
+              <p className="text-xs text-muted-foreground">{(websiteSettings.seo?.metaTitle || '').length}/200 characters</p>
+            </div>
+            <div className="space-y-2">
+              <Label>Meta Description <span className="text-xs text-muted-foreground">(optional, defaults to Description)</span></Label>
+              <Textarea
+                value={websiteSettings.seo?.metaDescription || ''}
+                onChange={(e) => updateWebsiteSettings({ seo: { ...websiteSettings.seo, metaDescription: e.target.value } })}
+                placeholder="Custom description for search engines"
+                rows={3}
+                maxLength={500}
+              />
+              <p className="text-xs text-muted-foreground">{(websiteSettings.seo?.metaDescription || '').length}/500 characters</p>
+            </div>
+            <div className="space-y-2">
+              <Label>Keywords</Label>
+              <Input
+                value={websiteSettings.seo?.keywords || ''}
+                onChange={(e) => updateWebsiteSettings({ seo: { ...websiteSettings.seo, keywords: e.target.value } })}
+                placeholder="seo, keywords, comma-separated"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Author</Label>
+              <Input
+                value={websiteSettings.seo?.author || ''}
+                onChange={(e) => updateWebsiteSettings({ seo: { ...websiteSettings.seo, author: e.target.value } })}
+                placeholder="Author name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Robots</Label>
+              <Select
+                value={websiteSettings.seo?.robots || 'index, follow'}
+                onValueChange={(value) => updateWebsiteSettings({ seo: { ...websiteSettings.seo, robots: value } })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select robots directive" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="index, follow">Index, Follow (default)</SelectItem>
+                  <SelectItem value="noindex, follow">No Index, Follow</SelectItem>
+                  <SelectItem value="index, nofollow">Index, No Follow</SelectItem>
+                  <SelectItem value="noindex, nofollow">No Index, No Follow</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Canonical URL</Label>
+              <Input
+                value={websiteSettings.seo?.canonical || ''}
+                onChange={(e) => updateWebsiteSettings({ seo: { ...websiteSettings.seo, canonical: e.target.value } })}
+                placeholder="https://example.com/page"
+              />
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Open Graph */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Open Graph (Social Media)</h3>
+            <div className="space-y-2">
+              <Label>OG Title</Label>
+              <Input
+                value={websiteSettings.seo?.ogTitle || ''}
+                onChange={(e) => updateWebsiteSettings({ seo: { ...websiteSettings.seo, ogTitle: e.target.value } })}
+                placeholder="Title for social media shares"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>OG Description</Label>
+              <Textarea
+                value={websiteSettings.seo?.ogDescription || ''}
+                onChange={(e) => updateWebsiteSettings({ seo: { ...websiteSettings.seo, ogDescription: e.target.value } })}
+                placeholder="Description for social media shares"
+                rows={2}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>OG Image URL</Label>
+              <Input
+                value={websiteSettings.seo?.ogImage || ''}
+                onChange={(e) => updateWebsiteSettings({ seo: { ...websiteSettings.seo, ogImage: e.target.value } })}
+                placeholder="https://example.com/image.jpg"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>OG Type</Label>
+              <Select
+                value={websiteSettings.seo?.ogType || 'website'}
+                onValueChange={(value) => updateWebsiteSettings({ seo: { ...websiteSettings.seo, ogType: value } })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="website">Website</SelectItem>
+                  <SelectItem value="article">Article</SelectItem>
+                  <SelectItem value="book">Book</SelectItem>
+                  <SelectItem value="profile">Profile</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Twitter Card */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Twitter Card</h3>
+            <div className="space-y-2">
+              <Label>Card Type</Label>
+              <Select
+                value={websiteSettings.seo?.twitterCard || 'summary'}
+                onValueChange={(value) => updateWebsiteSettings({ seo: { ...websiteSettings.seo, twitterCard: value as any } })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select card type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="summary">Summary</SelectItem>
+                  <SelectItem value="summary_large_image">Summary Large Image</SelectItem>
+                  <SelectItem value="app">App</SelectItem>
+                  <SelectItem value="player">Player</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Twitter Site</Label>
+              <Input
+                value={websiteSettings.seo?.twitterSite || ''}
+                onChange={(e) => updateWebsiteSettings({ seo: { ...websiteSettings.seo, twitterSite: e.target.value } })}
+                placeholder="@username"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Twitter Creator</Label>
+              <Input
+                value={websiteSettings.seo?.twitterCreator || ''}
+                onChange={(e) => updateWebsiteSettings({ seo: { ...websiteSettings.seo, twitterCreator: e.target.value } })}
+                placeholder="@username"
+              />
+            </div>
+          </div>
+
+          <Separator />
 
           {/* Custom CSS */}
           <div className="space-y-4">

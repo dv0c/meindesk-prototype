@@ -70,10 +70,10 @@ export async function proxy(req: NextRequest) {
   // 4. Perform Rewriting or 404
   if (!tenantId) {
     // Tenant (Prototype or Custom) not found in DB
-    console.log(`Tenant '${normalizedSubdomain}' not found. Showing 404.`);
+    console.log(`Tenant '${normalizedSubdomain}' not found. Redirecting to 404 page.`);
 
-    // Return a 404 for any subdomain that doesn't exist in the DB.
-    return new NextResponse("Tenant Not Found", { status: 404 });
+    // Redirect to a proper 404 page instead of showing plain text
+    return NextResponse.redirect(new URL("/tenant-not-found", req.url));
   }
 
   // ✅ Rewrite the URL to the tenant route.
@@ -87,6 +87,6 @@ export async function proxy(req: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|robots.txt|assets|images).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|robots.txt|assets|images|tenant-not-found).*)",
   ],
 };

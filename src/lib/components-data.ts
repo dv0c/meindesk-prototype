@@ -1649,54 +1649,7 @@ export const ALL_COMPONENTS: ComponentDefinition[] = [
             },
         ],
     },
-    {
-        name: "SophiaNavBar",
-        category: "navigation",
-        allowChildren: false,
-        themeName: "Sophia Platanisioti",
-        hidden: true,
-        props: [
-            {
-                name: "name",
-                type: "string",
-                label: "Name",
-                defaultValue: "Σοφία Πλατανησιώτη",
-            },
-            {
-                name: "title",
-                type: "string",
-                label: "Job Title",
-                defaultValue: "Σύμβουλος Ψυχικής Υγείας",
-            },
-            {
-                name: "imageSrc",
-                type: "image",
-                label: "Right Image",
-                defaultValue: "https://res.cloudinary.com/dv0c/image/upload/v1702334000/brain-flower-art_placeholder.png",
-            },
-            {
-                name: "links",
-                type: "json",
-                label: "Top Links",
-                defaultValue: [
-                    { label: "ΑΡΧΙΚΗ", href: "#" },
-                    { label: "ΥΠΗΡΕΣΙΕΣ", href: "#" },
-                    { label: "ΕΠΙΚΟΙΝΩΝΙΑ", href: "#" },
-                    { label: "ΒΙΟΓΡΑΦΙΚΟ", href: "#" },
-                    { label: "ΑΡΘΡΑ", href: "#", submenu: [{ label: "Blog", href: "#" }] },
-                ],
-            },
-            {
-                name: "bottomLinks",
-                type: "json",
-                label: "Bottom Links",
-                defaultValue: [
-                    { label: "Ομάδες Συμβουλευτικής και Αυτογνωσίας", href: "#" },
-                    { label: "ΕΚΔΗΛΩΣΕΙΣ", href: "#" },
-                ],
-            }
-        ],
-    },
+
     {
         name: "Hero",
         category: "layout",
@@ -1717,206 +1670,100 @@ export const ALL_COMPONENTS: ComponentDefinition[] = [
                 defaultValue: ""
             },
             {
-                name: "heading1",
-                type: "string",
-                label: "Heading 1",
-                defaultValue: "Είμαι στη διάθεσή σας για μια διαδικτυακή συνάντηση,"
-            },
-            {
-                name: "heading2",
-                type: "string",
-                label: "Heading 2",
-                defaultValue: "για να γνωριστούμε και να απαντήσω σε ό,τι σας απασχολεί."
-            },
-            {
-                name: "altText",
-                type: "string",
-                label: "Image Alt Text",
-                defaultValue: "Hero Image"
-            },
-            {
                 name: "containerPadding",
                 type: "spacing",
                 label: "Container Padding",
                 defaultValue: "px-3"
             },
             {
-                name: "maxWidth",
-                type: "string",
-                label: "Max Width Class",
-                defaultValue: "max-w-[52.5rem]"
-            },
-            {
-                name: "gap",
-                type: "string",
-                label: "Gap Class",
-                defaultValue: "gap-10"
-            },
-            {
-                name: "contentMarginTop",
+                name: "containerMargin",
                 type: "spacing",
-                label: "Content Top Margin",
-                defaultValue: "mt-20"
-            },
-            {
-                name: "imageMarginRight",
-                type: "spacing",
-                label: "Image Right Margin",
-                defaultValue: "mr-8"
-            },
-            {
-                name: "imageMarginBottom",
-                type: "spacing",
-                label: "Image Bottom Margin",
-                defaultValue: "mb-5"
-            },
-            {
-                name: "bottomPadding",
-                type: "spacing",
-                label: "Bottom Padding",
-                defaultValue: "pb-20"
-            },
-            {
-                name: "imageWidth",
-                type: "number",
-                label: "Image Width (px)",
-                defaultValue: 380
-            },
-            {
-                name: "imageHeight",
-                type: "number",
-                label: "Image Height (px)",
-                defaultValue: 460
-            },
-            {
-                name: "imageQuality",
-                type: "number",
-                label: "Image Quality (1-100)",
-                defaultValue: 100
-            },
-            {
-                name: "imagePosition",
-                type: "select",
-                label: "Image Position",
-                defaultValue: "left",
-                options: [
-                    { label: "Left", value: "left" },
-                    { label: "Right", value: "right" },
-                    { label: "Top", value: "top" },
-                    { label: "Bottom", value: "bottom" }
-                ]
-            },
-            {
-                name: "imageObjectFit",
-                type: "select",
-                label: "Image Object Fit",
-                defaultValue: "cover",
-                options: [
-                    { label: "Cover", value: "cover" },
-                    { label: "Contain", value: "contain" },
-                    { label: "Fill", value: "fill" },
-                    { label: "None", value: "none" },
-                    { label: "Scale Down", value: "scale-down" }
-                ]
-            },
-            {
-                name: "textColor",
-                type: "color",
-                label: "Text Color",
-                defaultValue: "text-[#5a5933]"
-            },
-            {
-                name: "headingColor",
-                type: "color",
-                label: "Heading Color",
-                defaultValue: "text-[#7f2e2d]"
-            },
-            {
-                name: "backgroundColor",
-                type: "color",
-                label: "Background Color",
-                defaultValue: ""
-            },
-            {
-                name: "dividerColor",
-                type: "color",
-                label: "Divider Color",
-                defaultValue: "border-black/30"
-            },
-            {
-                name: "fontSize",
-                type: "number",
-                label: "Font Size Class",
-                defaultValue: "text-[18px]"
-            },
-            {
-                name: "headingSize",
-                type: "number",
-                label: "Heading Size",
-                defaultValue: "text-[120%]"
-            },
-            {
-                name: "lineHeight",
-                type: "number",
-                label: "Line Height Class",
-                defaultValue: "leading-snug"
-            },
-            {
-                name: "layout",
-                type: "select",
-                label: "Layout Style",
-                defaultValue: "default",
-                options: [
-                    { label: "Default", value: "default" },
-                    { label: "Centered", value: "centered" },
-                    { label: "Wide", value: "wide" }
-                ]
-            },
-            {
-                name: "imageFloat",
-                type: "select",
-                label: "Image Float",
-                defaultValue: "left",
-                options: [
-                    { label: "Left", value: "left" },
-                    { label: "Right", value: "right" },
-                    { label: "None", value: "none" }
-                ]
-            },
-            {
-                name: "showImage",
-                type: "boolean",
-                label: "Show Image",
-                defaultValue: true
-            },
-            {
-                name: "showDivider",
-                type: "boolean",
-                label: "Show Divider",
-                defaultValue: true
-            },
-            {
-                name: "showHeadings",
-                type: "boolean",
-                label: "Show Headings Section",
-                defaultValue: true
-            },
-            {
-                name: "responsiveImageWidth",
-                type: "string",
-                label: "Responsive Image Width",
-                defaultValue: "w-full sm:w-auto"
-            },
-            {
-                name: "mobileLayout",
-                type: "select",
-                label: "Mobile Layout",
-                defaultValue: "stack",
-                options: [
-                    { label: "Stack Vertically", value: "stack" },
-                    { label: "Keep Default", value: "default" }
-                ]
+                label: "Container Margin",
+                defaultValue: "0"
             }
         ],
     },
+    {
+        name: "Navbar",
+        category: "layout",
+        themeName: "Sophia Platanisioti",
+        props: [
+            {
+                name: "logoColor",
+                type: "color",
+                label: "Logo Color",
+                defaultValue: "#5a5933"
+            },
+            {
+                name: "bannerImage",
+                type: "image",
+                label: "Banner Image",
+                defaultValue: "/banner.webp"
+            },
+            {
+                name: "links",
+                type: "json",
+                label: "Navigation Links",
+                schema: [
+                    { key: "label", label: "Label", type: "string" },
+                    { key: "href", label: "URL", type: "string" },
+                    {
+                        key: "submenu",
+                        label: "Submenu",
+                        type: "json",
+                        schema: [
+                            { key: "label", label: "Label", type: "string" },
+                            { key: "href", label: "URL", type: "string" },
+                        ],
+                    },
+                ],
+                defaultValue: [
+                    { label: "ΑΡΧΙΚΗ", href: "/" },
+                    { label: "ΥΠΗΡΕΣΙΕΣ", href: "/ypiresies" },
+                    { label: "ΕΠΙΚΟΙΝΩΝΙΑ", href: "/contact" },
+                    { label: "ΒΙΟΓΡΑΦΙΚΟ", href: "/biography" },
+                    {
+                        label: "ΑΡΘΡΑ",
+                        href: "/articles",
+                        submenu: [
+                            { label: "ΨΥΧΟΘΕΡΑΠΕΙΑ", href: "/articles/psychotherapy" },
+                            { label: "ΣΥΜΒΟΥΛΕΥΤΙΚΗ", href: "/articles/counseling" },
+                            { label: "BLOG", href: "/articles/blog" },
+                            { label: "Όλα τα Άρθρα", href: "/articles" },
+                        ],
+                    },
+                ],
+            },
+        ],
+    },
 ]
+
+    // VALIDATION: Prevent duplicate component definitions during development
+    // This runs when the module is loaded (e.g., server start or build)
+    ; (() => {
+        if (typeof window !== 'undefined') return; // Run only on server/build
+
+        const seen = new Set<string>();
+        const errors: string[] = [];
+
+        // Check for duplicates in ALL_COMPONENTS
+        ALL_COMPONENTS.forEach((component, index) => {
+            // Create a unique key based on theme and name
+            // Global components (no theme) use just the name
+            // Themed components use ThemeName::ComponentName
+            const key = component.themeName
+                ? `${component.themeName}::${component.name}`
+                : `Global::${component.name}`;
+
+            if (seen.has(key)) {
+                errors.push(`Duplicate component definition at index ${index}: "${component.name}" ${component.themeName ? `(Theme: ${component.themeName})` : "(Global)"}`);
+            }
+            seen.add(key);
+        });
+
+        if (errors.length > 0) {
+            console.error("\n\n❌ CRITICAL: DUPLICATE COMPONENTS DETECTED IN components-data.ts ❌");
+            errors.forEach(err => console.error(err));
+            console.error("Please remove duplicates to prevent database conflicts.\n\n");
+        }
+    })();

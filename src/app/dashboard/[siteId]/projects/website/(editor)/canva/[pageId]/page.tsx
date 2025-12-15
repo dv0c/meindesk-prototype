@@ -115,10 +115,36 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
 
   async function loadSettings() {
     try {
+      // Fetch site info to get name and description
+      const siteResponse = await fetch(`/api/team/${tenantId}/sites/${tenantId}`)
+      let siteName = 'Website'
+      let siteDescription = 'Built with Prototype Meindesk'
+
+      if (siteResponse.ok) {
+        const siteData = await siteResponse.json()
+        siteName = siteData.title || siteName
+        siteDescription = siteData.description || siteDescription
+      }
+
+      // Fetch settings
       const response = await fetch(`/api/v1/${tenantId}/settings`)
       if (response.ok) {
         const settings = await response.json()
-        updateWebsiteSettings(settings)
+
+        // Use site name and description as defaults if not set in settings
+        const settingsWithDefaults = {
+          ...settings,
+          title: settings.title || siteName,
+          description: settings.description || siteDescription,
+        }
+
+        updateWebsiteSettings(settingsWithDefaults)
+      } else {
+        // If no settings exist, initialize with site info
+        updateWebsiteSettings({
+          title: siteName,
+          description: siteDescription,
+        })
       }
     } catch (error) {
       console.error("Failed to load settings:", error)

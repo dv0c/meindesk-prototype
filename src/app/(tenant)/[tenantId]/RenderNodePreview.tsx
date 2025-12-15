@@ -10,6 +10,7 @@ interface RenderNodePreviewProps {
 }
 
 // Optimized component map for preview mode with SSR enabled
+// Optimized component map for preview mode with SSR enabled
 const componentMap: Record<string, React.ComponentType<any>> = {
     Container: dynamic(() => import("@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ui/editor/Container")),
     Grid: dynamic(() => import("@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ui/editor/Grid")),
@@ -30,28 +31,8 @@ const componentMap: Record<string, React.ComponentType<any>> = {
     Newsletter: dynamic(() => import("@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ui/editor/Newsletter").then(m => ({ default: m.Newsletter }))),
     Stats: dynamic(() => import("@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ui/editor/Stats").then(m => ({ default: m.Stats }))),
     TeamMember: dynamic(() => import("@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ui/editor/TeamMember").then(m => ({ default: m.TeamMember }))),
-    Tabs: dynamic(() => import("@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ui/editor/Tabs").then(m => ({ default: m.Tabs }))),
-    Navbar: dynamic(() => import("@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ui/editor/Navbar")),
     Navbar2: dynamic(() => import("@/components/Builder/CustomBlocks/Navbar")),
     SingleArticle: dynamic(() => import("@/components/Builder/CustomBlocks/SingleArticle").then(m => ({ default: m.SingleArticle }))),
-    Badge: dynamic(() => import("@/components/Builder/CustomBlocks/Badge")),
-    Avatar: dynamic(() => import("@/components/Builder/CustomBlocks/Avatar")),
-    Input: dynamic(() => import("@/components/Builder/CustomBlocks/Input")),
-    Textarea: dynamic(() => import("@/components/Builder/CustomBlocks/Textarea")),
-    Select: dynamic(() => import("@/components/Builder/CustomBlocks/Select")),
-    Checkbox: dynamic(() => import("@/components/Builder/CustomBlocks/Checkbox")),
-    Switch: dynamic(() => import("@/components/Builder/CustomBlocks/Switch")),
-    Slider: dynamic(() => import("@/components/Builder/CustomBlocks/Slider")),
-    Progress: dynamic(() => import("@/components/Builder/CustomBlocks/Progress")),
-    Separator: dynamic(() => import("@/components/Builder/CustomBlocks/Separator")),
-    Skeleton: dynamic(() => import("@/components/Builder/CustomBlocks/Skeleton")),
-    Spinner: dynamic(() => import("@/components/Builder/CustomBlocks/Spinner")),
-    Table: dynamic(() => import("@/components/Builder/CustomBlocks/Table")),
-    Breadcrumb: dynamic(() => import("@/components/Builder/CustomBlocks/Breadcrumb")),
-    Kbd: dynamic(() => import("@/components/Builder/CustomBlocks/Kbd")),
-    Alert: dynamic(() => import("@/components/Builder/CustomBlocks/Alert").then(m => ({ default: m.Alert }))),
-    Gallery: dynamic(() => import("@/components/Builder/CustomBlocks/Gallery")),
-    MostPopular: dynamic(() => import("@/components/Builder/CustomBlocks/MostPopular")),
     ImageGrid: dynamic(() => import("@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ui/editor/ImageGrid")),
     ThemeSwitcher: dynamic(() => import("@/components/Builder/CustomBlocks/ThemeSwitcher")),
     NavbarContainer: dynamic(() => import("@/components/Builder/CustomBlocks/NavbarContainer")),
@@ -59,17 +40,15 @@ const componentMap: Record<string, React.ComponentType<any>> = {
     NavigationBlock: dynamic(() => import("@/components/Builder/CustomBlocks/NavbarBlocks/NavigationBlock")),
     ActionButtonBlock: dynamic(() => import("@/components/Builder/CustomBlocks/NavbarBlocks/ActionButtonBlock")),
     HeroSection: dynamic(() => import("@/components/Builder/CustomBlocks/HeroSection")),
-    FooterBlock: dynamic(() => import("@/components/Builder/CustomBlocks/FooterBlock")),
-    SectionDivider: dynamic(() => import("@/components/Builder/CustomBlocks/SectionDivider")),
     ContactInfo: dynamic(() => import("@/components/Builder/CustomBlocks/ContactInfo")),
-    SplitHero: dynamic(() => import("@/components/Builder/CustomBlocks/SplitHero")),
+    MostPopular: dynamic(() => import("@/components/Builder/CustomBlocks/MostPopular")),
 }
 
 // Theme component registry - allows multiple components with same name from different themes
 const themeComponentMap: Record<string, React.ComponentType<any>> = {
     // SophiaPlatanisioti Theme
     "Sophia Platanisioti_Hero": dynamic(() => import("@/components/Builder/CustomBlocks/Themes/SophiaPlatanisioti/Hero").then(m => ({ default: m.Hero }))),
-    "Sophia Platanisioti_SophiaNavBar": dynamic(() => import("@/components/Builder/CustomBlocks/Themes/SophiaPlatanisioti/SophiaNavBar")),
+    "Sophia Platanisioti_Navbar": dynamic(() => import("@/components/Builder/CustomBlocks/Themes/SophiaPlatanisioti/Navbar").then(m => ({ default: m.Navbar })), { ssr: false }),
 
     // Add more themes here following the pattern: "ThemeName_ComponentName"
 }

@@ -5,12 +5,16 @@ const defaultSettings: WebsiteSettings = {
   title: "My Website",
   description: "Built with v0 Page Builder",
   theme: {
+    mode: 'light',
     primaryColor: "#000000",
     secondaryColor: "#ffffff",
     fontFamily: "Inter",
     backgroundColor: "#ffffff",
     textColor: "#000000",
   },
+  seo: {
+    // SEO fields are all optional, start with empty object
+  }
 };
 
 interface BuilderState {
@@ -67,6 +71,10 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
         theme: {
           ...state.websiteSettings.theme,
           ...(settings.theme || {}),
+        },
+        seo: {
+          ...state.websiteSettings.seo,
+          ...(settings.seo || {}),
         },
       },
     })),

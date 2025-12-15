@@ -1,29 +1,25 @@
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { sanitizeCSS } from "@/lib/security/sanitize-css";
+import type { WebsiteSettings } from "@/lib/types";
 import {
     sanitizeColor,
     sanitizeFontFamily,
     sanitizeText,
+    sanitizeKeywords,
+    sanitizeTwitterHandle,
     validateColor,
     validateFontFamily,
-    validateText
+    validateText,
+    validateURL,
+    validateKeywords,
+    validateRobots,
+    validateTwitterHandle,
+    validateThemeMode,
+    validateOgType
 } from "@/lib/security/validate-inputs";
 
-// Define settings type
-type WebsiteSettings = {
-    title?: string;
-    description?: string;
-    theme?: {
-        primaryColor?: string;
-        secondaryColor?: string;
-        backgroundColor?: string;
-        textColor?: string;
-        fontFamily?: string;
-    };
-    globalCss?: string;
-};
 
 export async function GET(
     req: Request,
@@ -59,7 +55,7 @@ export async function PATCH(
 ) {
     try {
         const { tenantId } = await params;
-        const rawSettings: WebsiteSettings = await req.json();
+        const rawSettings: Partial<WebsiteSettings> = await req.json();
 
         // Validation errors array
         const errors: string[] = [];
@@ -80,9 +76,9 @@ export async function PATCH(
             }
         }
 
-        // Validate theme colors
+        // Validate theme colors and mode
         if (rawSettings.theme) {
-            const { primaryColor, secondaryColor, backgroundColor, textColor, fontFamily } = rawSettings.theme;
+            const { primaryColor, secondaryColor, backgroundColor, textColor, fontFamily, mode } = rawSettings.theme;
 
             if (primaryColor) {
                 const colorValidation = validateColor(primaryColor);
@@ -118,6 +114,123 @@ export async function PATCH(
                     errors.push(`Font Family: ${fontValidation.error}`);
                 }
             }
+
+            if (mode) {
+                const modeValidation = validateThemeMode(mode);
+                if (!modeValidation.valid) {
+                    errors.push(`Theme Mode: ${modeValidation.error}`);
+                }
+            }
+        }
+
+        // Validate favicon URL
+        if (rawSettings.favicon) {
+            const urlValidation = validateURL(rawSettings.favicon);
+            if (!urlValidation.valid) {
+                errors.push(`Favicon: ${urlValidation.error}`);
+            }
+        }
+
+        // Validate SEO settings
+        if (rawSettings.seo) {
+            const {
+                metaTitle,
+                metaDescription,
+                keywords,
+                author,
+                robots,
+                canonical,
+                ogTitle,
+                ogDescription,
+                ogImage,
+                ogType,
+                twitterSite,
+                twitterCreator
+            } = rawSettings.seo;
+
+            if (metaTitle) {
+                const titleValidation = validateText(metaTitle, 200);
+                if (!titleValidation.valid) {
+                    errors.push(`SEO Meta Title: ${titleValidation.error}`);
+                }
+            }
+
+            if (metaDescription) {
+                const descValidation = validateText(metaDescription, 500);
+                if (!descValidation.valid) {
+                    errors.push(`SEO Meta Description: ${descValidation.error}`);
+                }
+            }
+
+            if (keywords) {
+                const keywordsValidation = validateKeywords(keywords);
+                if (!keywordsValidation.valid) {
+                    errors.push(`SEO Keywords: ${keywordsValidation.error}`);
+                }
+            }
+
+            if (author) {
+                const authorValidation = validateText(author, 100);
+                if (!authorValidation.valid) {
+                    errors.push(`SEO Author: ${authorValidation.error}`);
+                }
+            }
+
+            if (robots) {
+                const robotsValidation = validateRobots(robots);
+                if (!robotsValidation.valid) {
+                    errors.push(`SEO Robots: ${robotsValidation.error}`);
+                }
+            }
+
+            if (canonical) {
+                const urlValidation = validateURL(canonical);
+                if (!urlValidation.valid) {
+                    errors.push(`SEO Canonical URL: ${urlValidation.error}`);
+                }
+            }
+
+            if (ogTitle) {
+                const titleValidation = validateText(ogTitle, 200);
+                if (!titleValidation.valid) {
+                    errors.push(`Open Graph Title: ${titleValidation.error}`);
+                }
+            }
+
+            if (ogDescription) {
+                const descValidation = validateText(ogDescription, 500);
+                if (!descValidation.valid) {
+                    errors.push(`Open Graph Description: ${descValidation.error}`);
+                }
+            }
+
+            if (ogImage) {
+                const urlValidation = validateURL(ogImage);
+                if (!urlValidation.valid) {
+                    errors.push(`Open Graph Image: ${urlValidation.error}`);
+                }
+            }
+
+            if (ogType) {
+                const typeValidation = validateOgType(ogType);
+                if (!typeValidation.valid) {
+                    errors.push(`Open Graph Type: ${typeValidation.error}`);
+                }
+            }
+
+            if (twitterSite) {
+                const handleValidation = validateTwitterHandle(twitterSite);
+                if (!handleValidation.valid) {
+                    errors.push(`Twitter Site: ${handleValidation.error}`);
+                }
+            }
+
+            if (twitterCreator) {
+                const handleValidation = validateTwitterHandle(twitterCreator);
+                if (!handleValidation.valid) {
+                    errors.push(`Twitter Creator: ${handleValidation.error}`);
+                }
+            }
         }
 
         // Return validation errors if any
@@ -128,28 +241,62 @@ export async function PATCH(
             );
         }
 
-        // Sanitize all inputs before saving
-        const sanitizedSettings: WebsiteSettings = {
-            title: rawSettings.title ? sanitizeText(rawSettings.title, 200) : undefined,
-            description: rawSettings.description ? sanitizeText(rawSettings.description, 500) : undefined,
-            theme: rawSettings.theme ? {
-                primaryColor: rawSettings.theme.primaryColor ? sanitizeColor(rawSettings.theme.primaryColor) : undefined,
-                secondaryColor: rawSettings.theme.secondaryColor ? sanitizeColor(rawSettings.theme.secondaryColor) : undefined,
-                backgroundColor: rawSettings.theme.backgroundColor ? sanitizeColor(rawSettings.theme.backgroundColor) : undefined,
-                textColor: rawSettings.theme.textColor ? sanitizeColor(rawSettings.theme.textColor) : undefined,
-                fontFamily: rawSettings.theme.fontFamily ? sanitizeFontFamily(rawSettings.theme.fontFamily) : undefined,
-            } : undefined,
-            globalCss: rawSettings.globalCss ? sanitizeCSS(rawSettings.globalCss) : undefined,
-        };
+        // Sanitize all inputs before saving (as JSON-compatible partial update)
+        const sanitizedSettings: any = {};
+
+        if (rawSettings.title !== undefined) {
+            sanitizedSettings.title = rawSettings.title ? sanitizeText(rawSettings.title, 200) : '';
+        }
+
+        if (rawSettings.description !== undefined) {
+            sanitizedSettings.description = rawSettings.description ? sanitizeText(rawSettings.description, 500) : '';
+        }
+
+        if (rawSettings.favicon !== undefined) {
+            sanitizedSettings.favicon = rawSettings.favicon;
+        }
+
+        if (rawSettings.theme) {
+            sanitizedSettings.theme = {
+                mode: rawSettings.theme.mode,
+                primaryColor: rawSettings.theme.primaryColor ? sanitizeColor(rawSettings.theme.primaryColor) : '#000000',
+                secondaryColor: rawSettings.theme.secondaryColor ? sanitizeColor(rawSettings.theme.secondaryColor) : '#ffffff',
+                backgroundColor: rawSettings.theme.backgroundColor ? sanitizeColor(rawSettings.theme.backgroundColor) : '#ffffff',
+                textColor: rawSettings.theme.textColor ? sanitizeColor(rawSettings.theme.textColor) : '#000000',
+                fontFamily: rawSettings.theme.fontFamily ? sanitizeFontFamily(rawSettings.theme.fontFamily) : 'Inter',
+            };
+        }
+
+        if (rawSettings.globalCss !== undefined) {
+            sanitizedSettings.globalCss = rawSettings.globalCss ? sanitizeCSS(rawSettings.globalCss) : undefined;
+        }
+
+        if (rawSettings.seo !== undefined) {
+            sanitizedSettings.seo = rawSettings.seo ? {
+                metaTitle: rawSettings.seo.metaTitle ? sanitizeText(rawSettings.seo.metaTitle, 200) : undefined,
+                metaDescription: rawSettings.seo.metaDescription ? sanitizeText(rawSettings.seo.metaDescription, 500) : undefined,
+                keywords: rawSettings.seo.keywords ? sanitizeKeywords(rawSettings.seo.keywords) : undefined,
+                author: rawSettings.seo.author ? sanitizeText(rawSettings.seo.author, 100) : undefined,
+                robots: rawSettings.seo.robots,
+                canonical: rawSettings.seo.canonical,
+                ogTitle: rawSettings.seo.ogTitle ? sanitizeText(rawSettings.seo.ogTitle, 200) : undefined,
+                ogDescription: rawSettings.seo.ogDescription ? sanitizeText(rawSettings.seo.ogDescription, 500) : undefined,
+                ogImage: rawSettings.seo.ogImage,
+                ogType: rawSettings.seo.ogType,
+                twitterCard: rawSettings.seo.twitterCard,
+                twitterSite: rawSettings.seo.twitterSite ? sanitizeTwitterHandle(rawSettings.seo.twitterSite) : undefined,
+                twitterCreator: rawSettings.seo.twitterCreator ? sanitizeTwitterHandle(rawSettings.seo.twitterCreator) : undefined,
+            } : undefined;
+        }
 
         // Update site settings
         const site = await db.site.update({
             where: { id: tenantId },
-            data: { settings: sanitizedSettings },
+            data: { settings: sanitizedSettings as any },
         });
 
         // Invalidate the cache so tenant site sees the new settings immediately
-        revalidateTag('site-details');
+        revalidatePath('/', 'layout');
 
         return NextResponse.json(site.settings);
     } catch (error) {

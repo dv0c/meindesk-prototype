@@ -172,7 +172,7 @@ export const ArticleSourceType: typeof $Enums.ArticleSourceType
  */
 export class PrismaClient<
   ClientOptions extends Prisma.PrismaClientOptions = Prisma.PrismaClientOptions,
-  U = 'log' extends keyof ClientOptions ? ClientOptions['log'] extends Array<Prisma.LogLevel | Prisma.LogDefinition> ? Prisma.GetEvents<ClientOptions['log']> : never : never,
+  const U = 'log' extends keyof ClientOptions ? ClientOptions['log'] extends Array<Prisma.LogLevel | Prisma.LogDefinition> ? Prisma.GetEvents<ClientOptions['log']> : never : never,
   ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs
 > {
   [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['other'] }
@@ -204,13 +204,6 @@ export class PrismaClient<
    * Disconnect from the database
    */
   $disconnect(): $Utils.JsPromise<void>;
-
-  /**
-   * Add a middleware
-   * @deprecated since 4.16.0. For new code, prefer client extensions instead.
-   * @see https://pris.ly/d/extensions
-   */
-  $use(cb: Prisma.Middleware): void
 
 /**
    * Allows the running of a sequence of read/write operations that are guaranteed to either succeed or fail as a whole.
@@ -475,8 +468,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 6.6.0
-   * Query Engine version: f676762280b54cd07c770017ed3711ddde35f37a
+   * Prisma Client JS version: 6.19.0
+   * Query Engine version: 2ba551f319ab1df4bc874a89965d8b3641056773
    */
   export type PrismaVersion = {
     client: string
@@ -489,6 +482,7 @@ export namespace Prisma {
    */
 
 
+  export import Bytes = runtime.Bytes
   export import JsonObject = runtime.JsonObject
   export import JsonArray = runtime.JsonArray
   export import JsonValue = runtime.JsonValue
@@ -2185,16 +2179,24 @@ export namespace Prisma {
     /**
      * @example
      * ```
-     * // Defaults to stdout
+     * // Shorthand for `emit: 'stdout'`
      * log: ['query', 'info', 'warn', 'error']
      * 
-     * // Emit as events
+     * // Emit as events only
      * log: [
-     *   { emit: 'stdout', level: 'query' },
-     *   { emit: 'stdout', level: 'info' },
-     *   { emit: 'stdout', level: 'warn' }
-     *   { emit: 'stdout', level: 'error' }
+     *   { emit: 'event', level: 'query' },
+     *   { emit: 'event', level: 'info' },
+     *   { emit: 'event', level: 'warn' }
+     *   { emit: 'event', level: 'error' }
      * ]
+     * 
+     * / Emit as events and log to stdout
+     * og: [
+     *  { emit: 'stdout', level: 'query' },
+     *  { emit: 'stdout', level: 'info' },
+     *  { emit: 'stdout', level: 'warn' }
+     *  { emit: 'stdout', level: 'error' }
+     * 
      * ```
      * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/logging#the-log-option).
      */
@@ -2251,10 +2253,15 @@ export namespace Prisma {
     emit: 'stdout' | 'event'
   }
 
-  export type GetLogType<T extends LogLevel | LogDefinition> = T extends LogDefinition ? T['emit'] extends 'event' ? T['level'] : never : never
-  export type GetEvents<T extends any> = T extends Array<LogLevel | LogDefinition> ?
-    GetLogType<T[0]> | GetLogType<T[1]> | GetLogType<T[2]> | GetLogType<T[3]>
-    : never
+  export type CheckIsLogLevel<T> = T extends LogLevel ? T : never;
+
+  export type GetLogType<T> = CheckIsLogLevel<
+    T extends LogDefinition ? T['level'] : T
+  >;
+
+  export type GetEvents<T extends any[]> = T extends Array<LogLevel | LogDefinition>
+    ? GetLogType<T[number]>
+    : never;
 
   export type QueryEvent = {
     timestamp: Date
@@ -2294,25 +2301,6 @@ export namespace Prisma {
     | 'runCommandRaw'
     | 'findRaw'
     | 'groupBy'
-
-  /**
-   * These options are being passed into the middleware as "params"
-   */
-  export type MiddlewareParams = {
-    model?: ModelName
-    action: PrismaAction
-    args: any
-    dataPath: string[]
-    runInTransaction: boolean
-  }
-
-  /**
-   * The `T` type makes sure, that the `return proceed` is not forgotten in the middleware implementation
-   */
-  export type Middleware<T = any> = (
-    params: MiddlewareParams,
-    next: (params: MiddlewareParams) => $Utils.JsPromise<T>,
-  ) => $Utils.JsPromise<T>
 
   // tested in getLogLevel.test.ts
   export function getLogLevel(log: Array<LogLevel | LogDefinition>): LogLevel | undefined;
@@ -18021,6 +18009,7 @@ export namespace Prisma {
     thumbnail: number
     price: number
     isPremium: number
+    fonts: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -18064,6 +18053,7 @@ export namespace Prisma {
     thumbnail?: true
     price?: true
     isPremium?: true
+    fonts?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -18162,6 +18152,7 @@ export namespace Prisma {
     thumbnail: string | null
     price: number
     isPremium: boolean
+    fonts: JsonValue | null
     createdAt: Date
     updatedAt: Date
     _count: ThemeCountAggregateOutputType | null
@@ -18192,6 +18183,7 @@ export namespace Prisma {
     thumbnail?: boolean
     price?: boolean
     isPremium?: boolean
+    fonts?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     blocks?: boolean | Theme$blocksArgs<ExtArgs>
@@ -18208,11 +18200,12 @@ export namespace Prisma {
     thumbnail?: boolean
     price?: boolean
     isPremium?: boolean
+    fonts?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ThemeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "thumbnail" | "price" | "isPremium" | "createdAt" | "updatedAt", ExtArgs["result"]["theme"]>
+  export type ThemeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "thumbnail" | "price" | "isPremium" | "fonts" | "createdAt" | "updatedAt", ExtArgs["result"]["theme"]>
   export type ThemeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     blocks?: boolean | Theme$blocksArgs<ExtArgs>
     installedIn?: boolean | Theme$installedInArgs<ExtArgs>
@@ -18232,6 +18225,7 @@ export namespace Prisma {
       thumbnail: string | null
       price: number
       isPremium: boolean
+      fonts: Prisma.JsonValue | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["theme"]>
@@ -18634,6 +18628,7 @@ export namespace Prisma {
     readonly thumbnail: FieldRef<"Theme", 'String'>
     readonly price: FieldRef<"Theme", 'Float'>
     readonly isPremium: FieldRef<"Theme", 'Boolean'>
+    readonly fonts: FieldRef<"Theme", 'Json'>
     readonly createdAt: FieldRef<"Theme", 'DateTime'>
     readonly updatedAt: FieldRef<"Theme", 'DateTime'>
   }
@@ -21254,6 +21249,7 @@ export namespace Prisma {
     thumbnail: 'thumbnail',
     price: 'price',
     isPremium: 'isPremium',
+    fonts: 'fonts',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -22696,6 +22692,7 @@ export namespace Prisma {
     thumbnail?: StringNullableFilter<"Theme"> | string | null
     price?: FloatFilter<"Theme"> | number
     isPremium?: BoolFilter<"Theme"> | boolean
+    fonts?: JsonNullableFilter<"Theme">
     createdAt?: DateTimeFilter<"Theme"> | Date | string
     updatedAt?: DateTimeFilter<"Theme"> | Date | string
     blocks?: ThemeBlockListRelationFilter
@@ -22709,6 +22706,7 @@ export namespace Prisma {
     thumbnail?: SortOrder
     price?: SortOrder
     isPremium?: SortOrder
+    fonts?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     blocks?: ThemeBlockOrderByRelationAggregateInput
@@ -22725,6 +22723,7 @@ export namespace Prisma {
     thumbnail?: StringNullableFilter<"Theme"> | string | null
     price?: FloatFilter<"Theme"> | number
     isPremium?: BoolFilter<"Theme"> | boolean
+    fonts?: JsonNullableFilter<"Theme">
     createdAt?: DateTimeFilter<"Theme"> | Date | string
     updatedAt?: DateTimeFilter<"Theme"> | Date | string
     blocks?: ThemeBlockListRelationFilter
@@ -22738,6 +22737,7 @@ export namespace Prisma {
     thumbnail?: SortOrder
     price?: SortOrder
     isPremium?: SortOrder
+    fonts?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ThemeCountOrderByAggregateInput
@@ -22757,6 +22757,7 @@ export namespace Prisma {
     thumbnail?: StringNullableWithAggregatesFilter<"Theme"> | string | null
     price?: FloatWithAggregatesFilter<"Theme"> | number
     isPremium?: BoolWithAggregatesFilter<"Theme"> | boolean
+    fonts?: JsonNullableWithAggregatesFilter<"Theme">
     createdAt?: DateTimeWithAggregatesFilter<"Theme"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Theme"> | Date | string
   }
@@ -24219,6 +24220,7 @@ export namespace Prisma {
     thumbnail?: string | null
     price?: number
     isPremium?: boolean
+    fonts?: InputJsonValue | null
     createdAt?: Date | string
     updatedAt?: Date | string
     blocks?: ThemeBlockCreateNestedManyWithoutThemeInput
@@ -24232,6 +24234,7 @@ export namespace Prisma {
     thumbnail?: string | null
     price?: number
     isPremium?: boolean
+    fonts?: InputJsonValue | null
     createdAt?: Date | string
     updatedAt?: Date | string
     blocks?: ThemeBlockUncheckedCreateNestedManyWithoutThemeInput
@@ -24244,6 +24247,7 @@ export namespace Prisma {
     thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
     isPremium?: BoolFieldUpdateOperationsInput | boolean
+    fonts?: InputJsonValue | InputJsonValue | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     blocks?: ThemeBlockUpdateManyWithoutThemeNestedInput
@@ -24256,6 +24260,7 @@ export namespace Prisma {
     thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
     isPremium?: BoolFieldUpdateOperationsInput | boolean
+    fonts?: InputJsonValue | InputJsonValue | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     blocks?: ThemeBlockUncheckedUpdateManyWithoutThemeNestedInput
@@ -24269,6 +24274,7 @@ export namespace Prisma {
     thumbnail?: string | null
     price?: number
     isPremium?: boolean
+    fonts?: InputJsonValue | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -24279,6 +24285,7 @@ export namespace Prisma {
     thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
     isPremium?: BoolFieldUpdateOperationsInput | boolean
+    fonts?: InputJsonValue | InputJsonValue | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -24289,6 +24296,7 @@ export namespace Prisma {
     thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
     isPremium?: BoolFieldUpdateOperationsInput | boolean
+    fonts?: InputJsonValue | InputJsonValue | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -25521,6 +25529,7 @@ export namespace Prisma {
     thumbnail?: SortOrder
     price?: SortOrder
     isPremium?: SortOrder
+    fonts?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -29933,6 +29942,7 @@ export namespace Prisma {
     thumbnail?: string | null
     price?: number
     isPremium?: boolean
+    fonts?: InputJsonValue | null
     createdAt?: Date | string
     updatedAt?: Date | string
     installedIn?: SiteThemeCreateNestedManyWithoutThemeInput
@@ -29945,6 +29955,7 @@ export namespace Prisma {
     thumbnail?: string | null
     price?: number
     isPremium?: boolean
+    fonts?: InputJsonValue | null
     createdAt?: Date | string
     updatedAt?: Date | string
     installedIn?: SiteThemeUncheckedCreateNestedManyWithoutThemeInput
@@ -29972,6 +29983,7 @@ export namespace Prisma {
     thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
     isPremium?: BoolFieldUpdateOperationsInput | boolean
+    fonts?: InputJsonValue | InputJsonValue | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     installedIn?: SiteThemeUpdateManyWithoutThemeNestedInput
@@ -29983,6 +29995,7 @@ export namespace Prisma {
     thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
     isPremium?: BoolFieldUpdateOperationsInput | boolean
+    fonts?: InputJsonValue | InputJsonValue | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     installedIn?: SiteThemeUncheckedUpdateManyWithoutThemeNestedInput
@@ -30060,6 +30073,7 @@ export namespace Prisma {
     thumbnail?: string | null
     price?: number
     isPremium?: boolean
+    fonts?: InputJsonValue | null
     createdAt?: Date | string
     updatedAt?: Date | string
     blocks?: ThemeBlockCreateNestedManyWithoutThemeInput
@@ -30072,6 +30086,7 @@ export namespace Prisma {
     thumbnail?: string | null
     price?: number
     isPremium?: boolean
+    fonts?: InputJsonValue | null
     createdAt?: Date | string
     updatedAt?: Date | string
     blocks?: ThemeBlockUncheckedCreateNestedManyWithoutThemeInput
@@ -30168,6 +30183,7 @@ export namespace Prisma {
     thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
     isPremium?: BoolFieldUpdateOperationsInput | boolean
+    fonts?: InputJsonValue | InputJsonValue | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     blocks?: ThemeBlockUpdateManyWithoutThemeNestedInput
@@ -30179,6 +30195,7 @@ export namespace Prisma {
     thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
     price?: FloatFieldUpdateOperationsInput | number
     isPremium?: BoolFieldUpdateOperationsInput | boolean
+    fonts?: InputJsonValue | InputJsonValue | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     blocks?: ThemeBlockUncheckedUpdateManyWithoutThemeNestedInput
