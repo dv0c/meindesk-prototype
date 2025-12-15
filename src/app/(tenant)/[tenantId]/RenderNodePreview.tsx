@@ -65,8 +65,36 @@ const componentMap: Record<string, React.ComponentType<any>> = {
     SplitHero: dynamic(() => import("@/components/Builder/CustomBlocks/SplitHero")),
 }
 
+// Theme component registry - allows multiple components with same name from different themes
+const themeComponentMap: Record<string, React.ComponentType<any>> = {
+    // SophiaPlatanisioti Theme
+    "Sophia Platanisioti_Hero": dynamic(() => import("@/components/Builder/CustomBlocks/Themes/SophiaPlatanisioti/Hero").then(m => ({ default: m.Hero }))),
+    "Sophia Platanisioti_SophiaNavBar": dynamic(() => import("@/components/Builder/CustomBlocks/Themes/SophiaPlatanisioti/SophiaNavBar")),
+
+    // Add more themes here following the pattern: "ThemeName_ComponentName"
+}
+
+// Helper function to get component - checks both maps
+function getComponent(componentType: string, themeName?: string): React.ComponentType<any> | undefined {
+    // If theme name is provided, check theme registry first
+    if (themeName) {
+        const themeKey = `${themeName}_${componentType}`
+        if (themeComponentMap[themeKey]) {
+            return themeComponentMap[themeKey]
+        }
+    }
+
+    // Fallback to regular component map
+    return componentMap[componentType]
+}
+
 function RenderNodePreview({ node }: RenderNodePreviewProps) {
-    const Component = componentMap[node.type]
+    // Try to get theme name from node metadata/props
+    // Check node-level themeName first (where component-registry stores it), then fall back to props
+    const themeName = node.themeName || node.props?.themeName
+
+    // Get component from either theme registry or base registry
+    const Component = getComponent(node.type, themeName)
 
     if (!Component) {
         return null // Silently skip unknown components in preview mode
@@ -104,7 +132,11 @@ function RenderNodePreview({ node }: RenderNodePreviewProps) {
             {CustomStyle}
             <Suspense fallback={<div className="animate-pulse bg-muted/20 rounded min-h-[40px]" />}>
                 <Component
-                    {...node.props}
+                    {...(() => {
+                        // Filter out themeName from props - it's builder metadata, not a component prop
+                        const { themeName: _, ...cleanProps } = node.props || {};
+                        return cleanProps;
+                    })()}
                     className={`${node.props.className || ""} ${node.className || ""}`}
                     {...(node.props.style === undefined && node.style ? { style: node.style } : {})}
                     onClick={handleClick}

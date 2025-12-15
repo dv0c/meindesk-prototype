@@ -1821,43 +1821,43 @@ export const ALL_COMPONENTS: ComponentDefinition[] = [
             },
             {
                 name: "textColor",
-                type: "string",
+                type: "color",
                 label: "Text Color",
                 defaultValue: "text-[#5a5933]"
             },
             {
                 name: "headingColor",
-                type: "string",
+                type: "color",
                 label: "Heading Color",
                 defaultValue: "text-[#7f2e2d]"
             },
             {
                 name: "backgroundColor",
-                type: "string",
+                type: "color",
                 label: "Background Color",
                 defaultValue: ""
             },
             {
                 name: "dividerColor",
-                type: "string",
+                type: "color",
                 label: "Divider Color",
                 defaultValue: "border-black/30"
             },
             {
                 name: "fontSize",
-                type: "string",
+                type: "number",
                 label: "Font Size Class",
                 defaultValue: "text-[18px]"
             },
             {
                 name: "headingSize",
-                type: "string",
+                type: "number",
                 label: "Heading Size",
                 defaultValue: "text-[120%]"
             },
             {
                 name: "lineHeight",
-                type: "string",
+                type: "number",
                 label: "Line Height Class",
                 defaultValue: "leading-snug"
             },

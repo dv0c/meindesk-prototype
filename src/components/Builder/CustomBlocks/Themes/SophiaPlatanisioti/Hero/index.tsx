@@ -1,5 +1,7 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
+import { useEditorContent } from "@/hooks/useEditorContent";
+import "./styles.css";
 
 interface HeroProps {
     // Content
@@ -99,40 +101,51 @@ export const Hero = ({
     responsiveImageWidth = "w-full sm:w-auto",
     mobileLayout = "stack",
 }: HeroProps) => {
+    // Extract HTML from structured editor data using hook
+    const htmlContent = useEditorContent(content)
+
+    // Apply layout-specific classes
+    const layoutClasses = {
+        default: "",
+        centered: "items-center justify-center text-center",
+        wide: "max-w-full"
+    }
+
+    // Determine image order based on position
+    const imageOrder = imagePosition === "right" ? "order-2" : imagePosition === "bottom" ? "order-last" : ""
+    const flexDirection = imagePosition === "top" || imagePosition === "bottom" ? "flex-col" : ""
+
     const containerClass = `${containerPadding} ${backgroundColor}`;
-    const wrapperClass = `flex ${maxWidth} mx-auto ${gap} ${mobileLayout === "stack" ? "flex-col md:flex-row" : ""
-        }`;
-    const contentClass = `${fontSize} ${contentMarginTop} space-y-5 ${textColor}`;
-    const imageClass = `object-${imageObjectFit} ${responsiveImageWidth} ${imageFloat !== "none" ? `float-${imageFloat}` : ""
-        } ${imageMarginRight} ${imageMarginBottom}`;
+    const wrapperClass = `${layout === "wide" ? "max-w-full" : maxWidth} mx-auto ${layoutClasses[layout]}`;
+    const contentClass = `${fontSize} space-y-5 ${textColor}`;
+    const imageClass = `float-left ${imageMarginRight} ${imageMarginBottom} object-${imageObjectFit}`;
 
     return (
         <div className={containerClass}>
             <div className={wrapperClass}>
                 <div className={contentClass}>
+                    {/* Image floats left, text wraps around it */}
                     {showImage && thumbnail && (
-                        <div className="w-auto h-auto">
-                            <Image
-                                width={imageWidth}
-                                height={imageHeight}
-                                quality={imageQuality}
-                                className={imageClass}
-                                alt={altText}
-                                src={thumbnail}
-                                priority
-                            />
-                        </div>
+                        <Image
+                            width={imageWidth}
+                            height={imageHeight}
+                            quality={imageQuality}
+                            className={imageClass}
+                            alt={altText}
+                            src={thumbnail}
+                            priority
+                        />
                     )}
 
-                    {content && (
+                    {htmlContent && (
                         <div
-                            className={`${fontSize} homepage prose-sm prose-p:pt-0 prose-p:${lineHeight} mr-auto mx-auto max-w-full mt-20 ${textColor}`}
-                            dangerouslySetInnerHTML={{ __html: content }}
+                            className="prose-sm homepage prose-p:pt-0 prose-p:${lineHeight} max-w-full"
+                            dangerouslySetInnerHTML={{ __html: htmlContent }}
                         />
                     )}
 
                     {showHeadings && (heading1 || heading2) && (
-                        <div>
+                        <div className="clear-both">
                             {showDivider && <hr className={`${dividerColor} mb-10`} />}
                             <div className={`text-center space-y-3 ${bottomPadding}`}>
                                 {heading1 && (
@@ -149,7 +162,7 @@ export const Hero = ({
                         </div>
                     )}
 
-                    {children && <div className="mt-8">{children}</div>}
+                    {children && <div className="mt-8 clear-both">{children}</div>}
                 </div>
             </div>
         </div>

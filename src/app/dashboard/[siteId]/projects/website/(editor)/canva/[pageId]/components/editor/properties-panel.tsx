@@ -490,6 +490,7 @@ export function PropertiesPanel({ selectedNode, onUpdateNode, onDeleteNode, site
           <TabsContent value="advanced" className="flex-1 overflow-hidden mt-0">
             <ScrollArea className="h-full p-4">
               <div className="space-y-6">
+                <p className="text-muted-foreground text-xs">Advanced Settings are applied to the node's HTML element only where possible.</p>
                 {/* Layout / Identity */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 pb-2 border-b text-sm font-semibold text-muted-foreground uppercase tracking-wider">
@@ -645,8 +646,24 @@ function renderPropInput(
       )
 
     case "textarea": {
-      // Check if value contains HTML tags (indicates it was edited in rich text editor)
-      const hasHtmlContent = value && typeof value === 'string' && /<[^>]+>/.test(value)
+      // Check if value contains HTML tags or structured editor data
+      let htmlContent = ""
+      let hasHtmlContent = false
+
+      try {
+        // Try to parse as structured data
+        const parsed = JSON.parse(value)
+        if (parsed && parsed.html) {
+          htmlContent = parsed.html
+          hasHtmlContent = /<[^>]+>/.test(htmlContent)
+        }
+      } catch {
+        // Not JSON, check if it's raw HTML
+        if (value && typeof value === 'string' && /<[^>]+>/.test(value)) {
+          htmlContent = value
+          hasHtmlContent = true
+        }
+      }
 
       if (hasHtmlContent) {
         // Show editor-based UI instead of raw HTML textarea
@@ -682,8 +699,8 @@ function renderPropInput(
             </div>
             <div
               className="text-xs text-muted-foreground prose prose-sm max-w-none overflow-hidden"
-              dangerouslySetInnerHTML={{ __html: value }}
-              style={{ maxHeight: '200px', overflow: 'auto' }}
+              dangerouslySetInnerHTML={{ __html: htmlContent }}
+              style={{ maxHeight: '100px', overflow: 'hidden' }}
             />
           </div>
         )
