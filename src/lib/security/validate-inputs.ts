@@ -113,14 +113,14 @@ export function validateURL(url: string): { valid: boolean; error?: string } {
     try {
         const parsed = new URL(url);
 
+        // Block javascript: and data: URLs first
+        if (parsed.protocol === 'javascript:' || parsed.protocol === 'data:') {
+            return { valid: false, error: 'JavaScript and data URLs not allowed' };
+        }
+
         // Only allow HTTPS (or HTTP for localhost development)
         if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
             return { valid: false, error: 'Only HTTPS URLs are allowed' };
-        }
-
-        // Block javascript: and data: URLs
-        if (parsed.protocol === 'javascript:' || parsed.protocol === 'data:') {
-            return { valid: false, error: 'JavaScript and data URLs not allowed' };
         }
 
         return { valid: true };

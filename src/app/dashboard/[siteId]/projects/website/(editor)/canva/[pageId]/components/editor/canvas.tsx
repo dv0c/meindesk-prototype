@@ -48,7 +48,7 @@ export function Canvas({ nodes, selectedNodeId, onSelectNode, onContextMenu, val
     <div
       ref={setNodeRef}
       className={`
-    canvas-interactive-area relative min-h-full p-6 transition-colors overflow-auto
+    canvas-interactive-area relative min-h-full  transition-colors overflow-auto
     ${isOver ? "bg-primary/5" : ""} 
     ${nodes.length === 0 ? "flex items-center justify-center" : ""} 
   `}
