@@ -4,14 +4,84 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useBuilderStore } from "@/lib/store"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { useParams } from "next/navigation"
+import { useEffect, useState, useCallback, useRef } from "react"
+import { CheckCircle2, Loader2, AlertCircle } from "lucide-react"
 
 export function GlobalSettingsPanel() {
   const { websiteSettings, updateWebsiteSettings } = useBuilderStore()
+  const params = useParams()
+  const siteId = params.siteId as string
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const isInitialMount = useRef(true)
+
+  // Debounced save function
+  const saveSettings = useCallback(async (settings: typeof websiteSettings) => {
+    if (!siteId) return
+
+    setSaveStatus('saving')
+    try {
+      const response = await fetch(`/api/v1/${siteId}/settings`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings),
+      })
+
+      if (!response.ok) throw new Error('Failed to save')
+
+      setSaveStatus('saved')
+      setTimeout(() => setSaveStatus('idle'), 2000)
+    } catch (error) {
+      console.error('Error saving settings:', error)
+      setSaveStatus('error')
+      setTimeout(() => setSaveStatus('idle'), 3000)
+    }
+  }, [siteId])
+
+  // Auto-save when settings change (skip initial mount)
+  useEffect(() => {
+    // Skip saving on initial mount
+    if (isInitialMount.current) {
+      isInitialMount.current = false
+      return
+    }
+
+    const timeoutId = setTimeout(() => {
+      if (siteId) {
+        saveSettings(websiteSettings)
+      }
+    }, 1000) // 1 second debounce
+
+    return () => clearTimeout(timeoutId)
+  }, [websiteSettings, siteId, saveSettings])
 
   return (
     <div className="flex flex-col h-full bg-background">
       <div className="p-4 border-b">
-        <h2 className="font-semibold">Website Settings</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold">Website Settings</h2>
+          {/* Save Status Indicator */}
+          <div className="flex items-center gap-2 text-xs">
+            {saveStatus === 'saving' && (
+              <>
+                <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+                <span className="text-muted-foreground">Saving...</span>
+              </>
+            )}
+            {saveStatus === 'saved' && (
+              <>
+                <CheckCircle2 className="h-3 w-3 text-green-600" />
+                <span className="text-green-600">Saved</span>
+              </>
+            )}
+            {saveStatus === 'error' && (
+              <>
+                <AlertCircle className="h-3 w-3 text-destructive" />
+                <span className="text-destructive">Error</span>
+              </>
+            )}
+          </div>
+        </div>
       </div>
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-6">

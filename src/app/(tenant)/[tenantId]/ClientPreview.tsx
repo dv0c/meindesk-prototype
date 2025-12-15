@@ -40,7 +40,7 @@ function ClientPreview({ tenantId, page }: ClientPreviewProps) {
   }, [page.layout])
 
   return (
-    <div className="bg-background">
+    <div>
       <main>{renderedLayout}</main>
     </div>
   )

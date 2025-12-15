@@ -74,6 +74,7 @@ export async function getCachedSiteDetails(siteId: string) {
                         defaultThemePreference: true,
                         logo: true,
                         description: true,
+                        settings: true,
                     },
                 });
             },
@@ -96,6 +97,7 @@ export async function getCachedSiteDetails(siteId: string) {
                 defaultThemePreference: true,
                 logo: true,
                 description: true,
+                settings: true,
             },
         });
     }

@@ -66,6 +66,8 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
     clearCanvas,
     findNode,
     moveNode,
+    updateWebsiteSettings,
+    websiteSettings,
   } = useBuilderStore()
 
   const sensors = useSensors(
@@ -75,8 +77,12 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
   )
 
   useEffect(() => {
-    loadPage()
-    loadComponents()
+    async function init() {
+      await loadPage() // Wait for page to load first
+      await loadSettings() // Then load settings
+      loadComponents() // Components can load in parallel
+    }
+    init()
   }, [])
 
   async function loadComponents() {
@@ -104,6 +110,18 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
       toast.error("Failed to load page")
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function loadSettings() {
+    try {
+      const response = await fetch(`/api/v1/${tenantId}/settings`)
+      if (response.ok) {
+        const settings = await response.json()
+        updateWebsiteSettings(settings)
+      }
+    } catch (error) {
+      console.error("Failed to load settings:", error)
     }
   }
 
@@ -466,8 +484,22 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
               siteId={tenantId}
             />
           )}
-          <div className="flex-1 bg-muted/10 h-full overflow-hidden flex flex-col relative">
-            <div className="overflow-auto h-full ">
+          <div className="flex-1 h-full overflow-hidden flex flex-col relative">
+            <div className="overflow-auto h-full bg-zinc-50 dark:bg-zinc-900">
+              {/* Inject Global Settings */}
+              <style dangerouslySetInnerHTML={{
+                __html: `
+                  .canvas-preview {
+                    ${websiteSettings.theme.backgroundColor ? `background-color: ${websiteSettings.theme.backgroundColor};` : ''}
+                    ${websiteSettings.theme.textColor ? `color: ${websiteSettings.theme.textColor};` : ''}
+                    ${websiteSettings.theme.fontFamily ? `font-family: '${websiteSettings.theme.fontFamily}', sans-serif;` : ''}
+                  }
+                  .canvas-preview * {
+                    ${websiteSettings.theme.fontFamily ? `font-family: '${websiteSettings.theme.fontFamily}', sans-serif;` : ''}
+                  }
+                  ${websiteSettings.globalCss || ''}
+                `
+              }} />
               <div
                 onClickCapture={(e) => {
                   const target = e.target as HTMLElement
@@ -475,7 +507,7 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
                     e.preventDefault()
                   }
                 }}
-                className={`bg-background shadow-sm border h-fit transition-all duration-300 ${nodes.length ? "min-h-full h-fit" : "h-full"} ${deviceMode === "mobile"
+                className={`canvas-preview shadow-lg h-fit transition-all duration-300 ${nodes.length ? "min-h-full h-fit" : "h-full"} ${deviceMode === "mobile"
                   ? "w-[375px] mx-auto"
                   : deviceMode === "tablet"
                     ? "w-3xl mx-auto"

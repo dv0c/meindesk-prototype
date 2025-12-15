@@ -121,6 +121,7 @@ model Site {
   status                 String   @default("active") // New: 'active', 'suspended', 'trial', 'pending'
   defaultThemePreference String   @default("system")
   template_schema        Json?    @default("{\"version\": \"1.2.0\",\"template\": \"simple\", \"global\": {\"container\": \"max-w-7xl\"}}")
+  settings               Json?    @default("{}") // Global website settings (fonts, colors, SEO, etc.)
   // --- Timestamps ---
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
