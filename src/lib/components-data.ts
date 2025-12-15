@@ -1669,17 +1669,29 @@ export const ALL_COMPONENTS: ComponentDefinition[] = [
                 label: "Hero Image",
                 defaultValue: ""
             },
+            // {
+            //     name: "containerPadding",
+            //     type: "spacing",
+            //     label: "Container Padding",
+            //     defaultValue: "px-3"
+            // },
+            // {
+            //     name: "containerMargin",
+            //     type: "spacing",
+            //     label: "Container Margin",
+            //     defaultValue: "0"
+            // },
             {
-                name: "containerPadding",
-                type: "spacing",
-                label: "Container Padding",
-                defaultValue: "px-3"
+                name: "heading1",
+                type: "string",
+                label: "Heading 1",
+                defaultValue: "ίμαι στη διάθεσή σας για μια διαδικτυακή συνάντηση,"
             },
             {
-                name: "containerMargin",
-                type: "spacing",
-                label: "Container Margin",
-                defaultValue: "0"
+                name: "heading2",
+                type: "string",
+                label: "Heading 2",
+                defaultValue: "για να γνωριστούμε και να απαντήσω σε ό,τι σας απασχολεί."
             }
         ],
     },
@@ -1733,6 +1745,37 @@ export const ALL_COMPONENTS: ComponentDefinition[] = [
                         ],
                     },
                 ],
+            },
+        ],
+    },
+    {
+        name: "Footer",
+        category: "layout",
+        themeName: "Sophia Platanisioti",
+        props: [
+            {
+                name: "heading",
+                type: "string",
+                label: "Heading",
+                defaultValue: "Σοφία Πλατανησιώτη - Σύμβουλος Ψυχικής Υγείας"
+            },
+            {
+                name: "phone",
+                type: "string",
+                label: "Phone Number",
+                defaultValue: "+30 6947777532"
+            },
+            {
+                name: "email",
+                type: "string",
+                label: "Email",
+                defaultValue: "platanisiotisophia@gmail.com"
+            },
+            {
+                name: "facebook",
+                type: "string",
+                label: "Facebook URL",
+                defaultValue: "https://www.facebook.com/PlatanisiotiSophia"
             },
         ],
     },

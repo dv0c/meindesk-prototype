@@ -12,6 +12,9 @@ interface HeroProps {
     // Editable Spacing
     containerPadding?: string;
     containerMargin?: string;
+
+    heading1?: string;
+    heading2?: string;
 }
 
 export const Hero = ({
@@ -20,13 +23,13 @@ export const Hero = ({
     children,
     containerPadding = "px-3",
     containerMargin = "0",
+    heading1 = "",
+    heading2 = "",
 }: HeroProps) => {
     // Extract HTML from structured editor data using hook
     const htmlContent = useEditorContent(content)
 
     // Static values - not editable
-    const heading1 = "Είμαι στη διάθεσή σας για μια διαδικτυακή συνάντηση,";
-    const heading2 = "για να γνωριστούμε και να απαντήσω σε ό,τι σας απασχολεί.";
     const altText = "Hero Image";
 
     // Combine container classes (both padding and margin are Tailwind classes)

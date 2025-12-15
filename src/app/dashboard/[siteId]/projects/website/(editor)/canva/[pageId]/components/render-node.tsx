@@ -59,6 +59,7 @@ const themeComponentMap: Record<string, React.ComponentType<any>> = {
   // SophiaPlatanisioti Theme
   "Sophia Platanisioti_Hero": dynamic(() => import("@/components/Builder/CustomBlocks/Themes/SophiaPlatanisioti/Hero").then(m => ({ default: m.Hero })), { ssr: false }),
   "Sophia Platanisioti_Navbar": dynamic(() => import("@/components/Builder/CustomBlocks/Themes/SophiaPlatanisioti/Navbar").then(m => ({ default: m.Navbar })), { ssr: false }),
+  "Sophia Platanisioti_Footer": dynamic(() => import("@/components/Builder/CustomBlocks/Themes/SophiaPlatanisioti/Footer"), { ssr: false }),
 
   // Add more themes here following the pattern: "ThemeName_ComponentName"
   // "AnotherTheme_Hero": dynamic(() => import("@/components/Builder/CustomBlocks/Themes/AnotherTheme/Hero"), { ssr: false }),
