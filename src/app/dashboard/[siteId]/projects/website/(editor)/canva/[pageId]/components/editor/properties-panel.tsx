@@ -14,28 +14,44 @@ import type { ComponentDefinition, LayoutNode, PropDefinition } from "@/lib/type
 import { getAvailableComponents } from "@/lib/component-registry"
 import { Trash2, Box, Settings, Code, FileCode, Layout, Type, Move, Square, Palette, Plus, ImageIcon } from "lucide-react"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Slider } from "@/components/ui/slider"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { MediaGalleryModal } from "./media-gallery-modal"
+import { AlignCenter, AlignLeft, AlignRight, AlignJustify, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, FlipHorizontal, FlipVertical, RotateCw, PlusCircle, MoreHorizontal } from "lucide-react"
+import { EditorDialog } from "./editor-dialog"
 
 interface PropertiesPanelProps {
   selectedNode: LayoutNode | null
   onUpdateNode: (updates: Partial<LayoutNode>) => void
   onDeleteNode: () => void
+  siteId?: string // Add siteId to load theme components
 }
 
-export function PropertiesPanel({ selectedNode, onUpdateNode, onDeleteNode }: PropertiesPanelProps) {
+export function PropertiesPanel({ selectedNode, onUpdateNode, onDeleteNode, siteId }: PropertiesPanelProps) {
   const [componentDef, setComponentDef] = useState<ComponentDefinition | null>(null)
   const [mediaGalleryOpen, setMediaGalleryOpen] = useState(false)
   const [activeImageProp, setActiveImageProp] = useState<string | null>(null)
+  const [editorDialogOpen, setEditorDialogOpen] = useState(false)
+  const [activeEditorProp, setActiveEditorProp] = useState<{ name: string; value: string } | null>(null)
 
   useEffect(() => {
     if (selectedNode) {
-      loadComponentDefinition(selectedNode.type)
+      loadComponentDefinition(selectedNode.type, selectedNode.themeName)
     }
-  }, [selectedNode])
+  }, [selectedNode, siteId])
 
-  async function loadComponentDefinition(type: string) {
-    const components = await getAvailableComponents()
-    const def = components.find((c) => c.name === type)
+  async function loadComponentDefinition(type: string, themeName?: string) {
+    // Pass siteId to load theme components
+    const components = await getAvailableComponents(siteId)
+
+    // Match by name AND themeName if present
+    const def = components.find((c) => {
+      const nameMatches = c.name === type
+      const themeMatches = themeName ? c.themeName === themeName : !c.themeName
+      return nameMatches && themeMatches
+    })
+
     setComponentDef(def || null)
   }
 
@@ -86,30 +102,58 @@ export function PropertiesPanel({ selectedNode, onUpdateNode, onDeleteNode }: Pr
     }
   }
 
+  const handleOpenEditor = (propName: string, value: string) => {
+    setActiveEditorProp({ name: propName, value })
+    setEditorDialogOpen(true)
+  }
+
+  const handleEditorSave = (value: string) => {
+    if (activeEditorProp) {
+      handlePropChange(activeEditorProp.name, value)
+    }
+  }
+
   return (
     <>
-      <Card className="h-full flex flex-col border-0 rounded-none shadow-none">
+      <div className="flex flex-col h-full bg-background/50">
         <Tabs defaultValue="content" className="flex-1 flex flex-col overflow-hidden">
-          <div className="border-b px-4 py-2 flex items-center justify-between">
-            <TabsList className="grid w-full max-w-[240px] grid-cols-3 h-8">
-              <TabsTrigger value="content" className="text-xs">
-                Content
+          {/* Header to match Sidebar style */}
+          <div className="sticky top-0 z-10 backdrop-blur-xl bg-background/95 border-b p-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-sm font-semibold tracking-tight">Properties</h2>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                onClick={onDeleteNode}
+                title="Delete Component"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+            <TabsList className="w-full grid grid-cols-3 gap-1 bg-muted/50 p-1 h-auto rounded-lg">
+              <TabsTrigger
+                value="content"
+                className="flex items-center gap-2 py-2 rounded-md transition-all duration-200 text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:scale-[0.98] hover:bg-background/50"
+              >
+                <Box className="w-3.5 h-3.5" />
+                <span className="font-medium">Content</span>
               </TabsTrigger>
-              <TabsTrigger value="style" className="text-xs">
-                Style
+              <TabsTrigger
+                value="style"
+                className="flex items-center gap-2 py-2 rounded-md transition-all duration-200 text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:scale-[0.98] hover:bg-background/50"
+              >
+                <Palette className="w-3.5 h-3.5" />
+                <span className="font-medium">Style</span>
               </TabsTrigger>
-              <TabsTrigger value="advanced" className="text-xs">
-                Advanced
+              <TabsTrigger
+                value="advanced"
+                className="flex items-center gap-2 py-2 rounded-md transition-all duration-200 text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:scale-[0.98] hover:bg-background/50"
+              >
+                <Code className="w-3.5 h-3.5" />
+                <span className="font-medium">Advanced</span>
               </TabsTrigger>
             </TabsList>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onDeleteNode}
-              className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 ml-2"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
           </div>
 
           <TabsContent value="content" className="flex-1 overflow-hidden mt-0">
@@ -125,7 +169,7 @@ export function PropertiesPanel({ selectedNode, onUpdateNode, onDeleteNode }: Pr
                     <Label htmlFor={prop.name} className="text-xs">
                       {prop.label}
                     </Label>
-                    {renderPropInput(prop, selectedNode.props[prop.name], handlePropChange, handleOpenGallery, selectedNode.props)}
+                    {renderPropInput(prop, selectedNode.props[prop.name], handlePropChange, handleOpenGallery, handleOpenEditor, selectedNode.props)}
                   </div>
                 ))}
               </div>
@@ -524,13 +568,58 @@ export function PropertiesPanel({ selectedNode, onUpdateNode, onDeleteNode }: Pr
             </ScrollArea>
           </TabsContent>
         </Tabs>
-      </Card>
+      </div>
       <MediaGalleryModal
         open={mediaGalleryOpen}
         onOpenChange={setMediaGalleryOpen}
         onSelect={handleGallerySelect}
       />
+      <EditorDialog
+        open={editorDialogOpen}
+        onOpenChange={setEditorDialogOpen}
+        value={activeEditorProp?.value || ""}
+        onSave={handleEditorSave}
+        title={`Edit ${activeEditorProp?.name || "Content"}`}
+      />
     </>
+  )
+}
+
+// Separate component for debounced textarea to avoid hooks violations
+function DebouncedTextarea({
+  id,
+  value,
+  onChange,
+  className,
+}: {
+  id: string
+  value: string
+  onChange: (value: string) => void
+  className?: string
+}) {
+  const [localValue, setLocalValue] = useState(value || "")
+
+  useEffect(() => {
+    setLocalValue(value || "")
+  }, [value])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localValue !== value) {
+        onChange(localValue)
+      }
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [localValue, value, onChange])
+
+  return (
+    <Textarea
+      id={id}
+      className={className}
+      value={localValue}
+      onChange={(e) => setLocalValue(e.target.value)}
+    />
   )
 }
 
@@ -539,6 +628,7 @@ function renderPropInput(
   value: any,
   onChange: (propName: string, value: any) => void,
   onOpenGallery?: (propName: string) => void,
+  onOpenEditor?: (propName: string, value: string) => void,
   allProps: Record<string, any> = {}
 ) {
   switch (prop.type) {
@@ -554,15 +644,77 @@ function renderPropInput(
         />
       )
 
-    case "textarea":
+    case "textarea": {
+      // Check if value contains HTML tags (indicates it was edited in rich text editor)
+      const hasHtmlContent = value && typeof value === 'string' && /<[^>]+>/.test(value)
+
+      if (hasHtmlContent) {
+        // Show editor-based UI instead of raw HTML textarea
+        return (
+          <div className="space-y-2 border rounded-md p-3 bg-muted/10">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium text-muted-foreground">Rich Text Content</span>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 text-xs"
+                  onClick={() => onChange(prop.name, "")}
+                  title="Clear content"
+                >
+                  Clear
+                </Button>
+                {onOpenEditor && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-7 text-xs"
+                    onClick={() => onOpenEditor(prop.name, value || "")}
+                    title="Edit in Rich Text Editor"
+                  >
+                    <Code className="h-3 w-3 mr-1" />
+                    Edit in Editor
+                  </Button>
+                )}
+              </div>
+            </div>
+            <div
+              className="text-xs text-muted-foreground prose prose-sm max-w-none overflow-hidden"
+              dangerouslySetInnerHTML={{ __html: value }}
+              style={{ maxHeight: '200px', overflow: 'auto' }}
+            />
+          </div>
+        )
+      }
+
+      // Show regular textarea for plain text
       return (
-        <Textarea
-          id={prop.name}
-          className="min-h-[100px] font-sans text-sm"
-          value={value || ""}
-          onChange={(e) => onChange(prop.name, e.target.value)}
-        />
+        <div className="space-y-2">
+          <div className="flex gap-2">
+            <DebouncedTextarea
+              id={prop.name}
+              className="min-h-[100px] max-h-[400px] font-sans text-sm resize-y flex-1"
+              value={value || ""}
+              onChange={(val) => onChange(prop.name, val)}
+            />
+            {onOpenEditor && (
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="h-8 w-8 shrink-0"
+                onClick={() => onOpenEditor(prop.name, value || "")}
+                title="Open in Rich Text Editor"
+              >
+                <Code className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </div>
       )
+    }
 
     case "number":
       return (

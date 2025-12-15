@@ -365,25 +365,27 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div className="h-screen flex flex-col bg-muted/10 overflow-hidden">
         {/* Top Bar */}
-        <header className="h-14 border-b bg-background flex items-center justify-between p-5 z-30 shrink-0">
+        {/* Modern Top Navbar with Glassmorphism */}
+        <header className="h-16 border-b backdrop-blur-xl bg-background/80 shadow-sm flex items-center justify-between px-6 z-30 shrink-0">
           {/* Left: Page title */}
           <div className="flex items-center gap-4">
-            <Button onClick={() => history.back()} variant="ghost" size="icon" className="cursor-pointer h-8 w-8">
+            <Button onClick={() => history.back()} variant="ghost" size="icon" className="h-9 w-9 rounded-full hover:bg-muted transition-colors">
               <ArrowLeft className="h-4 w-4" />
             </Button>
-            <div className="h-6 w-px bg-border mx-2" />
+            <div className="h-8 w-px bg-border/50" />
             <div className="flex items-center gap-3">
-              <Input size={pageName.length || 8} maxLength={30} onChange={(e) => setPageName(e.target.value)} value={pageName || ""} placeholder="Untitled" className=" bg-background block border-none" />
-              <span className="text-xs text-muted-foreground">Draft</span>
+              <Input size={pageName.length || 8} maxLength={30} onChange={(e) => setPageName(e.target.value)} value={pageName || ""} placeholder="Untitled" className="h-9 bg-transparent border-none font-semibold text-base focus-visible:ring-0 focus-visible:ring-offset-0 px-0" />
+              <span className="px-2 py-1 text-xs font-medium bg-muted/80 text-muted-foreground rounded-full">Draft</span>
             </div>
           </div>
 
           {/* Center: Device toggle */}
-          <div className="absolute left-1/2 -translate-x-1/2 flex items-center bg-muted/50 rounded-md p-1 border shadow-sm">
+          <div className="absolute left-1/2 -translate-x-1/2 flex items-center bg-muted/50 rounded-full p-1 border shadow-sm backdrop-blur-sm">
             <Button
               variant={deviceMode === "desktop" ? "secondary" : "ghost"}
               size="icon"
-              className="h-7 w-7"
+              className="h-8 w-8 rounded-full transition-all"
+              title="Desktop View"
               onClick={() => setDeviceMode("desktop")}
             >
               <Monitor className="h-4 w-4" />
@@ -391,7 +393,8 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
             <Button
               variant={deviceMode === "tablet" ? "secondary" : "ghost"}
               size="icon"
-              className="h-7 w-7"
+              className="h-8 w-8 rounded-full transition-all"
+              title="Tablet View"
               onClick={() => setDeviceMode("tablet")}
             >
               <Tablet className="h-4 w-4" />
@@ -399,7 +402,8 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
             <Button
               variant={deviceMode === "mobile" ? "secondary" : "ghost"}
               size="icon"
-              className="h-7 w-7"
+              className="h-8 w-8 rounded-full transition-all"
+              title="Mobile View"
               onClick={() => setDeviceMode("mobile")}
             >
               <Smartphone className="h-4 w-4" />
@@ -432,20 +436,24 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
             <Button variant="ghost" size="icon" className="h-8 w-8">
               <Redo className="h-4 w-4" />
             </Button> */}
-            <div className="h-6 w-px bg-border mx-2" />
-            <Button variant="outline" size="sm" onClick={clearCanvas}>
-              Clear
-            </Button>
-            <Link href={`/preview/${pageId}`} target="_blank">
-              <Button variant="secondary" size="sm">
-                <Eye className="h-4 w-4 mr-2" />
-                Preview
+            <div className="h-8 w-px bg-border/50 mx-2" />
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={clearCanvas}>
+                Clear
               </Button>
-            </Link>
-            <Button size="sm" onClick={handleSave} disabled={isSaving}>
-              <Save className="h-4 w-4 mr-2" />
-              {isSaving ? "Saving..." : "Update"}
-            </Button>
+              <Link href={`/preview/${pageId}`} target="_blank">
+                <Button variant="secondary" size="sm">
+                  <Eye className="h-4 w-4 mr-2" />
+                  Preview
+                </Button>
+              </Link>
+              <Button size="sm" onClick={handleSave} disabled={isSaving}>
+                <Save className="h-4 w-4 mr-2" />
+                {isSaving ? "Saving..." : "Update"}
+              </Button>
+            </div>
           </div>
         </header>
 

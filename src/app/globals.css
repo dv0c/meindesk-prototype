@@ -200,4 +200,14 @@
   input[type='checkbox']:checked {
     animation: checkboxScale 0.2s ease-out;
   }
+
+  /* Canvas Focus Mode */
+  .canvas-interactive-area:has(.draggable-node:hover) .draggable-node {
+    opacity: 0.4;
+    transition: opacity 0.2s ease;
+  }
+
+  .canvas-interactive-area:has(.draggable-node:hover) .draggable-node:hover {
+    opacity: 1 !important;
+  }
 }

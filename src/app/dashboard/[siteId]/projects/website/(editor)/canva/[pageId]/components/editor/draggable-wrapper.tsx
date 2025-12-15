@@ -75,7 +75,7 @@ export function DraggableWrapper({
       onClick={handleClick}
       onContextMenu={handleContextMenu}
       className={cn(
-        "relative group transition-all duration-200",
+        "draggable-node relative group transition-all duration-200",
         isContainer && isOver && "ring-2 ring-primary ring-offset-1 bg-primary/5",
         isContainer && !isOver && "hover:ring-1 hover:ring-dashed hover:ring-primary/30",
         isSelected ? "ring-2 ring-primary ring-offset-2 z-10" : "hover:ring-1 hover:ring-primary/50",

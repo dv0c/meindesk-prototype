@@ -88,7 +88,8 @@ function getComponent(componentType: string, themeName?: string): React.Componen
 
 export function RenderNode({ node, isEditor = false, onSelect, isSelected = false, onContextMenu, validComponentNames }: RenderNodeProps) {
   // Try to get theme name from node metadata/props
-  const themeName = node.props?.themeName || (node as any).themeName
+  // Check node-level themeName first (where component-registry stores it), then fall back to props
+  const themeName = node.themeName || node.props?.themeName
 
   // Get component from either theme registry or base registry
   const Component = getComponent(node.type, themeName)
@@ -233,7 +234,11 @@ export function RenderNode({ node, isEditor = false, onSelect, isSelected = fals
         {/*  {...(node.props.style === undefined && node.style ? { style: node.style } : {})} */}
         {/* This is for the style to be applied to the component (e.x Articles.tsx) */}
         <Component
-          {...node.props}
+          {...(() => {
+            // Filter out themeName from props - it's builder metadata, not a component prop
+            const { themeName: _, ...cleanProps } = node.props || {};
+            return cleanProps;
+          })()}
           className={`${node.props.className || ""} ${node.className || ""}`}
           {...(node.props.style === undefined && node.style ? { style: node.style } : {})}
           onClick={handleClick}
