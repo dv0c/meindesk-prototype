@@ -15,6 +15,7 @@ export function GlobalSettingsPanel() {
   const params = useParams()
   const siteId = params.siteId as string
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [availableFonts, setAvailableFonts] = useState<Array<{ family: string, variable?: string }>>([{ family: 'System Default', variable: undefined }])
   const isInitialMount = useRef(true)
 
   // Debounced save function
@@ -60,6 +61,40 @@ export function GlobalSettingsPanel() {
 
     return () => clearTimeout(timeoutId)
   }, [websiteSettings, siteId, saveSettings])
+
+  // Load available fonts from installed themes
+  useEffect(() => {
+    const loadFonts = async () => {
+      if (!siteId) return
+
+      try {
+        // Fetch installed themes
+        const response = await fetch(`/api/team/${siteId}/themes`)
+        if (!response.ok) return
+
+        const themes = await response.json()
+        const fonts: Array<{ family: string, variable?: string }> = [{ family: 'System Default' }]
+
+        // Collect all fonts from installed themes
+        themes.forEach((theme: any) => {
+          if (theme.fonts && Array.isArray(theme.fonts)) {
+            theme.fonts.forEach((font: any) => {
+              // Avoid duplicates
+              if (!fonts.find(f => f.family === font.family)) {
+                fonts.push({ family: font.family, variable: font.variable })
+              }
+            })
+          }
+        })
+
+        setAvailableFonts(fonts)
+      } catch (error) {
+        console.error('Error loading fonts:', error)
+      }
+    }
+
+    loadFonts()
+  }, [siteId])
 
   return (
     <div className="h-full flex flex-col">
@@ -226,7 +261,49 @@ export function GlobalSettingsPanel() {
           <div className="space-y-4">
             <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Typography</h3>
             <div className="space-y-2">
-              <Label>Font Family</Label>
+              <Label>Heading Font</Label>
+              <Select
+                value={websiteSettings.theme.headingFont || 'System Default'}
+                onValueChange={(value) =>
+                  updateWebsiteSettings({ theme: { ...websiteSettings.theme, headingFont: value } })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select heading font" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableFonts.map((font) => (
+                    <SelectItem key={font.family} value={font.family}>
+                      {font.family}
+                      {font.variable && <span className="text-xs text-muted-foreground ml-2">({font.variable})</span>}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Body Font</Label>
+              <Select
+                value={websiteSettings.theme.bodyFont || 'System Default'}
+                onValueChange={(value) =>
+                  updateWebsiteSettings({ theme: { ...websiteSettings.theme, bodyFont: value } })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select body font" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableFonts.map((font) => (
+                    <SelectItem key={font.family} value={font.family}>
+                      {font.family}
+                      {font.variable && <span className="text-xs text-muted-foreground ml-2">({font.variable})</span>}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Font Family <span className="text-xs text-muted-foreground">(fallback/custom)</span></Label>
               <Input
                 placeholder="e.g. Inter, sans-serif"
                 value={websiteSettings.theme.fontFamily}

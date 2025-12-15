@@ -264,6 +264,8 @@ export async function PATCH(
                 backgroundColor: rawSettings.theme.backgroundColor ? sanitizeColor(rawSettings.theme.backgroundColor) : '#ffffff',
                 textColor: rawSettings.theme.textColor ? sanitizeColor(rawSettings.theme.textColor) : '#000000',
                 fontFamily: rawSettings.theme.fontFamily ? sanitizeFontFamily(rawSettings.theme.fontFamily) : 'Inter',
+                headingFont: rawSettings.theme.headingFont ? sanitizeFontFamily(rawSettings.theme.headingFont) : undefined,
+                bodyFont: rawSettings.theme.bodyFont ? sanitizeFontFamily(rawSettings.theme.bodyFont) : undefined,
             };
         }
 

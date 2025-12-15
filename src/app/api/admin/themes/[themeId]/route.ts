@@ -47,7 +47,7 @@ export async function PUT(
         }
 
         const body = await req.json();
-        const { name, description, price, isPremium, thumbnail } = body;
+        const { name, description, price, isPremium, thumbnail, fonts } = body;
 
         const theme = await db.theme.update({
             where: {
@@ -59,6 +59,7 @@ export async function PUT(
                 price,
                 isPremium,
                 thumbnail,
+                fonts: fonts || undefined, // Save fonts if provided
             },
         });
 

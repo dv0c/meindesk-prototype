@@ -25,6 +25,8 @@ export interface WebsiteSettings {
     primaryColor: string;
     secondaryColor: string;
     fontFamily: string;
+    headingFont?: string; // Selected font for headings from theme library
+    bodyFont?: string; // Selected font for body text from theme library
     backgroundColor: string;
     textColor: string;
   };

@@ -121,6 +121,7 @@ model Site {
   status                 String   @default("active") // New: 'active', 'suspended', 'trial', 'pending'
   defaultThemePreference String   @default("system")
   template_schema        Json?    @default("{\"version\": \"1.2.0\",\"template\": \"simple\", \"global\": {\"container\": \"max-w-7xl\"}}")
+  settings               Json?    @default("{}") // Global website settings (fonts, colors, SEO, etc.)
   // --- Timestamps ---
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
@@ -330,14 +331,18 @@ model RssItem {
 // --- Theme Store Models ---
 
 model Theme {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String
   thumbnail   String?
-  price       Float    @default(0)
-  isPremium   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  price       Float   @default(0)
+  isPremium   Boolean @default(false)
+
+  // Font configuration: array of { family, type, weights, subsets, url, variable }
+  fonts Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   blocks      ThemeBlock[]
   installedIn SiteTheme[]

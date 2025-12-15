@@ -170,13 +170,33 @@ export default async function TenantLayout({ children }: { children: React.React
         />
       )}
 
+      {/* Load Heading Font from theme */}
+      {settingsTheme.headingFont && settingsTheme.headingFont !== 'System Default' && (
+        <link
+          href={`https://fonts.googleapis.com/css2?family=${settingsTheme.headingFont.replace(/\s+/g, '+')}:wght@400;500;600;700;800;900&display=swap`}
+          rel="stylesheet"
+        />
+      )}
+
+      {/* Load Body Font from theme */}
+      {settingsTheme.bodyFont && settingsTheme.bodyFont !== 'System Default' && settingsTheme.bodyFont !== settingsTheme.headingFont && (
+        <link
+          href={`https://fonts.googleapis.com/css2?family=${settingsTheme.bodyFont.replace(/\s+/g, '+')}:wght@400;500;600;700&display=swap`}
+          rel="stylesheet"
+        />
+      )}
+
       {/* Global CSS Variables and Custom CSS (using sanitized CSS) */}
       <style dangerouslySetInnerHTML={{
         __html: `
           :root {
             ${cssVariables}
+            ${settingsTheme.headingFont && settingsTheme.headingFont !== 'System Default' ? `--font-heading: '${settingsTheme.headingFont}', sans-serif;` : ''}
+            ${settingsTheme.bodyFont && settingsTheme.bodyFont !== 'System Default' ? `--font-body: '${settingsTheme.bodyFont}', sans-serif;` : ''}
           }
           ${safeFontFamily ? `body { font-family: '${safeFontFamily}', sans-serif; }` : ''}
+          ${settingsTheme.headingFont && settingsTheme.headingFont !== 'System Default' ? `h1, h2, h3, h4, h5, h6 { font-family: '${settingsTheme.headingFont}', sans-serif; }` : ''}
+          ${settingsTheme.bodyFont && settingsTheme.bodyFont !== 'System Default' ? `body, p, span, div { font-family: '${settingsTheme.bodyFont}', sans-serif; }` : ''}
           ${safeGlobalCss}
         `
       }} />

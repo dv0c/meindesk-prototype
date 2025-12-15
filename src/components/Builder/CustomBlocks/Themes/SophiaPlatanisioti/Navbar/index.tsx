@@ -140,12 +140,12 @@ interface NavigationLinksProps {
 
 function NavigationLinks({ links, pathname, ulClassName }: NavigationLinksProps) {
     return (
-        <ul className={cn("items-center text-[.6875rem] max-w-[700px]!", ulClassName)}>
+        <ul className={cn("items-center  space-y-4 text-[.8875rem] max-w-[700px]!", ulClassName)}>
             {links.map((link, index) => (
                 <li key={index}>
                     {link.submenu && link.submenu.length > 0 ? (
                         <div className="menu-item group relative">
-                            <div className="flex items-center gap-2 cursor-pointer h-full hover:font-bold">
+                            <div className="flex items-center gap-2 cursor-pointer h-full transition-all group-hover:underline">
                                 <span>{link.label}</span>
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -160,13 +160,13 @@ function NavigationLinks({ links, pathname, ulClassName }: NavigationLinksProps)
                             </div>
                             <div className="absolute h-auto z-10 top-full mt-px transition-all delay-75 right-0 invisible opacity-0 group-hover:visible group-hover:opacity-100">
                                 <div className="bg-white border rounded-sm shadow-lg py-1">
-                                    <ul className="p-0 min-w-[200px]">
+                                    <ul className="p-0 space-y-2 min-w-[200px]">
                                         {link.submenu.map((subItem, subIndex) => (
                                             <li key={subIndex}>
                                                 <Link
                                                     href={subItem.href}
                                                     className={cn(
-                                                        "block uppercase px-3 py-1.5 w-full hover:bg-gray-100 hover:font-semibold tracking-wide text-[.75rem]",
+                                                        "block uppercase px-3 py-1.5 w-full hover:underline tracking-wide text-[.875rem]",
                                                         pathname === subItem.href && "font-semibold",
                                                     )}
                                                 >
@@ -179,7 +179,7 @@ function NavigationLinks({ links, pathname, ulClassName }: NavigationLinksProps)
                             </div>
                         </div>
                     ) : (
-                        <Link className={cn("menu-item hover:font-bold transition-all", pathname === link.href && "font-bold text-[11px]!")} href={link.href}>
+                        <Link className={cn("menu-item hover:underline transition-all", pathname === link.href && "underline!")} href={link.href}>
                             {link.label}
                         </Link>
                     )}
