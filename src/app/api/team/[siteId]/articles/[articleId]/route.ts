@@ -7,9 +7,12 @@ export const runtime = "nodejs";
 // -------------------------------------------------------
 // GET – Fetch a single article by ID
 // -------------------------------------------------------
+// -------------------------------------------------------
+// GET – Fetch a single article by ID
+// -------------------------------------------------------
 export async function GET(
   req: NextRequest,
-  { params }: { params: { articleId: string } }
+  { params }: { params: Promise<{ articleId: string }> }
 ) {
   try {
     const session = await getAuthSession();
@@ -63,7 +66,7 @@ export async function GET(
 // -------------------------------------------------------
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { articleId: string; siteId: string } }
+  { params }: { params: Promise<{ articleId: string; siteId: string }> }
 ) {
   try {
     const session = await getAuthSession();
@@ -71,18 +74,19 @@ export async function PATCH(
       return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
-    const { articleId } = await params;
+    const { articleId, siteId } = await params;
     const data = await req.json();
 
     const allowed = [
       "title",
-      "slug",      // <-- include slug here
+      "slug",
       "excerpt",
       "content",
       "html",
       "cover",
       "status",
       "categoryId",
+      "categories",
       "metadata",
     ];
     const updateData: Record<string, any> = {};
@@ -97,7 +101,7 @@ export async function PATCH(
       const existing = await db.article.findFirst({
         where: {
           slug: updateData.slug,
-          siteId: params.siteId,
+          siteId: siteId,
           NOT: { id: articleId }, // exclude current article
         },
       });
@@ -127,7 +131,7 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { articleId: string } }
+  { params }: { params: Promise<{ articleId: string }> }
 ) {
   try {
     const session = await getAuthSession();

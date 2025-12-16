@@ -98,52 +98,51 @@ export function ComponentPickerMenuPlugin({
         ) => {
           return anchorElementRef.current && options.length
             ? createPortal(
-                <div className="fixed z-10 w-[250px] rounded-md shadow-md">
-                  <Command
-                    onKeyDown={(e) => {
-                      if (e.key === "ArrowUp") {
-                        e.preventDefault()
-                        setHighlightedIndex(
-                          selectedIndex !== null
-                            ? (selectedIndex - 1 + options.length) %
-                                options.length
-                            : options.length - 1
-                        )
-                      } else if (e.key === "ArrowDown") {
-                        e.preventDefault()
-                        setHighlightedIndex(
-                          selectedIndex !== null
-                            ? (selectedIndex + 1) % options.length
-                            : 0
-                        )
-                      }
-                    }}
-                  >
-                    <CommandList>
-                      <CommandGroup>
-                        {options.map((option, index) => (
-                          <CommandItem
-                            key={option.key}
-                            value={option.title}
-                            onSelect={() => {
-                              selectOptionAndCleanUp(option)
-                            }}
-                            className={`flex items-center gap-2 ${
-                              selectedIndex === index
-                                ? "bg-accent"
-                                : "!bg-transparent"
+              <div className="fixed z-50 w-[220px] rounded-lg border border-border/50 bg-popover/95 backdrop-blur-sm shadow-xl overflow-hidden">
+                <Command
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowUp") {
+                      e.preventDefault()
+                      setHighlightedIndex(
+                        selectedIndex !== null
+                          ? (selectedIndex - 1 + options.length) %
+                          options.length
+                          : options.length - 1
+                      )
+                    } else if (e.key === "ArrowDown") {
+                      e.preventDefault()
+                      setHighlightedIndex(
+                        selectedIndex !== null
+                          ? (selectedIndex + 1) % options.length
+                          : 0
+                      )
+                    }
+                  }}
+                >
+                  <CommandList className="max-h-[300px] p-1">
+                    <CommandGroup>
+                      {options.map((option, index) => (
+                        <CommandItem
+                          key={option.key}
+                          value={option.title}
+                          onSelect={() => {
+                            selectOptionAndCleanUp(option)
+                          }}
+                          className={`flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors cursor-pointer ${selectedIndex === index
+                              ? "bg-accent text-accent-foreground"
+                              : "bg-transparent hover:bg-accent/50"
                             }`}
-                          >
-                            {option.icon}
-                            {option.title}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </div>,
-                anchorElementRef.current
-              )
+                        >
+                          <span className="text-muted-foreground">{option.icon}</span>
+                          {option.title}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </div>,
+              anchorElementRef.current
+            )
             : null
         }}
       />

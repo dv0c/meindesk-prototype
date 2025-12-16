@@ -18,7 +18,7 @@ interface LayoutProps {
 
 const Layout: FC<LayoutProps> = ({ children }) => {
     const pathname = usePathname()
-    const hideHeader = pathname.includes("projects/website/canva/")
+    const hideHeader = pathname.includes("projects/website/canva/") || pathname.includes("/articles/") && pathname.includes("/editor")
 
     return (
         <SiteProvider>

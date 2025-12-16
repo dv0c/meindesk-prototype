@@ -194,7 +194,7 @@ function FloatingTextFormat({
   return (
     <div
       ref={popupCharStylesEditorRef}
-      className="bg-background absolute top-0 left-0 flex gap-1 rounded-md border p-1 opacity-0 shadow-md transition-opacity duration-300 will-change-transform"
+      className="bg-popover/95 backdrop-blur-sm absolute top-0 left-0 flex gap-0.5 rounded-lg border border-border/50 p-1 opacity-0 shadow-xl transition-opacity duration-200 will-change-transform"
     >
       {editor.isEditable() && (
         <>
@@ -218,6 +218,7 @@ function FloatingTextFormat({
                 editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold")
               }}
               size="sm"
+              className="hover:bg-accent/80 hover:text-accent-foreground data-[state=on]:bg-accent data-[state=on]:text-accent-foreground"
             >
               <BoldIcon className="h-4 w-4" />
             </ToggleGroupItem>
@@ -228,6 +229,7 @@ function FloatingTextFormat({
                 editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic")
               }}
               size="sm"
+              className="hover:bg-accent/80 hover:text-accent-foreground data-[state=on]:bg-accent data-[state=on]:text-accent-foreground"
             >
               <ItalicIcon className="h-4 w-4" />
             </ToggleGroupItem>
@@ -238,6 +240,7 @@ function FloatingTextFormat({
                 editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline")
               }}
               size="sm"
+              className="hover:bg-accent/80 hover:text-accent-foreground data-[state=on]:bg-accent data-[state=on]:text-accent-foreground"
             >
               <UnderlineIcon className="h-4 w-4" />
             </ToggleGroupItem>
@@ -248,10 +251,11 @@ function FloatingTextFormat({
                 editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough")
               }}
               size="sm"
+              className="hover:bg-accent/80 hover:text-accent-foreground data-[state=on]:bg-accent data-[state=on]:text-accent-foreground"
             >
               <StrikethroughIcon className="h-4 w-4" />
             </ToggleGroupItem>
-            <Separator orientation="vertical" />
+            <Separator orientation="vertical" className="h-6 mx-1 bg-border/60" />
             <ToggleGroupItem
               value="code"
               aria-label="Toggle code"
@@ -259,6 +263,7 @@ function FloatingTextFormat({
                 editor.dispatchCommand(FORMAT_TEXT_COMMAND, "code")
               }}
               size="sm"
+              className="hover:bg-accent/80 hover:text-accent-foreground data-[state=on]:bg-accent data-[state=on]:text-accent-foreground"
             >
               <CodeIcon className="h-4 w-4" />
             </ToggleGroupItem>
@@ -267,10 +272,11 @@ function FloatingTextFormat({
               aria-label="Toggle link"
               onClick={insertLink}
               size="sm"
+              className="hover:bg-accent/80 hover:text-accent-foreground data-[state=on]:bg-accent data-[state=on]:text-accent-foreground"
             >
               <LinkIcon className="h-4 w-4" />
             </ToggleGroupItem>
-            <Separator orientation="vertical" />
+            <Separator orientation="vertical" className="h-6 mx-1 bg-border/60" />
           </ToggleGroup>
           <ToggleGroup
             type="single"
@@ -285,6 +291,7 @@ function FloatingTextFormat({
                 editor.dispatchCommand(FORMAT_TEXT_COMMAND, "subscript")
               }}
               size="sm"
+              className="hover:bg-accent/80 hover:text-accent-foreground data-[state=on]:bg-accent data-[state=on]:text-accent-foreground"
             >
               <SubscriptIcon className="h-4 w-4" />
             </ToggleGroupItem>
@@ -295,6 +302,7 @@ function FloatingTextFormat({
                 editor.dispatchCommand(FORMAT_TEXT_COMMAND, "superscript")
               }}
               size="sm"
+              className="hover:bg-accent/80 hover:text-accent-foreground data-[state=on]:bg-accent data-[state=on]:text-accent-foreground"
             >
               <SuperscriptIcon className="h-4 w-4" />
             </ToggleGroupItem>

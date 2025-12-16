@@ -1,0 +1,53 @@
+"use server";
+import { getAuthSession } from "@/lib/auth";
+import { db } from "@/lib/db";
+
+export async function CreateCategory({
+    siteId,
+    data,
+}: {
+    siteId: string;
+    data: {
+        name: string;
+        description?: string;
+        slug: string;
+        thumbnail?: string;
+        published?: boolean;
+    };
+}) {
+    const session = await getAuthSession();
+    if (!session?.user.id) throw new Error("Not authorized");
+
+    // Verify site ownership
+    const site = await db.site.findFirst({
+        where: { id: siteId, userId: session.user.id },
+    });
+    if (!site) throw new Error("Site not found or not yours");
+
+    // Check if slug already exists for this site
+    const existingCategory = await db.category.findFirst({
+        where: {
+            siteId,
+            slug: data.slug,
+        },
+    });
+
+    if (existingCategory) {
+        throw new Error("A category with this slug already exists");
+    }
+
+    // Create the category
+    const category = await db.category.create({
+        data: {
+            name: data.name,
+            description: data.description || "",
+            slug: data.slug,
+            thumbnail: data.thumbnail,
+            published: data.published ?? true,
+            siteId,
+            userId: session.user.id,
+        },
+    });
+
+    return category;
+}

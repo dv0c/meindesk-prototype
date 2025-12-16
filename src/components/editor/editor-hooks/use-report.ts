@@ -7,13 +7,18 @@ const getElement = (): HTMLElement => {
     element = document.createElement("div")
     element.id = "report-container"
     element.style.position = "fixed"
-    element.style.top = "50%"
-    element.style.left = "50%"
-    element.style.fontSize = "32px"
-    element.style.transform = "translate(-50%, -50px)"
-    element.style.padding = "20px"
-    element.style.background = "rgba(240, 240, 240, 0.4)"
-    element.style.borderRadius = "20px"
+    element.style.bottom = "24px"
+    element.style.right = "24px"
+    element.style.fontSize = "14px"
+    element.style.fontWeight = "500"
+    element.style.padding = "12px 16px"
+    element.style.background = "hsl(var(--popover) / 0.95)"
+    element.style.backdropFilter = "blur(8px)"
+    element.style.borderRadius = "8px"
+    element.style.border = "1px solid hsl(var(--border) / 0.5)"
+    element.style.boxShadow = "0 10px 25px -5px rgba(0, 0, 0, 0.25)"
+    element.style.color = "hsl(var(--popover-foreground))"
+    element.style.zIndex = "9999"
 
     if (document.body) {
       document.body.appendChild(element)

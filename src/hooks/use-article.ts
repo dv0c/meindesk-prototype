@@ -83,7 +83,7 @@ export function useArticle({ onSuccess, onError }: UseArticleOptions = {}) {
       setLoading(true)
       try {
         const res = await axios.patch(`/api/team/${teamId}/articles/${articleId}`, data)
-        toast.success("Article updated successfully!")
+        // toast.success("Article updated successfully!")
         setArticle(res.data)
         setArticles((prev) =>
           prev.map((a) => (a.id === articleId ? res.data : a))

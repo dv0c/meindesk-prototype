@@ -1,5 +1,7 @@
+"use client"
+
 import type { JSX } from "react"
-import { useMemo } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link"
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext"
 import {
@@ -8,6 +10,7 @@ import {
   NodeContextMenuSeparator,
 } from "@lexical/react/LexicalNodeContextMenuPlugin"
 import {
+  $getNodeByKey,
   $getSelection,
   $isDecoratorNode,
   $isNodeSelection,
@@ -21,16 +24,66 @@ import {
   Clipboard,
   ClipboardType,
   Copy,
+  ImageIcon,
   Link2Off,
   Scissors,
   Trash2,
 } from "lucide-react"
 
-export function ContextMenuPlugin(): JSX.Element {
+import { $isImageNode } from "@/components/editor/nodes/image-node"
+import MediaLibraryDialog, { type MediaItem } from "@/components/MediaGallery/media-select"
+
+export function ContextMenuPlugin({ siteId }: { siteId?: string }): JSX.Element {
   const [editor] = useLexicalComposerContext()
+  const [isMediaDialogOpen, setIsMediaDialogOpen] = useState(false)
+  const [selectedImageNodeKey, setSelectedImageNodeKey] = useState<string | null>(null)
+
+  const handleChangeImage = useCallback(() => {
+    editor.getEditorState().read(() => {
+      const selection = $getSelection()
+      if ($isNodeSelection(selection)) {
+        const nodes = selection.getNodes()
+        const imageNode = nodes.find((node) => $isImageNode(node))
+        if (imageNode) {
+          setSelectedImageNodeKey(imageNode.getKey())
+          setIsMediaDialogOpen(true)
+        }
+      }
+    })
+  }, [editor])
+
+  const handleMediaSelect = useCallback((items: MediaItem[]) => {
+    if (items.length > 0 && selectedImageNodeKey) {
+      const newSrc = items[0].url
+      editor.update(() => {
+        const node = $getNodeByKey(selectedImageNodeKey)
+        if (node && $isImageNode(node)) {
+          node.setSrc(newSrc)
+          if (items[0].alt) {
+            node.setAltText(items[0].alt)
+          }
+        }
+      })
+    }
+    setIsMediaDialogOpen(false)
+    setSelectedImageNodeKey(null)
+  }, [editor, selectedImageNodeKey])
 
   const items = useMemo(() => {
     return [
+      // Image-specific options
+      new NodeContextMenuOption(`Change Image`, {
+        $onSelect: () => {
+          handleChangeImage()
+        },
+        $showOn: (node: LexicalNode) => $isImageNode(node),
+        disabled: !siteId,
+        icon: <ImageIcon className="h-4 w-4" />,
+      }),
+      new NodeContextMenuSeparator({
+        $showOn: (node: LexicalNode) => $isImageNode(node),
+      }),
+      // Link options
       new NodeContextMenuOption(`Remove Link`, {
         $onSelect: () => {
           editor.dispatchCommand(TOGGLE_LINK_COMMAND, null)
@@ -42,6 +95,7 @@ export function ContextMenuPlugin(): JSX.Element {
       new NodeContextMenuSeparator({
         $showOn: (node: LexicalNode) => $isLinkNode(node.getParent()),
       }),
+      // General options
       new NodeContextMenuOption(`Cut`, {
         $onSelect: () => {
           editor.dispatchCommand(CUT_COMMAND, null)
@@ -136,14 +190,29 @@ export function ContextMenuPlugin(): JSX.Element {
         icon: <Trash2 className="h-4 w-4" />,
       }),
     ]
-  }, [editor])
+  }, [editor, handleChangeImage, siteId])
 
   return (
-    <NodeContextMenuPlugin
-      className="bg-popover text-popover-foreground !z-50 overflow-hidden rounded-md border shadow-md outline-none [&:has(*)]:!z-10"
-      itemClassName="relative w-full flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none select-none hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50"
-      separatorClassName="bg-border -mx-1 h-px"
-      items={items}
-    />
+    <>
+      <NodeContextMenuPlugin
+        className="bg-popover/95 backdrop-blur-sm text-popover-foreground z-50 min-w-[180px] overflow-hidden rounded-lg border border-border/50 p-1 shadow-xl outline-none"
+        itemClassName="relative w-full flex cursor-default items-center gap-2.5 rounded-md px-2.5 py-2 text-sm outline-none select-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50"
+        separatorClassName="bg-border/50 my-1 h-px"
+        items={items}
+      />
+      {siteId && (
+        <MediaLibraryDialog
+          siteId={siteId}
+          isOpen={isMediaDialogOpen}
+          onClose={() => {
+            setIsMediaDialogOpen(false)
+            setSelectedImageNodeKey(null)
+          }}
+          onSelect={handleMediaSelect}
+          multiSelect={false}
+        />
+      )}
+    </>
   )
 }
+
