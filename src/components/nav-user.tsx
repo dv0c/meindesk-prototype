@@ -7,6 +7,9 @@ import {
   CreditCard,
   LogOut,
   Sparkles,
+  Sun,
+  Moon,
+  Laptop,
 } from "lucide-react"
 
 import {
@@ -22,6 +25,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu"
 import {
   SidebarMenu,
@@ -32,6 +38,7 @@ import {
 import { signOut, useSession } from "next-auth/react"
 import { Skeleton } from "./ui/skeleton"
 import { useRouter } from "next/navigation"
+import { useTheme } from "next-themes"
 
 export function NavUser({
 }: {
@@ -39,6 +46,7 @@ export function NavUser({
   const router = useRouter()
   const { isMobile } = useSidebar()
   const { data, status } = useSession()
+  const { setTheme } = useTheme()
   const user = data?.user
   if (status === 'loading') {
     return (
@@ -60,7 +68,7 @@ export function NavUser({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                {/* <AvatarImage src={user.image} alt={user.name} /> */}
+                <AvatarImage src={user?.image || ""} alt={user?.name || "User"} />
                 <AvatarFallback className="rounded-lg">{user?.email?.charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
@@ -80,7 +88,7 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user?.image || ""} alt={user?.name || "avatar"} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">{user?.email?.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user?.name}</span>
@@ -109,6 +117,27 @@ export function NavUser({
                 <Bell />
                 Notifications
               </DropdownMenuItem>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                  <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                  <span className="ml-2">Theme</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem onClick={() => setTheme("light")}>
+                    <Sun className="mr-2 h-4 w-4" />
+                    <span>Light</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTheme("dark")}>
+                    <Moon className="mr-2 h-4 w-4" />
+                    <span>Dark</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTheme("system")}>
+                    <Laptop className="mr-2 h-4 w-4" />
+                    <span>System</span>
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => signOut({
