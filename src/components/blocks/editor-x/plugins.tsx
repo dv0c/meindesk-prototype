@@ -226,6 +226,7 @@ export function EditorContent({ className, siteId }: { className?: string; siteI
           HeadingPickerPlugin({ n: 3 }),
           TablePickerPlugin(),
           CheckListPickerPlugin(),
+          CarouselPickerPlugin(),
           NumberedListPickerPlugin(),
           BulletedListPickerPlugin(),
           QuotePickerPlugin(),
@@ -234,7 +235,7 @@ export function EditorContent({ className, siteId }: { className?: string; siteI
           EmbedsPickerPlugin({ embed: "tweet" }),
           EmbedsPickerPlugin({ embed: "youtube-video" }),
           ImagePickerPlugin(),
-          CarouselPickerPlugin(),
+
           ColumnsLayoutPickerPlugin(),
           AlignmentPickerPlugin({ alignment: "left" }),
           AlignmentPickerPlugin({ alignment: "center" }),

@@ -45,9 +45,9 @@ async function fetchChildren(parentId: string): Promise<PageWithChildren[]> {
 // ------------------------------------
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { tenantId: string; id: string } }
 ) {
-  const { id } = await params;
+  const { tenantId, id } = await params;
 
   try {
     // Try fetching by ID first
@@ -55,7 +55,7 @@ export async function GET(
 
     // Fallback: if not found, search by slug
     if (!page) {
-      page = await db.page.findFirst({ where: { slug: id } });
+      page = await db.page.findFirst({ where: { slug: id, siteId: tenantId } });
     }
 
     if (!page) {

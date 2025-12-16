@@ -169,22 +169,22 @@ export function ContextMenuPlugin({ siteId }: { siteId?: string }): JSX.Element 
         icon: <ClipboardType className="h-4 w-4" />,
       }),
       new NodeContextMenuSeparator(),
-      new NodeContextMenuOption(`Delete Node`, {
+      new NodeContextMenuOption(`Remove`, {
         $onSelect: () => {
-          const selection = $getSelection()
-          if ($isRangeSelection(selection)) {
-            const currentNode = selection.anchor.getNode()
-            const ancestorNodeWithRootAsParent = currentNode.getParents().at(-2)
-
-            ancestorNodeWithRootAsParent?.remove()
-          } else if ($isNodeSelection(selection)) {
-            const selectedNodes = selection.getNodes()
-            selectedNodes.forEach((node) => {
-              if ($isDecoratorNode(node)) {
+          editor.update(() => {
+            const selection = $getSelection()
+            if ($isNodeSelection(selection)) {
+              selection.getNodes().forEach((node) => {
                 node.remove()
+              })
+            } else if ($isRangeSelection(selection)) {
+              const node = selection.anchor.getNode();
+              const topLevelElement = node.getTopLevelElement();
+              if (topLevelElement) {
+                topLevelElement.remove();
               }
-            })
-          }
+            }
+          })
         },
         disabled: false,
         icon: <Trash2 className="h-4 w-4" />,

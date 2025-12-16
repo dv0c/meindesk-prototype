@@ -160,6 +160,7 @@ export default function CarouselComponent({
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
             onClick={() => setSelected(true)}
+            onContextMenu={() => setSelected(true)}
         >
             {images.length === 0 ? (
                 <div className="flex flex-col items-center justify-center p-12 bg-muted/30 border-dashed border-2 rounded-md">
