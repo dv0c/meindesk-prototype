@@ -77,8 +77,72 @@ export default function EditorPage({ params }: EditorPageProps) {
 
   if (!loaded) {
     return (
-      <div className="flex items-center justify-center h-[50vh]">
-        <Spinner />
+      <div>
+        {/* Header skeleton */}
+        <header className="border-t border-b shadow sticky top-0 bg-background z-20 p-3 mb-10">
+          <div className="flex justify-between items-center flex-wrap gap-3">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 bg-muted animate-pulse rounded" />
+              <div className="h-5 w-32 bg-muted animate-pulse rounded" />
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="h-9 w-24 bg-muted animate-pulse rounded" />
+              <div className="h-9 w-32 bg-muted animate-pulse rounded" />
+            </div>
+          </div>
+        </header>
+
+        <div className="flex flex-col lg:flex-row gap-5 justify-center">
+          {/* Main content skeleton */}
+          <div className="space-y-5 max-w-[64.5rem] w-full">
+            {/* Title section */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="h-5 w-12 bg-muted animate-pulse rounded" />
+                <div className="h-4 w-32 bg-muted animate-pulse rounded" />
+              </div>
+              <div className="h-10 w-full bg-muted animate-pulse rounded" />
+            </div>
+
+            {/* Content editor section */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="h-5 w-16 bg-muted animate-pulse rounded" />
+                <div className="h-4 w-40 bg-muted animate-pulse rounded" />
+              </div>
+              <div className="border rounded-lg p-4 min-h-[400px]">
+                <div className="space-y-3">
+                  <div className="h-4 w-3/4 bg-muted animate-pulse rounded" />
+                  <div className="h-4 w-full bg-muted animate-pulse rounded" />
+                  <div className="h-4 w-5/6 bg-muted animate-pulse rounded" />
+                  <div className="h-4 w-2/3 bg-muted animate-pulse rounded" />
+                  <div className="h-4 w-4/5 bg-muted animate-pulse rounded" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right sidebar skeleton */}
+          <div className="space-y-5 w-full lg:w-72">
+            {/* Slug section */}
+            <div className="space-y-3">
+              <div className="h-5 w-12 bg-muted animate-pulse rounded" />
+              <div className="h-10 w-full bg-muted animate-pulse rounded" />
+            </div>
+
+            {/* Excerpt section */}
+            <div className="space-y-3">
+              <div className="h-5 w-16 bg-muted animate-pulse rounded" />
+              <div className="h-20 w-full bg-muted animate-pulse rounded" />
+            </div>
+
+            {/* Thumbnail section */}
+            <div className="space-y-3">
+              <div className="h-5 w-20 bg-muted animate-pulse rounded" />
+              <div className="h-40 w-full bg-muted animate-pulse rounded" />
+            </div>
+          </div>
+        </div>
       </div>
     )
   }

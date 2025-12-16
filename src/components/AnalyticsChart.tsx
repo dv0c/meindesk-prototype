@@ -12,14 +12,42 @@ export function AnalyticsCharts({ siteId, range }: { siteId: string; range: stri
 
     if (loading) return (
         <div className="grid gap-6 lg:grid-cols-2">
+            {/* Area chart skeleton - full width */}
+            <Card className="lg:col-span-2">
+                <CardHeader className="border-b">
+                    <div className="h-5 w-32 bg-muted animate-pulse rounded" />
+                    <div className="h-4 w-48 bg-muted animate-pulse rounded mt-2" />
+                </CardHeader>
+                <CardContent className="pt-6">
+                    <div className="h-[200px] flex items-end gap-2 px-4">
+                        {Array.from({ length: 12 }).map((_, i) => (
+                            <div
+                                key={i}
+                                className="flex-1 bg-muted animate-pulse rounded-t"
+                                style={{ height: `${30 + Math.random() * 70}%` }}
+                            />
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Chart card skeletons */}
             {Array.from({ length: 4 }).map((_, idx) => (
-                <Card className="h-[300px] animate-pulse" key={idx}>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium"></CardTitle>
-                        <div className="text-muted-foreground"></div>
+                <Card key={idx}>
+                    <CardHeader className="border-b">
+                        <div className="h-5 w-28 bg-muted animate-pulse rounded" />
+                        <div className="h-4 w-40 bg-muted animate-pulse rounded mt-2" />
                     </CardHeader>
-                    <CardContent className="h-100 w-full">
+                    <CardContent className="pt-6">
+                        <div className="h-[180px] flex items-center justify-center">
+                            {/* Pie/chart placeholder */}
+                            <div className="w-32 h-32 bg-muted animate-pulse rounded-full" />
+                        </div>
                     </CardContent>
+                    <CardFooter className="flex-col items-start gap-2">
+                        <div className="h-4 w-36 bg-muted animate-pulse rounded" />
+                        <div className="h-3 w-48 bg-muted animate-pulse rounded" />
+                    </CardFooter>
                 </Card>
             ))}
         </div>

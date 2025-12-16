@@ -19,7 +19,30 @@ interface QuickActionsProps {
 const QuickActions = ({ siteId, features }: QuickActionsProps) => {
   const path = `/dashboard/${siteId}/projects/website`;
 
-  if (!features) return null; // optionally show a skeleton/loading
+  if (!features) return (
+    <Card className="lg:col-span-2">
+      <CardHeader>
+        <div className="h-6 w-28 bg-muted animate-pulse rounded" />
+        <div className="h-4 w-44 bg-muted animate-pulse rounded mt-2" />
+      </CardHeader>
+      <CardContent>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="flex flex-col gap-2 p-4 border rounded">
+              <div className="flex items-center justify-between">
+                <div className="h-5 w-5 bg-muted animate-pulse rounded" />
+                <div className="h-4 w-4 bg-muted animate-pulse rounded" />
+              </div>
+              <div className="space-y-2">
+                <div className="h-4 w-32 bg-muted animate-pulse rounded" />
+                <div className="h-3 w-44 bg-muted animate-pulse rounded" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  )
 
   return (
     <Card className="lg:col-span-2">

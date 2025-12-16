@@ -2,112 +2,36 @@
 
 import { useFetch } from "@/hooks/useFetch"
 import { Rss as RSS } from "@prisma/client"
-import { Rss, RssIcon } from "lucide-react"
-import Link from "next/link"
+import { Plus, RssIcon } from "lucide-react"
 import { useSite } from "../Contexts/site-id-context"
 import PageWrapper from "../PageWrapper"
 import { Button } from "../ui/button"
-import { Card, CardContent } from "../ui/card"
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog"
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "../ui/empty"
+import { MyFeedTable } from "./MyFeedTable"
 import CreateNewFeed from "./CreateButtonPage"
 
 const MyFeed = () => {
     const { siteId } = useSite()
-    const { data, error, loading } = useFetch<RSS[]>(`/api/team/${siteId}/rss/my-feed`)
+    const { data, error, loading, refetch } = useFetch<RSS[]>(`/api/team/${siteId}/rss/my-feed`)
     const feeds = Array.isArray(data) ? data : []
-    console.log(data)
-    if (!siteId) return null
 
-    // Skeleton cards for loading state
-    const renderSkeletons = () => {
-        return Array.from({ length: 6 }).map((_, idx) => (
-            <Card key={idx} className="animate-pulse p-4 border rounded-md">
-                <CardContent className="px-3 pb-3 w-full">
-                    <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-muted rounded-sm"></div>
-                        <div className="flex flex-col gap-2 w-full min-w-0">
-                            <div className="h-4 bg-muted rounded w-3/4"></div>
-                            <div className="h-3 bg-muted rounded w-full max-w-[200px]"></div>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-        ))
-    }
+    if (!siteId) return null
 
     return (
         <PageWrapper
             action={<CreateRSS siteId={siteId} />}
-            title="My RSS Feed"
+            title="My RSS Feeds"
             description="Manage your RSS feed subscriptions"
         >
-            {loading ? (
-                <div className="grid sm:grid-cols-1 w-full md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                    {renderSkeletons()}
+            {error || !siteId ? (
+                <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6">
+                    <p className="text-destructive font-medium">Failed to load feeds</p>
+                    <p className="text-sm text-muted-foreground mt-1">{error}</p>
                 </div>
-            ) : error || !siteId ? (
-                <p className="text-red-500">Failed to load feeds: {error}</p>
-            ) : feeds.length === 0 ? (
+            ) : feeds.length === 0 && !loading ? (
                 <NoFeed siteId={siteId} />
             ) : (
-                <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                    {feeds.map((feed) => {
-                        const feedUrl = feed.url ? decodeURIComponent(feed.url) : "Untitled Feed"
-
-                        return (
-                            <Link
-                                key={feed.id}
-                                href={`/dashboard/${siteId}/projects/website/rss/feed/${encodeURIComponent(feed.url as string)}`}
-                                className="block"
-                            >
-                                <Card className="group relative p-4 border rounded-md hover:shadow-md transition">
-                                    <CardContent className="px-3 pb-3 w-full">
-                                        {/* Feed actions */}
-                                        {/* <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button size="icon-sm" variant="ghost" className="cursor-pointer">
-                                                        <Menu />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem>Edit Feed</DropdownMenuItem>
-                                                    <DropdownMenuItem className="text-red-500">Delete Feed</DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </div> */}
-
-                                        {/* Feed info */}
-                                        <div className="flex items-center gap-3">
-                                            <div className="text-3xl flex-shrink-0">
-                                                {feed.icon ? (
-                                                    <img
-                                                        src={feed.icon}
-                                                        alt="feed icon"
-                                                        className="object-cover rounded-sm w-12 h-12"
-                                                    />
-                                                ) : (
-                                                    <Rss className="text-blue-500 w-12 h-12" />
-                                                )}
-                                            </div>
-
-                                            <div className="flex flex-col gap-1 min-w-0">
-                                                <span className="text-lg font-bold truncate max-w-full">{feed.title || "Untitled Feed"}</span>
-                                                <p
-                                                    className="text-sm dark:text-accent text-accent-foreground truncate max-w-full break-all"
-                                                    title={feedUrl}
-                                                >
-                                                    {feedUrl}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            </Link>
-                        )
-                    })}
-                </div>
+                <MyFeedTable feeds={feeds} loading={loading} siteId={siteId} onDelete={refetch} />
             )}
         </PageWrapper>
     )
@@ -119,8 +43,9 @@ const CreateRSS = ({ siteId }: { siteId: string }) => {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button className="cursor-pointer" variant="default">
-                    Create RSS Feed
+                <Button className="cursor-pointer gap-2" variant="default">
+                    <Plus className="h-4 w-4" />
+                    Add RSS Feed
                 </Button>
             </DialogTrigger>
             <DialogContent className="!max-w-7xl">
@@ -132,18 +57,19 @@ const CreateRSS = ({ siteId }: { siteId: string }) => {
 
 
 const NoFeed = ({ siteId }: { siteId: string }) => (
-    <Empty className="border border-dashed">
-        <EmptyHeader>
-            <EmptyMedia variant="icon">
-                <RssIcon />
-            </EmptyMedia>
-            <EmptyTitle>There is no RSS Feed.</EmptyTitle>
-            <EmptyDescription>
-                Discovery or create your first RSS Feed.
-            </EmptyDescription>
-        </EmptyHeader>
-        <EmptyContent>
-            <CreateRSS siteId={siteId} />
-        </EmptyContent>
-    </Empty>
+    <div className="flex flex-col items-center justify-center py-16 px-4">
+        <div className="relative mb-6">
+            <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                <RssIcon className="h-10 w-10 text-primary" />
+            </div>
+            <div className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-muted border-2 border-background flex items-center justify-center">
+                <Plus className="h-3 w-3 text-muted-foreground" />
+            </div>
+        </div>
+        <h3 className="text-xl font-semibold mb-2">No RSS Feeds Yet</h3>
+        <p className="text-muted-foreground text-center max-w-sm mb-6">
+            Start by adding your first RSS feed to automatically import content from your favorite sources.
+        </p>
+        <CreateRSS siteId={siteId} />
+    </div>
 )

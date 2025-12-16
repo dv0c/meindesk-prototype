@@ -7,6 +7,7 @@ interface FetchState<T> {
   data: T | null
   loading: boolean
   error: string | null
+  refetch: () => void
 }
 
 /**
@@ -17,6 +18,7 @@ export function useFetch<T = any>(url: string | null): FetchState<T> {
   const [data, setData] = useState<T | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [refetchTrigger, setRefetchTrigger] = useState(0)
 
   useEffect(() => {
     if (!url) return
@@ -35,7 +37,7 @@ export function useFetch<T = any>(url: string | null): FetchState<T> {
       } catch (err) {
         if (!cancelled) {
           const message =
-            (err as AxiosError)?.response?.data?.error ||
+            (err as AxiosError<{ error?: string }>)?.response?.data?.error ||
             (err as Error).message ||
             "Failed to fetch data"
           setError(message)
@@ -49,7 +51,11 @@ export function useFetch<T = any>(url: string | null): FetchState<T> {
     return () => {
       cancelled = true
     }
-  }, [url])
+  }, [url, refetchTrigger])
 
-  return { data, loading, error }
+  const refetch = () => {
+    setRefetchTrigger((prev) => prev + 1)
+  }
+
+  return { data, loading, error, refetch }
 }

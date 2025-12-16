@@ -97,7 +97,57 @@ export function PagesTable() {
     getPages(team.id)
   }
 
-  if (loading) return <Skeleton className="h-64 w-full" />
+  if (loading) return (
+    <div className="space-y-4 w-full">
+      {/* Search and Filter Skeleton */}
+      <div className="flex items-center gap-3">
+        <div className="relative flex-1 max-w-sm">
+          <Skeleton className="h-9 w-full" />
+        </div>
+        <Skeleton className="h-9 w-[140px]" />
+      </div>
+
+      {/* Table Skeleton */}
+      <div className="rounded-lg border border-border bg-card overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-transparent border-border">
+              <TableHead className="h-10"><Skeleton className="h-3 w-12" /></TableHead>
+              <TableHead className="h-10"><Skeleton className="h-3 w-8" /></TableHead>
+              <TableHead className="h-10"><Skeleton className="h-3 w-12" /></TableHead>
+              <TableHead className="h-10"><Skeleton className="h-3 w-16" /></TableHead>
+              <TableHead className="h-10"><Skeleton className="h-3 w-16" /></TableHead>
+              <TableHead className="h-10"><Skeleton className="h-3 w-14" /></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {Array.from({ length: 5 }).map((_, idx) => (
+              <TableRow key={idx} className="border-border">
+                <TableCell className="py-3">
+                  <Skeleton className="h-4 w-32" />
+                </TableCell>
+                <TableCell className="py-3">
+                  <Skeleton className="h-3 w-24" />
+                </TableCell>
+                <TableCell className="py-3">
+                  <Skeleton className="h-5 w-16 rounded-full" />
+                </TableCell>
+                <TableCell className="py-3">
+                  <Skeleton className="h-3 w-20" />
+                </TableCell>
+                <TableCell className="py-3">
+                  <Skeleton className="h-3 w-20" />
+                </TableCell>
+                <TableCell className="py-3 text-right">
+                  <Skeleton className="h-8 w-8 ml-auto" />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  )
 
   return (
     <>
