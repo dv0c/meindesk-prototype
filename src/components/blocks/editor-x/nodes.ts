@@ -24,6 +24,8 @@ import { LayoutContainerNode } from "@/components/editor/nodes/layout-container-
 import { LayoutItemNode } from "@/components/editor/nodes/layout-item-node";
 import { MentionNode } from "@/components/editor/nodes/mention-node";
 
+import { CarouselNode } from "@/components/editor/nodes/carousel-node";
+
 export const nodes: ReadonlyArray<Klass<LexicalNode> | LexicalNodeReplacement> =
   [
     HeadingNode,
@@ -51,4 +53,5 @@ export const nodes: ReadonlyArray<Klass<LexicalNode> | LexicalNodeReplacement> =
     TweetNode,
     YouTubeNode,
     AutocompleteNode,
+    CarouselNode,
   ];

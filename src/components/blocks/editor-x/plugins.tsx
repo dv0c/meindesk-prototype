@@ -98,6 +98,8 @@ import { TABLE } from "@/components/editor/transformers/markdown-table-transform
 import { TWEET } from "@/components/editor/transformers/markdown-tweet-transformer"
 import { ButtonGroup } from "@/components/ui/button-group"
 import { Separator } from "@/components/ui/separator"
+import CarouselPlugin from "@/components/editor/plugins/carousel-plugin"
+import { CarouselPickerPlugin } from "@/components/editor/plugins/picker/carousel-picker-plugin"
 
 const placeholder = "Start writing, or press '/' for commands..."
 const maxLength = 50000
@@ -232,6 +234,7 @@ export function EditorContent({ className, siteId }: { className?: string; siteI
           EmbedsPickerPlugin({ embed: "tweet" }),
           EmbedsPickerPlugin({ embed: "youtube-video" }),
           ImagePickerPlugin(),
+          CarouselPickerPlugin(),
           ColumnsLayoutPickerPlugin(),
           AlignmentPickerPlugin({ alignment: "left" }),
           AlignmentPickerPlugin({ alignment: "center" }),
@@ -254,6 +257,7 @@ export function EditorContent({ className, siteId }: { className?: string; siteI
         anchorElem={floatingAnchorElem}
         setIsLinkEditMode={setIsLinkEditMode}
       />
+      <CarouselPlugin />
 
       <ListMaxIndentLevelPlugin />
     </div>
