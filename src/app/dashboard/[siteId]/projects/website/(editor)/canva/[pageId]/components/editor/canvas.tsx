@@ -14,10 +14,12 @@ interface CanvasProps {
   selectedNodeId: string | null
   onSelectNode: (id: string) => void
   onContextMenu?: (e: React.MouseEvent, id: string) => void
+  onDuplicate?: (id: string) => void
+  onDelete?: (id: string) => void
   validComponentNames?: string[]
 }
 
-export function Canvas({ nodes, selectedNodeId, onSelectNode, onContextMenu, validComponentNames }: CanvasProps) {
+export function Canvas({ nodes, selectedNodeId, onSelectNode, onContextMenu, onDuplicate, onDelete, validComponentNames }: CanvasProps) {
   const { websiteSettings } = useBuilderStore()
 
   const { setNodeRef, isOver } = useDroppable({
@@ -83,6 +85,8 @@ export function Canvas({ nodes, selectedNodeId, onSelectNode, onContextMenu, val
                 onSelect={onSelectNode}
                 isSelected={node.id === selectedNodeId}
                 onContextMenu={onContextMenu}
+                onDuplicate={onDuplicate}
+                onDelete={onDelete}
                 validComponentNames={validComponentNames}
               />
             ))}

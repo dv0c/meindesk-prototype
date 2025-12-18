@@ -1,7 +1,7 @@
 // Core types for the page builder system
 export interface LayoutNode {
   id: string;
-  type: string; // component name
+  type: string; // component name, or "SnippetRef" for linked snippets
   props: Record<string, any>;
   children?: LayoutNode[];
   className?: string;
@@ -10,6 +10,7 @@ export interface LayoutNode {
   attributes?: Record<string, string>;
   script?: string;
   themeName?: string; // Theme this component belongs to (for themed components)
+  snippetId?: string; // If type is "SnippetRef", this references a Snippet.id
 }
 
 export interface WebsiteSettings {

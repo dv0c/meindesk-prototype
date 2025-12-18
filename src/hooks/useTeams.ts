@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import axios from "axios"
 
 export interface Site {
@@ -26,39 +26,63 @@ export interface Site {
     cateories?: boolean
     media?: boolean
     analytics?: boolean
-    
+
   }
 }
 
+// Global cache and promise for teams to avoid duplicate requests
+let teamsCache: Site[] | null = null
+let teamsFetchPromise: Promise<Site[]> | null = null
+
 export function useTeams() {
-  const [teams, setTeams] = useState<Site[]>([])
-  const [loading, setLoading] = useState(true)
+  const [teams, setTeams] = useState<Site[]>(() => teamsCache || [])
+  const [loading, setLoading] = useState<boolean>(() => !teamsCache)
   const [error, setError] = useState<string | null>(null)
+  const mounted = useRef(true)
 
   useEffect(() => {
-    let cancelled = false
+    mounted.current = true
+    return () => {
+      mounted.current = false
+    }
+  }, [])
+
+  useEffect(() => {
+    // If we already have data in cache, we might want to background refresh or just use it.
+    // For now, if we have cache, we just ensure loading is false.
+    if (teamsCache) {
+      setTeams(teamsCache)
+      setLoading(false)
+      return
+    }
 
     const fetchTeams = async () => {
-      setLoading(true)
-      setError(null)
+      if (!teamsFetchPromise) {
+        teamsFetchPromise = axios.get<{ teams: Site[] }>("/api/team").then(res => res.data.teams)
+      }
 
       try {
-        const res = await axios.get<{ teams: Site[] }>("/api/team")
-        if (!cancelled) setTeams(res.data.teams)
+        const data = await teamsFetchPromise
+        teamsCache = data
+        if (mounted.current) {
+          setTeams(data)
+          setLoading(false)
+          setError(null)
+        }
       } catch (err: any) {
-        if (!cancelled) setError(err.response?.data?.error || err.message || "Failed to fetch teams")
-        if (!cancelled) setTeams([])
-      } finally {
-        if (!cancelled) setLoading(false)
+        // Reset promise on error so we can retry later
+        teamsFetchPromise = null
+        if (mounted.current) {
+          setError(err.response?.data?.error || err.message || "Failed to fetch teams")
+          setTeams([])
+          setLoading(false)
+        }
       }
     }
 
     fetchTeams()
-
-    return () => {
-      cancelled = true
-    }
   }, [])
 
+  // Expose a mutate function if needed in future to clear cache
   return { teams, loading, error }
 }

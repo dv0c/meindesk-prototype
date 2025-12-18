@@ -9,6 +9,7 @@ import { DraggableWrapper } from "./editor/draggable-wrapper"
 import { useBuilderStore } from "@/lib/store"
 import { AlertTriangle, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { SnippetInstance } from "./editor/snippet-instance"
 
 interface RenderNodeProps {
   node: LayoutNode
@@ -16,6 +17,8 @@ interface RenderNodeProps {
   onSelect?: (id: string) => void
   isSelected?: boolean
   onContextMenu?: (e: React.MouseEvent, id: string) => void
+  onDuplicate?: (id: string) => void
+  onDelete?: (id: string) => void
   validComponentNames?: string[]
 }
 
@@ -80,7 +83,7 @@ function getComponent(componentType: string, themeName?: string): React.Componen
 }
 
 
-export function RenderNode({ node, isEditor = false, onSelect, isSelected = false, onContextMenu, validComponentNames }: RenderNodeProps) {
+export function RenderNode({ node, isEditor = false, onSelect, isSelected = false, onContextMenu, onDuplicate, onDelete, validComponentNames }: RenderNodeProps) {
   // Try to get theme name from node metadata/props
   // Check node-level themeName first (where component-registry stores it), then fall back to props
   const themeName = node.themeName || node.props?.themeName
@@ -95,7 +98,38 @@ export function RenderNode({ node, isEditor = false, onSelect, isSelected = fals
   // We treat it as missing if:
   // 1. It's not in our code map (Component is undefined)
   // 2. OR it is in code map but explicitly not allowed by API (isAllowed is false)
-  const isMissing = !Component || !isAllowed
+  // (SnippetRef is always allowed as it's handled specially)
+  const isMissing = node.type !== "SnippetRef" && (!Component || !isAllowed)
+
+  // Handle SnippetRef nodes - linked snippets
+  if (node.type === "SnippetRef" && node.snippetId) {
+    const renderSnippetContent = (content: LayoutNode[]) => (
+      <>
+        {content.map((childNode) => (
+          <RenderNode
+            key={childNode.id}
+            node={childNode}
+            isEditor={isEditor}
+            onSelect={onSelect}
+            isSelected={false}
+            onContextMenu={onContextMenu}
+            validComponentNames={validComponentNames}
+          />
+        ))}
+      </>
+    )
+
+    return (
+      <SnippetInstance
+        node={node}
+        isEditor={isEditor}
+        onSelect={onSelect}
+        isSelected={isSelected}
+        onContextMenu={onContextMenu}
+        renderContent={renderSnippetContent}
+      />
+    )
+  }
 
   if (isMissing) {
     if (isEditor) {
@@ -105,6 +139,8 @@ export function RenderNode({ node, isEditor = false, onSelect, isSelected = fals
           isSelected={isSelected}
           onSelect={onSelect}
           onContextMenu={onContextMenu}
+          onDuplicate={onDuplicate}
+          onDelete={onDelete}
           isContainer={false}
           data={{ type: "component", isContainer: false, component: node }}
         >
@@ -252,6 +288,8 @@ export function RenderNode({ node, isEditor = false, onSelect, isSelected = fals
         isSelected={isSelected}
         onSelect={onSelect}
         onContextMenu={onContextMenu}
+        onDuplicate={onDuplicate}
+        onDelete={onDelete}
         isContainer={allowsChildren}
         data={{
           type: "component",

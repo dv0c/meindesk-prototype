@@ -1,16 +1,18 @@
 "use client"
 
 import type React from "react"
-import { use, useEffect, useState } from "react"
+import { use, useEffect, useState, useRef, useCallback } from "react"
 import { useBuilderStore } from "@/lib/store"
 import { Sidebar } from "./components/editor/sidebar"
 import { Canvas } from "./components/editor/canvas"
 import { ContextMenu } from "./components/editor/context-menu"
 import { LayersPanel } from "./components/editor/layers-panel"
+import { SaveSnippetDialog } from "./components/editor/save-snippet-dialog"
+import { EditSnippetDialog } from "./components/editor/edit-snippet-dialog"
 import { Button } from "./components/ui/button"
 import { createNode, generateNodeId } from "@/lib/component-registry"
 import type { ComponentDefinition, LayoutNode } from "@/lib/types"
-import { Save, Eye, Home, Undo, Redo, Smartphone, Monitor, Tablet, Layers, ArrowLeft, ChevronLeft, SidebarClose, Box } from "lucide-react"
+import { Save, Eye, Home, Undo, Redo, Smartphone, Monitor, Tablet, Layers, ArrowLeft, ChevronLeft, SidebarClose, Box, FileEdit } from "lucide-react"
 import Link from "next/link"
 import {
   DndContext,
@@ -22,6 +24,7 @@ import {
 } from "@dnd-kit/core"
 import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
+import { SnippetsProvider } from "./components/editor/snippets-context"
 
 // Helper: find node’s parent recursively
 function findNodeParent(id: string, nodes: LayoutNode[]): { parent: LayoutNode | null; index: number } | null {
@@ -54,6 +57,14 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
   const [showLayersPanel, setShowLayersPanel] = useState(false)
   const [loading, setLoading] = useState(true) // <--- Loading state
   const [validComponentNames, setValidComponentNames] = useState<string[]>([])
+
+  // Snippet state
+  const [showSaveSnippetDialog, setShowSaveSnippetDialog] = useState(false)
+  const [snippetContent, setSnippetContent] = useState<LayoutNode[]>([])
+  const [showEditSnippetDialog, setShowEditSnippetDialog] = useState(false)
+  const [editSnippetId, setEditSnippetId] = useState<string | null>(null)
+  const [snippetToReplaceNodeId, setSnippetToReplaceNodeId] = useState<string | null>(null)
+  const snippetsPanelRef = useRef<{ refresh: () => void } | null>(null)
 
   const {
     nodes,
@@ -185,6 +196,50 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
 
   function handleUpdateNode(updates: Partial<LayoutNode>) {
     if (selectedNodeId) updateNode(selectedNodeId, updates)
+  }
+
+  // Update snippet content - save to snippet database
+  async function handleUpdateSnippetContent(snippetId: string, contentNodeId: string, updates: Partial<LayoutNode>) {
+    try {
+      // Fetch current snippet data
+      const response = await fetch(`/api/v1/${tenantId}/snippets/${snippetId}`)
+      if (!response.ok) throw new Error("Failed to fetch snippet")
+
+      const snippet = await response.json()
+      const snippetContent = snippet.content as LayoutNode[]
+
+      // Find and update the node in snippet content
+      function updateNodeInTree(nodes: LayoutNode[]): LayoutNode[] {
+        return nodes.map(node => {
+          if (node.id === contentNodeId) {
+            return { ...node, ...updates }
+          }
+          if (node.children) {
+            return { ...node, children: updateNodeInTree(node.children) }
+          }
+          return node
+        })
+      }
+
+      const updatedContent = updateNodeInTree(snippetContent)
+
+      // Save updated content to database
+      const saveResponse = await fetch(`/api/v1/${tenantId}/snippets/${snippetId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: updatedContent }),
+      })
+
+      if (!saveResponse.ok) throw new Error("Failed to save snippet")
+
+      toast.success("Snippet updated", { description: "Changes saved to snippet" })
+
+      // Trigger snippets refresh to propagate changes
+      window.dispatchEvent(new CustomEvent("snippets-refresh"))
+    } catch (error) {
+      console.error("Failed to update snippet content:", error)
+      toast.error("Failed to update snippet")
+    }
   }
 
   function handleDeleteNode() {
@@ -381,6 +436,109 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
     }
   }
 
+  // Snippet handlers
+  function handleSaveAsSnippet() {
+    if (!contextMenu) return
+    const node = findNode(contextMenu.nodeId, nodes)
+    if (!node) return
+
+    // Set the content to save (wrap single node in array)
+    setSnippetContent([node])
+    setSnippetToReplaceNodeId(contextMenu.nodeId)
+    setShowSaveSnippetDialog(true)
+  }
+
+  // Insert a linked snippet reference
+  function handleInsertSnippet(snippetId: string, snippetName: string) {
+    // Create a SnippetRef node that references the snippet
+    const refNode: LayoutNode = {
+      id: generateNodeId(),
+      type: "SnippetRef",
+      snippetId: snippetId,
+      props: {},
+    }
+    addNode(refNode)
+    toast.success(`Linked snippet "${snippetName}" added`)
+  }
+
+  // Unlink a snippet - convert to independent copy
+  function handleUnlinkSnippet(nodeId: string, snippetContent: LayoutNode[]) {
+    // Remove the SnippetRef node
+    removeNode(nodeId)
+
+    // Add the actual content as independent nodes with new IDs
+    function cloneWithNewIds(nodes: LayoutNode[]): LayoutNode[] {
+      return nodes.map(node => ({
+        ...node,
+        id: generateNodeId(),
+        children: node.children ? cloneWithNewIds(node.children) : undefined,
+      }))
+    }
+
+    const clonedContent = cloneWithNewIds(snippetContent)
+    clonedContent.forEach(node => addNode(node))
+
+    toast.success("Snippet unlinked - now an independent copy")
+  }
+
+  function handleSnippetSaved(snippetId: string, snippetName: string) {
+    // Trigger snippets refresh to load the new snippet into context
+    window.dispatchEvent(new CustomEvent('snippets-refresh'))
+
+    // Small delay to ensure snippets are loaded before replacing
+    setTimeout(() => {
+      if (snippetToReplaceNodeId) {
+        // Find position of original node before removing it
+        const position = findNodeParent(snippetToReplaceNodeId, nodes)
+
+        if (position) {
+          // Create SnippetRef node
+          const refNode: LayoutNode = {
+            id: generateNodeId(),
+            type: "SnippetRef",
+            snippetId: snippetId,
+            props: {},
+          }
+
+          if (position.parent) {
+            // Insert as child of parent at same index
+            const newChildren = [...(position.parent.children || [])]
+            // Remove original node
+            newChildren.splice(position.index, 1)
+            // Insert SnippetRef at same position
+            newChildren.splice(position.index, 0, refNode)
+            updateNode(position.parent.id, { children: newChildren })
+          } else {
+            // Insert at root level at same index
+            const newNodes = [...nodes]
+            // Remove original node
+            newNodes.splice(position.index, 1)
+            // Insert SnippetRef at same position
+            newNodes.splice(position.index, 0, refNode)
+            useBuilderStore.setState({ nodes: newNodes })
+          }
+
+          toast.success(`Component replaced with linked snippet "${snippetName}"`)
+        } else {
+          // Fallback: just remove the original and add snippet at the end
+          removeNode(snippetToReplaceNodeId)
+          const refNode: LayoutNode = {
+            id: generateNodeId(),
+            type: "SnippetRef",
+            snippetId: snippetId,
+            props: {},
+          }
+          addNode(refNode)
+          toast.success(`Linked snippet "${snippetName}" created`)
+        }
+      }
+
+      // Reset state
+      setSnippetContent([])
+      setSnippetToReplaceNodeId(null)
+    }, 300) // Wait for snippets to refresh
+  }
+
   // ----------------- Loading Skeleton -----------------
   if (loading) {
     return (
@@ -406,115 +564,119 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
 
   // ----------------- Main Editor -----------------
   return (
-    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div className="h-screen flex flex-col bg-muted/10 overflow-hidden">
-        {/* Top Bar */}
-        {/* Modern Top Navbar with Glassmorphism */}
-        <header className="h-16 border-b backdrop-blur-xl bg-background/80 shadow-sm flex items-center justify-between px-6 z-30 shrink-0">
-          {/* Left: Page title */}
-          <div className="flex items-center gap-4">
-            <Button onClick={() => history.back()} variant="ghost" size="icon" className="h-9 w-9 rounded-full hover:bg-muted transition-colors">
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <div className="h-8 w-px bg-border/50" />
-            <div className="flex items-center gap-3">
-              <Input size={pageName.length || 8} maxLength={30} onChange={(e) => setPageName(e.target.value)} value={pageName || ""} placeholder="Untitled" className="h-9 bg-transparent border-none font-semibold text-base focus-visible:ring-0 focus-visible:ring-offset-0 px-0" />
-              <span className="px-2 py-1 text-xs font-medium bg-muted/80 text-muted-foreground rounded-full">Draft</span>
+    <SnippetsProvider siteId={tenantId}>
+      <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+        <div className="h-screen flex flex-col bg-muted/10 overflow-hidden">
+          {/* Top Bar */}
+          {/* Modern Top Navbar with Glassmorphism */}
+          <header className="h-16 border-b backdrop-blur-xl bg-background/80 shadow-sm flex items-center justify-between px-6 z-30 shrink-0">
+            {/* Left: Page title */}
+            <div className="flex items-center gap-4">
+              <Button onClick={() => history.back()} variant="ghost" size="icon" className="h-9 w-9 rounded-full hover:bg-muted transition-colors">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <div className="h-8 w-px bg-border/50" />
+              <div className="flex items-center gap-3">
+                <div>
+                  <Input size={pageName.length || 8} maxLength={30} onChange={(e) => setPageName(e.target.value)} value={pageName || ""} placeholder="Untitled" className="h-9  bg-transparent border-none font-semibold text-base focus-visible:ring-0 focus-visible:ring-offset-0 px-2" />
+                </div>
+              </div>
             </div>
-          </div>
 
-          {/* Center: Device toggle */}
-          <div className="absolute left-1/2 -translate-x-1/2 flex items-center bg-muted/50 rounded-full p-1 border shadow-sm backdrop-blur-sm">
-            <Button
-              variant={deviceMode === "desktop" ? "secondary" : "ghost"}
-              size="icon"
-              className="h-8 w-8 rounded-full transition-all"
-              title="Desktop View"
-              onClick={() => setDeviceMode("desktop")}
-            >
-              <Monitor className="h-4 w-4" />
-            </Button>
-            <Button
-              variant={deviceMode === "tablet" ? "secondary" : "ghost"}
-              size="icon"
-              className="h-8 w-8 rounded-full transition-all"
-              title="Tablet View"
-              onClick={() => setDeviceMode("tablet")}
-            >
-              <Tablet className="h-4 w-4" />
-            </Button>
-            <Button
-              variant={deviceMode === "mobile" ? "secondary" : "ghost"}
-              size="icon"
-              className="h-8 w-8 rounded-full transition-all"
-              title="Mobile View"
-              onClick={() => setDeviceMode("mobile")}
-            >
-              <Smartphone className="h-4 w-4" />
-            </Button>
-          </div>
+            {/* Center: Device toggle */}
+            <div className="absolute left-1/2 -translate-x-1/2 flex items-center bg-muted/50 rounded-full p-1 border shadow-sm backdrop-blur-sm">
+              <Button
+                variant={deviceMode === "desktop" ? "secondary" : "ghost"}
+                size="icon"
+                className="h-8 w-8 rounded-full transition-all"
+                title="Desktop View"
+                onClick={() => setDeviceMode("desktop")}
+              >
+                <Monitor className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={deviceMode === "tablet" ? "secondary" : "ghost"}
+                size="icon"
+                className="h-8 w-8 rounded-full transition-all"
+                title="Tablet View"
+                onClick={() => setDeviceMode("tablet")}
+              >
+                <Tablet className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={deviceMode === "mobile" ? "secondary" : "ghost"}
+                size="icon"
+                className="h-8 w-8 rounded-full transition-all"
+                title="Mobile View"
+                onClick={() => setDeviceMode("mobile")}
+              >
+                <Smartphone className="h-4 w-4" />
+              </Button>
+            </div>
 
-          {/* Right: Actions */}
-          <div className="flex items-center gap-2">
-            <Button
-              variant={showSidebar ? "secondary" : "ghost"}
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setShowSidebar(!showSidebar)}
-              title="Toggle Sidebar"
-            >
-              <SidebarClose className="h-4 w-4" />
-            </Button>
-            <Button
-              variant={showLayersPanel ? "secondary" : "ghost"}
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setShowLayersPanel(!showLayersPanel)}
-            >
-              <Layers className="h-4 w-4" />
-            </Button>
+            {/* Right: Actions */}
+            <div className="flex items-center gap-2">
+              <Button
+                variant={showSidebar ? "secondary" : "ghost"}
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setShowSidebar(!showSidebar)}
+                title="Toggle Sidebar"
+              >
+                <SidebarClose className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={showLayersPanel ? "secondary" : "ghost"}
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setShowLayersPanel(!showLayersPanel)}
+              >
+                <Layers className="h-4 w-4" />
+              </Button>
 
-            {/* <Button variant="ghost" size="icon" className="h-8 w-8">
+              {/* <Button variant="ghost" size="icon" className="h-8 w-8">
               <Undo className="h-4 w-4" />
             </Button>
             <Button variant="ghost" size="icon" className="h-8 w-8">
               <Redo className="h-4 w-4" />
             </Button> */}
-            <div className="h-8 w-px bg-border/50 mx-2" />
+              <div className="h-8 w-px bg-border/50 mx-2" />
 
-            {/* Action Buttons */}
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={clearCanvas}>
-                Clear
-              </Button>
-              <Link href={`/preview/${pageId}`} target="_blank">
-                <Button variant="secondary" size="sm">
-                  <Eye className="h-4 w-4 mr-2" />
-                  Preview
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={clearCanvas}>
+                  Clear
                 </Button>
-              </Link>
-              <Button size="sm" onClick={handleSave} disabled={isSaving}>
-                <Save className="h-4 w-4 mr-2" />
-                {isSaving ? "Saving..." : "Update"}
-              </Button>
+                <Link href={`/preview/${pageId}`} target="_blank">
+                  <Button variant="secondary" size="sm">
+                    <Eye className="h-4 w-4 mr-2" />
+                    Preview
+                  </Button>
+                </Link>
+                <Button size="sm" onClick={handleSave} disabled={isSaving}>
+                  <Save className="h-4 w-4 mr-2" />
+                  {isSaving ? "Saving..." : "Update"}
+                </Button>
+              </div>
             </div>
-          </div>
-        </header>
+          </header>
 
-        <div className="flex-1 flex h-full overflow-hidden">
-          {showSidebar && (
-            <Sidebar
-              onAddComponent={handleAddComponent}
-              onUpdateNode={handleUpdateNode}
-              onDeleteNode={handleDeleteNode}
-              siteId={tenantId}
-            />
-          )}
-          <div className="flex-1 h-full overflow-hidden flex flex-col relative">
-            <div className="overflow-auto h-full bg-zinc-50 dark:bg-zinc-900">
-              {/* Inject Global Settings */}
-              <style dangerouslySetInnerHTML={{
-                __html: `
+          <div className="flex-1 flex h-full overflow-hidden">
+            {showSidebar && (
+              <Sidebar
+                onAddComponent={handleAddComponent}
+                onUpdateNode={handleUpdateNode}
+                onUpdateSnippetContent={handleUpdateSnippetContent}
+                onDeleteNode={handleDeleteNode}
+                onInsertSnippet={handleInsertSnippet}
+                siteId={tenantId}
+              />
+            )}
+            <div className="flex-1 h-full overflow-hidden flex flex-col relative">
+              <div className="overflow-auto h-full bg-zinc-50 dark:bg-zinc-900">
+                {/* Inject Global Settings */}
+                <style dangerouslySetInnerHTML={{
+                  __html: `
                   .canvas-preview {
                     ${websiteSettings.theme.backgroundColor ? `background-color: ${websiteSettings.theme.backgroundColor};` : ''}
                     ${websiteSettings.theme.textColor ? `color: ${websiteSettings.theme.textColor};` : ''}
@@ -525,140 +687,202 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
                   }
                   ${websiteSettings.globalCss || ''}
                 `
-              }} />
-              <div
-                onClickCapture={(e) => {
-                  const target = e.target as HTMLElement
-                  if (target.closest("a")) {
-                    e.preventDefault()
-                  }
-                }}
-                className={`canvas-preview shadow-lg h-fit transition-all duration-300 ${nodes.length ? "min-h-full h-fit" : "h-full"} ${deviceMode === "mobile"
-                  ? "w-[375px] mx-auto"
-                  : deviceMode === "tablet"
-                    ? "w-3xl mx-auto"
-                    : "w-full max-w-full"
-                  }`}
-              >
-                <Canvas
-                  nodes={nodes}
-                  selectedNodeId={selectedNodeId}
-                  onSelectNode={selectNode}
-                  onContextMenu={handleContextMenu}
-                  validComponentNames={validComponentNames}
-                />
+                }} />
+                <div
+                  onClickCapture={(e) => {
+                    const target = e.target as HTMLElement
+                    if (target.closest("a")) {
+                      e.preventDefault()
+                    }
+                  }}
+                  className={`canvas-preview shadow-lg h-fit transition-all duration-300 ${nodes.length ? "min-h-full h-fit" : "h-full"} ${deviceMode === "mobile"
+                    ? "w-[375px] mx-auto"
+                    : deviceMode === "tablet"
+                      ? "w-3xl mx-auto"
+                      : "w-full max-w-full"
+                    }`}
+                >
+                  <Canvas
+                    nodes={nodes}
+                    selectedNodeId={selectedNodeId}
+                    onSelectNode={selectNode}
+                    onContextMenu={handleContextMenu}
+                    onDuplicate={handleDuplicateNode}
+                    onDelete={(id) => {
+                      removeNode(id)
+                      selectNode(null)
+                    }}
+                    validComponentNames={validComponentNames}
+                  />
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {contextMenu && (
-          <ContextMenu
-            x={contextMenu.x}
-            y={contextMenu.y}
-            onClose={() => setContextMenu(null)}
-            onEdit={() => selectNode(contextMenu.nodeId)}
-            onDuplicate={handleDuplicateNode}
-            onDelete={() => {
-              removeNode(contextMenu.nodeId)
-              selectNode(null)
-            }}
-            onMoveUp={handleMoveNodeUp}
-            onMoveDown={handleMoveNodeDown}
-          />
-        )}
+          {contextMenu && (
+            <ContextMenu
+              x={contextMenu.x}
+              y={contextMenu.y}
+              onClose={() => setContextMenu(null)}
+              onEdit={() => selectNode(contextMenu.nodeId)}
+              onDuplicate={handleDuplicateNode}
+              onDelete={() => {
+                removeNode(contextMenu.nodeId)
+                selectNode(null)
+              }}
+              onMoveUp={handleMoveNodeUp}
+              onMoveDown={handleMoveNodeDown}
+              onSaveAsSnippet={handleSaveAsSnippet}
+              isSnippetRef={findNode(contextMenu.nodeId, nodes)?.type === "SnippetRef"}
+              onUnlinkSnippet={() => {
+                const node = findNode(contextMenu.nodeId, nodes)
+                if (node?.type === "SnippetRef" && node.snippetId) {
+                  // Get the snippet content from context
+                  const { getSnippet } = require('./components/editor/snippets-context')
+                  // We need to use the context, so let's get it directly from the provider
+                  // Find snippet in the snippets context
+                  const snippetContent = findNode(contextMenu.nodeId, nodes)
 
-        {showLayersPanel && (
-          <LayersPanel
-            nodes={nodes}
-            selectedNodeId={selectedNodeId}
-            onSelectNode={selectNode}
-            onMoveNode={moveNode}
-            onClose={() => setShowLayersPanel(false)}
-            onDeleteNode={(id) => {
-              removeNode(id)
-              selectNode(null)
-              toast("Component Deleted", {
-                description: "Component has been removed from the canvas"
-              })
-            }}
-            onDuplicateNode={(id) => {
-              const node = findNode(id, nodes)
-              if (!node) return
-
-              function cloneNode(original: LayoutNode): LayoutNode {
-                return {
-                  ...original,
-                  id: generateNodeId(),
-                  children: original.children?.map(cloneNode),
+                  // For now, we'll need to fetch the snippet content
+                  fetch(`/api/v1/${tenantId}/snippets/${node.snippetId}`)
+                    .then(res => res.json())
+                    .then(snippet => {
+                      if (snippet?.content) {
+                        handleUnlinkSnippet(contextMenu.nodeId, snippet.content)
+                      } else {
+                        toast.error("Failed to unlink snippet")
+                      }
+                    })
+                    .catch(() => {
+                      toast.error("Failed to unlink snippet")
+                    })
                 }
-              }
+              }}
+              onEditSnippet={() => {
+                const node = findNode(contextMenu.nodeId, nodes)
+                if (node?.type === "SnippetRef" && node.snippetId) {
+                  // Navigate to full snippet editor
+                  window.open(`/dashboard/${tenantId}/projects/website/snippets/${node.snippetId}/edit`, '_blank')
+                }
+              }}
+            />
+          )}
 
-              const clonedNode = cloneNode(node)
-              const parentInfo = findNodeParent(id, nodes)
-              if (parentInfo && parentInfo.parent) {
-                const parent = parentInfo.parent
-                const newChildren = [...(parent.children || [])]
-                newChildren.splice(parentInfo.index + 1, 0, clonedNode)
-                updateNode(parent.id, { children: newChildren })
-              } else {
-                const rootIndex = nodes.findIndex((n) => n.id === id)
-                const newNodes = [...nodes]
-                newNodes.splice(rootIndex + 1, 0, clonedNode)
-                useBuilderStore.setState({ nodes: newNodes })
-              }
-
-              toast("Component Duplicated", {
-                description: "Component has been duplicated"
-              })
-            }}
-            onMoveNodeUp={(id) => {
-              const parentInfo = findNodeParent(id, nodes)
-              if (!parentInfo || parentInfo.index === 0) return
-
-              if (parentInfo.parent) {
-                const newChildren = [...(parentInfo.parent.children || [])]
-                const [movedNode] = newChildren.splice(parentInfo.index, 1)
-                newChildren.splice(parentInfo.index - 1, 0, movedNode)
-                updateNode(parentInfo.parent.id, { children: newChildren })
-              } else {
-                const newNodes = [...nodes]
-                const [movedNode] = newNodes.splice(parentInfo.index, 1)
-                newNodes.splice(parentInfo.index - 1, 0, movedNode)
-                useBuilderStore.setState({ nodes: newNodes })
-              }
-            }}
-            onMoveNodeDown={(id) => {
-              const parentInfo = findNodeParent(id, nodes)
-              if (!parentInfo) return
-              const siblings = parentInfo.parent ? parentInfo.parent.children || [] : nodes
-              if (parentInfo.index >= siblings.length - 1) return
-
-              if (parentInfo.parent) {
-                const newChildren = [...siblings]
-                const [movedNode] = newChildren.splice(parentInfo.index, 1)
-                newChildren.splice(parentInfo.index + 1, 0, movedNode)
-                updateNode(parentInfo.parent.id, { children: newChildren })
-              } else {
-                const newNodes = [...nodes]
-                const [movedNode] = newNodes.splice(parentInfo.index, 1)
-                newNodes.splice(parentInfo.index + 1, 0, movedNode)
-                useBuilderStore.setState({ nodes: newNodes })
-              }
-            }}
-            onAddChildToNode={handleAddChildToNode}
+          {/* Save Snippet Dialog */}
+          <SaveSnippetDialog
+            open={showSaveSnippetDialog}
+            onOpenChange={setShowSaveSnippetDialog}
+            siteId={tenantId}
+            content={snippetContent}
+            onSaved={handleSnippetSaved}
           />
-        )}
 
-        <DragOverlay dropAnimation={null}>
-          {activeDragItem ? (
-            <div className="flex flex-col items-center justify-center p-3 h-24 w-36 border-2 border-primary rounded-md bg-card shadow-xl cursor-grabbing">
-              <Box className="h-6 w-6 mb-2 text-muted-foreground" />
-              <span className="text-xs text-center font-medium leading-tight">{activeDragItem.name}</span>
-            </div>
-          ) : null}
-        </DragOverlay>
-      </div>
-    </DndContext>
+          {/* Edit Snippet Dialog */}
+          {editSnippetId && (
+            <EditSnippetDialog
+              open={showEditSnippetDialog}
+              onOpenChange={setShowEditSnippetDialog}
+              snippetId={editSnippetId}
+              siteId={tenantId}
+              onSaved={() => {
+                setShowEditSnippetDialog(false)
+                setEditSnippetId(null)
+              }}
+            />
+          )}
+
+          {showLayersPanel && (
+            <LayersPanel
+              nodes={nodes}
+              selectedNodeId={selectedNodeId}
+              onSelectNode={selectNode}
+              onMoveNode={moveNode}
+              onClose={() => setShowLayersPanel(false)}
+              onDeleteNode={(id) => {
+                removeNode(id)
+                selectNode(null)
+                toast("Component Deleted", {
+                  description: "Component has been removed from the canvas"
+                })
+              }}
+              onDuplicateNode={(id) => {
+                const node = findNode(id, nodes)
+                if (!node) return
+
+                function cloneNode(original: LayoutNode): LayoutNode {
+                  return {
+                    ...original,
+                    id: generateNodeId(),
+                    children: original.children?.map(cloneNode),
+                  }
+                }
+
+                const clonedNode = cloneNode(node)
+                const parentInfo = findNodeParent(id, nodes)
+                if (parentInfo && parentInfo.parent) {
+                  const parent = parentInfo.parent
+                  const newChildren = [...(parent.children || [])]
+                  newChildren.splice(parentInfo.index + 1, 0, clonedNode)
+                  updateNode(parent.id, { children: newChildren })
+                } else {
+                  const rootIndex = nodes.findIndex((n) => n.id === id)
+                  const newNodes = [...nodes]
+                  newNodes.splice(rootIndex + 1, 0, clonedNode)
+                  useBuilderStore.setState({ nodes: newNodes })
+                }
+
+                toast("Component Duplicated", {
+                  description: "Component has been duplicated"
+                })
+              }}
+              onMoveNodeUp={(id) => {
+                const parentInfo = findNodeParent(id, nodes)
+                if (!parentInfo || parentInfo.index === 0) return
+
+                if (parentInfo.parent) {
+                  const newChildren = [...(parentInfo.parent.children || [])]
+                  const [movedNode] = newChildren.splice(parentInfo.index, 1)
+                  newChildren.splice(parentInfo.index - 1, 0, movedNode)
+                  updateNode(parentInfo.parent.id, { children: newChildren })
+                } else {
+                  const newNodes = [...nodes]
+                  const [movedNode] = newNodes.splice(parentInfo.index, 1)
+                  newNodes.splice(parentInfo.index - 1, 0, movedNode)
+                  useBuilderStore.setState({ nodes: newNodes })
+                }
+              }}
+              onMoveNodeDown={(id) => {
+                const parentInfo = findNodeParent(id, nodes)
+                if (!parentInfo) return
+                const siblings = parentInfo.parent ? parentInfo.parent.children || [] : nodes
+                if (parentInfo.index >= siblings.length - 1) return
+
+                if (parentInfo.parent) {
+                  const newChildren = [...siblings]
+                  const [movedNode] = newChildren.splice(parentInfo.index, 1)
+                  newChildren.splice(parentInfo.index + 1, 0, movedNode)
+                  updateNode(parentInfo.parent.id, { children: newChildren })
+                } else {
+                  const newNodes = [...nodes]
+                  const [movedNode] = newNodes.splice(parentInfo.index, 1)
+                  newNodes.splice(parentInfo.index + 1, 0, movedNode)
+                  useBuilderStore.setState({ nodes: newNodes })
+                }
+              }}
+              onAddChildToNode={handleAddChildToNode}
+            />
+          )}
+
+          <DragOverlay dropAnimation={null}>
+            {activeDragItem ? (
+              <div className="flex flex-col items-center justify-center p-3 h-24 w-36 border-2 border-primary rounded-md bg-card shadow-xl cursor-grabbing">
+                <Box className="h-6 w-6 mb-2 text-muted-foreground" />
+                <span className="text-xs text-center font-medium leading-tight">{activeDragItem.name}</span>
+              </div>
+            ) : null}
+          </DragOverlay>
+        </div>
+      </DndContext>
+    </SnippetsProvider>
   )
 }

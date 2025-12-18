@@ -40,6 +40,7 @@ import {
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { getAvailableComponents } from "@/lib/component-registry"
+import { useSnippets } from "./snippets-context"
 
 // --- Types ---
 
@@ -116,6 +117,30 @@ function findItemDeep(nodes: LayoutNode[], id: string): LayoutNode | null {
 }
 
 // --- Components ---
+
+// Helper component to show proper name for layers
+function LayerNodeName({ node }: { node: LayoutNode }) {
+  const { getSnippet } = useSnippets()
+
+  if (node.type === "SnippetRef" && node.snippetId) {
+    const snippet = getSnippet(node.snippetId)
+    if (snippet) {
+      return (
+        <span className="flex-1 truncate font-medium text-sm select-none flex items-center gap-1">
+          <span className="text-purple-600 dark:text-purple-400">🔗</span>
+          {snippet.name}
+        </span>
+      )
+    }
+    return (
+      <span className="flex-1 truncate font-medium text-sm select-none text-orange-500">
+        📦 Missing Snippet
+      </span>
+    )
+  }
+
+  return <span className="flex-1 truncate font-medium text-sm select-none">{node.type}</span>
+}
 
 function AddChildDropdown({ parentId, onAddChild }: { parentId: string; onAddChild: (type: string) => void }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -285,7 +310,7 @@ const LayerItem = React.forwardRef<HTMLDivElement, LayerItemProps>(({
       </div>
 
       {/* Content */}
-      <span className="flex-1 truncate font-medium text-sm select-none">{node.type}</span>
+      <LayerNodeName node={node} />
 
       {node.children && node.children.length > 0 && (
         <span className="text-[10px] font-semibold text-muted-foreground bg-muted/80 px-2 py-0.5 rounded-full ml-auto">

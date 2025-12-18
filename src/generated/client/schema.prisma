@@ -97,6 +97,7 @@ model Category {
   metadata Json?
   user     User?   @relation(fields: [userId], references: [id])
   userId   String? @db.ObjectId
+  rsses    Rss[]
 }
 
 model Site {
@@ -152,10 +153,29 @@ model Site {
   RSS             Rss[]
   AnalyticsEvent  AnalyticsEvent[]
   installedThemes SiteTheme[]
+  snippets        Snippet[]
 
   // Optional: Add a custom index for performance on frequently queried fields
   @@index([userId])
   @@map("sites") // Optional: Custom collection name
+}
+
+// --- Snippets Model ---
+// User-created reusable component snippets
+model Snippet {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  category    String   @default("custom") // e.g., "header", "footer", "section", "custom"
+  thumbnail   String? // Optional preview image
+  content     Json // LayoutNode[] - the actual component tree
+  siteId      String   @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@index([siteId])
 }
 
 model Features {
@@ -306,8 +326,10 @@ model Rss {
   updatedAt   DateTime @updatedAt
   autoImport  Boolean  @default(false)
 
-  site     Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
-  rssItems RssItem[]
+  site       Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  rssItems   RssItem[]
+  category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId String?   @db.ObjectId
 }
 
 model RssItem {

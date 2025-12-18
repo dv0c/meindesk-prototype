@@ -44,6 +44,11 @@ export type Category = $Result.DefaultSelection<Prisma.$CategoryPayload>
  */
 export type Site = $Result.DefaultSelection<Prisma.$SitePayload>
 /**
+ * Model Snippet
+ * 
+ */
+export type Snippet = $Result.DefaultSelection<Prisma.$SnippetPayload>
+/**
  * Model Features
  * 
  */
@@ -300,6 +305,16 @@ export class PrismaClient<
     * ```
     */
   get site(): Prisma.SiteDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.snippet`: Exposes CRUD operations for the **Snippet** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Snippets
+    * const snippets = await prisma.snippet.findMany()
+    * ```
+    */
+  get snippet(): Prisma.SnippetDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.features`: Exposes CRUD operations for the **Features** model.
@@ -857,6 +872,7 @@ export namespace Prisma {
     VerificationToken: 'VerificationToken',
     Category: 'Category',
     Site: 'Site',
+    Snippet: 'Snippet',
     Features: 'Features',
     Subscription: 'Subscription',
     BillingHistory: 'BillingHistory',
@@ -886,7 +902,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "account" | "session" | "verificationToken" | "category" | "site" | "features" | "subscription" | "billingHistory" | "analyticsEvent" | "article" | "page" | "rss" | "rssItem" | "theme" | "themeBlock" | "siteTheme"
+      modelProps: "user" | "account" | "session" | "verificationToken" | "category" | "site" | "snippet" | "features" | "subscription" | "billingHistory" | "analyticsEvent" | "article" | "page" | "rss" | "rssItem" | "theme" | "themeBlock" | "siteTheme"
       txIsolationLevel: never
     }
     model: {
@@ -1331,6 +1347,80 @@ export namespace Prisma {
           count: {
             args: Prisma.SiteCountArgs<ExtArgs>
             result: $Utils.Optional<SiteCountAggregateOutputType> | number
+          }
+        }
+      }
+      Snippet: {
+        payload: Prisma.$SnippetPayload<ExtArgs>
+        fields: Prisma.SnippetFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SnippetFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SnippetPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SnippetFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SnippetPayload>
+          }
+          findFirst: {
+            args: Prisma.SnippetFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SnippetPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SnippetFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SnippetPayload>
+          }
+          findMany: {
+            args: Prisma.SnippetFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SnippetPayload>[]
+          }
+          create: {
+            args: Prisma.SnippetCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SnippetPayload>
+          }
+          createMany: {
+            args: Prisma.SnippetCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.SnippetDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SnippetPayload>
+          }
+          update: {
+            args: Prisma.SnippetUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SnippetPayload>
+          }
+          deleteMany: {
+            args: Prisma.SnippetDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SnippetUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.SnippetUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SnippetPayload>
+          }
+          aggregate: {
+            args: Prisma.SnippetAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSnippet>
+          }
+          groupBy: {
+            args: Prisma.SnippetGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SnippetGroupByOutputType>[]
+          }
+          findRaw: {
+            args: Prisma.SnippetFindRawArgs<ExtArgs>
+            result: JsonObject
+          }
+          aggregateRaw: {
+            args: Prisma.SnippetAggregateRawArgs<ExtArgs>
+            result: JsonObject
+          }
+          count: {
+            args: Prisma.SnippetCountArgs<ExtArgs>
+            result: $Utils.Optional<SnippetCountAggregateOutputType> | number
           }
         }
       }
@@ -2233,6 +2323,7 @@ export namespace Prisma {
     verificationToken?: VerificationTokenOmit
     category?: CategoryOmit
     site?: SiteOmit
+    snippet?: SnippetOmit
     features?: FeaturesOmit
     subscription?: SubscriptionOmit
     billingHistory?: BillingHistoryOmit
@@ -2405,6 +2496,37 @@ export namespace Prisma {
 
 
   /**
+   * Count Type CategoryCountOutputType
+   */
+
+  export type CategoryCountOutputType = {
+    rsses: number
+  }
+
+  export type CategoryCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    rsses?: boolean | CategoryCountOutputTypeCountRssesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * CategoryCountOutputType without action
+   */
+  export type CategoryCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CategoryCountOutputType
+     */
+    select?: CategoryCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * CategoryCountOutputType without action
+   */
+  export type CategoryCountOutputTypeCountRssesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RssWhereInput
+  }
+
+
+  /**
    * Count Type SiteCountOutputType
    */
 
@@ -2415,6 +2537,7 @@ export namespace Prisma {
     RSS: number
     AnalyticsEvent: number
     installedThemes: number
+    snippets: number
   }
 
   export type SiteCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2424,6 +2547,7 @@ export namespace Prisma {
     RSS?: boolean | SiteCountOutputTypeCountRSSArgs
     AnalyticsEvent?: boolean | SiteCountOutputTypeCountAnalyticsEventArgs
     installedThemes?: boolean | SiteCountOutputTypeCountInstalledThemesArgs
+    snippets?: boolean | SiteCountOutputTypeCountSnippetsArgs
   }
 
   // Custom InputTypes
@@ -2477,6 +2601,13 @@ export namespace Prisma {
    */
   export type SiteCountOutputTypeCountInstalledThemesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: SiteThemeWhereInput
+  }
+
+  /**
+   * SiteCountOutputType without action
+   */
+  export type SiteCountOutputTypeCountSnippetsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SnippetWhereInput
   }
 
 
@@ -7043,6 +7174,8 @@ export namespace Prisma {
     userId?: boolean
     site?: boolean | Category$siteArgs<ExtArgs>
     user?: boolean | Category$userArgs<ExtArgs>
+    rsses?: boolean | Category$rssesArgs<ExtArgs>
+    _count?: boolean | CategoryCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["category"]>
 
 
@@ -7065,6 +7198,8 @@ export namespace Prisma {
   export type CategoryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     site?: boolean | Category$siteArgs<ExtArgs>
     user?: boolean | Category$userArgs<ExtArgs>
+    rsses?: boolean | Category$rssesArgs<ExtArgs>
+    _count?: boolean | CategoryCountOutputTypeDefaultArgs<ExtArgs>
   }
 
   export type $CategoryPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7072,6 +7207,7 @@ export namespace Prisma {
     objects: {
       site: Prisma.$SitePayload<ExtArgs> | null
       user: Prisma.$UserPayload<ExtArgs> | null
+      rsses: Prisma.$RssPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -7450,6 +7586,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     site<T extends Category$siteArgs<ExtArgs> = {}>(args?: Subset<T, Category$siteArgs<ExtArgs>>): Prisma__SiteClient<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     user<T extends Category$userArgs<ExtArgs> = {}>(args?: Subset<T, Category$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    rsses<T extends Category$rssesArgs<ExtArgs> = {}>(args?: Subset<T, Category$rssesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RssPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7898,6 +8035,30 @@ export namespace Prisma {
   }
 
   /**
+   * Category.rsses
+   */
+  export type Category$rssesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Rss
+     */
+    select?: RssSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Rss
+     */
+    omit?: RssOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RssInclude<ExtArgs> | null
+    where?: RssWhereInput
+    orderBy?: RssOrderByWithRelationInput | RssOrderByWithRelationInput[]
+    cursor?: RssWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: RssScalarFieldEnum | RssScalarFieldEnum[]
+  }
+
+  /**
    * Category without action
    */
   export type CategoryDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -8251,6 +8412,7 @@ export namespace Prisma {
     RSS?: boolean | Site$RSSArgs<ExtArgs>
     AnalyticsEvent?: boolean | Site$AnalyticsEventArgs<ExtArgs>
     installedThemes?: boolean | Site$installedThemesArgs<ExtArgs>
+    snippets?: boolean | Site$snippetsArgs<ExtArgs>
     _count?: boolean | SiteCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["site"]>
 
@@ -8292,6 +8454,7 @@ export namespace Prisma {
     RSS?: boolean | Site$RSSArgs<ExtArgs>
     AnalyticsEvent?: boolean | Site$AnalyticsEventArgs<ExtArgs>
     installedThemes?: boolean | Site$installedThemesArgs<ExtArgs>
+    snippets?: boolean | Site$snippetsArgs<ExtArgs>
     _count?: boolean | SiteCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -8307,6 +8470,7 @@ export namespace Prisma {
       RSS: Prisma.$RssPayload<ExtArgs>[]
       AnalyticsEvent: Prisma.$AnalyticsEventPayload<ExtArgs>[]
       installedThemes: Prisma.$SiteThemePayload<ExtArgs>[]
+      snippets: Prisma.$SnippetPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -8703,6 +8867,7 @@ export namespace Prisma {
     RSS<T extends Site$RSSArgs<ExtArgs> = {}>(args?: Subset<T, Site$RSSArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RssPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     AnalyticsEvent<T extends Site$AnalyticsEventArgs<ExtArgs> = {}>(args?: Subset<T, Site$AnalyticsEventArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AnalyticsEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     installedThemes<T extends Site$installedThemesArgs<ExtArgs> = {}>(args?: Subset<T, Site$installedThemesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteThemePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    snippets<T extends Site$snippetsArgs<ExtArgs> = {}>(args?: Subset<T, Site$snippetsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SnippetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9325,6 +9490,30 @@ export namespace Prisma {
   }
 
   /**
+   * Site.snippets
+   */
+  export type Site$snippetsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Snippet
+     */
+    select?: SnippetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Snippet
+     */
+    omit?: SnippetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SnippetInclude<ExtArgs> | null
+    where?: SnippetWhereInput
+    orderBy?: SnippetOrderByWithRelationInput | SnippetOrderByWithRelationInput[]
+    cursor?: SnippetWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SnippetScalarFieldEnum | SnippetScalarFieldEnum[]
+  }
+
+  /**
    * Site without action
    */
   export type SiteDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -9340,6 +9529,1025 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: SiteInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Snippet
+   */
+
+  export type AggregateSnippet = {
+    _count: SnippetCountAggregateOutputType | null
+    _min: SnippetMinAggregateOutputType | null
+    _max: SnippetMaxAggregateOutputType | null
+  }
+
+  export type SnippetMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+    description: string | null
+    category: string | null
+    thumbnail: string | null
+    siteId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SnippetMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+    description: string | null
+    category: string | null
+    thumbnail: string | null
+    siteId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SnippetCountAggregateOutputType = {
+    id: number
+    name: number
+    description: number
+    category: number
+    thumbnail: number
+    content: number
+    siteId: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SnippetMinAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+    category?: true
+    thumbnail?: true
+    siteId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SnippetMaxAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+    category?: true
+    thumbnail?: true
+    siteId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SnippetCountAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+    category?: true
+    thumbnail?: true
+    content?: true
+    siteId?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SnippetAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Snippet to aggregate.
+     */
+    where?: SnippetWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Snippets to fetch.
+     */
+    orderBy?: SnippetOrderByWithRelationInput | SnippetOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SnippetWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Snippets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Snippets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Snippets
+    **/
+    _count?: true | SnippetCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SnippetMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SnippetMaxAggregateInputType
+  }
+
+  export type GetSnippetAggregateType<T extends SnippetAggregateArgs> = {
+        [P in keyof T & keyof AggregateSnippet]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSnippet[P]>
+      : GetScalarType<T[P], AggregateSnippet[P]>
+  }
+
+
+
+
+  export type SnippetGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SnippetWhereInput
+    orderBy?: SnippetOrderByWithAggregationInput | SnippetOrderByWithAggregationInput[]
+    by: SnippetScalarFieldEnum[] | SnippetScalarFieldEnum
+    having?: SnippetScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SnippetCountAggregateInputType | true
+    _min?: SnippetMinAggregateInputType
+    _max?: SnippetMaxAggregateInputType
+  }
+
+  export type SnippetGroupByOutputType = {
+    id: string
+    name: string
+    description: string | null
+    category: string
+    thumbnail: string | null
+    content: JsonValue
+    siteId: string
+    createdAt: Date
+    updatedAt: Date
+    _count: SnippetCountAggregateOutputType | null
+    _min: SnippetMinAggregateOutputType | null
+    _max: SnippetMaxAggregateOutputType | null
+  }
+
+  type GetSnippetGroupByPayload<T extends SnippetGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SnippetGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SnippetGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SnippetGroupByOutputType[P]>
+            : GetScalarType<T[P], SnippetGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SnippetSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    description?: boolean
+    category?: boolean
+    thumbnail?: boolean
+    content?: boolean
+    siteId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["snippet"]>
+
+
+
+  export type SnippetSelectScalar = {
+    id?: boolean
+    name?: boolean
+    description?: boolean
+    category?: boolean
+    thumbnail?: boolean
+    content?: boolean
+    siteId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type SnippetOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "category" | "thumbnail" | "content" | "siteId" | "createdAt" | "updatedAt", ExtArgs["result"]["snippet"]>
+  export type SnippetInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }
+
+  export type $SnippetPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Snippet"
+    objects: {
+      site: Prisma.$SitePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      name: string
+      description: string | null
+      category: string
+      thumbnail: string | null
+      content: Prisma.JsonValue
+      siteId: string
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["snippet"]>
+    composites: {}
+  }
+
+  type SnippetGetPayload<S extends boolean | null | undefined | SnippetDefaultArgs> = $Result.GetResult<Prisma.$SnippetPayload, S>
+
+  type SnippetCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SnippetFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SnippetCountAggregateInputType | true
+    }
+
+  export interface SnippetDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Snippet'], meta: { name: 'Snippet' } }
+    /**
+     * Find zero or one Snippet that matches the filter.
+     * @param {SnippetFindUniqueArgs} args - Arguments to find a Snippet
+     * @example
+     * // Get one Snippet
+     * const snippet = await prisma.snippet.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SnippetFindUniqueArgs>(args: SelectSubset<T, SnippetFindUniqueArgs<ExtArgs>>): Prisma__SnippetClient<$Result.GetResult<Prisma.$SnippetPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Snippet that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SnippetFindUniqueOrThrowArgs} args - Arguments to find a Snippet
+     * @example
+     * // Get one Snippet
+     * const snippet = await prisma.snippet.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SnippetFindUniqueOrThrowArgs>(args: SelectSubset<T, SnippetFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SnippetClient<$Result.GetResult<Prisma.$SnippetPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Snippet that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SnippetFindFirstArgs} args - Arguments to find a Snippet
+     * @example
+     * // Get one Snippet
+     * const snippet = await prisma.snippet.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SnippetFindFirstArgs>(args?: SelectSubset<T, SnippetFindFirstArgs<ExtArgs>>): Prisma__SnippetClient<$Result.GetResult<Prisma.$SnippetPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Snippet that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SnippetFindFirstOrThrowArgs} args - Arguments to find a Snippet
+     * @example
+     * // Get one Snippet
+     * const snippet = await prisma.snippet.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SnippetFindFirstOrThrowArgs>(args?: SelectSubset<T, SnippetFindFirstOrThrowArgs<ExtArgs>>): Prisma__SnippetClient<$Result.GetResult<Prisma.$SnippetPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Snippets that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SnippetFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Snippets
+     * const snippets = await prisma.snippet.findMany()
+     * 
+     * // Get first 10 Snippets
+     * const snippets = await prisma.snippet.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const snippetWithIdOnly = await prisma.snippet.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SnippetFindManyArgs>(args?: SelectSubset<T, SnippetFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SnippetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Snippet.
+     * @param {SnippetCreateArgs} args - Arguments to create a Snippet.
+     * @example
+     * // Create one Snippet
+     * const Snippet = await prisma.snippet.create({
+     *   data: {
+     *     // ... data to create a Snippet
+     *   }
+     * })
+     * 
+     */
+    create<T extends SnippetCreateArgs>(args: SelectSubset<T, SnippetCreateArgs<ExtArgs>>): Prisma__SnippetClient<$Result.GetResult<Prisma.$SnippetPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Snippets.
+     * @param {SnippetCreateManyArgs} args - Arguments to create many Snippets.
+     * @example
+     * // Create many Snippets
+     * const snippet = await prisma.snippet.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SnippetCreateManyArgs>(args?: SelectSubset<T, SnippetCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a Snippet.
+     * @param {SnippetDeleteArgs} args - Arguments to delete one Snippet.
+     * @example
+     * // Delete one Snippet
+     * const Snippet = await prisma.snippet.delete({
+     *   where: {
+     *     // ... filter to delete one Snippet
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SnippetDeleteArgs>(args: SelectSubset<T, SnippetDeleteArgs<ExtArgs>>): Prisma__SnippetClient<$Result.GetResult<Prisma.$SnippetPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Snippet.
+     * @param {SnippetUpdateArgs} args - Arguments to update one Snippet.
+     * @example
+     * // Update one Snippet
+     * const snippet = await prisma.snippet.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SnippetUpdateArgs>(args: SelectSubset<T, SnippetUpdateArgs<ExtArgs>>): Prisma__SnippetClient<$Result.GetResult<Prisma.$SnippetPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Snippets.
+     * @param {SnippetDeleteManyArgs} args - Arguments to filter Snippets to delete.
+     * @example
+     * // Delete a few Snippets
+     * const { count } = await prisma.snippet.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SnippetDeleteManyArgs>(args?: SelectSubset<T, SnippetDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Snippets.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SnippetUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Snippets
+     * const snippet = await prisma.snippet.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SnippetUpdateManyArgs>(args: SelectSubset<T, SnippetUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Snippet.
+     * @param {SnippetUpsertArgs} args - Arguments to update or create a Snippet.
+     * @example
+     * // Update or create a Snippet
+     * const snippet = await prisma.snippet.upsert({
+     *   create: {
+     *     // ... data to create a Snippet
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Snippet we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SnippetUpsertArgs>(args: SelectSubset<T, SnippetUpsertArgs<ExtArgs>>): Prisma__SnippetClient<$Result.GetResult<Prisma.$SnippetPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Snippets that matches the filter.
+     * @param {SnippetFindRawArgs} args - Select which filters you would like to apply.
+     * @example
+     * const snippet = await prisma.snippet.findRaw({
+     *   filter: { age: { $gt: 25 } }
+     * })
+     */
+    findRaw(args?: SnippetFindRawArgs): Prisma.PrismaPromise<JsonObject>
+
+    /**
+     * Perform aggregation operations on a Snippet.
+     * @param {SnippetAggregateRawArgs} args - Select which aggregations you would like to apply.
+     * @example
+     * const snippet = await prisma.snippet.aggregateRaw({
+     *   pipeline: [
+     *     { $match: { status: "registered" } },
+     *     { $group: { _id: "$country", total: { $sum: 1 } } }
+     *   ]
+     * })
+     */
+    aggregateRaw(args?: SnippetAggregateRawArgs): Prisma.PrismaPromise<JsonObject>
+
+
+    /**
+     * Count the number of Snippets.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SnippetCountArgs} args - Arguments to filter Snippets to count.
+     * @example
+     * // Count the number of Snippets
+     * const count = await prisma.snippet.count({
+     *   where: {
+     *     // ... the filter for the Snippets we want to count
+     *   }
+     * })
+    **/
+    count<T extends SnippetCountArgs>(
+      args?: Subset<T, SnippetCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SnippetCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Snippet.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SnippetAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SnippetAggregateArgs>(args: Subset<T, SnippetAggregateArgs>): Prisma.PrismaPromise<GetSnippetAggregateType<T>>
+
+    /**
+     * Group by Snippet.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SnippetGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SnippetGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SnippetGroupByArgs['orderBy'] }
+        : { orderBy?: SnippetGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SnippetGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSnippetGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Snippet model
+   */
+  readonly fields: SnippetFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Snippet.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SnippetClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    site<T extends SiteDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SiteDefaultArgs<ExtArgs>>): Prisma__SiteClient<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Snippet model
+   */
+  interface SnippetFieldRefs {
+    readonly id: FieldRef<"Snippet", 'String'>
+    readonly name: FieldRef<"Snippet", 'String'>
+    readonly description: FieldRef<"Snippet", 'String'>
+    readonly category: FieldRef<"Snippet", 'String'>
+    readonly thumbnail: FieldRef<"Snippet", 'String'>
+    readonly content: FieldRef<"Snippet", 'Json'>
+    readonly siteId: FieldRef<"Snippet", 'String'>
+    readonly createdAt: FieldRef<"Snippet", 'DateTime'>
+    readonly updatedAt: FieldRef<"Snippet", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Snippet findUnique
+   */
+  export type SnippetFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Snippet
+     */
+    select?: SnippetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Snippet
+     */
+    omit?: SnippetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SnippetInclude<ExtArgs> | null
+    /**
+     * Filter, which Snippet to fetch.
+     */
+    where: SnippetWhereUniqueInput
+  }
+
+  /**
+   * Snippet findUniqueOrThrow
+   */
+  export type SnippetFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Snippet
+     */
+    select?: SnippetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Snippet
+     */
+    omit?: SnippetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SnippetInclude<ExtArgs> | null
+    /**
+     * Filter, which Snippet to fetch.
+     */
+    where: SnippetWhereUniqueInput
+  }
+
+  /**
+   * Snippet findFirst
+   */
+  export type SnippetFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Snippet
+     */
+    select?: SnippetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Snippet
+     */
+    omit?: SnippetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SnippetInclude<ExtArgs> | null
+    /**
+     * Filter, which Snippet to fetch.
+     */
+    where?: SnippetWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Snippets to fetch.
+     */
+    orderBy?: SnippetOrderByWithRelationInput | SnippetOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Snippets.
+     */
+    cursor?: SnippetWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Snippets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Snippets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Snippets.
+     */
+    distinct?: SnippetScalarFieldEnum | SnippetScalarFieldEnum[]
+  }
+
+  /**
+   * Snippet findFirstOrThrow
+   */
+  export type SnippetFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Snippet
+     */
+    select?: SnippetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Snippet
+     */
+    omit?: SnippetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SnippetInclude<ExtArgs> | null
+    /**
+     * Filter, which Snippet to fetch.
+     */
+    where?: SnippetWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Snippets to fetch.
+     */
+    orderBy?: SnippetOrderByWithRelationInput | SnippetOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Snippets.
+     */
+    cursor?: SnippetWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Snippets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Snippets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Snippets.
+     */
+    distinct?: SnippetScalarFieldEnum | SnippetScalarFieldEnum[]
+  }
+
+  /**
+   * Snippet findMany
+   */
+  export type SnippetFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Snippet
+     */
+    select?: SnippetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Snippet
+     */
+    omit?: SnippetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SnippetInclude<ExtArgs> | null
+    /**
+     * Filter, which Snippets to fetch.
+     */
+    where?: SnippetWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Snippets to fetch.
+     */
+    orderBy?: SnippetOrderByWithRelationInput | SnippetOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Snippets.
+     */
+    cursor?: SnippetWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Snippets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Snippets.
+     */
+    skip?: number
+    distinct?: SnippetScalarFieldEnum | SnippetScalarFieldEnum[]
+  }
+
+  /**
+   * Snippet create
+   */
+  export type SnippetCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Snippet
+     */
+    select?: SnippetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Snippet
+     */
+    omit?: SnippetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SnippetInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Snippet.
+     */
+    data: XOR<SnippetCreateInput, SnippetUncheckedCreateInput>
+  }
+
+  /**
+   * Snippet createMany
+   */
+  export type SnippetCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Snippets.
+     */
+    data: SnippetCreateManyInput | SnippetCreateManyInput[]
+  }
+
+  /**
+   * Snippet update
+   */
+  export type SnippetUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Snippet
+     */
+    select?: SnippetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Snippet
+     */
+    omit?: SnippetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SnippetInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Snippet.
+     */
+    data: XOR<SnippetUpdateInput, SnippetUncheckedUpdateInput>
+    /**
+     * Choose, which Snippet to update.
+     */
+    where: SnippetWhereUniqueInput
+  }
+
+  /**
+   * Snippet updateMany
+   */
+  export type SnippetUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Snippets.
+     */
+    data: XOR<SnippetUpdateManyMutationInput, SnippetUncheckedUpdateManyInput>
+    /**
+     * Filter which Snippets to update
+     */
+    where?: SnippetWhereInput
+    /**
+     * Limit how many Snippets to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Snippet upsert
+   */
+  export type SnippetUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Snippet
+     */
+    select?: SnippetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Snippet
+     */
+    omit?: SnippetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SnippetInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Snippet to update in case it exists.
+     */
+    where: SnippetWhereUniqueInput
+    /**
+     * In case the Snippet found by the `where` argument doesn't exist, create a new Snippet with this data.
+     */
+    create: XOR<SnippetCreateInput, SnippetUncheckedCreateInput>
+    /**
+     * In case the Snippet was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SnippetUpdateInput, SnippetUncheckedUpdateInput>
+  }
+
+  /**
+   * Snippet delete
+   */
+  export type SnippetDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Snippet
+     */
+    select?: SnippetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Snippet
+     */
+    omit?: SnippetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SnippetInclude<ExtArgs> | null
+    /**
+     * Filter which Snippet to delete.
+     */
+    where: SnippetWhereUniqueInput
+  }
+
+  /**
+   * Snippet deleteMany
+   */
+  export type SnippetDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Snippets to delete
+     */
+    where?: SnippetWhereInput
+    /**
+     * Limit how many Snippets to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Snippet findRaw
+   */
+  export type SnippetFindRawArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The query predicate filter. If unspecified, then all documents in the collection will match the predicate. ${@link https://docs.mongodb.com/manual/reference/operator/query MongoDB Docs}.
+     */
+    filter?: InputJsonValue
+    /**
+     * Additional options to pass to the `find` command ${@link https://docs.mongodb.com/manual/reference/command/find/#command-fields MongoDB Docs}.
+     */
+    options?: InputJsonValue
+  }
+
+  /**
+   * Snippet aggregateRaw
+   */
+  export type SnippetAggregateRawArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * An array of aggregation stages to process and transform the document stream via the aggregation pipeline. ${@link https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline MongoDB Docs}.
+     */
+    pipeline?: InputJsonValue[]
+    /**
+     * Additional options to pass to the `aggregate` command ${@link https://docs.mongodb.com/manual/reference/command/aggregate/#command-fields MongoDB Docs}.
+     */
+    options?: InputJsonValue
+  }
+
+  /**
+   * Snippet without action
+   */
+  export type SnippetDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Snippet
+     */
+    select?: SnippetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Snippet
+     */
+    omit?: SnippetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SnippetInclude<ExtArgs> | null
   }
 
 
@@ -15864,6 +17072,7 @@ export namespace Prisma {
     createdAt: Date | null
     updatedAt: Date | null
     autoImport: boolean | null
+    categoryId: string | null
   }
 
   export type RssMaxAggregateOutputType = {
@@ -15876,6 +17085,7 @@ export namespace Prisma {
     createdAt: Date | null
     updatedAt: Date | null
     autoImport: boolean | null
+    categoryId: string | null
   }
 
   export type RssCountAggregateOutputType = {
@@ -15888,6 +17098,7 @@ export namespace Prisma {
     createdAt: number
     updatedAt: number
     autoImport: number
+    categoryId: number
     _all: number
   }
 
@@ -15902,6 +17113,7 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     autoImport?: true
+    categoryId?: true
   }
 
   export type RssMaxAggregateInputType = {
@@ -15914,6 +17126,7 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     autoImport?: true
+    categoryId?: true
   }
 
   export type RssCountAggregateInputType = {
@@ -15926,6 +17139,7 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     autoImport?: true
+    categoryId?: true
     _all?: true
   }
 
@@ -16011,6 +17225,7 @@ export namespace Prisma {
     createdAt: Date
     updatedAt: Date
     autoImport: boolean
+    categoryId: string | null
     _count: RssCountAggregateOutputType | null
     _min: RssMinAggregateOutputType | null
     _max: RssMaxAggregateOutputType | null
@@ -16040,8 +17255,10 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     autoImport?: boolean
+    categoryId?: boolean
     site?: boolean | SiteDefaultArgs<ExtArgs>
     rssItems?: boolean | Rss$rssItemsArgs<ExtArgs>
+    category?: boolean | Rss$categoryArgs<ExtArgs>
     _count?: boolean | RssCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["rss"]>
 
@@ -16057,12 +17274,14 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     autoImport?: boolean
+    categoryId?: boolean
   }
 
-  export type RssOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "icon" | "url" | "siteId" | "createdAt" | "updatedAt" | "autoImport", ExtArgs["result"]["rss"]>
+  export type RssOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "icon" | "url" | "siteId" | "createdAt" | "updatedAt" | "autoImport" | "categoryId", ExtArgs["result"]["rss"]>
   export type RssInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     site?: boolean | SiteDefaultArgs<ExtArgs>
     rssItems?: boolean | Rss$rssItemsArgs<ExtArgs>
+    category?: boolean | Rss$categoryArgs<ExtArgs>
     _count?: boolean | RssCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -16071,6 +17290,7 @@ export namespace Prisma {
     objects: {
       site: Prisma.$SitePayload<ExtArgs>
       rssItems: Prisma.$RssItemPayload<ExtArgs>[]
+      category: Prisma.$CategoryPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -16082,6 +17302,7 @@ export namespace Prisma {
       createdAt: Date
       updatedAt: Date
       autoImport: boolean
+      categoryId: string | null
     }, ExtArgs["result"]["rss"]>
     composites: {}
   }
@@ -16447,6 +17668,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     site<T extends SiteDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SiteDefaultArgs<ExtArgs>>): Prisma__SiteClient<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     rssItems<T extends Rss$rssItemsArgs<ExtArgs> = {}>(args?: Subset<T, Rss$rssItemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RssItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    category<T extends Rss$categoryArgs<ExtArgs> = {}>(args?: Subset<T, Rss$categoryArgs<ExtArgs>>): Prisma__CategoryClient<$Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -16485,6 +17707,7 @@ export namespace Prisma {
     readonly createdAt: FieldRef<"Rss", 'DateTime'>
     readonly updatedAt: FieldRef<"Rss", 'DateTime'>
     readonly autoImport: FieldRef<"Rss", 'Boolean'>
+    readonly categoryId: FieldRef<"Rss", 'String'>
   }
     
 
@@ -16876,6 +18099,25 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: RssItemScalarFieldEnum | RssItemScalarFieldEnum[]
+  }
+
+  /**
+   * Rss.category
+   */
+  export type Rss$categoryArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Category
+     */
+    select?: CategorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Category
+     */
+    omit?: CategoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CategoryInclude<ExtArgs> | null
+    where?: CategoryWhereInput
   }
 
   /**
@@ -21106,6 +22348,21 @@ export namespace Prisma {
   export type SiteScalarFieldEnum = (typeof SiteScalarFieldEnum)[keyof typeof SiteScalarFieldEnum]
 
 
+  export const SnippetScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    description: 'description',
+    category: 'category',
+    thumbnail: 'thumbnail',
+    content: 'content',
+    siteId: 'siteId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SnippetScalarFieldEnum = (typeof SnippetScalarFieldEnum)[keyof typeof SnippetScalarFieldEnum]
+
+
   export const FeaturesScalarFieldEnum: {
     id: 'id',
     analytics: 'analytics',
@@ -21217,7 +22474,8 @@ export namespace Prisma {
     siteId: 'siteId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
-    autoImport: 'autoImport'
+    autoImport: 'autoImport',
+    categoryId: 'categoryId'
   };
 
   export type RssScalarFieldEnum = (typeof RssScalarFieldEnum)[keyof typeof RssScalarFieldEnum]
@@ -21740,6 +22998,7 @@ export namespace Prisma {
     userId?: StringNullableFilter<"Category"> | string | null
     site?: XOR<SiteNullableScalarRelationFilter, SiteWhereInput> | null
     user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    rsses?: RssListRelationFilter
   }
 
   export type CategoryOrderByWithRelationInput = {
@@ -21756,6 +23015,7 @@ export namespace Prisma {
     userId?: SortOrder
     site?: SiteOrderByWithRelationInput
     user?: UserOrderByWithRelationInput
+    rsses?: RssOrderByRelationAggregateInput
   }
 
   export type CategoryWhereUniqueInput = Prisma.AtLeast<{
@@ -21775,6 +23035,7 @@ export namespace Prisma {
     userId?: StringNullableFilter<"Category"> | string | null
     site?: XOR<SiteNullableScalarRelationFilter, SiteWhereInput> | null
     user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    rsses?: RssListRelationFilter
   }, "id">
 
   export type CategoryOrderByWithAggregationInput = {
@@ -21846,6 +23107,7 @@ export namespace Prisma {
     RSS?: RssListRelationFilter
     AnalyticsEvent?: AnalyticsEventListRelationFilter
     installedThemes?: SiteThemeListRelationFilter
+    snippets?: SnippetListRelationFilter
   }
 
   export type SiteOrderByWithRelationInput = {
@@ -21880,6 +23142,7 @@ export namespace Prisma {
     RSS?: RssOrderByRelationAggregateInput
     AnalyticsEvent?: AnalyticsEventOrderByRelationAggregateInput
     installedThemes?: SiteThemeOrderByRelationAggregateInput
+    snippets?: SnippetOrderByRelationAggregateInput
   }
 
   export type SiteWhereUniqueInput = Prisma.AtLeast<{
@@ -21917,6 +23180,7 @@ export namespace Prisma {
     RSS?: RssListRelationFilter
     AnalyticsEvent?: AnalyticsEventListRelationFilter
     installedThemes?: SiteThemeListRelationFilter
+    snippets?: SnippetListRelationFilter
   }, "id" | "subdomain" | "url">
 
   export type SiteOrderByWithAggregationInput = {
@@ -21975,6 +23239,81 @@ export namespace Prisma {
     userId?: StringNullableWithAggregatesFilter<"Site"> | string | null
     featuresId?: StringNullableWithAggregatesFilter<"Site"> | string | null
     subscriptionId?: StringNullableWithAggregatesFilter<"Site"> | string | null
+  }
+
+  export type SnippetWhereInput = {
+    AND?: SnippetWhereInput | SnippetWhereInput[]
+    OR?: SnippetWhereInput[]
+    NOT?: SnippetWhereInput | SnippetWhereInput[]
+    id?: StringFilter<"Snippet"> | string
+    name?: StringFilter<"Snippet"> | string
+    description?: StringNullableFilter<"Snippet"> | string | null
+    category?: StringFilter<"Snippet"> | string
+    thumbnail?: StringNullableFilter<"Snippet"> | string | null
+    content?: JsonFilter<"Snippet">
+    siteId?: StringFilter<"Snippet"> | string
+    createdAt?: DateTimeFilter<"Snippet"> | Date | string
+    updatedAt?: DateTimeFilter<"Snippet"> | Date | string
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+  }
+
+  export type SnippetOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    category?: SortOrder
+    thumbnail?: SortOrder
+    content?: SortOrder
+    siteId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    site?: SiteOrderByWithRelationInput
+  }
+
+  export type SnippetWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: SnippetWhereInput | SnippetWhereInput[]
+    OR?: SnippetWhereInput[]
+    NOT?: SnippetWhereInput | SnippetWhereInput[]
+    name?: StringFilter<"Snippet"> | string
+    description?: StringNullableFilter<"Snippet"> | string | null
+    category?: StringFilter<"Snippet"> | string
+    thumbnail?: StringNullableFilter<"Snippet"> | string | null
+    content?: JsonFilter<"Snippet">
+    siteId?: StringFilter<"Snippet"> | string
+    createdAt?: DateTimeFilter<"Snippet"> | Date | string
+    updatedAt?: DateTimeFilter<"Snippet"> | Date | string
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+  }, "id">
+
+  export type SnippetOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    category?: SortOrder
+    thumbnail?: SortOrder
+    content?: SortOrder
+    siteId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: SnippetCountOrderByAggregateInput
+    _max?: SnippetMaxOrderByAggregateInput
+    _min?: SnippetMinOrderByAggregateInput
+  }
+
+  export type SnippetScalarWhereWithAggregatesInput = {
+    AND?: SnippetScalarWhereWithAggregatesInput | SnippetScalarWhereWithAggregatesInput[]
+    OR?: SnippetScalarWhereWithAggregatesInput[]
+    NOT?: SnippetScalarWhereWithAggregatesInput | SnippetScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Snippet"> | string
+    name?: StringWithAggregatesFilter<"Snippet"> | string
+    description?: StringNullableWithAggregatesFilter<"Snippet"> | string | null
+    category?: StringWithAggregatesFilter<"Snippet"> | string
+    thumbnail?: StringNullableWithAggregatesFilter<"Snippet"> | string | null
+    content?: JsonWithAggregatesFilter<"Snippet">
+    siteId?: StringWithAggregatesFilter<"Snippet"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"Snippet"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Snippet"> | Date | string
   }
 
   export type FeaturesWhereInput = {
@@ -22522,8 +23861,10 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Rss"> | Date | string
     updatedAt?: DateTimeFilter<"Rss"> | Date | string
     autoImport?: BoolFilter<"Rss"> | boolean
+    categoryId?: StringNullableFilter<"Rss"> | string | null
     site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
     rssItems?: RssItemListRelationFilter
+    category?: XOR<CategoryNullableScalarRelationFilter, CategoryWhereInput> | null
   }
 
   export type RssOrderByWithRelationInput = {
@@ -22536,8 +23877,10 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     autoImport?: SortOrder
+    categoryId?: SortOrder
     site?: SiteOrderByWithRelationInput
     rssItems?: RssItemOrderByRelationAggregateInput
+    category?: CategoryOrderByWithRelationInput
   }
 
   export type RssWhereUniqueInput = Prisma.AtLeast<{
@@ -22553,8 +23896,10 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Rss"> | Date | string
     updatedAt?: DateTimeFilter<"Rss"> | Date | string
     autoImport?: BoolFilter<"Rss"> | boolean
+    categoryId?: StringNullableFilter<"Rss"> | string | null
     site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
     rssItems?: RssItemListRelationFilter
+    category?: XOR<CategoryNullableScalarRelationFilter, CategoryWhereInput> | null
   }, "id">
 
   export type RssOrderByWithAggregationInput = {
@@ -22567,6 +23912,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     autoImport?: SortOrder
+    categoryId?: SortOrder
     _count?: RssCountOrderByAggregateInput
     _max?: RssMaxOrderByAggregateInput
     _min?: RssMinOrderByAggregateInput
@@ -22585,6 +23931,7 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"Rss"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Rss"> | Date | string
     autoImport?: BoolWithAggregatesFilter<"Rss"> | boolean
+    categoryId?: StringNullableWithAggregatesFilter<"Rss"> | string | null
   }
 
   export type RssItemWhereInput = {
@@ -23182,6 +24529,7 @@ export namespace Prisma {
     metadata?: InputJsonValue | null
     site?: SiteCreateNestedOneWithoutCategoryInput
     user?: UserCreateNestedOneWithoutCategoryInput
+    rsses?: RssCreateNestedManyWithoutCategoryInput
   }
 
   export type CategoryUncheckedCreateInput = {
@@ -23196,6 +24544,7 @@ export namespace Prisma {
     siteId?: string | null
     metadata?: InputJsonValue | null
     userId?: string | null
+    rsses?: RssUncheckedCreateNestedManyWithoutCategoryInput
   }
 
   export type CategoryUpdateInput = {
@@ -23209,6 +24558,7 @@ export namespace Prisma {
     metadata?: InputJsonValue | InputJsonValue | null
     site?: SiteUpdateOneWithoutCategoryNestedInput
     user?: UserUpdateOneWithoutCategoryNestedInput
+    rsses?: RssUpdateManyWithoutCategoryNestedInput
   }
 
   export type CategoryUncheckedUpdateInput = {
@@ -23222,6 +24572,7 @@ export namespace Prisma {
     siteId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: InputJsonValue | InputJsonValue | null
     userId?: NullableStringFieldUpdateOperationsInput | string | null
+    rsses?: RssUncheckedUpdateManyWithoutCategoryNestedInput
   }
 
   export type CategoryCreateManyInput = {
@@ -23291,6 +24642,7 @@ export namespace Prisma {
     RSS?: RssCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
+    snippets?: SnippetCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateInput = {
@@ -23322,6 +24674,7 @@ export namespace Prisma {
     RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
+    snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUpdateInput = {
@@ -23352,6 +24705,7 @@ export namespace Prisma {
     RSS?: RssUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateInput = {
@@ -23382,6 +24736,7 @@ export namespace Prisma {
     RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteCreateManyInput = {
@@ -23452,6 +24807,85 @@ export namespace Prisma {
     userId?: NullableStringFieldUpdateOperationsInput | string | null
     featuresId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type SnippetCreateInput = {
+    id?: string
+    name: string
+    description?: string | null
+    category?: string
+    thumbnail?: string | null
+    content: InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    site: SiteCreateNestedOneWithoutSnippetsInput
+  }
+
+  export type SnippetUncheckedCreateInput = {
+    id?: string
+    name: string
+    description?: string | null
+    category?: string
+    thumbnail?: string | null
+    content: InputJsonValue
+    siteId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SnippetUpdateInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: StringFieldUpdateOperationsInput | string
+    thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: InputJsonValue | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    site?: SiteUpdateOneRequiredWithoutSnippetsNestedInput
+  }
+
+  export type SnippetUncheckedUpdateInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: StringFieldUpdateOperationsInput | string
+    thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: InputJsonValue | InputJsonValue
+    siteId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SnippetCreateManyInput = {
+    id?: string
+    name: string
+    description?: string | null
+    category?: string
+    thumbnail?: string | null
+    content: InputJsonValue
+    siteId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SnippetUpdateManyMutationInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: StringFieldUpdateOperationsInput | string
+    thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: InputJsonValue | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SnippetUncheckedUpdateManyInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: StringFieldUpdateOperationsInput | string
+    thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: InputJsonValue | InputJsonValue
+    siteId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type FeaturesCreateInput = {
@@ -24034,6 +25468,7 @@ export namespace Prisma {
     autoImport?: boolean
     site: SiteCreateNestedOneWithoutRSSInput
     rssItems?: RssItemCreateNestedManyWithoutRssInput
+    category?: CategoryCreateNestedOneWithoutRssesInput
   }
 
   export type RssUncheckedCreateInput = {
@@ -24046,6 +25481,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     autoImport?: boolean
+    categoryId?: string | null
     rssItems?: RssItemUncheckedCreateNestedManyWithoutRssInput
   }
 
@@ -24059,6 +25495,7 @@ export namespace Prisma {
     autoImport?: BoolFieldUpdateOperationsInput | boolean
     site?: SiteUpdateOneRequiredWithoutRSSNestedInput
     rssItems?: RssItemUpdateManyWithoutRssNestedInput
+    category?: CategoryUpdateOneWithoutRssesNestedInput
   }
 
   export type RssUncheckedUpdateInput = {
@@ -24070,6 +25507,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     autoImport?: BoolFieldUpdateOperationsInput | boolean
+    categoryId?: NullableStringFieldUpdateOperationsInput | string | null
     rssItems?: RssItemUncheckedUpdateManyWithoutRssNestedInput
   }
 
@@ -24083,6 +25521,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     autoImport?: boolean
+    categoryId?: string | null
   }
 
   export type RssUpdateManyMutationInput = {
@@ -24104,6 +25543,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     autoImport?: BoolFieldUpdateOperationsInput | boolean
+    categoryId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type RssItemCreateInput = {
@@ -24800,6 +26240,16 @@ export namespace Prisma {
     isNot?: UserWhereInput | null
   }
 
+  export type RssListRelationFilter = {
+    every?: RssWhereInput
+    some?: RssWhereInput
+    none?: RssWhereInput
+  }
+
+  export type RssOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type CategoryCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
@@ -24884,12 +26334,6 @@ export namespace Prisma {
     isNot?: SubscriptionWhereInput | null
   }
 
-  export type RssListRelationFilter = {
-    every?: RssWhereInput
-    some?: RssWhereInput
-    none?: RssWhereInput
-  }
-
   export type AnalyticsEventListRelationFilter = {
     every?: AnalyticsEventWhereInput
     some?: AnalyticsEventWhereInput
@@ -24902,8 +26346,10 @@ export namespace Prisma {
     none?: SiteThemeWhereInput
   }
 
-  export type RssOrderByRelationAggregateInput = {
-    _count?: SortOrder
+  export type SnippetListRelationFilter = {
+    every?: SnippetWhereInput
+    some?: SnippetWhereInput
+    none?: SnippetWhereInput
   }
 
   export type AnalyticsEventOrderByRelationAggregateInput = {
@@ -24911,6 +26357,10 @@ export namespace Prisma {
   }
 
   export type SiteThemeOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SnippetOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -25007,6 +26457,70 @@ export namespace Prisma {
     _sum?: NestedIntFilter<$PrismaModel>
     _min?: NestedIntFilter<$PrismaModel>
     _max?: NestedIntFilter<$PrismaModel>
+  }
+  export type JsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+  }
+
+  export type SiteScalarRelationFilter = {
+    is?: SiteWhereInput
+    isNot?: SiteWhereInput
+  }
+
+  export type SnippetCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    category?: SortOrder
+    thumbnail?: SortOrder
+    content?: SortOrder
+    siteId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SnippetMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    category?: SortOrder
+    thumbnail?: SortOrder
+    siteId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SnippetMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    category?: SortOrder
+    thumbnail?: SortOrder
+    siteId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
   }
 
   export type FeaturesCountOrderByAggregateInput = {
@@ -25180,11 +26694,6 @@ export namespace Prisma {
 
   export type BillingHistorySumOrderByAggregateInput = {
     amount?: SortOrder
-  }
-
-  export type SiteScalarRelationFilter = {
-    is?: SiteWhereInput
-    isNot?: SiteWhereInput
   }
 
   export type AnalyticsEventCountOrderByAggregateInput = {
@@ -25421,6 +26930,11 @@ export namespace Prisma {
     none?: RssItemWhereInput
   }
 
+  export type CategoryNullableScalarRelationFilter = {
+    is?: CategoryWhereInput | null
+    isNot?: CategoryWhereInput | null
+  }
+
   export type RssItemOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -25435,6 +26949,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     autoImport?: SortOrder
+    categoryId?: SortOrder
   }
 
   export type RssMaxOrderByAggregateInput = {
@@ -25447,6 +26962,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     autoImport?: SortOrder
+    categoryId?: SortOrder
   }
 
   export type RssMinOrderByAggregateInput = {
@@ -25459,6 +26975,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     autoImport?: SortOrder
+    categoryId?: SortOrder
   }
 
   export type RssScalarRelationFilter = {
@@ -25563,17 +27080,6 @@ export namespace Prisma {
   export type ThemeSumOrderByAggregateInput = {
     price?: SortOrder
   }
-  export type JsonFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-  }
 
   export type ThemeScalarRelationFilter = {
     is?: ThemeWhereInput
@@ -25597,20 +27103,6 @@ export namespace Prisma {
     id?: SortOrder
     themeId?: SortOrder
     componentName?: SortOrder
-  }
-  export type JsonWithAggregatesFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedJsonFilter<$PrismaModel>
-    _max?: NestedJsonFilter<$PrismaModel>
   }
 
   export type SiteThemeSiteIdThemeIdCompoundUniqueInput = {
@@ -26004,6 +27496,20 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type RssCreateNestedManyWithoutCategoryInput = {
+    create?: XOR<RssCreateWithoutCategoryInput, RssUncheckedCreateWithoutCategoryInput> | RssCreateWithoutCategoryInput[] | RssUncheckedCreateWithoutCategoryInput[]
+    connectOrCreate?: RssCreateOrConnectWithoutCategoryInput | RssCreateOrConnectWithoutCategoryInput[]
+    createMany?: RssCreateManyCategoryInputEnvelope
+    connect?: RssWhereUniqueInput | RssWhereUniqueInput[]
+  }
+
+  export type RssUncheckedCreateNestedManyWithoutCategoryInput = {
+    create?: XOR<RssCreateWithoutCategoryInput, RssUncheckedCreateWithoutCategoryInput> | RssCreateWithoutCategoryInput[] | RssUncheckedCreateWithoutCategoryInput[]
+    connectOrCreate?: RssCreateOrConnectWithoutCategoryInput | RssCreateOrConnectWithoutCategoryInput[]
+    createMany?: RssCreateManyCategoryInputEnvelope
+    connect?: RssWhereUniqueInput | RssWhereUniqueInput[]
+  }
+
   export type BoolFieldUpdateOperationsInput = {
     set?: boolean
   }
@@ -26026,6 +27532,34 @@ export namespace Prisma {
     delete?: UserWhereInput | boolean
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutCategoryInput, UserUpdateWithoutCategoryInput>, UserUncheckedUpdateWithoutCategoryInput>
+  }
+
+  export type RssUpdateManyWithoutCategoryNestedInput = {
+    create?: XOR<RssCreateWithoutCategoryInput, RssUncheckedCreateWithoutCategoryInput> | RssCreateWithoutCategoryInput[] | RssUncheckedCreateWithoutCategoryInput[]
+    connectOrCreate?: RssCreateOrConnectWithoutCategoryInput | RssCreateOrConnectWithoutCategoryInput[]
+    upsert?: RssUpsertWithWhereUniqueWithoutCategoryInput | RssUpsertWithWhereUniqueWithoutCategoryInput[]
+    createMany?: RssCreateManyCategoryInputEnvelope
+    set?: RssWhereUniqueInput | RssWhereUniqueInput[]
+    disconnect?: RssWhereUniqueInput | RssWhereUniqueInput[]
+    delete?: RssWhereUniqueInput | RssWhereUniqueInput[]
+    connect?: RssWhereUniqueInput | RssWhereUniqueInput[]
+    update?: RssUpdateWithWhereUniqueWithoutCategoryInput | RssUpdateWithWhereUniqueWithoutCategoryInput[]
+    updateMany?: RssUpdateManyWithWhereWithoutCategoryInput | RssUpdateManyWithWhereWithoutCategoryInput[]
+    deleteMany?: RssScalarWhereInput | RssScalarWhereInput[]
+  }
+
+  export type RssUncheckedUpdateManyWithoutCategoryNestedInput = {
+    create?: XOR<RssCreateWithoutCategoryInput, RssUncheckedCreateWithoutCategoryInput> | RssCreateWithoutCategoryInput[] | RssUncheckedCreateWithoutCategoryInput[]
+    connectOrCreate?: RssCreateOrConnectWithoutCategoryInput | RssCreateOrConnectWithoutCategoryInput[]
+    upsert?: RssUpsertWithWhereUniqueWithoutCategoryInput | RssUpsertWithWhereUniqueWithoutCategoryInput[]
+    createMany?: RssCreateManyCategoryInputEnvelope
+    set?: RssWhereUniqueInput | RssWhereUniqueInput[]
+    disconnect?: RssWhereUniqueInput | RssWhereUniqueInput[]
+    delete?: RssWhereUniqueInput | RssWhereUniqueInput[]
+    connect?: RssWhereUniqueInput | RssWhereUniqueInput[]
+    update?: RssUpdateWithWhereUniqueWithoutCategoryInput | RssUpdateWithWhereUniqueWithoutCategoryInput[]
+    updateMany?: RssUpdateManyWithWhereWithoutCategoryInput | RssUpdateManyWithWhereWithoutCategoryInput[]
+    deleteMany?: RssScalarWhereInput | RssScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutSiteInput = {
@@ -26088,6 +27622,13 @@ export namespace Prisma {
     connect?: SiteThemeWhereUniqueInput | SiteThemeWhereUniqueInput[]
   }
 
+  export type SnippetCreateNestedManyWithoutSiteInput = {
+    create?: XOR<SnippetCreateWithoutSiteInput, SnippetUncheckedCreateWithoutSiteInput> | SnippetCreateWithoutSiteInput[] | SnippetUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SnippetCreateOrConnectWithoutSiteInput | SnippetCreateOrConnectWithoutSiteInput[]
+    createMany?: SnippetCreateManySiteInputEnvelope
+    connect?: SnippetWhereUniqueInput | SnippetWhereUniqueInput[]
+  }
+
   export type CategoryUncheckedCreateNestedManyWithoutSiteInput = {
     create?: XOR<CategoryCreateWithoutSiteInput, CategoryUncheckedCreateWithoutSiteInput> | CategoryCreateWithoutSiteInput[] | CategoryUncheckedCreateWithoutSiteInput[]
     connectOrCreate?: CategoryCreateOrConnectWithoutSiteInput | CategoryCreateOrConnectWithoutSiteInput[]
@@ -26128,6 +27669,13 @@ export namespace Prisma {
     connectOrCreate?: SiteThemeCreateOrConnectWithoutSiteInput | SiteThemeCreateOrConnectWithoutSiteInput[]
     createMany?: SiteThemeCreateManySiteInputEnvelope
     connect?: SiteThemeWhereUniqueInput | SiteThemeWhereUniqueInput[]
+  }
+
+  export type SnippetUncheckedCreateNestedManyWithoutSiteInput = {
+    create?: XOR<SnippetCreateWithoutSiteInput, SnippetUncheckedCreateWithoutSiteInput> | SnippetCreateWithoutSiteInput[] | SnippetUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SnippetCreateOrConnectWithoutSiteInput | SnippetCreateOrConnectWithoutSiteInput[]
+    createMany?: SnippetCreateManySiteInputEnvelope
+    connect?: SnippetWhereUniqueInput | SnippetWhereUniqueInput[]
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -26252,6 +27800,20 @@ export namespace Prisma {
     deleteMany?: SiteThemeScalarWhereInput | SiteThemeScalarWhereInput[]
   }
 
+  export type SnippetUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<SnippetCreateWithoutSiteInput, SnippetUncheckedCreateWithoutSiteInput> | SnippetCreateWithoutSiteInput[] | SnippetUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SnippetCreateOrConnectWithoutSiteInput | SnippetCreateOrConnectWithoutSiteInput[]
+    upsert?: SnippetUpsertWithWhereUniqueWithoutSiteInput | SnippetUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: SnippetCreateManySiteInputEnvelope
+    set?: SnippetWhereUniqueInput | SnippetWhereUniqueInput[]
+    disconnect?: SnippetWhereUniqueInput | SnippetWhereUniqueInput[]
+    delete?: SnippetWhereUniqueInput | SnippetWhereUniqueInput[]
+    connect?: SnippetWhereUniqueInput | SnippetWhereUniqueInput[]
+    update?: SnippetUpdateWithWhereUniqueWithoutSiteInput | SnippetUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: SnippetUpdateManyWithWhereWithoutSiteInput | SnippetUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: SnippetScalarWhereInput | SnippetScalarWhereInput[]
+  }
+
   export type CategoryUncheckedUpdateManyWithoutSiteNestedInput = {
     create?: XOR<CategoryCreateWithoutSiteInput, CategoryUncheckedCreateWithoutSiteInput> | CategoryCreateWithoutSiteInput[] | CategoryUncheckedCreateWithoutSiteInput[]
     connectOrCreate?: CategoryCreateOrConnectWithoutSiteInput | CategoryCreateOrConnectWithoutSiteInput[]
@@ -26334,6 +27896,34 @@ export namespace Prisma {
     update?: SiteThemeUpdateWithWhereUniqueWithoutSiteInput | SiteThemeUpdateWithWhereUniqueWithoutSiteInput[]
     updateMany?: SiteThemeUpdateManyWithWhereWithoutSiteInput | SiteThemeUpdateManyWithWhereWithoutSiteInput[]
     deleteMany?: SiteThemeScalarWhereInput | SiteThemeScalarWhereInput[]
+  }
+
+  export type SnippetUncheckedUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<SnippetCreateWithoutSiteInput, SnippetUncheckedCreateWithoutSiteInput> | SnippetCreateWithoutSiteInput[] | SnippetUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SnippetCreateOrConnectWithoutSiteInput | SnippetCreateOrConnectWithoutSiteInput[]
+    upsert?: SnippetUpsertWithWhereUniqueWithoutSiteInput | SnippetUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: SnippetCreateManySiteInputEnvelope
+    set?: SnippetWhereUniqueInput | SnippetWhereUniqueInput[]
+    disconnect?: SnippetWhereUniqueInput | SnippetWhereUniqueInput[]
+    delete?: SnippetWhereUniqueInput | SnippetWhereUniqueInput[]
+    connect?: SnippetWhereUniqueInput | SnippetWhereUniqueInput[]
+    update?: SnippetUpdateWithWhereUniqueWithoutSiteInput | SnippetUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: SnippetUpdateManyWithWhereWithoutSiteInput | SnippetUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: SnippetScalarWhereInput | SnippetScalarWhereInput[]
+  }
+
+  export type SiteCreateNestedOneWithoutSnippetsInput = {
+    create?: XOR<SiteCreateWithoutSnippetsInput, SiteUncheckedCreateWithoutSnippetsInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutSnippetsInput
+    connect?: SiteWhereUniqueInput
+  }
+
+  export type SiteUpdateOneRequiredWithoutSnippetsNestedInput = {
+    create?: XOR<SiteCreateWithoutSnippetsInput, SiteUncheckedCreateWithoutSnippetsInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutSnippetsInput
+    upsert?: SiteUpsertWithoutSnippetsInput
+    connect?: SiteWhereUniqueInput
+    update?: XOR<XOR<SiteUpdateToOneWithWhereWithoutSnippetsInput, SiteUpdateWithoutSnippetsInput>, SiteUncheckedUpdateWithoutSnippetsInput>
   }
 
   export type SiteCreateNestedManyWithoutFeaturesInput = {
@@ -26613,6 +28203,12 @@ export namespace Prisma {
     connect?: RssItemWhereUniqueInput | RssItemWhereUniqueInput[]
   }
 
+  export type CategoryCreateNestedOneWithoutRssesInput = {
+    create?: XOR<CategoryCreateWithoutRssesInput, CategoryUncheckedCreateWithoutRssesInput>
+    connectOrCreate?: CategoryCreateOrConnectWithoutRssesInput
+    connect?: CategoryWhereUniqueInput
+  }
+
   export type RssItemUncheckedCreateNestedManyWithoutRssInput = {
     create?: XOR<RssItemCreateWithoutRssInput, RssItemUncheckedCreateWithoutRssInput> | RssItemCreateWithoutRssInput[] | RssItemUncheckedCreateWithoutRssInput[]
     connectOrCreate?: RssItemCreateOrConnectWithoutRssInput | RssItemCreateOrConnectWithoutRssInput[]
@@ -26640,6 +28236,16 @@ export namespace Prisma {
     update?: RssItemUpdateWithWhereUniqueWithoutRssInput | RssItemUpdateWithWhereUniqueWithoutRssInput[]
     updateMany?: RssItemUpdateManyWithWhereWithoutRssInput | RssItemUpdateManyWithWhereWithoutRssInput[]
     deleteMany?: RssItemScalarWhereInput | RssItemScalarWhereInput[]
+  }
+
+  export type CategoryUpdateOneWithoutRssesNestedInput = {
+    create?: XOR<CategoryCreateWithoutRssesInput, CategoryUncheckedCreateWithoutRssesInput>
+    connectOrCreate?: CategoryCreateOrConnectWithoutRssesInput
+    upsert?: CategoryUpsertWithoutRssesInput
+    disconnect?: boolean
+    delete?: CategoryWhereInput | boolean
+    connect?: CategoryWhereUniqueInput
+    update?: XOR<XOR<CategoryUpdateToOneWithWhereWithoutRssesInput, CategoryUpdateWithoutRssesInput>, CategoryUncheckedUpdateWithoutRssesInput>
   }
 
   export type RssItemUncheckedUpdateManyWithoutRssNestedInput = {
@@ -27041,6 +28647,17 @@ export namespace Prisma {
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
   }
+  export type NestedJsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+  }
 
   export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel>
@@ -27107,17 +28724,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumPageStatusFilter<$PrismaModel>
     _max?: NestedEnumPageStatusFilter<$PrismaModel>
-  }
-  export type NestedJsonFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
-        Required<NestedJsonFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
-
-  export type NestedJsonFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
   }
 
   export type SessionCreateWithoutUserInput = {
@@ -27206,6 +28812,7 @@ export namespace Prisma {
     RSS?: RssCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
+    snippets?: SnippetCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutUserInput = {
@@ -27236,6 +28843,7 @@ export namespace Prisma {
     RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
+    snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutUserInput = {
@@ -27258,6 +28866,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     metadata?: InputJsonValue | null
     site?: SiteCreateNestedOneWithoutCategoryInput
+    rsses?: RssCreateNestedManyWithoutCategoryInput
   }
 
   export type CategoryUncheckedCreateWithoutUserInput = {
@@ -27271,6 +28880,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     siteId?: string | null
     metadata?: InputJsonValue | null
+    rsses?: RssUncheckedCreateNestedManyWithoutCategoryInput
   }
 
   export type CategoryCreateOrConnectWithoutUserInput = {
@@ -27856,6 +29466,7 @@ export namespace Prisma {
     RSS?: RssCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
+    snippets?: SnippetCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutCategoryInput = {
@@ -27886,6 +29497,7 @@ export namespace Prisma {
     RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
+    snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutCategoryInput = {
@@ -27936,6 +29548,41 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutCategoryInput, UserUncheckedCreateWithoutCategoryInput>
   }
 
+  export type RssCreateWithoutCategoryInput = {
+    id?: string
+    title: string
+    description?: string | null
+    icon?: string | null
+    url?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    autoImport?: boolean
+    site: SiteCreateNestedOneWithoutRSSInput
+    rssItems?: RssItemCreateNestedManyWithoutRssInput
+  }
+
+  export type RssUncheckedCreateWithoutCategoryInput = {
+    id?: string
+    title: string
+    description?: string | null
+    icon?: string | null
+    url?: string | null
+    siteId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    autoImport?: boolean
+    rssItems?: RssItemUncheckedCreateNestedManyWithoutRssInput
+  }
+
+  export type RssCreateOrConnectWithoutCategoryInput = {
+    where: RssWhereUniqueInput
+    create: XOR<RssCreateWithoutCategoryInput, RssUncheckedCreateWithoutCategoryInput>
+  }
+
+  export type RssCreateManyCategoryInputEnvelope = {
+    data: RssCreateManyCategoryInput | RssCreateManyCategoryInput[]
+  }
+
   export type SiteUpsertWithoutCategoryInput = {
     update: XOR<SiteUpdateWithoutCategoryInput, SiteUncheckedUpdateWithoutCategoryInput>
     create: XOR<SiteCreateWithoutCategoryInput, SiteUncheckedCreateWithoutCategoryInput>
@@ -27974,6 +29621,7 @@ export namespace Prisma {
     RSS?: RssUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutCategoryInput = {
@@ -28003,6 +29651,7 @@ export namespace Prisma {
     RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutCategoryInput = {
@@ -28050,6 +29699,38 @@ export namespace Prisma {
     Subscription?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     Article?: ArticleUncheckedUpdateManyWithoutAuthorNestedInput
     Page?: PageUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type RssUpsertWithWhereUniqueWithoutCategoryInput = {
+    where: RssWhereUniqueInput
+    update: XOR<RssUpdateWithoutCategoryInput, RssUncheckedUpdateWithoutCategoryInput>
+    create: XOR<RssCreateWithoutCategoryInput, RssUncheckedCreateWithoutCategoryInput>
+  }
+
+  export type RssUpdateWithWhereUniqueWithoutCategoryInput = {
+    where: RssWhereUniqueInput
+    data: XOR<RssUpdateWithoutCategoryInput, RssUncheckedUpdateWithoutCategoryInput>
+  }
+
+  export type RssUpdateManyWithWhereWithoutCategoryInput = {
+    where: RssScalarWhereInput
+    data: XOR<RssUpdateManyMutationInput, RssUncheckedUpdateManyWithoutCategoryInput>
+  }
+
+  export type RssScalarWhereInput = {
+    AND?: RssScalarWhereInput | RssScalarWhereInput[]
+    OR?: RssScalarWhereInput[]
+    NOT?: RssScalarWhereInput | RssScalarWhereInput[]
+    id?: StringFilter<"Rss"> | string
+    title?: StringFilter<"Rss"> | string
+    description?: StringNullableFilter<"Rss"> | string | null
+    icon?: StringNullableFilter<"Rss"> | string | null
+    url?: StringNullableFilter<"Rss"> | string | null
+    siteId?: StringFilter<"Rss"> | string
+    createdAt?: DateTimeFilter<"Rss"> | Date | string
+    updatedAt?: DateTimeFilter<"Rss"> | Date | string
+    autoImport?: BoolFilter<"Rss"> | boolean
+    categoryId?: StringNullableFilter<"Rss"> | string | null
   }
 
   export type UserCreateWithoutSiteInput = {
@@ -28166,6 +29847,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     metadata?: InputJsonValue | null
     user?: UserCreateNestedOneWithoutCategoryInput
+    rsses?: RssCreateNestedManyWithoutCategoryInput
   }
 
   export type CategoryUncheckedCreateWithoutSiteInput = {
@@ -28179,6 +29861,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     metadata?: InputJsonValue | null
     userId?: string | null
+    rsses?: RssUncheckedCreateNestedManyWithoutCategoryInput
   }
 
   export type CategoryCreateOrConnectWithoutSiteInput = {
@@ -28288,6 +29971,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     autoImport?: boolean
     rssItems?: RssItemCreateNestedManyWithoutRssInput
+    category?: CategoryCreateNestedOneWithoutRssesInput
   }
 
   export type RssUncheckedCreateWithoutSiteInput = {
@@ -28299,6 +29983,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     autoImport?: boolean
+    categoryId?: string | null
     rssItems?: RssItemUncheckedCreateNestedManyWithoutRssInput
   }
 
@@ -28361,6 +30046,37 @@ export namespace Prisma {
 
   export type SiteThemeCreateManySiteInputEnvelope = {
     data: SiteThemeCreateManySiteInput | SiteThemeCreateManySiteInput[]
+  }
+
+  export type SnippetCreateWithoutSiteInput = {
+    id?: string
+    name: string
+    description?: string | null
+    category?: string
+    thumbnail?: string | null
+    content: InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SnippetUncheckedCreateWithoutSiteInput = {
+    id?: string
+    name: string
+    description?: string | null
+    category?: string
+    thumbnail?: string | null
+    content: InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SnippetCreateOrConnectWithoutSiteInput = {
+    where: SnippetWhereUniqueInput
+    create: XOR<SnippetCreateWithoutSiteInput, SnippetUncheckedCreateWithoutSiteInput>
+  }
+
+  export type SnippetCreateManySiteInputEnvelope = {
+    data: SnippetCreateManySiteInput | SnippetCreateManySiteInput[]
   }
 
   export type UserUpsertWithoutSiteInput = {
@@ -28542,21 +30258,6 @@ export namespace Prisma {
     data: XOR<RssUpdateManyMutationInput, RssUncheckedUpdateManyWithoutSiteInput>
   }
 
-  export type RssScalarWhereInput = {
-    AND?: RssScalarWhereInput | RssScalarWhereInput[]
-    OR?: RssScalarWhereInput[]
-    NOT?: RssScalarWhereInput | RssScalarWhereInput[]
-    id?: StringFilter<"Rss"> | string
-    title?: StringFilter<"Rss"> | string
-    description?: StringNullableFilter<"Rss"> | string | null
-    icon?: StringNullableFilter<"Rss"> | string | null
-    url?: StringNullableFilter<"Rss"> | string | null
-    siteId?: StringFilter<"Rss"> | string
-    createdAt?: DateTimeFilter<"Rss"> | Date | string
-    updatedAt?: DateTimeFilter<"Rss"> | Date | string
-    autoImport?: BoolFilter<"Rss"> | boolean
-  }
-
   export type AnalyticsEventUpsertWithWhereUniqueWithoutSiteInput = {
     where: AnalyticsEventWhereUniqueInput
     update: XOR<AnalyticsEventUpdateWithoutSiteInput, AnalyticsEventUncheckedUpdateWithoutSiteInput>
@@ -28614,6 +30315,175 @@ export namespace Prisma {
     installedAt?: DateTimeFilter<"SiteTheme"> | Date | string
   }
 
+  export type SnippetUpsertWithWhereUniqueWithoutSiteInput = {
+    where: SnippetWhereUniqueInput
+    update: XOR<SnippetUpdateWithoutSiteInput, SnippetUncheckedUpdateWithoutSiteInput>
+    create: XOR<SnippetCreateWithoutSiteInput, SnippetUncheckedCreateWithoutSiteInput>
+  }
+
+  export type SnippetUpdateWithWhereUniqueWithoutSiteInput = {
+    where: SnippetWhereUniqueInput
+    data: XOR<SnippetUpdateWithoutSiteInput, SnippetUncheckedUpdateWithoutSiteInput>
+  }
+
+  export type SnippetUpdateManyWithWhereWithoutSiteInput = {
+    where: SnippetScalarWhereInput
+    data: XOR<SnippetUpdateManyMutationInput, SnippetUncheckedUpdateManyWithoutSiteInput>
+  }
+
+  export type SnippetScalarWhereInput = {
+    AND?: SnippetScalarWhereInput | SnippetScalarWhereInput[]
+    OR?: SnippetScalarWhereInput[]
+    NOT?: SnippetScalarWhereInput | SnippetScalarWhereInput[]
+    id?: StringFilter<"Snippet"> | string
+    name?: StringFilter<"Snippet"> | string
+    description?: StringNullableFilter<"Snippet"> | string | null
+    category?: StringFilter<"Snippet"> | string
+    thumbnail?: StringNullableFilter<"Snippet"> | string | null
+    content?: JsonFilter<"Snippet">
+    siteId?: StringFilter<"Snippet"> | string
+    createdAt?: DateTimeFilter<"Snippet"> | Date | string
+    updatedAt?: DateTimeFilter<"Snippet"> | Date | string
+  }
+
+  export type SiteCreateWithoutSnippetsInput = {
+    id?: string
+    subdomain: string
+    url: string
+    views?: number
+    limitViews?: number
+    title: string
+    description?: string | null
+    logo?: string | null
+    theme?: InputJsonValue | null
+    status?: string
+    defaultThemePreference?: string
+    template_schema?: InputJsonValue | null
+    settings?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    home_Id?: string | null
+    privacy_policy_id?: string | null
+    cookies_id?: string | null
+    terms_id?: string | null
+    user?: UserCreateNestedOneWithoutSiteInput
+    features?: FeaturesCreateNestedOneWithoutSiteInput
+    subscription?: SubscriptionCreateNestedOneWithoutSiteInput
+    category?: CategoryCreateNestedManyWithoutSiteInput
+    Article?: ArticleCreateNestedManyWithoutSiteInput
+    Page?: PageCreateNestedManyWithoutSiteInput
+    RSS?: RssCreateNestedManyWithoutSiteInput
+    AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteUncheckedCreateWithoutSnippetsInput = {
+    id?: string
+    subdomain: string
+    url: string
+    views?: number
+    limitViews?: number
+    title: string
+    description?: string | null
+    logo?: string | null
+    theme?: InputJsonValue | null
+    status?: string
+    defaultThemePreference?: string
+    template_schema?: InputJsonValue | null
+    settings?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    home_Id?: string | null
+    privacy_policy_id?: string | null
+    cookies_id?: string | null
+    terms_id?: string | null
+    userId?: string | null
+    featuresId?: string | null
+    subscriptionId?: string | null
+    category?: CategoryUncheckedCreateNestedManyWithoutSiteInput
+    Article?: ArticleUncheckedCreateNestedManyWithoutSiteInput
+    Page?: PageUncheckedCreateNestedManyWithoutSiteInput
+    RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
+    AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteCreateOrConnectWithoutSnippetsInput = {
+    where: SiteWhereUniqueInput
+    create: XOR<SiteCreateWithoutSnippetsInput, SiteUncheckedCreateWithoutSnippetsInput>
+  }
+
+  export type SiteUpsertWithoutSnippetsInput = {
+    update: XOR<SiteUpdateWithoutSnippetsInput, SiteUncheckedUpdateWithoutSnippetsInput>
+    create: XOR<SiteCreateWithoutSnippetsInput, SiteUncheckedCreateWithoutSnippetsInput>
+    where?: SiteWhereInput
+  }
+
+  export type SiteUpdateToOneWithWhereWithoutSnippetsInput = {
+    where?: SiteWhereInput
+    data: XOR<SiteUpdateWithoutSnippetsInput, SiteUncheckedUpdateWithoutSnippetsInput>
+  }
+
+  export type SiteUpdateWithoutSnippetsInput = {
+    subdomain?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    views?: IntFieldUpdateOperationsInput | number
+    limitViews?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    theme?: InputJsonValue | InputJsonValue | null
+    status?: StringFieldUpdateOperationsInput | string
+    defaultThemePreference?: StringFieldUpdateOperationsInput | string
+    template_schema?: InputJsonValue | InputJsonValue | null
+    settings?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_Id?: NullableStringFieldUpdateOperationsInput | string | null
+    privacy_policy_id?: NullableStringFieldUpdateOperationsInput | string | null
+    cookies_id?: NullableStringFieldUpdateOperationsInput | string | null
+    terms_id?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneWithoutSiteNestedInput
+    features?: FeaturesUpdateOneWithoutSiteNestedInput
+    subscription?: SubscriptionUpdateOneWithoutSiteNestedInput
+    category?: CategoryUpdateManyWithoutSiteNestedInput
+    Article?: ArticleUpdateManyWithoutSiteNestedInput
+    Page?: PageUpdateManyWithoutSiteNestedInput
+    RSS?: RssUpdateManyWithoutSiteNestedInput
+    AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
+  }
+
+  export type SiteUncheckedUpdateWithoutSnippetsInput = {
+    subdomain?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    views?: IntFieldUpdateOperationsInput | number
+    limitViews?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    theme?: InputJsonValue | InputJsonValue | null
+    status?: StringFieldUpdateOperationsInput | string
+    defaultThemePreference?: StringFieldUpdateOperationsInput | string
+    template_schema?: InputJsonValue | InputJsonValue | null
+    settings?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_Id?: NullableStringFieldUpdateOperationsInput | string | null
+    privacy_policy_id?: NullableStringFieldUpdateOperationsInput | string | null
+    cookies_id?: NullableStringFieldUpdateOperationsInput | string | null
+    terms_id?: NullableStringFieldUpdateOperationsInput | string | null
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    featuresId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: CategoryUncheckedUpdateManyWithoutSiteNestedInput
+    Article?: ArticleUncheckedUpdateManyWithoutSiteNestedInput
+    Page?: PageUncheckedUpdateManyWithoutSiteNestedInput
+    RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
+    AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
+  }
+
   export type SiteCreateWithoutFeaturesInput = {
     id?: string
     subdomain: string
@@ -28642,6 +30512,7 @@ export namespace Prisma {
     RSS?: RssCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
+    snippets?: SnippetCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutFeaturesInput = {
@@ -28672,6 +30543,7 @@ export namespace Prisma {
     RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
+    snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutFeaturesInput = {
@@ -28770,6 +30642,7 @@ export namespace Prisma {
     RSS?: RssCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
+    snippets?: SnippetCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutSubscriptionInput = {
@@ -28800,6 +30673,7 @@ export namespace Prisma {
     RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
+    snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutSubscriptionInput = {
@@ -29027,6 +30901,7 @@ export namespace Prisma {
     Page?: PageCreateNestedManyWithoutSiteInput
     RSS?: RssCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
+    snippets?: SnippetCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutAnalyticsEventInput = {
@@ -29057,6 +30932,7 @@ export namespace Prisma {
     Page?: PageUncheckedCreateNestedManyWithoutSiteInput
     RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
+    snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutAnalyticsEventInput = {
@@ -29102,6 +30978,7 @@ export namespace Prisma {
     Page?: PageUpdateManyWithoutSiteNestedInput
     RSS?: RssUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutAnalyticsEventInput = {
@@ -29131,6 +31008,7 @@ export namespace Prisma {
     Page?: PageUncheckedUpdateManyWithoutSiteNestedInput
     RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteCreateWithoutArticleInput = {
@@ -29161,6 +31039,7 @@ export namespace Prisma {
     RSS?: RssCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
+    snippets?: SnippetCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutArticleInput = {
@@ -29191,6 +31070,7 @@ export namespace Prisma {
     RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
+    snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutArticleInput = {
@@ -29279,6 +31159,7 @@ export namespace Prisma {
     RSS?: RssUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutArticleInput = {
@@ -29308,6 +31189,7 @@ export namespace Prisma {
     RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutArticleInput = {
@@ -29385,6 +31267,7 @@ export namespace Prisma {
     RSS?: RssCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
+    snippets?: SnippetCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutPageInput = {
@@ -29415,6 +31298,7 @@ export namespace Prisma {
     RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
+    snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutPageInput = {
@@ -29503,6 +31387,7 @@ export namespace Prisma {
     RSS?: RssUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutPageInput = {
@@ -29532,6 +31417,7 @@ export namespace Prisma {
     RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutPageInput = {
@@ -29609,6 +31495,7 @@ export namespace Prisma {
     Page?: PageCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
+    snippets?: SnippetCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutRSSInput = {
@@ -29639,6 +31526,7 @@ export namespace Prisma {
     Page?: PageUncheckedCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
+    snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutRSSInput = {
@@ -29685,6 +31573,39 @@ export namespace Prisma {
     data: RssItemCreateManyRssInput | RssItemCreateManyRssInput[]
   }
 
+  export type CategoryCreateWithoutRssesInput = {
+    id?: string
+    name: string
+    description: string
+    slug: string
+    thumbnail?: string | null
+    published?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    metadata?: InputJsonValue | null
+    site?: SiteCreateNestedOneWithoutCategoryInput
+    user?: UserCreateNestedOneWithoutCategoryInput
+  }
+
+  export type CategoryUncheckedCreateWithoutRssesInput = {
+    id?: string
+    name: string
+    description: string
+    slug: string
+    thumbnail?: string | null
+    published?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId?: string | null
+    metadata?: InputJsonValue | null
+    userId?: string | null
+  }
+
+  export type CategoryCreateOrConnectWithoutRssesInput = {
+    where: CategoryWhereUniqueInput
+    create: XOR<CategoryCreateWithoutRssesInput, CategoryUncheckedCreateWithoutRssesInput>
+  }
+
   export type SiteUpsertWithoutRSSInput = {
     update: XOR<SiteUpdateWithoutRSSInput, SiteUncheckedUpdateWithoutRSSInput>
     create: XOR<SiteCreateWithoutRSSInput, SiteUncheckedCreateWithoutRSSInput>
@@ -29723,6 +31644,7 @@ export namespace Prisma {
     Page?: PageUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutRSSInput = {
@@ -29752,6 +31674,7 @@ export namespace Prisma {
     Page?: PageUncheckedUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type RssItemUpsertWithWhereUniqueWithoutRssInput = {
@@ -29789,6 +31712,43 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"RssItem"> | Date | string
   }
 
+  export type CategoryUpsertWithoutRssesInput = {
+    update: XOR<CategoryUpdateWithoutRssesInput, CategoryUncheckedUpdateWithoutRssesInput>
+    create: XOR<CategoryCreateWithoutRssesInput, CategoryUncheckedCreateWithoutRssesInput>
+    where?: CategoryWhereInput
+  }
+
+  export type CategoryUpdateToOneWithWhereWithoutRssesInput = {
+    where?: CategoryWhereInput
+    data: XOR<CategoryUpdateWithoutRssesInput, CategoryUncheckedUpdateWithoutRssesInput>
+  }
+
+  export type CategoryUpdateWithoutRssesInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
+    published?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    metadata?: InputJsonValue | InputJsonValue | null
+    site?: SiteUpdateOneWithoutCategoryNestedInput
+    user?: UserUpdateOneWithoutCategoryNestedInput
+  }
+
+  export type CategoryUncheckedUpdateWithoutRssesInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
+    published?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: InputJsonValue | InputJsonValue | null
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
   export type RssCreateWithoutRssItemsInput = {
     id?: string
     title: string
@@ -29799,6 +31759,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     autoImport?: boolean
     site: SiteCreateNestedOneWithoutRSSInput
+    category?: CategoryCreateNestedOneWithoutRssesInput
   }
 
   export type RssUncheckedCreateWithoutRssItemsInput = {
@@ -29811,6 +31772,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     autoImport?: boolean
+    categoryId?: string | null
   }
 
   export type RssCreateOrConnectWithoutRssItemsInput = {
@@ -29838,6 +31800,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     autoImport?: BoolFieldUpdateOperationsInput | boolean
     site?: SiteUpdateOneRequiredWithoutRSSNestedInput
+    category?: CategoryUpdateOneWithoutRssesNestedInput
   }
 
   export type RssUncheckedUpdateWithoutRssItemsInput = {
@@ -29849,6 +31812,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     autoImport?: BoolFieldUpdateOperationsInput | boolean
+    categoryId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type ThemeBlockCreateWithoutThemeInput = {
@@ -30029,6 +31993,7 @@ export namespace Prisma {
     Page?: PageCreateNestedManyWithoutSiteInput
     RSS?: RssCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
+    snippets?: SnippetCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutInstalledThemesInput = {
@@ -30059,6 +32024,7 @@ export namespace Prisma {
     Page?: PageUncheckedCreateNestedManyWithoutSiteInput
     RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
+    snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutInstalledThemesInput = {
@@ -30135,6 +32101,7 @@ export namespace Prisma {
     Page?: PageUpdateManyWithoutSiteNestedInput
     RSS?: RssUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutInstalledThemesInput = {
@@ -30164,6 +32131,7 @@ export namespace Prisma {
     Page?: PageUncheckedUpdateManyWithoutSiteNestedInput
     RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type ThemeUpsertWithoutInstalledInInput = {
@@ -30385,6 +32353,7 @@ export namespace Prisma {
     RSS?: RssUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutUserInput = {
@@ -30414,6 +32383,7 @@ export namespace Prisma {
     RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateManyWithoutUserInput = {
@@ -30449,6 +32419,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     metadata?: InputJsonValue | InputJsonValue | null
     site?: SiteUpdateOneWithoutCategoryNestedInput
+    rsses?: RssUpdateManyWithoutCategoryNestedInput
   }
 
   export type CategoryUncheckedUpdateWithoutUserInput = {
@@ -30461,6 +32432,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     siteId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: InputJsonValue | InputJsonValue | null
+    rsses?: RssUncheckedUpdateManyWithoutCategoryNestedInput
   }
 
   export type CategoryUncheckedUpdateManyWithoutUserInput = {
@@ -30608,6 +32580,53 @@ export namespace Prisma {
     locked?: BoolFieldUpdateOperationsInput | boolean
   }
 
+  export type RssCreateManyCategoryInput = {
+    id?: string
+    title: string
+    description?: string | null
+    icon?: string | null
+    url?: string | null
+    siteId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    autoImport?: boolean
+  }
+
+  export type RssUpdateWithoutCategoryInput = {
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    icon?: NullableStringFieldUpdateOperationsInput | string | null
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    autoImport?: BoolFieldUpdateOperationsInput | boolean
+    site?: SiteUpdateOneRequiredWithoutRSSNestedInput
+    rssItems?: RssItemUpdateManyWithoutRssNestedInput
+  }
+
+  export type RssUncheckedUpdateWithoutCategoryInput = {
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    icon?: NullableStringFieldUpdateOperationsInput | string | null
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    siteId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    autoImport?: BoolFieldUpdateOperationsInput | boolean
+    rssItems?: RssItemUncheckedUpdateManyWithoutRssNestedInput
+  }
+
+  export type RssUncheckedUpdateManyWithoutCategoryInput = {
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    icon?: NullableStringFieldUpdateOperationsInput | string | null
+    url?: NullableStringFieldUpdateOperationsInput | string | null
+    siteId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    autoImport?: BoolFieldUpdateOperationsInput | boolean
+  }
+
   export type CategoryCreateManySiteInput = {
     id?: string
     name: string
@@ -30665,6 +32684,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     autoImport?: boolean
+    categoryId?: string | null
   }
 
   export type AnalyticsEventCreateManySiteInput = {
@@ -30684,6 +32704,17 @@ export namespace Prisma {
     installedAt?: Date | string
   }
 
+  export type SnippetCreateManySiteInput = {
+    id?: string
+    name: string
+    description?: string | null
+    category?: string
+    thumbnail?: string | null
+    content: InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type CategoryUpdateWithoutSiteInput = {
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
@@ -30694,6 +32725,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     metadata?: InputJsonValue | InputJsonValue | null
     user?: UserUpdateOneWithoutCategoryNestedInput
+    rsses?: RssUpdateManyWithoutCategoryNestedInput
   }
 
   export type CategoryUncheckedUpdateWithoutSiteInput = {
@@ -30706,6 +32738,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     metadata?: InputJsonValue | InputJsonValue | null
     userId?: NullableStringFieldUpdateOperationsInput | string | null
+    rsses?: RssUncheckedUpdateManyWithoutCategoryNestedInput
   }
 
   export type CategoryUncheckedUpdateManyWithoutSiteInput = {
@@ -30828,6 +32861,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     autoImport?: BoolFieldUpdateOperationsInput | boolean
     rssItems?: RssItemUpdateManyWithoutRssNestedInput
+    category?: CategoryUpdateOneWithoutRssesNestedInput
   }
 
   export type RssUncheckedUpdateWithoutSiteInput = {
@@ -30838,6 +32872,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     autoImport?: BoolFieldUpdateOperationsInput | boolean
+    categoryId?: NullableStringFieldUpdateOperationsInput | string | null
     rssItems?: RssItemUncheckedUpdateManyWithoutRssNestedInput
   }
 
@@ -30849,6 +32884,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     autoImport?: BoolFieldUpdateOperationsInput | boolean
+    categoryId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type AnalyticsEventUpdateWithoutSiteInput = {
@@ -30894,6 +32930,36 @@ export namespace Prisma {
   export type SiteThemeUncheckedUpdateManyWithoutSiteInput = {
     themeId?: StringFieldUpdateOperationsInput | string
     installedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SnippetUpdateWithoutSiteInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: StringFieldUpdateOperationsInput | string
+    thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: InputJsonValue | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SnippetUncheckedUpdateWithoutSiteInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: StringFieldUpdateOperationsInput | string
+    thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: InputJsonValue | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SnippetUncheckedUpdateManyWithoutSiteInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: StringFieldUpdateOperationsInput | string
+    thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: InputJsonValue | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SiteCreateManyFeaturesInput = {
@@ -30947,6 +33013,7 @@ export namespace Prisma {
     RSS?: RssUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutFeaturesInput = {
@@ -30976,6 +33043,7 @@ export namespace Prisma {
     RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateManyWithoutFeaturesInput = {
@@ -31062,6 +33130,7 @@ export namespace Prisma {
     RSS?: RssUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutSubscriptionInput = {
@@ -31091,6 +33160,7 @@ export namespace Prisma {
     RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateManyWithoutSubscriptionInput = {

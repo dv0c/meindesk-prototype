@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { Copy, Trash2, ArrowUp, ArrowDown, Settings } from "lucide-react"
+import { Copy, Trash2, ArrowUp, ArrowDown, Settings, Puzzle, Link2Off, Edit } from "lucide-react"
 
 interface ContextMenuProps {
   x: number
@@ -12,9 +12,13 @@ interface ContextMenuProps {
   onDelete: () => void
   onMoveUp: () => void
   onMoveDown: () => void
+  onSaveAsSnippet?: () => void
+  onUnlinkSnippet?: () => void
+  onEditSnippet?: () => void
+  isSnippetRef?: boolean
 }
 
-export function ContextMenu({ x, y, onClose, onEdit, onDuplicate, onDelete, onMoveUp, onMoveDown }: ContextMenuProps) {
+export function ContextMenu({ x, y, onClose, onEdit, onDuplicate, onDelete, onMoveUp, onMoveDown, onSaveAsSnippet, onUnlinkSnippet, onEditSnippet, isSnippetRef }: ContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -77,6 +81,54 @@ export function ContextMenu({ x, y, onClose, onEdit, onDuplicate, onDelete, onMo
             </div>
             <span>Duplicate</span>
           </button>
+
+          {/* Save as Snippet */}
+          {onSaveAsSnippet && !isSnippetRef && (
+            <button
+              className="w-full px-3 py-2.5 text-sm font-medium hover:bg-accent/50 rounded-lg flex items-center gap-3 text-left transition-all duration-150 group"
+              onClick={() => {
+                onSaveAsSnippet()
+                onClose()
+              }}
+            >
+              <div className="h-8 w-8 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
+                <Puzzle className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+              </div>
+              <span>Save as Snippet</span>
+            </button>
+          )}
+
+          {/* Unlink Snippet */}
+          {isSnippetRef && onUnlinkSnippet && (
+            <button
+              className="w-full px-3 py-2.5 text-sm font-medium hover:bg-accent/50 rounded-lg flex items-center gap-3 text-left transition-all duration-150 group"
+              onClick={() => {
+                onUnlinkSnippet()
+                onClose()
+              }}
+            >
+              <div className="h-8 w-8 rounded-full bg-orange-500/10 flex items-center justify-center group-hover:bg-orange-500/20 transition-colors">
+                <Link2Off className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+              </div>
+              <span>Unlink Snippet</span>
+            </button>
+          )}
+
+          {/* Edit Snippet */}
+          {isSnippetRef && onEditSnippet && (
+            <button
+              className="w-full px-3 py-2.5 text-sm font-medium hover:bg-accent/50 rounded-lg flex items-center gap-3 text-left transition-all duration-150 group"
+              onClick={() => {
+                onEditSnippet()
+                onClose()
+              }}
+            >
+              <div className="h-8 w-8 rounded-full bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
+                <Edit className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              </div>
+              <span>Edit Snippet</span>
+            </button>
+          )}
 
           {/* Move Up */}
           <button

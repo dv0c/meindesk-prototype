@@ -56,6 +56,25 @@ function ThemeTogglerButton({
   ...props
 }: ThemeTogglerButtonProps) {
   const { theme, resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+
+  // Prevent hydration mismatch by only rendering after mount
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Render a placeholder with the same dimensions during SSR
+  if (!mounted) {
+    return (
+      <button
+        data-slot="theme-toggler-button"
+        className={cn(buttonVariants({ variant, size, className }))}
+        {...props}
+      >
+        <Sun className="opacity-0" />
+      </button>
+    );
+  }
 
   return (
     <ThemeTogglerPrimitive
@@ -83,3 +102,4 @@ function ThemeTogglerButton({
 }
 
 export { ThemeTogglerButton, type ThemeTogglerButtonProps };
+

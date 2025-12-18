@@ -195,6 +195,18 @@ exports.Prisma.SiteScalarFieldEnum = {
   subscriptionId: 'subscriptionId'
 };
 
+exports.Prisma.SnippetScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  category: 'category',
+  thumbnail: 'thumbnail',
+  content: 'content',
+  siteId: 'siteId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.FeaturesScalarFieldEnum = {
   id: 'id',
   analytics: 'analytics',
@@ -288,7 +300,8 @@ exports.Prisma.RssScalarFieldEnum = {
   siteId: 'siteId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  autoImport: 'autoImport'
+  autoImport: 'autoImport',
+  categoryId: 'categoryId'
 };
 
 exports.Prisma.RssItemScalarFieldEnum = {
@@ -373,6 +386,7 @@ exports.Prisma.ModelName = {
   VerificationToken: 'VerificationToken',
   Category: 'Category',
   Site: 'Site',
+  Snippet: 'Snippet',
   Features: 'Features',
   Subscription: 'Subscription',
   BillingHistory: 'BillingHistory',
