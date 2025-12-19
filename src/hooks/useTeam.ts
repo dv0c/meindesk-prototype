@@ -85,8 +85,17 @@ export function useTeam(fallbackId?: string, tenantPrefix?: string) {
   useEffect(() => {
     let cancelled = false
 
+    // Reset attemptedIds when urlId changes to allow fetching the new team
+    attemptedIds.current.clear()
+
     // Determine the initial ID to try
     let initialId = urlId
+
+    // If we have a urlId and it's not in cache, set loading immediately
+    if (initialId && !teamCache.has(initialId)) {
+      setLoading(true)
+      setError(null)
+    }
 
     // If no URL ID, we can't check localStorage synchronously in SSR safe way,
     // so we defer to the async fetch logic which handles it.

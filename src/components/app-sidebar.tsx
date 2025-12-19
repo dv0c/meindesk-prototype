@@ -36,12 +36,13 @@ import { Skeleton } from "./ui/skeleton"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { teams, loading: loadingTeams } = useTeams()
-  const { team: activeTeam } = useTeam()
+  const { team: activeTeam, loading: loadingTeam } = useTeam()
   const [hovered, setHovered] = useState(false)
   const { newOpen, setNewOpen } = useSidebar()
   const [isMobile, setIsMobile] = useState(false)
   const collapseTimer = useRef<NodeJS.Timeout | null>(null)
   const sidebarRef = useRef<HTMLDivElement | null>(null)
+  const prevTeamId = useRef<string | null>(null)
 
   // Detect mobile
   useEffect(() => {
@@ -99,6 +100,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }, [hovered, isMobile])
 
   const isOpen = isMobile ? newOpen : hovered || newOpen
+
+  // Track team transitions
+  useEffect(() => {
+    if (activeTeam?.id) {
+      prevTeamId.current = activeTeam.id
+    }
+  }, [activeTeam?.id])
+
+  // Check if we're loading (teams loading, OR team loading, OR no active team yet)
+  const isLoading = loadingTeams || loadingTeam || !activeTeam
 
   // Default nav and projects
   const defaultNavMain = [
@@ -186,7 +197,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             {...props}
           >
             <SidebarHeader>
-              {!teams.length || !activeTeam ? (
+              {isLoading ? (
                 <Skeleton className="h-12 w-full" />
               ) : (
                 <TeamSwitcher teams={filteredData.teams} />

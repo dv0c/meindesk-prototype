@@ -58,9 +58,11 @@ export function TeamSwitcher({
 
   // 🔥 Switch teams but preserve the rest of the path
   const handleTeamChange = (teamId: string) => {
+    // Update cookie with the new team ID
+    document.cookie = `activeTeamId=${teamId}; Path=/; Secure; SameSite=Lax`
+
     // @ts-ignore
     setActiveTeam(teams.find((t) => t.id === teamId) || null)
-    document.cookie = `activeTeamId=${activeTeam.id}; Path=/; Secure; SameSite=Lax`
 
     const parts = pathname.split("/")
 
@@ -118,8 +120,8 @@ export function TeamSwitcher({
                 key={team.id}
                 onClick={() => handleTeamChange(team.id)}
                 className={`gap-2 cursor-pointer p-2 ${activeTeam.id === team.id
-                    ? "bg-sidebar-ring text-sidebar-accent-foreground"
-                    : ""
+                  ? "bg-sidebar-ring text-sidebar-accent-foreground"
+                  : ""
                   }`}
               >
                 <div className="flex size-6 items-center justify-center rounded-md border">
