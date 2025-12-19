@@ -69,9 +69,21 @@ export function SnippetInstance({
         return null
     }
 
+    // Handle right-click on snippet content - forward to parent with SnippetRef's node ID
+    const handleContentContextMenu = (e: React.MouseEvent) => {
+        if (isEditor && onContextMenu) {
+            e.preventDefault()
+            e.stopPropagation()
+            onContextMenu(e, node.id) // Use the SnippetRef's node ID, not child's
+        }
+    }
+
     // Render the actual snippet content
     const content = (
-        <div className="relative group">
+        <div
+            className="relative group"
+            onContextMenu={handleContentContextMenu}
+        >
             {/* Linked snippet indicator in editor mode */}
             {isEditor && (
                 <div className="absolute -top-2 -left-2 z-10 flex items-center gap-1 px-2 py-0.5 bg-purple-500 text-white text-[10px] font-medium rounded-full shadow-sm opacity-80 group-hover:opacity-100 transition-opacity">

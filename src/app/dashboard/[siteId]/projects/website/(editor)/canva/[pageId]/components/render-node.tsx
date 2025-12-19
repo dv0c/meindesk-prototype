@@ -112,7 +112,7 @@ export function RenderNode({ node, isEditor = false, onSelect, isSelected = fals
             isEditor={isEditor}
             onSelect={onSelect}
             isSelected={false}
-            onContextMenu={onContextMenu}
+            // Don't pass onContextMenu to snippet children - the SnippetInstance wrapper handles it
             validComponentNames={validComponentNames}
           />
         ))}
