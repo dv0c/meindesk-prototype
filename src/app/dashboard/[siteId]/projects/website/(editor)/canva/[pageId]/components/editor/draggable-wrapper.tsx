@@ -30,26 +30,30 @@ export function DraggableWrapper({
   data,
   isContainer = false,
 }: DraggableWrapperProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  // Sortable for reordering within canvas
+  const { attributes, listeners, setNodeRef: setSortableRef, transform, transition, isDragging } = useSortable({
     id,
     data: { ...data, isContainer },
   })
 
+  // Separate droppable to accept items from sidebar
+  // Use a prefixed ID to avoid conflicts with sortable ID
+  const dropId = `droppable-${id}`
   const { setNodeRef: setDropRef, isOver } = useDroppable({
-    id: `${id}-drop`,
+    id: dropId,
     data: {
-      type: "container-drop",
+      type: "component-drop",
+      nodeId: id, // Store the original node ID for lookup
       parentId: id,
-      isContainer: true,
+      isContainer,
+      ...data,
     },
-    disabled: !isContainer,
   })
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    zIndex: isDragging ? 999 : undefined,
-    position: isDragging ? ("relative" as const) : undefined,
+    opacity: isDragging ? 0.4 : 1,
   }
 
   const handleClick = (e: React.MouseEvent) => {
@@ -65,24 +69,25 @@ export function DraggableWrapper({
     }
   }
 
+  // Combine refs - both sortable and droppable need the same element
   const setRefs = (node: HTMLDivElement | null) => {
-    setNodeRef(node)
-    if (isContainer) {
-      setDropRef(node)
-    }
+    setSortableRef(node)
+    setDropRef(node)
   }
 
   return (
     <div
       ref={setRefs}
       style={style}
+      data-node-id={id}
+      data-drop-id={dropId}
       onClick={handleClick}
       onContextMenu={handleContextMenu}
       className={cn(
         "draggable-node relative group transition-all duration-200",
-        isContainer && isOver && "ring-2 ring-primary ring-offset-1 bg-primary/5",
-        isContainer && !isOver && "hover:ring-2 hover:ring-blue-500/50",
-        isSelected ? "ring-2 ring-primary ring-offset-2 z-10" : "hover:ring-2 hover:ring-blue-500/60",
+        isOver && "ring-2 ring-primary ring-offset-1 bg-primary/5",
+        !isOver && isContainer && "hover:ring-2 hover:ring-blue-500/50",
+        isSelected ? "ring-2 ring-primary ring-offset-2 z-10" : !isOver && "hover:ring-2 hover:ring-blue-500/60",
         isDragging ? "opacity-50" : "opacity-100",
       )}
     >

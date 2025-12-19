@@ -18,10 +18,16 @@ import {
   DndContext,
   DragOverlay,
   type DragEndEvent,
+  type DragStartEvent,
   useSensor,
   useSensors,
   PointerSensor,
+  pointerWithin,
+  rectIntersection,
+  closestCenter,
+  type CollisionDetection,
 } from "@dnd-kit/core"
+import { snapCenterToCursor } from "@dnd-kit/modifiers"
 import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
 import { SnippetsProvider } from "./components/editor/snippets-context"
@@ -51,11 +57,15 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
   const [pageSlug, setPageSlug] = useState<string>()
   const [isSaving, setSaving] = useState(false)
   const [showSidebar, setShowSidebar] = useState(true)
-  const [activeDragItem, setActiveDragItem] = useState<ComponentDefinition | null>(null)
+  const [activeDrag, setActiveDrag] = useState<{
+    type: 'new' | 'existing';
+    item: ComponentDefinition | LayoutNode;
+  } | null>(null)
   const [deviceMode, setDeviceMode] = useState<"desktop" | "tablet" | "mobile">("desktop")
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; nodeId: string } | null>(null)
   const [showLayersPanel, setShowLayersPanel] = useState(false)
   const [loading, setLoading] = useState(true) // <--- Loading state
+  const [componentsLoading, setComponentsLoading] = useState(true) // <--- Components loading state
   const [validComponentNames, setValidComponentNames] = useState<string[]>([])
 
   // Snippet state
@@ -87,6 +97,22 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
     }),
   )
 
+  // Custom collision detection: tries pointerWithin first, then rect, then closestCenter
+  const customCollisionDetection: CollisionDetection = (args) => {
+    // First try pointer-based detection for precision
+    const pointerCollisions = pointerWithin(args)
+    if (pointerCollisions.length > 0) {
+      return pointerCollisions
+    }
+    // Then try rect intersection
+    const rectCollisions = rectIntersection(args)
+    if (rectCollisions.length > 0) {
+      return rectCollisions
+    }
+    // Final fallback to closestCenter (works well with sortable contexts)
+    return closestCenter(args)
+  }
+
   useEffect(() => {
     async function init() {
       await loadPage() // Wait for page to load first
@@ -97,12 +123,15 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
   }, [])
 
   async function loadComponents() {
+    setComponentsLoading(true)
     try {
       const { getAvailableComponents } = await import("@/lib/component-registry")
       const components = await getAvailableComponents(tenantId as string)
       setValidComponentNames(components.map(c => c.name))
     } catch (error) {
       console.error("Failed to load components:", error)
+    } finally {
+      setComponentsLoading(false)
     }
   }
 
@@ -250,43 +279,84 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
     }
   }
 
-  function handleDragStart(event: any) {
+  function handleDragStart(event: DragStartEvent) {
     const { active } = event
-    if (active.data.current?.type === "palette-item") setActiveDragItem(active.data.current.component)
+    const type = active.data.current?.type
+
+    if (type === "palette-item") {
+      setActiveDrag({ type: 'new', item: active.data.current?.component })
+    } else if (type === "snippet-item") {
+      // Dragging snippet from sidebar - store snippet info
+      setActiveDrag({ type: 'new', item: { name: active.data.current?.snippet?.name || 'Snippet', type: 'SnippetRef' } as any })
+    } else if (active.data.current?.component) {
+      // Dragging existing component on canvas
+      setActiveDrag({ type: 'existing', item: active.data.current.component })
+    }
   }
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
-    setActiveDragItem(null)
-    if (!over) return
+    setActiveDrag(null)
+    if (!over) {
+      return
+    }
 
-    // Adding new component
-    if (active.data.current?.type === "palette-item") {
-      const component = active.data.current.component as ComponentDefinition
+    const dataType = active.data.current?.type
+
+    // Helper to get actual node ID (strips droppable- prefix if present)
+    const getNodeId = (id: string): string => {
+      if (id.startsWith('droppable-')) {
+        return id.replace('droppable-', '')
+      }
+      return id
+    }
+
+    // Helper to check if drop occurred within the canvas area
+    // This prevents adding components when dropping back on the sidebar
+    const isDropWithinCanvas = (): boolean => {
+      const canvasElement = document.querySelector('.canvas-interactive-area')
+      if (!canvasElement) return false
+
+      const activatorEvent = event.activatorEvent as PointerEvent
+      if (!activatorEvent) return false
+
+      // Get current pointer position from the drag end event delta
+      const rect = canvasElement.getBoundingClientRect()
+      const x = activatorEvent.clientX + (event.delta?.x || 0)
+      const y = activatorEvent.clientY + (event.delta?.y || 0)
+
+      return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
+    }
+
+    // Adding new component from sidebar (palette-item)
+    if (dataType === "palette-item") {
+      // Only add if drop occurred within the canvas area
+      if (!isDropWithinCanvas()) {
+        return // User cancelled by dropping outside canvas
+      }
+
+      const component = active.data.current?.component as ComponentDefinition
       const newNode = createNode(component.name, component)
       let parentId: string | null = null
-      let index = 0
 
       if (over.id === "canvas-root") {
         parentId = null
-        index = nodes.length
       } else {
-        const overId = over.id as string
+        const overId = getNodeId(over.id as string)
         const overNode = findNode(overId, nodes)
+
+        // Only add if dropped on a valid canvas node (not on sidebar or other areas)
+        if (!overNode) {
+          return // Exit without adding - not a valid canvas target
+        }
+
         const isContainer = over.data.current?.isContainer || (overNode && overNode.children !== undefined)
 
         if (isContainer) {
           parentId = overId
-          index = overNode?.children?.length || 0
         } else {
           const parentInfo = findNodeParent(overId, nodes)
-          if (parentInfo) {
-            parentId = parentInfo.parent ? parentInfo.parent.id : null
-            index = parentInfo.index + 1
-          } else {
-            parentId = null
-            index = nodes.length
-          }
+          parentId = parentInfo?.parent?.id || null
         }
       }
 
@@ -294,31 +364,73 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
       toast("Component Added", { description: `${component.name} has been added to the canvas` })
     }
 
-    // Moving existing component
+    // Adding snippet from sidebar (snippet-item)
+    else if (dataType === "snippet-item") {
+      // Only add if drop occurred within the canvas area
+      if (!isDropWithinCanvas()) {
+        return // User cancelled by dropping outside canvas
+      }
+
+      const snippet = active.data.current?.snippet
+      const refNode: LayoutNode = {
+        id: generateNodeId(),
+        type: "SnippetRef",
+        snippetId: snippet.id,
+        props: {},
+      }
+
+      let parentId: string | null = null
+      if (over.id === "canvas-root") {
+        parentId = null
+      } else {
+        const overId = getNodeId(over.id as string)
+        const overNode = findNode(overId, nodes)
+
+        // Only add if dropped on a valid canvas node (not on sidebar or other areas)
+        if (!overNode) {
+          return // Exit without adding - not a valid canvas target
+        }
+
+        const isContainer = over.data.current?.isContainer || (overNode && overNode.children !== undefined)
+
+        if (isContainer) {
+          parentId = overId
+        } else {
+          const parentInfo = findNodeParent(overId, nodes)
+          parentId = parentInfo?.parent?.id || null
+        }
+      }
+
+      addNode(refNode, parentId as string)
+      toast("Snippet Added", { description: `"${snippet.name}" has been added to the canvas` })
+    }
+
+    // Moving/reordering existing component (including snippets on canvas)
     else if (active.id !== over.id) {
       const activeId = active.id as string
       const overId = over.id as string
-      if (activeId === overId) return
 
       let newParentId: string | null = null
       let newIndex = 0
 
       if (overId === "canvas-root") {
+        // Drop to root level - add at end
         newParentId = null
         newIndex = nodes.length
       } else {
         const overNode = findNode(overId, nodes)
         const isContainer = over.data.current?.isContainer || (overNode && overNode.children !== undefined)
-        const isEmptyContainer = isContainer && overNode?.children?.length === 0
 
-        if (isEmptyContainer) {
+        if (isContainer) {
+          // Drop inside container
           newParentId = overId
-          newIndex = 0
+          newIndex = overNode?.children?.length || 0
         } else {
+          // Drop as sibling - insert after target
           const parentInfo = findNodeParent(overId, nodes)
           if (parentInfo) {
-            newParentId = parentInfo.parent ? parentInfo.parent.id : null
-            newIndex = parentInfo.index
+            newParentId = parentInfo.parent?.id || null
+            newIndex = parentInfo.index + 1
           }
         }
       }
@@ -540,7 +652,7 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
   }
 
   // ----------------- Loading Skeleton -----------------
-  if (loading) {
+  if (loading || componentsLoading) {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-muted/10">
         <div className="w-full max-w-[1200px] p-6 animate-pulse">
@@ -565,7 +677,7 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
   // ----------------- Main Editor -----------------
   return (
     <SnippetsProvider siteId={tenantId}>
-      <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <DndContext sensors={sensors} collisionDetection={customCollisionDetection} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <div className="h-screen flex flex-col bg-muted/10 overflow-hidden">
           {/* Top Bar */}
           {/* Modern Top Navbar with Glassmorphism */}
@@ -873,11 +985,15 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
             />
           )}
 
-          <DragOverlay dropAnimation={null}>
-            {activeDragItem ? (
-              <div className="flex flex-col items-center justify-center p-3 h-24 w-36 border-2 border-primary rounded-md bg-card shadow-xl cursor-grabbing">
-                <Box className="h-6 w-6 mb-2 text-muted-foreground" />
-                <span className="text-xs text-center font-medium leading-tight">{activeDragItem.name}</span>
+          <DragOverlay modifiers={[snapCenterToCursor]} dropAnimation={null}>
+            {activeDrag ? (
+              <div className="flex flex-col items-center justify-center p-3 h-20 w-32 border-2 border-primary rounded-lg bg-card shadow-xl cursor-grabbing">
+                <Box className="h-5 w-5 mb-1.5 text-primary" />
+                <span className="text-xs text-center font-medium leading-tight">
+                  {activeDrag.type === 'new'
+                    ? (activeDrag.item as ComponentDefinition).name
+                    : (activeDrag.item as LayoutNode).type}
+                </span>
               </div>
             ) : null}
           </DragOverlay>
