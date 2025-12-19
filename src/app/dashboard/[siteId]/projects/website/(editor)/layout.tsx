@@ -9,12 +9,26 @@ interface EditorLayoutProps {
 }
 
 /**
+ * Validates that a string is a valid MongoDB ObjectID.
+ * ObjectIDs must be 24-character hexadecimal strings.
+ */
+function isValidObjectId(id: string): boolean {
+    if (!id || typeof id !== 'string') return false
+    return /^[a-fA-F0-9]{24}$/.test(id)
+}
+
+/**
  * Server-side layout for the editor routes.
  * Validates that the siteId exists and belongs to the logged-in user.
  * Returns 404 for invalid or non-existent site IDs.
  */
 export default async function EditorLayout({ children, params }: EditorLayoutProps) {
     const { siteId } = await params
+
+    // Validate siteId format (must be valid MongoDB ObjectID)
+    if (!isValidObjectId(siteId)) {
+        notFound()
+    }
 
     // Validate user is logged in
     const session = await getAuthSession()

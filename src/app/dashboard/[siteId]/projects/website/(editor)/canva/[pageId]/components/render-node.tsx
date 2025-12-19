@@ -20,6 +20,8 @@ interface RenderNodeProps {
   onDuplicate?: (id: string) => void
   onDelete?: (id: string) => void
   validComponentNames?: string[]
+  showInsertionBefore?: boolean
+  showInsertionAfter?: boolean
 }
 
 // Dynamic component map
@@ -83,7 +85,7 @@ function getComponent(componentType: string, themeName?: string): React.Componen
 }
 
 
-export function RenderNode({ node, isEditor = false, onSelect, isSelected = false, onContextMenu, onDuplicate, onDelete, validComponentNames }: RenderNodeProps) {
+export function RenderNode({ node, isEditor = false, onSelect, isSelected = false, onContextMenu, onDuplicate, onDelete, validComponentNames, showInsertionBefore = false, showInsertionAfter = false }: RenderNodeProps) {
   // Try to get theme name from node metadata/props
   // Check node-level themeName first (where component-registry stores it), then fall back to props
   const themeName = node.themeName || node.props?.themeName
@@ -143,6 +145,8 @@ export function RenderNode({ node, isEditor = false, onSelect, isSelected = fals
           onDelete={onDelete}
           isContainer={false}
           data={{ type: "component", isContainer: false, component: node }}
+          showInsertionBefore={showInsertionBefore}
+          showInsertionAfter={showInsertionAfter}
         >
           <div className="p-6 border rounded-lg flex flex-col items-center justify-center gap-3 text-center min-h-[150px] shadow-sm">
             <div className="h-10 w-10  rounded-full bg-red-500/20 flex items-center justify-center ">
@@ -296,6 +300,8 @@ export function RenderNode({ node, isEditor = false, onSelect, isSelected = fals
           isContainer: allowsChildren,
           component: node,
         }}
+        showInsertionBefore={showInsertionBefore}
+        showInsertionAfter={showInsertionAfter}
       >
         {content}
       </DraggableWrapper>

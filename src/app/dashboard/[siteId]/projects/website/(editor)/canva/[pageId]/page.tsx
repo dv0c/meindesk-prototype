@@ -19,6 +19,7 @@ import {
   DragOverlay,
   type DragEndEvent,
   type DragStartEvent,
+  type DragOverEvent,
   useSensor,
   useSensors,
   PointerSensor,
@@ -67,6 +68,7 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
   const [loading, setLoading] = useState(true) // <--- Loading state
   const [componentsLoading, setComponentsLoading] = useState(true) // <--- Components loading state
   const [validComponentNames, setValidComponentNames] = useState<string[]>([])
+  const [dragOverId, setDragOverId] = useState<string | null>(null) // Track hover position during drag
 
   // Snippet state
   const [showSaveSnippetDialog, setShowSaveSnippetDialog] = useState(false)
@@ -294,9 +296,15 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
     }
   }
 
+  function handleDragOver(event: DragOverEvent) {
+    const { over } = event
+    setDragOverId(over?.id as string | null)
+  }
+
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
     setActiveDrag(null)
+    setDragOverId(null)
     if (!over) {
       return
     }
@@ -312,26 +320,30 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
     }
 
     // Helper to check if drop occurred within the canvas area
-    // This prevents adding components when dropping back on the sidebar
+    // Trust the collision detection - if we have a valid 'over' target that starts with
+    // 'canvas-root' or 'droppable-', it's a valid canvas drop
     const isDropWithinCanvas = (): boolean => {
-      const canvasElement = document.querySelector('.canvas-interactive-area')
-      if (!canvasElement) return false
+      const overId = over?.id as string
+      if (!overId) return false
 
-      const activatorEvent = event.activatorEvent as PointerEvent
-      if (!activatorEvent) return false
+      // Valid canvas targets
+      if (overId === 'canvas-root') return true
+      if (overId.startsWith('droppable-')) return true
 
-      // Get current pointer position from the drag end event delta
-      const rect = canvasElement.getBoundingClientRect()
-      const x = activatorEvent.clientX + (event.delta?.x || 0)
-      const y = activatorEvent.clientY + (event.delta?.y || 0)
+      // Check if it's a sortable node on canvas 
+      const node = findNode(overId, nodes)
+      if (node) return true
 
-      return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
+      return false
     }
 
     // Adding new component from sidebar (palette-item)
     if (dataType === "palette-item") {
+      console.log('[DragEnd] Palette item drop:', { overId: over.id, isWithinCanvas: isDropWithinCanvas() })
+
       // Only add if drop occurred within the canvas area
       if (!isDropWithinCanvas()) {
+        console.log('[DragEnd] Drop outside canvas, ignoring')
         return // User cancelled by dropping outside canvas
       }
 
@@ -341,33 +353,40 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
 
       if (over.id === "canvas-root") {
         parentId = null
+        console.log('[DragEnd] Adding to canvas root')
       } else {
         const overId = getNodeId(over.id as string)
         const overNode = findNode(overId, nodes)
 
-        // Only add if dropped on a valid canvas node (not on sidebar or other areas)
+        console.log('[DragEnd] Drop target:', { overId, overNode: !!overNode, overData: over.data.current })
+
+        // If node not found but it's a droppable- ID, add to root
         if (!overNode) {
-          return // Exit without adding - not a valid canvas target
-        }
-
-        const isContainer = over.data.current?.isContainer || (overNode && overNode.children !== undefined)
-
-        if (isContainer) {
-          parentId = overId
+          console.log('[DragEnd] Node not found, adding to root')
+          parentId = null
         } else {
-          const parentInfo = findNodeParent(overId, nodes)
-          parentId = parentInfo?.parent?.id || null
+          const isContainer = over.data.current?.isContainer || (overNode && overNode.children !== undefined)
+
+          if (isContainer) {
+            parentId = overId
+          } else {
+            const parentInfo = findNodeParent(overId, nodes)
+            parentId = parentInfo?.parent?.id || null
+          }
         }
       }
 
-      addNode(newNode, parentId as string)
+      addNode(newNode, parentId || undefined)
       toast("Component Added", { description: `${component.name} has been added to the canvas` })
     }
 
     // Adding snippet from sidebar (snippet-item)
     else if (dataType === "snippet-item") {
+      console.log('[DragEnd] Snippet item drop:', { overId: over.id, isWithinCanvas: isDropWithinCanvas() })
+
       // Only add if drop occurred within the canvas area
       if (!isDropWithinCanvas()) {
+        console.log('[DragEnd] Snippet drop outside canvas, ignoring')
         return // User cancelled by dropping outside canvas
       }
 
@@ -382,31 +401,37 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
       let parentId: string | null = null
       if (over.id === "canvas-root") {
         parentId = null
+        console.log('[DragEnd] Snippet adding to canvas root')
       } else {
         const overId = getNodeId(over.id as string)
         const overNode = findNode(overId, nodes)
 
-        // Only add if dropped on a valid canvas node (not on sidebar or other areas)
+        console.log('[DragEnd] Snippet drop target:', { overId, overNode: !!overNode })
+
+        // If node not found but it's a droppable- ID, add to root
         if (!overNode) {
-          return // Exit without adding - not a valid canvas target
-        }
-
-        const isContainer = over.data.current?.isContainer || (overNode && overNode.children !== undefined)
-
-        if (isContainer) {
-          parentId = overId
+          console.log('[DragEnd] Snippet node not found, adding to root')
+          parentId = null
         } else {
-          const parentInfo = findNodeParent(overId, nodes)
-          parentId = parentInfo?.parent?.id || null
+          const isContainer = over.data.current?.isContainer || (overNode && overNode.children !== undefined)
+
+          if (isContainer) {
+            parentId = overId
+          } else {
+            const parentInfo = findNodeParent(overId, nodes)
+            parentId = parentInfo?.parent?.id || null
+          }
         }
       }
 
-      addNode(refNode, parentId as string)
+      addNode(refNode, parentId || undefined)
       toast("Snippet Added", { description: `"${snippet.name}" has been added to the canvas` })
     }
 
     // Moving/reordering existing component (including snippets on canvas)
     else if (active.id !== over.id) {
+      console.log('[DragEnd] Moving existing component:', { activeId: active.id, overId: over.id })
+
       const activeId = active.id as string
       const overId = over.id as string
 
@@ -417,20 +442,47 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
         // Drop to root level - add at end
         newParentId = null
         newIndex = nodes.length
+        console.log('[DragEnd] Moving to canvas root at index:', newIndex)
       } else {
-        const overNode = findNode(overId, nodes)
+        const cleanOverId = getNodeId(overId)
+        const overNode = findNode(cleanOverId, nodes)
         const isContainer = over.data.current?.isContainer || (overNode && overNode.children !== undefined)
+
+        console.log('[DragEnd] Move target:', { cleanOverId, overNode: !!overNode, isContainer })
 
         if (isContainer) {
           // Drop inside container
-          newParentId = overId
+          newParentId = cleanOverId
           newIndex = overNode?.children?.length || 0
+          console.log('[DragEnd] Moving into container:', { newParentId, newIndex })
         } else {
-          // Drop as sibling - insert after target
-          const parentInfo = findNodeParent(overId, nodes)
+          // Drop as sibling - determine if before or after based on pointer position
+          const parentInfo = findNodeParent(cleanOverId, nodes)
           if (parentInfo) {
             newParentId = parentInfo.parent?.id || null
-            newIndex = parentInfo.index + 1
+
+            // Figure out if we should insert before or after the target
+            // by checking the pointer position relative to the target element
+            const targetElement = document.querySelector(`[data-node-id="${cleanOverId}"]`)
+            if (targetElement) {
+              const rect = targetElement.getBoundingClientRect()
+              const activatorEvent = event.activatorEvent as PointerEvent
+              const pointerY = activatorEvent.clientY + (event.delta?.y || 0)
+              const targetMiddle = rect.top + rect.height / 2
+
+              // If pointer is above middle, insert before; otherwise insert after
+              if (pointerY < targetMiddle) {
+                newIndex = parentInfo.index // Insert BEFORE (same index pushes target down)
+                console.log('[DragEnd] Moving BEFORE target:', { newParentId, newIndex, pointerY, targetMiddle })
+              } else {
+                newIndex = parentInfo.index + 1 // Insert AFTER
+                console.log('[DragEnd] Moving AFTER target:', { newParentId, newIndex, pointerY, targetMiddle })
+              }
+            } else {
+              // Fallback: insert after
+              newIndex = parentInfo.index + 1
+              console.log('[DragEnd] Moving as sibling (fallback):', { newParentId, newIndex })
+            }
           }
         }
       }
@@ -677,7 +729,13 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
   // ----------------- Main Editor -----------------
   return (
     <SnippetsProvider siteId={tenantId}>
-      <DndContext sensors={sensors} collisionDetection={customCollisionDetection} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={customCollisionDetection}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragEnd={handleDragEnd}
+      >
         <div className="h-screen flex flex-col bg-muted/10 overflow-hidden">
           {/* Top Bar */}
           {/* Modern Top Navbar with Glassmorphism */}
@@ -825,6 +883,13 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
                       selectNode(null)
                     }}
                     validComponentNames={validComponentNames}
+                    activeId={activeDrag ? (activeDrag.type === 'existing' ? (activeDrag.item as LayoutNode).id : 'new-item') : null}
+                    overId={dragOverId}
+                    onAddAtIndex={(index) => {
+                      // Open sidebar or show component picker at specific index
+                      // For now, we'll toggle the sidebar
+                      setShowSidebar(true)
+                    }}
                   />
                 </div>
               </div>
@@ -985,9 +1050,15 @@ export default function EditorPage({ params }: { params: { siteId: string; pageI
             />
           )}
 
-          <DragOverlay modifiers={[snapCenterToCursor]} dropAnimation={null}>
+          <DragOverlay
+            modifiers={[snapCenterToCursor]}
+            dropAnimation={{
+              duration: 200,
+              easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
+            }}
+          >
             {activeDrag ? (
-              <div className="flex flex-col items-center justify-center p-3 h-20 w-32 border-2 border-primary rounded-lg bg-card shadow-xl cursor-grabbing">
+              <div className="flex flex-col items-center justify-center p-3 h-20 w-32 border-2 border-primary rounded-lg bg-card shadow-xl cursor-grabbing transition-transform">
                 <Box className="h-5 w-5 mb-1.5 text-primary" />
                 <span className="text-xs text-center font-medium leading-tight">
                   {activeDrag.type === 'new'
