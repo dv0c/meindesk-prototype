@@ -26,6 +26,7 @@ import {
     PropertyColor,
     PropertyInput,
 } from "../components/PropertySection"
+import { GlobalDecorationSettings, GlobalAlignmentSettings } from "../components/GlobalSettings"
 
 // Navigation link type with submenu support
 interface NavLink {
@@ -55,13 +56,29 @@ interface NavbarProps {
     // Layout
     showTopBar?: boolean
     maxWidth?: string
+
+    // Global Decoration
+    borderRadius?: number
+    borderWidth?: number
+    borderColor?: string
+    boxShadow?: string
+    // Global Alignment (Spacing)
+    marginTop?: string
+    marginRight?: string
+    marginBottom?: string
+    marginLeft?: string
+    paddingTop?: string
+    paddingRight?: string
+    paddingBottom?: string
+    paddingLeft?: string
 }
 
 export const Navbar = ({
     brandName = "Your Brand",
     tagline = "",
     brandColor = "#333333",
-    backgroundColor = "#ffffff",
+    backgroundColor = "transparent", // Wrapper defaults to transparent
+    navBackgroundColor = "#ffffff", // New prop for generic nav background
     textColor = "#333333",
     topBarBackground = "#000000",
     topBarTextColor = "#ffffff",
@@ -82,6 +99,12 @@ export const Navbar = ({
     ],
     showTopBar = true,
     maxWidth = "1200px",
+    borderRadius,
+    borderWidth,
+    borderColor,
+    boxShadow,
+    marginTop, marginRight, marginBottom, marginLeft,
+    paddingTop, paddingRight, paddingBottom, paddingLeft,
 }: NavbarProps) => {
     const {
         connectors: { connect, drag },
@@ -96,7 +119,15 @@ export const Navbar = ({
     return (
         <div
             ref={(ref) => ref && connect(drag(ref)) as any}
-            style={{ width: "100%" }}
+            style={{
+                width: "100%",
+                backgroundColor, // Wrapper background
+                borderRadius: `${borderRadius || 0}px`,
+                border: borderWidth ? `${borderWidth}px solid ${borderColor}` : "none",
+                boxShadow,
+                marginTop, marginRight, marginBottom, marginLeft,
+                paddingTop, paddingRight, paddingBottom, paddingLeft,
+            }}
         >
             {/* Top Bar */}
             {showTopBar && (email || phone || facebookUrl || instagramUrl) && (
@@ -156,7 +187,7 @@ export const Navbar = ({
             {/* Main Nav */}
             <nav
                 style={{
-                    backgroundColor,
+                    backgroundColor: navBackgroundColor,
                     borderBottom: "1px solid rgba(0,0,0,0.1)",
                     padding: "16px 20px",
                 }}
@@ -301,36 +332,44 @@ const SortableSubmenuItem = ({ sub, subIdx, updateSubmenuItem, removeSubmenuItem
         zIndex: isDragging ? 999 : "auto",
     }
 
+
+
     return (
         <div
             ref={setNodeRef}
             style={style}
-            className="flex gap-2 mb-2 p-2 bg-muted/50 rounded-md items-start"
+            className="group relative flex gap-2 mb-2 p-2 bg-background border border-border/50 rounded-md items-start hover:border-border transition-colors"
         >
             <div
                 {...attributes}
                 {...listeners}
-                className="mt-2 cursor-grab active:cursor-grabbing text-muted-foreground/50 hover:text-muted-foreground"
+                className="mt-2 cursor-grab active:cursor-grabbing text-muted-foreground/30 hover:text-muted-foreground transition-colors"
             >
                 <GripVertical size={14} />
             </div>
-            <div className="flex-1 space-y-1">
-                <input
-                    value={sub.label}
-                    onChange={(e) => updateSubmenuItem(subIdx, "label", e.target.value)}
-                    placeholder="Label"
-                    className="w-full px-2 py-1.5 text-xs border border-border rounded bg-background focus:outline-none focus:ring-1 focus:ring-primary/20"
-                />
-                <input
-                    value={sub.href}
-                    onChange={(e) => updateSubmenuItem(subIdx, "href", e.target.value)}
-                    placeholder="URL"
-                    className="w-full px-2 py-1.5 text-xs border border-border rounded bg-background focus:outline-none focus:ring-1 focus:ring-primary/20"
-                />
+            <div className="flex-1 space-y-2">
+                <div className="space-y-1">
+                    <label className="text-[10px] uppercase text-muted-foreground font-medium">Label</label>
+                    <input
+                        value={sub.label}
+                        onChange={(e) => updateSubmenuItem(subIdx, "label", e.target.value)}
+                        placeholder="Label"
+                        className="w-full h-8 px-2 text-xs border border-input rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring"
+                    />
+                </div>
+                <div className="space-y-1">
+                    <label className="text-[10px] uppercase text-muted-foreground font-medium">URL</label>
+                    <input
+                        value={sub.href}
+                        onChange={(e) => updateSubmenuItem(subIdx, "href", e.target.value)}
+                        placeholder="URL"
+                        className="w-full h-8 px-2 text-xs border border-input rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring"
+                    />
+                </div>
             </div>
             <button
                 onClick={() => removeSubmenuItem(subIdx)}
-                className="p-1 text-destructive hover:bg-destructive/10 rounded transition-colors"
+                className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors opacity-0 group-hover:opacity-100"
             >
                 <Trash2 size={14} />
             </button>
@@ -417,112 +456,119 @@ const LinkEditor = ({
         <div
             ref={setNodeRef}
             style={style}
-            className={`border border-border rounded-lg overflow-hidden mb-2 ${isOpen ? 'bg-background' : 'bg-muted/30'}`}
+            className={`border rounded-md overflow-hidden mb-2 bg-background ${isOpen ? 'ring-1 ring-ring border-transparent' : 'border-border'}`}
         >
             {/* Header */}
-            <div className={`flex items-center justify-between p-3 ${isOpen ? 'border-b border-border' : ''}`}>
-                <div
-                    className="flex items-center gap-2 cursor-pointer flex-1"
-                    onClick={onToggle}
-                >
+            <div
+                className={`flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-muted/50 transition-colors ${isOpen ? 'bg-muted/30' : ''}`}
+                onClick={onToggle}
+            >
+                <div className="flex items-center gap-2 flex-1 overflow-hidden">
                     {/* Drag Handle */}
                     <div
                         {...attributes}
                         {...listeners}
                         onClick={(e) => e.stopPropagation()}
-                        className="cursor-grab active:cursor-grabbing p-1 -ml-1 text-muted-foreground/50 hover:text-muted-foreground"
+                        className="cursor-grab active:cursor-grabbing p-1 -ml-1 text-muted-foreground/30 hover:text-muted-foreground transition-colors"
                     >
                         <GripVertical size={14} />
                     </div>
 
-                    <span className="text-sm font-medium">
+                    <span className="text-xs font-medium truncate">
                         {link.label || `Link ${index + 1}`}
                     </span>
                     {link.submenu && link.submenu.length > 0 && (
-                        <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded">
-                            {link.submenu.length} submenu
+                        <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded ml-auto mr-2">
+                            {link.submenu.length}
                         </span>
                     )}
                 </div>
-                <div onClick={onToggle} className="cursor-pointer pl-2">
-                    {isOpen ? <ChevronUp size={16} className="text-muted-foreground" /> : <ChevronDown size={16} className="text-muted-foreground" />}
-                </div>
+                {isOpen ? <ChevronUp size={14} className="text-muted-foreground" /> : <ChevronDown size={14} className="text-muted-foreground" />}
             </div>
 
             {/* Content */}
             {isOpen && (
-                <div className="p-3 bg-background">
-                    <div className="mb-3">
-                        <label className="block text-xs font-medium mb-1 text-muted-foreground">
+                <div className="p-3 space-y-3 border-t bg-muted/10">
+                    <div className="space-y-1">
+                        <label className="text-[10px] uppercase text-muted-foreground font-medium">
                             Label
                         </label>
                         <input
                             value={link.label}
                             onChange={(e) => onChange("label", e.target.value)}
-                            className="w-full px-2.5 py-2 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                            className="w-full h-8 px-2 text-xs border border-input rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring"
                         />
                     </div>
-                    <div className="mb-3">
-                        <label className="block text-xs font-medium mb-1 text-muted-foreground">
+                    <div className="space-y-1">
+                        <label className="text-[10px] uppercase text-muted-foreground font-medium">
                             URL
                         </label>
                         <input
                             value={link.href}
                             onChange={(e) => onChange("href", e.target.value)}
-                            className="w-full px-2.5 py-2 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                            className="w-full h-8 px-2 text-xs border border-input rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring"
                         />
                     </div>
 
                     {/* Submenu Section */}
-                    <div className="mt-4 pt-3 border-t border-border">
-                        <div className="flex items-center justify-between mb-2">
-                            <span className="text-xs font-semibold">Submenu Items</span>
+                    <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                            <span className="text-[10px] uppercase text-muted-foreground font-medium">Submenu Items</span>
                             <button
                                 onClick={addSubmenuItem}
-                                className="flex items-center gap-1 px-2 py-1 text-[11px] font-medium bg-primary/10 text-primary rounded hover:bg-primary/20 transition-colors"
+                                className="flex items-center gap-1 px-2 py-1 h-6 text-[10px] font-medium bg-secondary text-secondary-foreground rounded hover:bg-secondary/80 transition-colors"
                             >
-                                <Plus size={12} />
+                                <Plus size={10} />
                                 Add
                             </button>
                         </div>
 
                         {(!link.submenu || link.submenu.length === 0) && (
-                            <p className="text-xs text-muted-foreground my-2">
-                                No submenu items. Click "Add" to create dropdown items.
-                            </p>
+                            <div className="text-center py-2 border border-dashed rounded-md">
+                                <p className="text-[10px] text-muted-foreground">
+                                    No submenu items
+                                </p>
+                            </div>
                         )}
 
                         {/* Internal Sortable Context for Submenu */}
-                        <DndContext
-                            sensors={sensors}
-                            collisionDetection={closestCenter}
-                            onDragEnd={handleSubDragEnd}
-                        >
-                            <SortableContext
-                                items={(link.submenu || []).map((sub, idx) => sub.id || `sub-${idx}`)}
-                                strategy={verticalListSortingStrategy}
-                            >
-                                {link.submenu?.map((sub, subIdx) => (
-                                    <SortableSubmenuItem
-                                        key={sub.id || `sub-${subIdx}`}
-                                        sub={sub}
-                                        subIdx={subIdx}
-                                        updateSubmenuItem={updateSubmenuItem}
-                                        removeSubmenuItem={removeSubmenuItem}
-                                    />
-                                ))}
-                            </SortableContext>
-                        </DndContext>
+                        {link.submenu && link.submenu.length > 0 && (
+                            <div className="space-y-2 pl-3 border-l-2 border-muted">
+                                <DndContext
+                                    sensors={sensors}
+                                    collisionDetection={closestCenter}
+                                    onDragEnd={handleSubDragEnd}
+                                >
+                                    <SortableContext
+                                        items={(link.submenu || []).map((sub, idx) => sub.id || `sub-${idx}`)}
+                                        strategy={verticalListSortingStrategy}
+                                    >
+                                        {link.submenu?.map((sub, subIdx) => (
+                                            <SortableSubmenuItem
+                                                key={sub.id || `sub-${subIdx}`}
+                                                sub={sub}
+                                                subIdx={subIdx}
+                                                updateSubmenuItem={updateSubmenuItem}
+                                                removeSubmenuItem={removeSubmenuItem}
+                                            />
+                                        ))}
+                                    </SortableContext>
+                                </DndContext>
+                            </div>
+                        )}
                     </div>
 
                     {/* Actions */}
-                    <div className="flex justify-end mt-4 pt-3 border-t border-border">
+                    <div className="flex justify-between items-center pt-2 mt-2 border-t">
+                        <span className="text-[10px] text-muted-foreground">
+                            ID: {link.id?.split('-')[1]}
+                        </span>
                         <button
                             onClick={onRemove}
-                            className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium bg-destructive/10 text-destructive rounded hover:bg-destructive/20 transition-colors"
+                            className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-destructive hover:bg-destructive/10 rounded transition-colors"
                         >
                             <Trash2 size={12} />
-                            Delete Link
+                            Delete
                         </button>
                     </div>
                 </div>
@@ -552,7 +598,7 @@ export const NavbarSettings = () => {
         brandName: node.data.props.brandName,
         tagline: node.data.props.tagline,
         brandColor: node.data.props.brandColor,
-        backgroundColor: node.data.props.backgroundColor,
+        navBackgroundColor: node.data.props.navBackgroundColor || node.data.props.backgroundColor, // Fallback for migration
         textColor: node.data.props.textColor,
         topBarBackground: node.data.props.topBarBackground,
         topBarTextColor: node.data.props.topBarTextColor,
@@ -657,6 +703,9 @@ export const NavbarSettings = () => {
 
     return (
         <div>
+            <GlobalDecorationSettings />
+            <GlobalAlignmentSettings />
+
             <PropertySection title="Brand" summary={brandName}>
                 <PropertyRow label="Name">
                     <PropertyInput
@@ -681,10 +730,11 @@ export const NavbarSettings = () => {
             </PropertySection>
 
             <PropertySection title="Colors" summary="" defaultOpen={false}>
-                <PropertyRow label="Background">
+                <PropertyRow label="Nav Background">
                     <PropertyColor
-                        value={backgroundColor || "#ffffff"}
-                        onChange={(v) => setProp((props: NavbarProps) => (props.backgroundColor = v))}
+                        value={navBackgroundColor || "#ffffff"}
+                        onChange={(v) => setProp((props: NavbarProps) => (props.navBackgroundColor = v))}
+                        placeholder="#ffffff"
                     />
                 </PropertyRow>
                 <PropertyRow label="Text Color">
@@ -752,7 +802,7 @@ export const NavbarSettings = () => {
             </PropertySection>
 
             <PropertySection title="Navigation Links" summary={`${(links || []).length} links`}>
-                <div style={{ marginBottom: 12 }}>
+                <div className="space-y-3 border rounded-md p-3 bg-muted/30">
                     <DndContext
                         sensors={sensors}
                         collisionDetection={closestCenter}
@@ -775,14 +825,15 @@ export const NavbarSettings = () => {
                             ))}
                         </SortableContext>
                     </DndContext>
+
+                    <button
+                        onClick={addLink}
+                        className="w-full py-2 px-3 bg-secondary text-secondary-foreground rounded-md text-xs font-medium flex items-center justify-center gap-1.5 hover:bg-secondary/80 transition-colors"
+                    >
+                        <Plus size={14} />
+                        Add Navigation Link
+                    </button>
                 </div>
-                <button
-                    onClick={addLink}
-                    className="w-full py-2.5 px-3 bg-primary text-primary-foreground rounded-md text-sm font-medium flex items-center justify-center gap-1.5 hover:bg-primary/90 transition-colors"
-                >
-                    <Plus size={14} />
-                    Add Navigation Link
-                </button>
             </PropertySection>
         </div>
     )
@@ -794,7 +845,8 @@ Navbar.craft = {
         brandName: "Your Brand",
         tagline: "",
         brandColor: "#333333",
-        backgroundColor: "#ffffff",
+        navBackgroundColor: "#ffffff",
+        backgroundColor: "transparent",
         textColor: "#333333",
         topBarBackground: "#000000",
         topBarTextColor: "#ffffff",

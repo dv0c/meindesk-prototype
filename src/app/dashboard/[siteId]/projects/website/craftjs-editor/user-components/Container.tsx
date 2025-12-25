@@ -9,15 +9,13 @@ import {
     PropertySliderWithUnit,
     PropertyColor,
     PropertyInput,
+    PropertySelect,
 } from "../components/PropertySection"
+import { GlobalDecorationSettings, GlobalAlignmentSettings } from "../components/GlobalSettings"
 
 interface ContainerProps {
     children?: React.ReactNode
-    padding?: number
-    paddingTop?: number
-    paddingBottom?: number
-    paddingLeft?: number
-    paddingRight?: number
+    padding?: number // Legacy padding, used for empty state calculation
     backgroundColor?: string
     borderRadius?: number
     borderWidth?: number
@@ -25,15 +23,26 @@ interface ContainerProps {
     minHeight?: number | string
     maxWidth?: string
     className?: string
+    gap?: number
+    flexDirection?: "row" | "column"
+    alignItems?: "flex-start" | "center" | "flex-end" | "stretch"
+    justifyContent?: "flex-start" | "center" | "flex-end" | "space-between" | "space-around"
+
+    // Global Decoration
+    marginTop?: string
+    marginRight?: string
+    marginBottom?: string
+    marginLeft?: string
+    paddingTop?: string
+    paddingRight?: string
+    paddingBottom?: string
+    paddingLeft?: string
+    boxShadow?: string
 }
 
 export const Container = ({
     children,
-    padding = 20,
-    paddingTop,
-    paddingBottom,
-    paddingLeft,
-    paddingRight,
+    padding = 20, // Legacy padding, kept for empty state calculation
     backgroundColor = "transparent",
     borderRadius = 0,
     borderWidth = 0,
@@ -41,6 +50,13 @@ export const Container = ({
     minHeight = "100px",
     maxWidth = "100%",
     className = "",
+    gap = 0,
+    flexDirection = "column",
+    alignItems = "flex-start",
+    justifyContent = "flex-start",
+    marginTop, marginRight, marginBottom, marginLeft,
+    paddingTop, paddingRight, paddingBottom, paddingLeft,
+    boxShadow,
 }: ContainerProps) => {
     const {
         connectors: { connect, drag },
@@ -50,21 +66,28 @@ export const Container = ({
     }))
 
     const style: React.CSSProperties = {
-        padding: padding,
-        paddingTop: paddingTop ?? padding,
-        paddingBottom: paddingBottom ?? padding,
-        paddingLeft: paddingLeft ?? padding,
-        paddingRight: paddingRight ?? padding,
         backgroundColor,
-        borderRadius,
-        borderWidth,
-        borderColor,
-        borderStyle: borderWidth > 0 ? "solid" : "none",
+        borderRadius: `${borderRadius}px`,
+        border: `${borderWidth}px solid ${borderColor}`,
         minHeight,
         maxWidth,
         width: "100%",
         position: "relative" as const,
         transition: "all 0.2s ease",
+        display: "flex",
+        flexDirection,
+        gap: `${gap}px`,
+        alignItems,
+        justifyContent,
+        boxShadow,
+        marginTop,
+        marginRight,
+        marginBottom,
+        marginLeft,
+        paddingTop,
+        paddingRight,
+        paddingBottom,
+        paddingLeft,
     }
 
     // Check if container is empty
@@ -85,7 +108,7 @@ export const Container = ({
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        minHeight: minHeight - (padding * 2),
+                        minHeight: `calc(${minHeight} - ${padding * 2}px)`, // Use legacy padding for empty state
                         border: "2px dashed #e5e7eb",
                         borderRadius: 8,
                         color: "#9ca3af",
@@ -108,13 +131,17 @@ export const Container = ({
 export const ContainerSettings = () => {
     const {
         actions: { setProp },
-        padding,
-        backgroundColor,
-        borderRadius,
+        padding, // Kept for summary/empty state calculation
+        backgroundColor, // Kept for summary
+        borderRadius, // Kept for summary
         minHeight,
         maxWidth,
-        borderWidth,
-        borderColor,
+        borderWidth, // Kept for summary
+        borderColor, // Kept for summary
+        gap,
+        flexDirection,
+        alignItems,
+        justifyContent,
     } = useNode((node) => ({
         padding: node.data.props.padding,
         backgroundColor: node.data.props.backgroundColor,
@@ -123,6 +150,10 @@ export const ContainerSettings = () => {
         maxWidth: node.data.props.maxWidth,
         borderWidth: node.data.props.borderWidth,
         borderColor: node.data.props.borderColor,
+        gap: node.data.props.gap,
+        flexDirection: node.data.props.flexDirection,
+        alignItems: node.data.props.alignItems,
+        justifyContent: node.data.props.justifyContent,
     }))
 
     // Parse value with unit helper
@@ -139,12 +170,14 @@ export const ContainerSettings = () => {
     const { value: maxWidthValue, unit: maxWidthUnit } = parseValueWithUnit(maxWidth, '%', 100)
     const { value: minHeightValue, unit: minHeightUnit } = parseValueWithUnit(minHeight, 'px', 100)
 
-    const paddingSummary = `${padding || 0}px`
     const dimensionsSummary = `${maxWidth || "100%"} × ${minHeight || "100px"}`
     const borderSummary = borderWidth ? `${borderWidth}px` : "None"
 
     return (
         <div>
+            <GlobalAlignmentSettings />
+            <GlobalDecorationSettings />
+
             <PropertySection title="Dimensions" summary={dimensionsSummary}>
                 <PropertyRow label="Max Width">
                     <PropertySliderWithUnit
@@ -162,48 +195,48 @@ export const ContainerSettings = () => {
                 </PropertyRow>
             </PropertySection>
 
-            <PropertySection title="Padding" summary={paddingSummary}>
-                <PropertyRow label="All Sides">
+            <PropertySection title="Layout" summary={`${flexDirection} ${gap}px`}>
+                <PropertyRow label="Direction">
+                    <PropertySelect
+                        value={flexDirection || "column"}
+                        onChange={(v) => setProp((props: ContainerProps) => (props.flexDirection = v))}
+                        options={[
+                            { label: "Column", value: "column" },
+                            { label: "Row", value: "row" },
+                        ]}
+                    />
+                </PropertyRow>
+                <PropertyRow label="Gap">
                     <PropertySlider
-                        value={padding || 0}
-                        onChange={(v) => setProp((props: ContainerProps) => (props.padding = v))}
+                        value={gap || 0}
+                        onChange={(v) => setProp((props: ContainerProps) => (props.gap = v))}
                         min={0}
                         max={100}
                     />
                 </PropertyRow>
-            </PropertySection>
-
-            <PropertySection title="Colors" summary="">
-                <PropertyRow label="Background">
-                    <PropertyColor
-                        value={backgroundColor || ""}
-                        onChange={(v) => setProp((props: ContainerProps) => (props.backgroundColor = v))}
-                        placeholder="transparent"
+                <PropertyRow label="Align Items">
+                    <PropertySelect
+                        value={alignItems || "flex-start"}
+                        onChange={(v) => setProp((props: ContainerProps) => (props.alignItems = v))}
+                        options={[
+                            { label: "Start", value: "flex-start" },
+                            { label: "Center", value: "center" },
+                            { label: "End", value: "flex-end" },
+                            { label: "Stretch", value: "stretch" },
+                        ]}
                     />
                 </PropertyRow>
-            </PropertySection>
-
-            <PropertySection title="Border" summary={borderSummary} defaultOpen={false}>
-                <PropertyRow label="Width">
-                    <PropertySlider
-                        value={borderWidth || 0}
-                        onChange={(v) => setProp((props: ContainerProps) => (props.borderWidth = v))}
-                        min={0}
-                        max={10}
-                    />
-                </PropertyRow>
-                <PropertyRow label="Radius">
-                    <PropertySlider
-                        value={borderRadius || 0}
-                        onChange={(v) => setProp((props: ContainerProps) => (props.borderRadius = v))}
-                        min={0}
-                        max={50}
-                    />
-                </PropertyRow>
-                <PropertyRow label="Color">
-                    <PropertyColor
-                        value={borderColor || "#e5e7eb"}
-                        onChange={(v) => setProp((props: ContainerProps) => (props.borderColor = v))}
+                <PropertyRow label="Justify Content">
+                    <PropertySelect
+                        value={justifyContent || "flex-start"}
+                        onChange={(v) => setProp((props: ContainerProps) => (props.justifyContent = v))}
+                        options={[
+                            { label: "Start", value: "flex-start" },
+                            { label: "Center", value: "center" },
+                            { label: "End", value: "flex-end" },
+                            { label: "Between", value: "space-between" },
+                            { label: "Around", value: "space-around" },
+                        ]}
                     />
                 </PropertyRow>
             </PropertySection>
@@ -214,13 +247,26 @@ export const ContainerSettings = () => {
 Container.craft = {
     displayName: "Container",
     props: {
-        padding: 20,
+        padding: 20, // Kept for empty state calculation
         backgroundColor: "transparent",
         borderRadius: 0,
         minHeight: "100px",
         maxWidth: "100%",
         borderWidth: 0,
         borderColor: "#e5e7eb",
+        gap: 0,
+        flexDirection: "column",
+        alignItems: "flex-start",
+        justifyContent: "flex-start",
+        marginTop: undefined,
+        marginRight: undefined,
+        marginBottom: undefined,
+        marginLeft: undefined,
+        paddingTop: undefined,
+        paddingRight: undefined,
+        paddingBottom: undefined,
+        paddingLeft: undefined,
+        boxShadow: undefined,
     },
     rules: {
         canDrag: () => true,

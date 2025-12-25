@@ -308,3 +308,25 @@ export function PropertyCheckbox({ id, label, checked, onChange }: PropertyCheck
         </div>
     )
 }
+
+interface PropertySpacingProps {
+    values: Partial<Record<"top" | "right" | "bottom" | "left", string>>
+    onChange: (side: "top" | "right" | "bottom" | "left", value: string) => void
+}
+
+export function PropertySpacing({ values, onChange }: PropertySpacingProps) {
+    return (
+        <div className="grid grid-cols-2 gap-2">
+            {(["top", "right", "bottom", "left"] as const).map((side) => (
+                <div key={side} className="relative">
+                    <input
+                        value={values[side] || ""}
+                        onChange={(e) => onChange(side, e.target.value)}
+                        placeholder={side.charAt(0).toUpperCase() + side.slice(1)}
+                        className="w-full h-8 px-2 text-xs border rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring"
+                    />
+                </div>
+            ))}
+        </div>
+    )
+}
