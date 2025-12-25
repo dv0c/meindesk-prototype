@@ -60,14 +60,13 @@ function SnippetRefPreview({ node, tenantId }: { node: LayoutNode; tenantId?: st
     )
 }
 
-// Optimized component map for preview mode with SSR enabled
-// Optimized component map for preview mode with SSR enabled
+// Optimized component map for preview mode with SSR enabled where possible
+// Components that don't use client-side hooks (useState, useEffect, localStorage, etc.) can be SSR'd
 const componentMap: Record<string, React.ComponentType<any>> = {
+    // SSR-enabled components (static, no client-side hooks)
     Container: dynamic(() => import("@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ui/editor/Container")),
     Grid: dynamic(() => import("@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ui/editor/Grid")),
     Button: dynamic(() => import("@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ui/editor/Button")),
-    Slideshow: dynamic(() => import("@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ui/editor/Slideshow")),
-    Articles: dynamic(() => import("@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ui/editor/Articles")),
     Hero: dynamic(() => import("@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ui/editor/Hero")),
     Heading: dynamic(() => import("@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ui/editor/Heading")),
     Text: dynamic(() => import("@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ui/editor/Text")),
@@ -82,10 +81,8 @@ const componentMap: Record<string, React.ComponentType<any>> = {
     Newsletter: dynamic(() => import("@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ui/editor/Newsletter").then(m => ({ default: m.Newsletter }))),
     Stats: dynamic(() => import("@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ui/editor/Stats").then(m => ({ default: m.Stats }))),
     TeamMember: dynamic(() => import("@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ui/editor/TeamMember").then(m => ({ default: m.TeamMember }))),
-    Navbar2: dynamic(() => import("@/components/Builder/CustomBlocks/Navbar")),
     SingleArticle: dynamic(() => import("@/components/Builder/CustomBlocks/SingleArticle").then(m => ({ default: m.SingleArticle }))),
     ImageGrid: dynamic(() => import("@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ui/editor/ImageGrid")),
-    ThemeSwitcher: dynamic(() => import("@/components/Builder/CustomBlocks/ThemeSwitcher")),
     NavbarContainer: dynamic(() => import("@/components/Builder/CustomBlocks/NavbarContainer")),
     LogoBlock: dynamic(() => import("@/components/Builder/CustomBlocks/NavbarBlocks/LogoBlock")),
     NavigationBlock: dynamic(() => import("@/components/Builder/CustomBlocks/NavbarBlocks/NavigationBlock")),
@@ -93,11 +90,17 @@ const componentMap: Record<string, React.ComponentType<any>> = {
     HeroSection: dynamic(() => import("@/components/Builder/CustomBlocks/HeroSection")),
     ContactInfo: dynamic(() => import("@/components/Builder/CustomBlocks/ContactInfo")),
     MostPopular: dynamic(() => import("@/components/Builder/CustomBlocks/MostPopular")),
+
+    // Client-only components (use useState, useEffect, localStorage, or browser APIs)
+    Slideshow: dynamic(() => import("@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ui/editor/Slideshow"), { ssr: false }),
+    Articles: dynamic(() => import("@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ui/editor/Articles"), { ssr: false }),
+    Navbar2: dynamic(() => import("@/components/Builder/CustomBlocks/Navbar"), { ssr: false }),
+    ThemeSwitcher: dynamic(() => import("@/components/Builder/CustomBlocks/ThemeSwitcher"), { ssr: false }),
 }
 
 // Theme component registry - allows multiple components with same name from different themes
 const themeComponentMap: Record<string, React.ComponentType<any>> = {
-    // SophiaPlatanisioti Theme
+    // SophiaPlatanisioti Theme - SSR enabled for static components
     "Sophia Platanisioti_Hero": dynamic(() => import("@/components/Builder/CustomBlocks/Themes/SophiaPlatanisioti/Hero").then(m => ({ default: m.Hero }))),
     "Sophia Platanisioti_Navbar": dynamic(() => import("@/components/Builder/CustomBlocks/Themes/SophiaPlatanisioti/Navbar").then(m => ({ default: m.Navbar })), { ssr: false }),
     "Sophia Platanisioti_Footer": dynamic(() => import("@/components/Builder/CustomBlocks/Themes/SophiaPlatanisioti/Footer")),
