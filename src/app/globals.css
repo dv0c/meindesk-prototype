@@ -4,6 +4,7 @@
 @import 'swiper/css/navigation';
 @import 'swiper/css/pagination';
 @plugin "@tailwindcss/typography";
+@plugin "@tailwindcss/container-queries";
 
 @custom-variant dark (&:is(.dark *));
 

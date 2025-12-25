@@ -2,7 +2,6 @@
 
 import React, { createContext, useContext, useState, useMemo, useCallback } from "react"
 
-// Design state structure
 export interface DesignSettings {
     // Colors
     background: string
@@ -61,24 +60,7 @@ const DesignContext = createContext<DesignContextType | null>(null)
 
 // Default context for when not inside DesignProvider (e.g., CraftJS resolver)
 const defaultContextValue: DesignContextType = {
-    settings: {
-        background: "#ffffff",
-        neutral: "#1a1b20",
-        primary: "#3a69f3",
-        secondary: "#f0f0f2",
-        tertiary: "#f7f8f8",
-        baseFont: "Inter",
-        headingFont: "Inter",
-        headingWeight: "Medium",
-        buttonShape: "rounded",
-        buttonStyle: "filled",
-        buttonSize: "md",
-        buttonBorder: "0",
-        formShape: "soft",
-        formStyle: "outline",
-        selectedTheme: "default",
-        selectedPalette: "default",
-    },
+    settings: { ...defaultSettings },
     updateSettings: () => { },
     resetSettings: () => { },
     getCssVariables: () => "",

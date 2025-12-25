@@ -58,6 +58,7 @@
     "@radix-ui/react-visually-hidden": "^1.2.4",
     "@sparticuz/chromium": "^141.0.0",
     "@sparticuz/chromium-min": "^141.0.0",
+    "@tailwindcss/container-queries": "^0.1.1",
     "@types/bcrypt": "^6.0.0",
     "@types/xml2js": "^0.4.14",
     "@vercel/functions": "^3.1.4",

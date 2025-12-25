@@ -2,7 +2,9 @@
 
 import { useNode, useEditor } from "@craftjs/core"
 import React, { useState, useEffect } from "react"
-import { Menu, X, ChevronDown, ChevronUp, Mail, Phone, Plus, Trash2, GripVertical } from "lucide-react"
+import { Menu, ChevronDown, ChevronUp, Mail, Phone, Plus, Trash2, GripVertical, ImageIcon } from "lucide-react"
+import Image from "next/image"
+import { useParams } from "next/navigation"
 import {
     DndContext,
     closestCenter,
@@ -25,8 +27,12 @@ import {
     PropertyRow,
     PropertyColor,
     PropertyInput,
+    PropertySlider,
 } from "../components/PropertySection"
-
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+import MediaLibraryDialog, { MediaItem } from "@/components/MediaGallery/media-select"
 
 // Navigation link type with submenu support
 interface NavLink {
@@ -42,10 +48,10 @@ interface NavbarProps {
     tagline?: string
     brandColor?: string
     // Colors
-    backgroundColor?: string
-    textColor?: string
+    navBackgroundColor?: string
     topBarBackground?: string
     topBarTextColor?: string
+    textColor?: string
     // Contact
     email?: string
     phone?: string
@@ -56,55 +62,231 @@ interface NavbarProps {
     // Layout
     showTopBar?: boolean
     maxWidth?: string
+    // Banner
+    bannerImage?: string
+    bannerOpacity?: number
+}
 
-    // Global Decoration
-    borderRadius?: number
-    borderWidth?: number
-    borderColor?: string
-    boxShadow?: string
-    // Global Alignment (Spacing)
-    marginTop?: string
-    marginRight?: string
-    marginBottom?: string
-    marginLeft?: string
-    paddingTop?: string
-    paddingRight?: string
-    paddingBottom?: string
-    paddingLeft?: string
+// Icons
+const Instagram = ({ fill = "#fff" }: { fill?: string }) => (
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" height="15px" width="15px">
+        <path
+            d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913a5.885 5.885 0 001.384 2.126A5.868 5.868 0 004.14 23.37c.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558a5.898 5.898 0 002.126-1.384 5.86 5.86 0 001.384-2.126c.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913a5.89 5.89 0 00-1.384-2.126A5.847 5.847 0 0019.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227a3.81 3.81 0 01-.899 1.382 3.744 3.744 0 01-1.38.896c-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421a3.716 3.716 0 01-1.379-.899 3.644 3.644 0 01-.9-1.38c-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678a6.162 6.162 0 100 12.324 6.162 6.162 0 100-12.324zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405a1.441 1.441 0 01-2.88 0 1.44 1.44 0 012.88 0z"
+            fill={fill}
+        />
+    </svg>
+)
+
+const Facebook = ({ fill = "#fff" }: { fill?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" height="15px" width="15px">
+        <path
+            d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+            fill={fill}
+        />
+    </svg>
+)
+
+// Desktop Navigation Links
+function DesktopNavLinks({ links, textColor }: { links: NavLink[], textColor: string }) {
+    const [openSubmenu, setOpenSubmenu] = useState<number | null>(null)
+
+    return (
+        <ul className="hidden @lg:flex flex-wrap max-w-full gap-x-4 md:gap-x-6 items-baseline z-10 list-none m-0 p-0">
+            {links.map((link, index) => (
+                <li
+                    key={index}
+                    className="relative"
+                    onMouseEnter={() => link.submenu && setOpenSubmenu(index)}
+                    onMouseLeave={() => setOpenSubmenu(null)}
+                >
+                    {link.submenu && link.submenu.length > 0 ? (
+                        <div className="menu-item group relative">
+                            <div className="flex items-center gap-2 cursor-pointer h-full transition-all group-hover:underline text-[.8875rem]" style={{ color: textColor }}>
+                                <span>{link.label}</span>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth={1.5}
+                                    stroke="currentColor"
+                                    className="w-3 h-3"
+                                >
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                </svg>
+                            </div>
+                            {openSubmenu === index && (
+                                <div className="absolute h-auto z-10 top-full mt-px right-0 bg-white border rounded-sm shadow-lg py-1">
+                                    <ul className="p-0 space-y-2 min-w-[200px] list-none">
+                                        {link.submenu.map((subItem, subIndex) => (
+                                            <li key={subIndex}>
+                                                <a
+                                                    href={subItem.href}
+                                                    className="block uppercase px-3 py-1.5 w-full hover:underline tracking-wide text-[.875rem]"
+                                                    style={{ color: textColor }}
+                                                >
+                                                    {subItem.label}
+                                                </a>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <a
+                            className="menu-item hover:underline font-normal transition-all text-[.8875rem]"
+                            href={link.href}
+                            style={{ color: textColor }}
+                        >
+                            {link.label}
+                        </a>
+                    )}
+                </li>
+            ))}
+        </ul>
+    )
+}
+
+// Mobile Menu Component
+function MobileMenu({ links, brandColor, email, phone, facebookUrl, instagramUrl }: {
+    links: NavLink[],
+    brandColor: string,
+    email?: string,
+    phone?: string,
+    facebookUrl?: string,
+    instagramUrl?: string
+}) {
+    return (
+        <Sheet>
+            <SheetTrigger aria-label="menu" className="block @lg:hidden z-10">
+                <Menu className="h-8 w-8 text-black" />
+            </SheetTrigger>
+            <SheetContent className="pt-12 bg-white">
+                <div style={{ color: brandColor }}>
+                    <ul className="flex flex-col gap-4 list-none p-0">
+                        {links.map((item, i) => (
+                            <li key={i} className="border-b-[hsla(40,26%,73%,.4)] transition-all border-b py-2 cursor-pointer group">
+                                <a
+                                    className="group-hover:font-semibold transition-all block w-full"
+                                    href={item.href}
+                                >
+                                    {item.label}
+                                </a>
+                                {item.submenu && item.submenu.length > 0 && (
+                                    <ul className="pl-4 mt-2 space-y-2 list-none">
+                                        {item.submenu.map((subItem, subIndex) => (
+                                            <li key={subIndex}>
+                                                <a
+                                                    className="text-sm hover:font-semibold transition-all block"
+                                                    href={subItem.href}
+                                                >
+                                                    {subItem.label}
+                                                </a>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </li>
+                        ))}
+                    </ul>
+                    <div className="border-b-[hsla(40,26%,73%,.4)] mt-5">
+                        <div className="pb-5 border-b space-y-4 border-b-[hsla(40,26%,73%,.4)]">
+                            {email && (
+                                <a href={`mailto:${email}`} className="items-center flex gap-1 space-x-2">
+                                    <Mail size={15} className="stroke-[#ccc0a8] mt-1" />
+                                    <span className="text-black border-b truncate font-medium hover:border-b-gray-100 transition-all border-b-gray-500 text-sm">
+                                        {email}
+                                    </span>
+                                </a>
+                            )}
+                            {phone && (
+                                <a href={`tel:${phone}`} className="items-center space-x-2 flex gap-1">
+                                    <Phone size={15} className="stroke-[#ccc0a8] mt-1" />
+                                    <span className="text-black border-b font-medium hover:border-b-gray-100 transition-all border-b-gray-500 text-sm">
+                                        {phone}
+                                    </span>
+                                </a>
+                            )}
+                        </div>
+                        <div className="flex gap-3 mt-5">
+                            {facebookUrl && (
+                                <a href={facebookUrl} target="_blank" rel="noreferrer noopener">
+                                    <Facebook fill="#ccc0a8" />
+                                </a>
+                            )}
+                            {instagramUrl && (
+                                <a href={instagramUrl} target="_blank" rel="noreferrer noopener">
+                                    <Instagram fill="#ccc0a8" />
+                                </a>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </SheetContent>
+        </Sheet>
+    )
+}
+
+// Fixed Navigation (appears on scroll)
+function FixedNav({ links, brandName, brandColor, textColor, maxWidth, isScrolled }: {
+    links: NavLink[],
+    brandName: string,
+    brandColor: string,
+    textColor: string,
+    maxWidth: string,
+    isScrolled: boolean
+}) {
+    return (
+        <nav
+            className={cn(
+                "opacity-0 invisible fixed top-0 left-0 w-full shadow-md bg-white transition-all duration-300 z-50 px-5 border-b",
+                isScrolled && "opacity-100 visible",
+            )}
+        >
+            <div
+                className="mx-auto md:py-5 py-5 flex justify-between lg:gap-20 items-center"
+                style={{ maxWidth }}
+            >
+                <a
+                    href="/"
+                    className="md:text-4xl text-xl sm:text-2xl"
+                    style={{ color: brandColor }}
+                >
+                    {brandName}
+                </a>
+
+                <DesktopNavLinks links={links} textColor={textColor} />
+
+                <div className="block lg:hidden">
+                    <MobileMenu links={links} brandColor={brandColor} />
+                </div>
+            </div>
+        </nav>
+    )
 }
 
 export const Navbar = ({
-    brandName = "Your Brand",
-    tagline = "",
-    brandColor = "#333333",
-    backgroundColor = "transparent", // Wrapper defaults to transparent
-    navBackgroundColor = "#ffffff", // New prop for generic nav background
-    textColor = "#333333",
+    brandName = "Σοφία Πλατανησιώτη",
+    tagline = "Σύμβουλος Ψυχικής Υγείας",
+    brandColor = "#5a5933",
+    navBackgroundColor = "#a9c8be",
     topBarBackground = "#000000",
     topBarTextColor = "#ffffff",
-    email = "",
-    phone = "",
-    facebookUrl = "",
-    instagramUrl = "",
+    textColor = "#000000",
+    email = "platanisiotisophia@gmail.com",
+    phone = "+30 6947777532",
+    facebookUrl = "https://www.facebook.com/PlatanisiotiSophia",
+    instagramUrl = "https://www.instagram.com/sophia.platanisioti",
     links = [
-        { id: "nav-1", label: "Home", href: "/" },
-        { id: "nav-2", label: "About", href: "/about" },
-        {
-            id: "nav-3", label: "Services", href: "/services", submenu: [
-                { id: "sub-1", label: "Web Design", href: "/services/web" },
-                { id: "sub-2", label: "SEO", href: "/services/seo" },
-            ]
-        },
-        { id: "nav-4", label: "Contact", href: "/contact" },
+        { id: "nav-1", label: "ΑΡΧΙΚΗ", href: "/" },
+        { id: "nav-2", label: "ΥΠΗΡΕΣΙΕΣ", href: "/services" },
+        { id: "nav-3", label: "ΒΙΟΓΡΑΦΙΚΟ", href: "/about" },
+        { id: "nav-4", label: "ΕΠΙΚΟΙΝΩΝΙΑ", href: "/contact" },
     ],
     showTopBar = true,
-    maxWidth = "1200px",
-    borderRadius,
-    borderWidth,
-    borderColor,
-    boxShadow,
-    marginTop, marginRight, marginBottom, marginLeft,
-    paddingTop, paddingRight, paddingBottom, paddingLeft,
+    maxWidth = "90vw",
+    bannerImage = "",
+    bannerOpacity = 80,
 }: NavbarProps) => {
     const {
         connectors: { connect, drag },
@@ -113,196 +295,137 @@ export const Navbar = ({
         selected: state.events.selected,
     }))
 
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-    const [openSubmenu, setOpenSubmenu] = useState<number | null>(null)
+    const { enabled } = useEditor((state) => ({
+        enabled: state.options.enabled,
+    }))
+
+    // Simple scroll detection for the fixed nav
+    const [isScrolled, setIsScrolled] = useState(false)
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 10)
+        }
+        window.addEventListener("scroll", handleScroll)
+        return () => window.removeEventListener("scroll", handleScroll)
+    }, [])
 
     return (
         <div
             ref={(ref) => ref && connect(drag(ref)) as any}
-            style={{
-                width: "100%",
-                backgroundColor, // Wrapper background
-                borderRadius: `${borderRadius || 0}px`,
-                border: borderWidth ? `${borderWidth}px solid ${borderColor}` : "none",
-                boxShadow,
-                marginTop, marginRight, marginBottom, marginLeft,
-                paddingTop, paddingRight, paddingBottom, paddingLeft,
-            }}
+            className="w-full max-w-full relative @container overflow-hidden"
+            style={{ fontFamily: "var(--design-font-base, sans-serif)" }}
         >
-            {/* Top Bar */}
-            {showTopBar && (email || phone || facebookUrl || instagramUrl) && (
-                <div
-                    style={{
-                        backgroundColor: topBarBackground,
-                        color: topBarTextColor,
-                        padding: "8px 20px",
-                    }}
-                >
-                    <div
-                        style={{
-                            maxWidth,
-                            margin: "0 auto",
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                            fontSize: 13,
-                        }}
-                    >
-                        {/* Social Links */}
-                        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            {/* Top Bar - Desktop */}
+            {showTopBar && (
+                <section className="hidden @lg:block" style={{ backgroundColor: topBarBackground }}>
+                    <div className="max-w-5xl mx-auto flex justify-between items-center px-5">
+                        <div className="flex items-center gap-3 py-3">
                             {facebookUrl && (
-                                <a href={facebookUrl} target="_blank" rel="noreferrer" style={{ color: topBarTextColor }}>
-                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-                                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                                    </svg>
+                                <a href={facebookUrl} target="_blank" rel="noreferrer noopener">
+                                    <Facebook fill={topBarTextColor} />
                                 </a>
                             )}
                             {instagramUrl && (
-                                <a href={instagramUrl} target="_blank" rel="noreferrer" style={{ color: topBarTextColor }}>
-                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-                                        <path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913a5.885 5.885 0 001.384 2.126A5.868 5.868 0 004.14 23.37c.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558a5.898 5.898 0 002.126-1.384 5.86 5.86 0 001.384-2.126c.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913a5.89 5.89 0 00-1.384-2.126A5.847 5.847 0 0019.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227a3.81 3.81 0 01-.899 1.382 3.744 3.744 0 01-1.38.896c-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421a3.716 3.716 0 01-1.379-.899 3.644 3.644 0 01-.9-1.38c-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678a6.162 6.162 0 100 12.324 6.162 6.162 0 100-12.324zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405a1.441 1.441 0 01-2.88 0 1.44 1.44 0 012.88 0z" />
-                                    </svg>
+                                <a href={instagramUrl} target="_blank" rel="noreferrer noopener">
+                                    <Instagram fill={topBarTextColor} />
                                 </a>
                             )}
                         </div>
-                        {/* Contact Info */}
-                        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+                        <div className="flex gap-3">
                             {email && (
-                                <a href={`mailto:${email}`} style={{ display: "flex", alignItems: "center", gap: 6, color: topBarTextColor, textDecoration: "none" }}>
-                                    <Mail size={13} />
-                                    <span>{email}</span>
+                                <a href={`mailto:${email}`} className="items-center flex gap-1">
+                                    <Mail size={15} style={{ color: topBarTextColor }} className="mt-1" />
+                                    <span
+                                        className="border-b hover:border-b-gray-100 transition-all border-b-gray-500 text-sm font-light"
+                                        style={{ color: topBarTextColor }}
+                                    >
+                                        {email}
+                                    </span>
                                 </a>
                             )}
                             {phone && (
-                                <a href={`tel:${phone}`} style={{ display: "flex", alignItems: "center", gap: 6, color: topBarTextColor, textDecoration: "none" }}>
-                                    <Phone size={13} />
-                                    <span>{phone}</span>
+                                <a href={`tel:${phone}`} className="items-center flex gap-1">
+                                    <Phone size={15} style={{ color: topBarTextColor }} className="mt-1" />
+                                    <span
+                                        className="border-b hover:border-b-gray-100 transition-all border-b-gray-500 text-sm font-light"
+                                        style={{ color: topBarTextColor }}
+                                    >
+                                        {phone}
+                                    </span>
                                 </a>
                             )}
                         </div>
                     </div>
-                </div>
+                </section>
             )}
 
             {/* Main Nav */}
             <nav
-                style={{
-                    backgroundColor: navBackgroundColor,
-                    borderBottom: "1px solid rgba(0,0,0,0.1)",
-                    padding: "16px 20px",
-                }}
+                className="relative px-5 border-b border-b-black/40 z-0"
+                style={{ backgroundColor: navBackgroundColor }}
             >
-                <div
-                    style={{
-                        maxWidth,
-                        margin: "0 auto",
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                    }}
+                <section
+                    className="mx-auto h-24 md:h-40 flex gap-20 items-center justify-between lg:justify-start"
+                    style={{ maxWidth }}
                 >
-                    {/* Brand */}
-                    <div>
-                        <div style={{ fontSize: 24, fontWeight: 600, color: brandColor }}>
+                    <a href="/" className="z-10 min-w-0 flex-shrink">
+                        <h1
+                            className="text-lg @sm:text-xl @md:text-2xl @lg:text-4xl mb-1 @md:mb-2 truncate"
+                            style={{
+                                color: brandColor,
+                                fontFamily: "var(--design-font-heading, inherit)",
+                                fontWeight: "var(--design-font-weight-heading, 500)"
+                            }}
+                        >
                             {brandName}
-                        </div>
+                        </h1>
                         {tagline && (
-                            <div style={{ fontSize: 14, color: textColor, opacity: 0.8 }}>
-                                {tagline}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Desktop Navigation */}
-                    <ul
-                        style={{
-                            display: "flex",
-                            gap: 24,
-                            listStyle: "none",
-                            margin: 0,
-                            padding: 0,
-                        }}
-                    >
-                        {links.map((link, index) => (
-                            <li
-                                key={index}
-                                style={{ position: "relative" }}
-                                onMouseEnter={() => link.submenu && setOpenSubmenu(index)}
-                                onMouseLeave={() => setOpenSubmenu(null)}
+                            <h2
+                                className="text-xs @sm:text-sm @md:text-base @lg:text-[1.3125rem] truncate"
+                                style={{ color: textColor }}
                             >
-                                <a
-                                    href={link.href}
-                                    style={{
-                                        color: textColor,
-                                        textDecoration: "none",
-                                        fontSize: 14,
-                                        fontWeight: 500,
-                                        transition: "opacity 0.2s",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: 4,
-                                    }}
-                                >
-                                    {link.label}
-                                    {link.submenu && link.submenu.length > 0 && (
-                                        <ChevronDown size={14} style={{ opacity: 0.6 }} />
-                                    )}
-                                </a>
-                                {/* Submenu dropdown */}
-                                {link.submenu && link.submenu.length > 0 && openSubmenu === index && (
-                                    <div
-                                        style={{
-                                            position: "absolute",
-                                            top: "100%",
-                                            left: 0,
-                                            minWidth: 180,
-                                            backgroundColor: "#fff",
-                                            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                                            borderRadius: 6,
-                                            padding: "8px 0",
-                                            marginTop: 4,
-                                            zIndex: 100,
-                                        }}
-                                    >
-                                        {link.submenu.map((sub, subIdx) => (
-                                            <a
-                                                key={subIdx}
-                                                href={sub.href}
-                                                style={{
-                                                    display: "block",
-                                                    padding: "8px 16px",
-                                                    color: textColor,
-                                                    textDecoration: "none",
-                                                    fontSize: 13,
-                                                    transition: "background 0.15s",
-                                                }}
-                                                onMouseEnter={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.05)"}
-                                                onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
-                                            >
-                                                {sub.label}
-                                            </a>
-                                        ))}
-                                    </div>
-                                )}
-                            </li>
-                        ))}
-                    </ul>
+                                {tagline}
+                            </h2>
+                        )}
+                    </a>
 
-                    {/* Mobile Menu Button */}
-                    <button
-                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        style={{
-                            display: "none",
-                            background: "none",
-                            border: "none",
-                            cursor: "pointer",
-                            color: textColor,
-                        }}
-                    >
-                        {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                    </button>
-                </div>
+                    <DesktopNavLinks links={links} textColor={textColor} />
+
+                    <MobileMenu
+                        links={links}
+                        brandColor={brandColor}
+                        email={email}
+                        phone={phone}
+                        facebookUrl={facebookUrl}
+                        instagramUrl={instagramUrl}
+                    />
+                </section>
+
+                {/* Banner Background */}
+                {bannerImage && (
+                    <div className="absolute inset-0 -z-10 overflow-hidden">
+                        <Image
+                            src={bannerImage}
+                            fill
+                            alt="banner"
+                            className="object-cover pr-[20px]"
+                            style={{ opacity: bannerOpacity / 100 }}
+                            priority
+                        />
+                    </div>
+                )}
             </nav>
+
+            {/* Fixed Nav on Scroll */}
+            <FixedNav
+                links={links}
+                brandName={brandName}
+                brandColor={brandColor}
+                textColor={textColor}
+                maxWidth={maxWidth}
+                isScrolled={isScrolled}
+            />
         </div>
     )
 }
@@ -331,8 +454,6 @@ const SortableSubmenuItem = ({ sub, subIdx, updateSubmenuItem, removeSubmenuItem
         opacity: isDragging ? 0.5 : 1,
         zIndex: isDragging ? 999 : "auto",
     }
-
-
 
     return (
         <div
@@ -377,7 +498,7 @@ const SortableSubmenuItem = ({ sub, subIdx, updateSubmenuItem, removeSubmenuItem
     )
 }
 
-// Accordion-style link editor with internal Drag and Drop for Submenus
+// Accordion-style link editor
 interface LinkEditorProps {
     link: NavLink
     index: number
@@ -395,8 +516,6 @@ const LinkEditor = ({
     onChange,
     onRemove,
 }: LinkEditorProps) => {
-
-    // Sortable hooks for the parent item
     const {
         attributes,
         listeners,
@@ -437,7 +556,6 @@ const LinkEditor = ({
         onChange("submenu", newSubmenu)
     }
 
-    // Handle submenu drag end
     const handleSubDragEnd = (event: DragEndEvent) => {
         const { active, over } = event
         if (over && active.id !== over.id) {
@@ -458,13 +576,11 @@ const LinkEditor = ({
             style={style}
             className={`border rounded-md overflow-hidden mb-2 bg-background ${isOpen ? 'ring-1 ring-ring border-transparent' : 'border-border'}`}
         >
-            {/* Header */}
             <div
                 className={`flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-muted/50 transition-colors ${isOpen ? 'bg-muted/30' : ''}`}
                 onClick={onToggle}
             >
                 <div className="flex items-center gap-2 flex-1 overflow-hidden">
-                    {/* Drag Handle */}
                     <div
                         {...attributes}
                         {...listeners}
@@ -486,7 +602,6 @@ const LinkEditor = ({
                 {isOpen ? <ChevronUp size={14} className="text-muted-foreground" /> : <ChevronDown size={14} className="text-muted-foreground" />}
             </div>
 
-            {/* Content */}
             {isOpen && (
                 <div className="p-3 space-y-3 border-t bg-muted/10">
                     <div className="space-y-1">
@@ -510,7 +625,6 @@ const LinkEditor = ({
                         />
                     </div>
 
-                    {/* Submenu Section */}
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
                             <span className="text-[10px] uppercase text-muted-foreground font-medium">Submenu Items</span>
@@ -531,7 +645,6 @@ const LinkEditor = ({
                             </div>
                         )}
 
-                        {/* Internal Sortable Context for Submenu */}
                         {link.submenu && link.submenu.length > 0 && (
                             <div className="space-y-2 pl-3 border-l-2 border-muted">
                                 <DndContext
@@ -558,7 +671,6 @@ const LinkEditor = ({
                         )}
                     </div>
 
-                    {/* Actions */}
                     <div className="flex justify-between items-center pt-2 mt-2 border-t">
                         <span className="text-[10px] text-muted-foreground">
                             ID: {link.id?.split('-')[1]}
@@ -585,7 +697,6 @@ export const NavbarSettings = () => {
         tagline,
         brandColor,
         navBackgroundColor,
-        backgroundColor,
         textColor,
         topBarBackground,
         topBarTextColor,
@@ -595,11 +706,13 @@ export const NavbarSettings = () => {
         instagramUrl,
         showTopBar,
         links,
+        bannerImage,
+        bannerOpacity,
     } = useNode((node) => ({
         brandName: node.data.props.brandName,
         tagline: node.data.props.tagline,
         brandColor: node.data.props.brandColor,
-        navBackgroundColor: node.data.props.navBackgroundColor || node.data.props.backgroundColor, // Fallback for migration
+        navBackgroundColor: node.data.props.navBackgroundColor,
         textColor: node.data.props.textColor,
         topBarBackground: node.data.props.topBarBackground,
         topBarTextColor: node.data.props.topBarTextColor,
@@ -609,9 +722,24 @@ export const NavbarSettings = () => {
         instagramUrl: node.data.props.instagramUrl,
         showTopBar: node.data.props.showTopBar,
         links: node.data.props.links,
+        bannerImage: node.data.props.bannerImage,
+        bannerOpacity: node.data.props.bannerOpacity,
     }))
 
     const [openLinkIndex, setOpenLinkIndex] = useState<number | null>(null)
+    const [isBannerDialogOpen, setIsBannerDialogOpen] = useState(false)
+
+    const params = useParams()
+    const siteId = params.siteId as string
+
+    const handleBannerSelect = (items: MediaItem[]) => {
+        if (items.length > 0) {
+            const selectedImage = items[0]
+            setProp((props: NavbarProps) => {
+                props.bannerImage = selectedImage.url
+            })
+        }
+    }
 
     // Ensure links have IDs
     useEffect(() => {
@@ -627,7 +755,6 @@ export const NavbarSettings = () => {
                     newLink.id = `link-${Math.random().toString(36).substr(2, 9)}`
                 }
 
-                // Ensure submenus have IDs too
                 if (link.submenu) {
                     const newSubmenu = link.submenu.map((sub: NavLink) => {
                         if (!sub.id) {
@@ -704,8 +831,6 @@ export const NavbarSettings = () => {
 
     return (
         <div>
-
-
             <PropertySection title="Brand" summary={brandName}>
                 <PropertyRow label="Name">
                     <PropertyInput
@@ -723,7 +848,7 @@ export const NavbarSettings = () => {
                 </PropertyRow>
                 <PropertyRow label="Brand Color">
                     <PropertyColor
-                        value={brandColor || "#333333"}
+                        value={brandColor || "#5a5933"}
                         onChange={(v) => setProp((props: NavbarProps) => (props.brandColor = v))}
                     />
                 </PropertyRow>
@@ -732,18 +857,79 @@ export const NavbarSettings = () => {
             <PropertySection title="Colors" summary="" defaultOpen={false}>
                 <PropertyRow label="Nav Background">
                     <PropertyColor
-                        value={navBackgroundColor || "#ffffff"}
+                        value={navBackgroundColor || "#a9c8be"}
                         onChange={(v) => setProp((props: NavbarProps) => (props.navBackgroundColor = v))}
-                        placeholder="#ffffff"
+                        placeholder="#a9c8be"
                     />
                 </PropertyRow>
                 <PropertyRow label="Text Color">
                     <PropertyColor
-                        value={textColor || "#333333"}
+                        value={textColor || "#000000"}
                         onChange={(v) => setProp((props: NavbarProps) => (props.textColor = v))}
                     />
                 </PropertyRow>
             </PropertySection>
+
+            <PropertySection title="Banner Image" summary="" defaultOpen={false}>
+                <PropertyRow label="Image">
+                    <div className="flex flex-col gap-2 w-full">
+                        {bannerImage ? (
+                            <div className="relative group w-full aspect-[3/1] bg-muted rounded-md overflow-hidden border border-border">
+                                <img
+                                    src={bannerImage}
+                                    alt="Banner Preview"
+                                    className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                    <Button
+                                        variant="secondary"
+                                        size="sm"
+                                        className="h-8 text-xs"
+                                        onClick={() => setIsBannerDialogOpen(true)}
+                                    >
+                                        Change
+                                    </Button>
+                                    <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        className="h-8 text-xs"
+                                        onClick={() => setProp((props: NavbarProps) => (props.bannerImage = ""))}
+                                    >
+                                        Remove
+                                    </Button>
+                                </div>
+                            </div>
+                        ) : (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="w-full flex items-center justify-center gap-2 h-16 border-dashed"
+                                onClick={() => setIsBannerDialogOpen(true)}
+                            >
+                                <ImageIcon className="w-5 h-5 text-muted-foreground" />
+                                <span className="text-muted-foreground">Select Banner Image</span>
+                            </Button>
+                        )}
+                    </div>
+                </PropertyRow>
+                <PropertyRow label="Opacity">
+                    <PropertySlider
+                        value={bannerOpacity ?? 80}
+                        onChange={(v) => setProp((props: NavbarProps) => (props.bannerOpacity = v))}
+                        min={0}
+                        max={100}
+                        unit="%"
+                    />
+                </PropertyRow>
+            </PropertySection>
+
+            <MediaLibraryDialog
+                siteId={siteId}
+                isOpen={isBannerDialogOpen}
+                onClose={() => setIsBannerDialogOpen(false)}
+                onSelect={handleBannerSelect}
+                multiSelect={false}
+            />
 
             <PropertySection title="Top Bar" summary={showTopBar ? "Visible" : "Hidden"} defaultOpen={false}>
                 <PropertyRow label="Show Top Bar">
@@ -842,30 +1028,26 @@ export const NavbarSettings = () => {
 Navbar.craft = {
     displayName: "Navbar",
     props: {
-        brandName: "Your Brand",
-        tagline: "",
-        brandColor: "#333333",
-        navBackgroundColor: "#ffffff",
-        backgroundColor: "transparent",
-        textColor: "#333333",
+        brandName: "Σοφία Πλατανησιώτη",
+        tagline: "Σύμβουλος Ψυχικής Υγείας",
+        brandColor: "#5a5933",
+        navBackgroundColor: "#a9c8be",
+        textColor: "#000000",
         topBarBackground: "#000000",
         topBarTextColor: "#ffffff",
-        email: "hello@example.com",
-        phone: "+1 234 567 890",
-        facebookUrl: "",
-        instagramUrl: "",
+        email: "platanisiotisophia@gmail.com",
+        phone: "+30 6947777532",
+        facebookUrl: "https://www.facebook.com/PlatanisiotiSophia",
+        instagramUrl: "https://www.instagram.com/sophia.platanisioti",
         showTopBar: true,
-        maxWidth: "1200px",
+        maxWidth: "90vw",
+        bannerImage: "/banner.webp",
+        bannerOpacity: 80,
         links: [
-            { id: "nav-1", label: "Home", href: "/" },
-            { id: "nav-2", label: "About", href: "/about" },
-            {
-                id: "nav-3", label: "Services", href: "/services", submenu: [
-                    { id: "sub-1", label: "Web Design", href: "/services/web" },
-                    { id: "sub-2", label: "SEO", href: "/services/seo" },
-                ]
-            },
-            { id: "nav-4", label: "Contact", href: "/contact" },
+            { id: "nav-1", label: "ΑΡΧΙΚΗ", href: "/" },
+            { id: "nav-2", label: "ΥΠΗΡΕΣΙΕΣ", href: "/services" },
+            { id: "nav-3", label: "ΒΙΟΓΡΑΦΙΚΟ", href: "/about" },
+            { id: "nav-4", label: "ΕΠΙΚΟΙΝΩΝΙΑ", href: "/contact" },
         ],
     },
     rules: {

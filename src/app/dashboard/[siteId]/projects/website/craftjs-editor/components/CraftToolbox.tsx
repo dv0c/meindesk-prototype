@@ -4,7 +4,7 @@ import { useEditor, Element } from "@craftjs/core"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
-import { Search, Box, Type, Heading as HeadingIcon, Image as ImageIcon, LayoutGrid, Minus, Square, Navigation, Link as LinkIcon } from "lucide-react"
+import { Search, Box, Type, Heading as HeadingIcon, Image as ImageIcon, LayoutGrid, Minus, Square, Navigation, Link as LinkIcon, Sparkles } from "lucide-react"
 import {
     Container,
     Heading,
@@ -18,6 +18,8 @@ import {
     NavigationLinks,
     componentDefinitions,
 } from "../user-components"
+import { useMarketplaceSafe } from "./MarketplaceContext"
+import { Badge } from "@/components/ui/badge"
 
 const iconMap: Record<string, React.ReactNode> = {
     Container: <Box className="h-5 w-5" />,
@@ -48,14 +50,32 @@ const componentMap: Record<string, React.ComponentType<any>> = {
 export function CraftToolbox() {
     const { connectors } = useEditor()
     const [searchQuery, setSearchQuery] = useState("")
+    const { isComponentAvailable, installedThemes, isLoading } = useMarketplaceSafe()
 
-    const filteredComponents = componentDefinitions.filter(
-        (c) =>
+    // Filter components by search and availability
+    const filteredComponents = componentDefinitions.filter((c) => {
+        // First check if it matches search
+        const matchesSearch =
             c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             c.category.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+
+        if (!matchesSearch) return false
+
+        // Then check if component is available (from installed themes)
+        return isComponentAvailable(c.name)
+    })
 
     const categories = Array.from(new Set(filteredComponents.map((c) => c.category)))
+
+    // Get theme name for a component (for badge display)
+    const getComponentTheme = (componentName: string): string | null => {
+        for (const theme of installedThemes) {
+            if (theme.name === "Core") continue
+            const hasComponent = theme.blocks.some(b => b.componentName === componentName)
+            if (hasComponent) return theme.name
+        }
+        return null
+    }
 
     return (
         <div className="flex flex-col h-full bg-background">
@@ -73,7 +93,13 @@ export function CraftToolbox() {
 
             <ScrollArea className="flex-1 min-h-0">
                 <div className="p-4 space-y-6">
-                    {categories.length === 0 && (
+                    {isLoading && (
+                        <div className="text-center text-sm text-muted-foreground py-8">
+                            Loading components...
+                        </div>
+                    )}
+
+                    {!isLoading && categories.length === 0 && (
                         <div className="text-center text-sm text-muted-foreground py-8">
                             No components found
                         </div>
@@ -91,6 +117,7 @@ export function CraftToolbox() {
                                         const Component = componentMap[component.name]
                                         // Determine if this component accepts children
                                         const isContainer = component.name === "Container" || component.name === "Grid"
+                                        const themeName = getComponentTheme(component.name)
 
                                         return (
                                             <div
@@ -104,8 +131,17 @@ export function CraftToolbox() {
                                                         }
                                                     }
                                                 }}
-                                                className="flex flex-col items-center justify-center p-3 h-[80px] border rounded-lg bg-card hover:bg-accent/50 hover:border-primary/50 cursor-grab transition-all duration-200 group"
+                                                className="flex flex-col items-center justify-center p-3 h-[80px] border rounded-lg bg-card hover:bg-accent/50 hover:border-primary/50 cursor-grab transition-all duration-200 group relative"
                                             >
+                                                {themeName && (
+                                                    <Badge
+                                                        variant="secondary"
+                                                        className="absolute -top-2 -right-2 text-[9px] px-1.5 py-0 h-4 bg-primary/10 text-primary border-primary/20"
+                                                    >
+                                                        <Sparkles className="w-2.5 h-2.5 mr-0.5" />
+                                                        {themeName.split(' ')[0]}
+                                                    </Badge>
+                                                )}
                                                 <div className="text-muted-foreground group-hover:text-primary transition-colors">
                                                     {iconMap[component.name] || <Box className="h-5 w-5" />}
                                                 </div>
@@ -123,3 +159,4 @@ export function CraftToolbox() {
         </div>
     )
 }
+

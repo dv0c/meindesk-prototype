@@ -24,6 +24,7 @@ import { Eye, Loader2, Search } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import placeholder from "../../../../../public/placeholder.svg";
 
 interface Theme {
     id: string;
@@ -80,6 +81,12 @@ export default function ThemeStorePage() {
     };
 
     const handleInstall = async (theme: Theme) => {
+        // Prevent uninstalling the Core theme
+        if (theme.id === "000000000000000000000001" && theme.installed) {
+            alert("The Core theme cannot be uninstalled as it provides essential components.");
+            return;
+        }
+
         setInstalling(theme.id);
         const isInstalled = theme.installed;
 
@@ -119,7 +126,7 @@ export default function ThemeStorePage() {
         <div className="p-8 space-y-8">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Theme Store</h1>
+                    <h1 className="text-3xl font-bold tracking-tight">Theme Community Store</h1>
                     <p className="text-muted-foreground">
                         Discover and install new components and layouts for your site.
                     </p>
@@ -157,7 +164,7 @@ export default function ThemeStorePage() {
                             <div className="aspect-video w-full bg-muted relative">
                                 {/* Placeholder for thumbnail */}
                                 {theme.thumbnail ? (
-                                    <img src={theme.thumbnail} alt={theme.name} className="object-cover min-h-[250px] max-h-[250px] w-full h-full" />
+                                    <img src={theme.thumbnail ? theme.thumbnail : placeholder} alt={theme.name} className="object-cover min-h-[250px] max-h-[250px] w-full h-full" />
                                 ) : (
                                     <div className="flex items-center justify-center h-full text-muted-foreground bg-secondary/50">
                                         No Preview
@@ -193,12 +200,14 @@ export default function ThemeStorePage() {
                                     className="w-full"
                                     variant={theme.installed ? "destructive" : "default"}
                                     onClick={() => handleInstall(theme)}
-                                    disabled={installing === theme.id}
+                                    disabled={installing === theme.id || (theme.id === "000000000000000000000001" && theme.installed)}
                                 >
                                     {installing === theme.id && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                     {installing === theme.id
                                         ? (theme.installed ? "Uninstalling..." : "Installing...")
-                                        : (theme.installed ? "Uninstall" : "Install Theme")
+                                        : theme.id === "000000000000000000000001" && theme.installed
+                                            ? "Installed (Required)"
+                                            : (theme.installed ? "Uninstall" : "Install Theme")
                                     }
                                 </Button>
                             </CardFooter>
@@ -223,7 +232,6 @@ export default function ThemeStorePage() {
                                             <p className="font-medium">{block.componentName}</p>
                                             <div className="text-xs text-muted-foreground mt-2">
                                                 <p>Category: {block.componentDefinition?.category || 'Uncategorized'}</p>
-                                                <p>Props: {block.componentDefinition?.props?.length || 0}</p>
                                             </div>
                                         </div>
                                     ))}

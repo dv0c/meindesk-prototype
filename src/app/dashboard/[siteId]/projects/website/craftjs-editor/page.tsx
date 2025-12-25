@@ -9,6 +9,7 @@ import { RenderNode } from "./components/RenderNode"
 import { Button, Container, Divider, Grid, Heading, Image, NavigationLinks, Spacer, Text } from "./user-components"
 import { Navbar } from "./user-components/Navbar"
 import { DesignProvider, useDesign } from "./components/DesignContext"
+import { MarketplaceProvider } from "./components/MarketplaceContext"
 
 // Resolver for all user components
 const resolver = {
@@ -58,19 +59,21 @@ export default function CraftJSEditorPage({ params }: { params: { siteId: string
 
     return (
         <DesignProvider>
-            <EditorWithDesign
-                resolver={resolver}
-                pageName={pageName}
-                setPageName={setPageName}
-                deviceMode={deviceMode}
-                setDeviceMode={setDeviceMode}
-                onSave={handleSave}
-                isSaving={isSaving}
-                showSidebar={showSidebar}
-                setShowSidebar={setShowSidebar}
-                siteId={siteId}
-                getCanvasWidth={getCanvasWidth}
-            />
+            <MarketplaceProvider>
+                <EditorWithDesign
+                    resolver={resolver}
+                    pageName={pageName}
+                    setPageName={setPageName}
+                    deviceMode={deviceMode}
+                    setDeviceMode={setDeviceMode}
+                    onSave={handleSave}
+                    isSaving={isSaving}
+                    showSidebar={showSidebar}
+                    setShowSidebar={setShowSidebar}
+                    siteId={siteId}
+                    getCanvasWidth={getCanvasWidth}
+                />
+            </MarketplaceProvider>
         </DesignProvider>
     )
 }
@@ -104,11 +107,12 @@ function EditorWithDesign({ resolver, pageName, setPageName, deviceMode, setDevi
                     <div className="flex-1 h-full overflow-hidden flex flex-col relative">
                         <div className="overflow-auto h-full bg-zinc-50 dark:bg-zinc-900 p-5">
                             <div
-                                className="canvas-preview shadow-lg transition-all duration-300 mx-auto h-full"
+                                className="canvas-preview shadow-lg transition-all duration-300 mx-auto h-full overflow-y-auto overflow-x-hidden"
                                 style={{
                                     width: getCanvasWidth(),
                                     minHeight: "100%",
                                     backgroundColor: "var(--design-background, #ffffff)",
+                                    containerType: "inline-size",
                                     ...Object.fromEntries(
                                         getCssVariables()
                                             .split(';')
@@ -125,9 +129,15 @@ function EditorWithDesign({ resolver, pageName, setPageName, deviceMode, setDevi
                                         is={Container}
                                         canvas
                                         padding={40}
+                                        paddingTop="0"
+                                        paddingRight="0"
+                                        paddingBottom="0"
+                                        paddingLeft="0"
+                                        gap={16}
                                         backgroundColor="var(--design-background, #ffffff)"
-                                        minHeight={0}
-                                        className="h-full min-h-full"
+                                        minHeight="100%"
+                                        flexDirection="column"
+                                        alignItems="stretch"
                                         custom={{ displayName: "App", isDeletable: false }}
                                     >
                                         {/* Demo Article Content */}

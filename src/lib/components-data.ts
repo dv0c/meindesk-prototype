@@ -1779,6 +1779,50 @@ export const ALL_COMPONENTS: ComponentDefinition[] = [
             },
         ],
     },
+
+    // ===== CraftJS Theme Components =====
+    // These components are specifically for the CraftJS editor
+
+    // Sophia Platanisioti Theme - Navbar
+    {
+        name: "Navbar",
+        themeName: "SophiaPlatanisioti",
+        category: "CraftJS Navigation",
+        allowChildren: false,
+        props: [
+            { name: "brandName", type: "string", label: "Brand Name", defaultValue: "Σοφία Πλατανησιώτη" },
+            { name: "tagline", type: "string", label: "Tagline", defaultValue: "Σύμβουλος Ψυχικής Υγείας" },
+            { name: "brandColor", type: "color", label: "Brand Color", defaultValue: "#5a5933" },
+            { name: "navBackgroundColor", type: "color", label: "Nav Background", defaultValue: "#a9c8be" },
+            { name: "textColor", type: "color", label: "Text Color", defaultValue: "#000000" },
+            { name: "topBarBackground", type: "color", label: "Top Bar Background", defaultValue: "#000000" },
+            { name: "topBarTextColor", type: "color", label: "Top Bar Text", defaultValue: "#ffffff" },
+            { name: "email", type: "string", label: "Email", defaultValue: "email@example.com" },
+            { name: "phone", type: "string", label: "Phone", defaultValue: "+30 6947777532" },
+            { name: "showTopBar", type: "boolean", label: "Show Top Bar", defaultValue: true },
+            { name: "bannerImage", type: "image", label: "Banner Image", defaultValue: "" },
+            { name: "bannerOpacity", type: "number", label: "Banner Opacity", defaultValue: 80 },
+        ],
+    },
+
+    // Sophia Platanisioti Theme - NavigationLinks
+    {
+        name: "NavigationLinks",
+        themeName: "SophiaPlatanisioti",
+        category: "CraftJS Navigation",
+        allowChildren: false,
+        props: [
+            {
+                name: "direction", type: "select", label: "Direction", defaultValue: "horizontal", options: [
+                    { label: "Horizontal", value: "horizontal" },
+                    { label: "Vertical", value: "vertical" },
+                ]
+            },
+            { name: "gap", type: "number", label: "Gap", defaultValue: 16 },
+            { name: "textColor", type: "color", label: "Text Color", defaultValue: "#000000" },
+            { name: "fontSize", type: "number", label: "Font Size", defaultValue: 14 },
+        ],
+    },
 ]
 
     // VALIDATION: Prevent duplicate component definitions during development
