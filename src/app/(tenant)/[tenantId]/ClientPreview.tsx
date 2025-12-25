@@ -33,7 +33,7 @@ function ClientPreview({ tenantId, page }: ClientPreviewProps) {
     return (
       <main>
         {page.layout.map((node) => (
-          <RenderNodePreview key={node.id} node={node} />
+          <RenderNodePreview key={node.id} node={node} tenantId={tenantId} />
         ))}
       </main>
     )
