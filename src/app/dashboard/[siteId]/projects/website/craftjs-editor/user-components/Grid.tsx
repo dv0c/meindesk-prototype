@@ -8,6 +8,7 @@ import {
     PropertySlider,
     PropertyColor,
     PropertyButtonGroup,
+    PropertySliderWithUnit,
 } from "../components/PropertySection"
 
 interface GridProps {
@@ -17,6 +18,7 @@ interface GridProps {
     padding?: number
     backgroundColor?: string
     className?: string
+    maxWidth?: string
 }
 
 export const Grid = ({
@@ -26,6 +28,7 @@ export const Grid = ({
     padding = 0,
     backgroundColor = "transparent",
     className = "",
+    maxWidth = "100%",
 }: GridProps) => {
     const {
         connectors: { connect, drag },
@@ -45,6 +48,10 @@ export const Grid = ({
         padding,
         backgroundColor,
         minHeight: 80,
+        maxWidth,
+        marginLeft: "auto",
+        marginRight: "auto",
+        width: "100%",
     }
 
     // Check if grid is empty
@@ -68,10 +75,10 @@ export const Grid = ({
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            minHeight: 60,
-                            border: "2px dashed #e5e7eb",
+                            minHeight: 160,
+                            border: "2px dashed var(--design-border-color, #e5e7eb)",
                             borderRadius: 8,
-                            color: "#9ca3af",
+                            color: "var(--design-text-color, #9ca3af)",
                             fontSize: 12,
                             fontWeight: 500,
                             padding: 16,
@@ -96,12 +103,27 @@ export const GridSettings = () => {
         gap,
         padding,
         backgroundColor,
+        maxWidth,
     } = useNode((node) => ({
         columns: node.data.props.columns,
         gap: node.data.props.gap,
         padding: node.data.props.padding,
         backgroundColor: node.data.props.backgroundColor,
+        maxWidth: node.data.props.maxWidth,
     }))
+
+    // Parse value with unit helper
+    const parseValueWithUnit = (val: string | number | undefined, defaultUnit = 'px', defaultValue = 0): { value: number; unit: string } => {
+        if (typeof val === 'number') return { value: val, unit: 'px' }
+        if (!val) return { value: defaultValue, unit: defaultUnit }
+        const match = val.match(/^([\d.]+)(px|%|rem|vw)?$/)
+        if (match) {
+            return { value: parseFloat(match[1]) || 0, unit: match[2] || 'px' }
+        }
+        return { value: defaultValue, unit: defaultUnit }
+    }
+
+    const { value: maxWidthValue, unit: maxWidthUnit } = parseValueWithUnit(maxWidth, '%', 100)
 
     return (
         <div>
@@ -116,7 +138,15 @@ export const GridSettings = () => {
                             { label: "3", value: "3" },
                             { label: "4", value: "4" },
                             { label: "6", value: "6" },
+                            { label: "12", value: "12" },
                         ]}
+                    />
+                </PropertyRow>
+                <PropertyRow label="Max Width">
+                    <PropertySliderWithUnit
+                        value={maxWidthValue}
+                        unit={maxWidthUnit}
+                        onChange={(v, u) => setProp((props: GridProps) => (props.maxWidth = `${v}${u}`))}
                     />
                 </PropertyRow>
                 <PropertyRow label="Gap">
@@ -160,6 +190,7 @@ Grid.craft = {
         gap: 16,
         padding: 0,
         backgroundColor: "transparent",
+        maxWidth: "100%",
     },
     rules: {
         canDrag: () => true,

@@ -131,19 +131,6 @@ function EditorWithDesign({ resolver, pageName, setPageName, deviceMode, setDevi
                                         custom={{ displayName: "App", isDeletable: false }}
                                     >
                                         {/* Demo Article Content */}
-                                        <Element is={Heading} text="Welcome to the Page Builder" level="h1" fontSize={42} fontWeight="700" textAlign="left" />
-                                        <Element is={Spacer} height={16} />
-                                        <Element is={Text} text="This is a demo page to help you get started with the CraftJS editor. You can edit any text by clicking on it, and customize styles using the properties panel on the right." fontSize={18} color="#666666" />
-                                        <Element is={Spacer} height={32} />
-                                        <Element is={Heading} text="Getting Started" level="h2" fontSize={28} fontWeight="600" textAlign="left" />
-                                        <Element is={Spacer} height={12} />
-                                        <Element is={Text} text="Use the sidebar on the left to add new components. Click on any element to select it and see its properties. Try changing colors, fonts, and button styles from the Design panel!" fontSize={16} color="#444444" />
-                                        <Element is={Spacer} height={24} />
-                                        <Element is={Button} text="Learn More" variant="primary" size="lg" />
-                                        <Element is={Spacer} height={48} />
-                                        <Element is={Divider} />
-                                        <Element is={Spacer} height={24} />
-                                        <Element is={Text} text="Pro tip: Use the Design panel to change themes, colors, and fonts globally across your page." fontSize={14} color="#888888" />
                                     </Element>
                                 </Frame>
                             </div>

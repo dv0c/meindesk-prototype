@@ -72,6 +72,7 @@
     "dnd-kit": "^0.0.2",
     "embla-carousel-react": "^8.6.0",
     "eslint-config-next": "^16.0.7",
+    "framer-motion": "^12.23.26",
     "geoip-lite": "^1.4.10",
     "input-otp": "^1.4.2",
     "isomorphic-dompurify": "^2.34.0",
