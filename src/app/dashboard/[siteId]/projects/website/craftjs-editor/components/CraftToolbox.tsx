@@ -4,7 +4,7 @@ import { useEditor, Element } from "@craftjs/core"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
-import { Search, Box, Type, Heading as HeadingIcon, Image as ImageIcon, LayoutGrid, Minus, Square } from "lucide-react"
+import { Search, Box, Type, Heading as HeadingIcon, Image as ImageIcon, LayoutGrid, Minus, Square, Navigation } from "lucide-react"
 import {
     Container,
     Heading,
@@ -14,6 +14,7 @@ import {
     Grid,
     Divider,
     Spacer,
+    Navbar,
     componentDefinitions,
 } from "../user-components"
 
@@ -26,6 +27,7 @@ const iconMap: Record<string, React.ReactNode> = {
     Image: <ImageIcon className="h-5 w-5" />,
     Divider: <Minus className="h-5 w-5" />,
     Spacer: <Box className="h-5 w-5" />,
+    Navbar: <Navigation className="h-5 w-5" />,
 }
 
 const componentMap: Record<string, React.ComponentType<any>> = {
@@ -37,6 +39,7 @@ const componentMap: Record<string, React.ComponentType<any>> = {
     Grid,
     Divider,
     Spacer,
+    Navbar,
 }
 
 export function CraftToolbox() {

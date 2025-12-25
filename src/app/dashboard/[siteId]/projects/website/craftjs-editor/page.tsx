@@ -6,6 +6,7 @@ import { CraftHeader } from "./components/CraftHeader"
 import { CraftSidebar } from "./components/CraftSidebar"
 import { RenderNode } from "./components/RenderNode"
 import { Container, Heading, Text, Button, Image, Grid, Divider, Spacer } from "./user-components"
+import { Navbar } from "./user-components/Navbar"
 import { toast } from "sonner"
 import { Plus } from "lucide-react"
 
@@ -19,6 +20,7 @@ const resolver = {
     Grid,
     Divider,
     Spacer,
+    Navbar,
 }
 
 export default function CraftJSEditorPage({ params }: { params: { siteId: string } }) {

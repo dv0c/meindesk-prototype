@@ -7,6 +7,7 @@ export { Image, ImageSettings } from "./Image"
 export { Grid, GridSettings } from "./Grid"
 export { Divider, DividerSettings } from "./Divider"
 export { Spacer, SpacerSettings } from "./Spacer"
+export { Navbar, NavbarSettings } from "./Navbar"
 
 // Component definitions for the toolbox
 export const componentDefinitions = [
@@ -19,6 +20,11 @@ export const componentDefinitions = [
         name: "Grid",
         category: "Layout",
         description: "A responsive grid layout",
+    },
+    {
+        name: "Navbar",
+        category: "Navigation",
+        description: "A header navigation bar",
     },
     {
         name: "Heading",

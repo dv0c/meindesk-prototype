@@ -146,6 +146,70 @@ export function PropertySlider({
     )
 }
 
+interface PropertySliderWithUnitProps {
+    value: number
+    unit: string
+    onChange: (value: number, unit: string) => void
+    min?: number
+    max?: number
+    step?: number
+    units?: string[]
+}
+
+export function PropertySliderWithUnit({
+    value,
+    unit,
+    onChange,
+    min = 0,
+    max = 100,
+    step = 1,
+    units = ["px", "%", "rem", "vw"],
+}: PropertySliderWithUnitProps) {
+    // Adjust max based on unit
+    const getMaxForUnit = (u: string) => {
+        switch (u) {
+            case "%": return 100
+            case "vw": return 100
+            case "rem": return 50
+            case "px": return 1200
+            default: return max
+        }
+    }
+
+    const currentMax = getMaxForUnit(unit)
+    const clampedValue = Math.min(value, currentMax)
+
+    return (
+        <div className="space-y-1">
+            <input
+                type="range"
+                value={clampedValue}
+                onChange={(e) => onChange(parseInt(e.target.value), unit)}
+                min={min}
+                max={currentMax}
+                step={step}
+                className="w-full h-2 rounded-lg appearance-none cursor-pointer bg-muted"
+            />
+            <div className="flex justify-between items-center text-xs text-muted-foreground">
+                <span>{min}{unit}</span>
+                <span className="font-medium text-foreground">{clampedValue}{unit}</span>
+                <div className="flex items-center gap-1">
+                    <span>{currentMax}</span>
+                    <select
+                        value={unit}
+                        onChange={(e) => onChange(value, e.target.value)}
+                        className="h-5 px-1 text-xs border rounded bg-background cursor-pointer"
+                    >
+                        {units.map((u) => (
+                            <option key={u} value={u}>{u}</option>
+                        ))}
+                    </select>
+                </div>
+            </div>
+        </div>
+    )
+}
+
 interface PropertyColorProps {
     value: string
     onChange: (value: string) => void

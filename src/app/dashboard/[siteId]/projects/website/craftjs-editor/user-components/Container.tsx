@@ -6,6 +6,7 @@ import {
     PropertySection,
     PropertyRow,
     PropertySlider,
+    PropertySliderWithUnit,
     PropertyColor,
     PropertyInput,
 } from "../components/PropertySection"
@@ -21,7 +22,7 @@ interface ContainerProps {
     borderRadius?: number
     borderWidth?: number
     borderColor?: string
-    minHeight?: number
+    minHeight?: number | string
     maxWidth?: string
     className?: string
 }
@@ -37,7 +38,7 @@ export const Container = ({
     borderRadius = 0,
     borderWidth = 0,
     borderColor = "#e5e7eb",
-    minHeight = 100,
+    minHeight = "100px",
     maxWidth = "100%",
     className = "",
 }: ContainerProps) => {
@@ -124,26 +125,39 @@ export const ContainerSettings = () => {
         borderColor: node.data.props.borderColor,
     }))
 
+    // Parse value with unit helper
+    const parseValueWithUnit = (val: string | number | undefined, defaultUnit = 'px', defaultValue = 0): { value: number; unit: string } => {
+        if (typeof val === 'number') return { value: val, unit: 'px' }
+        if (!val) return { value: defaultValue, unit: defaultUnit }
+        const match = val.match(/^([\d.]+)(px|%|rem|vw)?$/)
+        if (match) {
+            return { value: parseFloat(match[1]) || 0, unit: match[2] || 'px' }
+        }
+        return { value: defaultValue, unit: defaultUnit }
+    }
+
+    const { value: maxWidthValue, unit: maxWidthUnit } = parseValueWithUnit(maxWidth, '%', 100)
+    const { value: minHeightValue, unit: minHeightUnit } = parseValueWithUnit(minHeight, 'px', 100)
+
     const paddingSummary = `${padding || 0}px`
-    const dimensionsSummary = `${maxWidth || "100%"} × ${minHeight || 0}px`
+    const dimensionsSummary = `${maxWidth || "100%"} × ${minHeight || "100px"}`
     const borderSummary = borderWidth ? `${borderWidth}px` : "None"
 
     return (
         <div>
             <PropertySection title="Dimensions" summary={dimensionsSummary}>
                 <PropertyRow label="Max Width">
-                    <PropertyInput
-                        value={maxWidth || "100%"}
-                        onChange={(v) => setProp((props: ContainerProps) => (props.maxWidth = v))}
-                        placeholder="100%"
+                    <PropertySliderWithUnit
+                        value={maxWidthValue}
+                        unit={maxWidthUnit}
+                        onChange={(v, u) => setProp((props: ContainerProps) => (props.maxWidth = `${v}${u}`))}
                     />
                 </PropertyRow>
                 <PropertyRow label="Min Height">
-                    <PropertySlider
-                        value={minHeight || 0}
-                        onChange={(v) => setProp((props: ContainerProps) => (props.minHeight = v))}
-                        min={0}
-                        max={800}
+                    <PropertySliderWithUnit
+                        value={minHeightValue}
+                        unit={minHeightUnit}
+                        onChange={(v, u) => setProp((props: ContainerProps) => (props.minHeight = `${v}${u}`))}
                     />
                 </PropertyRow>
             </PropertySection>
@@ -203,7 +217,7 @@ Container.craft = {
         padding: 20,
         backgroundColor: "transparent",
         borderRadius: 0,
-        minHeight: 100,
+        minHeight: "100px",
         maxWidth: "100%",
         borderWidth: 0,
         borderColor: "#e5e7eb",

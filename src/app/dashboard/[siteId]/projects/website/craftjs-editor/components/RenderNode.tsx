@@ -30,12 +30,25 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
 
     const [indicatorPosition, setIndicatorPosition] = useState<{ top: number; left: number } | null>(null)
     const [resizeHandlePosition, setResizeHandlePosition] = useState<{ bottom: number; right: number } | null>(null)
+    const [boxModel, setBoxModel] = useState<{
+        rect: DOMRect
+        margin: { top: number; right: number; bottom: number; left: number }
+        padding: { top: number; right: number; bottom: number; left: number }
+    } | null>(null)
+    const [spacingDrag, setSpacingDrag] = useState<{
+        type: "padding" | "margin"
+        side: "top" | "right" | "bottom" | "left"
+        value: number
+        x: number
+        y: number
+    } | null>(null)
 
     // Update positions when element changes or scrolls
     useEffect(() => {
         if (!dom || !enabled || (!isActive && !isHovered)) {
             setIndicatorPosition(null)
             setResizeHandlePosition(null)
+            setBoxModel(null)
             return
         }
 
@@ -52,6 +65,28 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                 })
             } else {
                 setResizeHandlePosition(null)
+            }
+
+            // Get computed styles for margin and padding (only when selected)
+            if (isActive) {
+                const computed = window.getComputedStyle(dom)
+                setBoxModel({
+                    rect,
+                    margin: {
+                        top: parseFloat(computed.marginTop) || 0,
+                        right: parseFloat(computed.marginRight) || 0,
+                        bottom: parseFloat(computed.marginBottom) || 0,
+                        left: parseFloat(computed.marginLeft) || 0,
+                    },
+                    padding: {
+                        top: parseFloat(computed.paddingTop) || 0,
+                        right: parseFloat(computed.paddingRight) || 0,
+                        bottom: parseFloat(computed.paddingBottom) || 0,
+                        left: parseFloat(computed.paddingLeft) || 0,
+                    },
+                })
+            } else {
+                setBoxModel(null)
             }
         }
 
@@ -173,6 +208,117 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
         document.body.style.cursor = "se-resize"
     }
 
+    // Handler for dragging padding/margin edges
+    const createSpacingDragHandler = (
+        type: "padding" | "margin",
+        side: "top" | "right" | "bottom" | "left",
+        cursor: string
+    ) => (e: React.MouseEvent) => {
+        if (!dom || !boxModel) return
+        e.stopPropagation()
+        e.preventDefault()
+
+        const startPos = side === "top" || side === "bottom" ? e.clientY : e.clientX
+        const startValue = boxModel[type][side]
+
+        // Store original transition
+        const originalTransition = dom.style.transition
+        dom.style.transition = "none"
+
+        let finalValue = startValue
+
+        // Set initial drag state
+        setSpacingDrag({
+            type,
+            side,
+            value: startValue,
+            x: e.clientX,
+            y: e.clientY,
+        })
+
+        const handleMouseMove = (moveEvent: MouseEvent) => {
+            const currentPos = side === "top" || side === "bottom" ? moveEvent.clientY : moveEvent.clientX
+            let delta = currentPos - startPos
+
+            // Invert delta for top/left (dragging up/left increases spacing)
+            if (side === "top" || side === "left") {
+                delta = -delta
+            }
+
+            finalValue = Math.max(0, Math.round(startValue + delta))
+
+            // Update drag state for tooltip
+            setSpacingDrag({
+                type,
+                side,
+                value: finalValue,
+                x: moveEvent.clientX,
+                y: moveEvent.clientY,
+            })
+
+            // Update DOM directly for smooth feedback
+            const propName = type === "padding"
+                ? `padding${side.charAt(0).toUpperCase() + side.slice(1)}`
+                : `margin${side.charAt(0).toUpperCase() + side.slice(1)}`
+
+            dom.style[propName as any] = `${finalValue}px`
+
+            // Update box model state for visual feedback
+            const rect = dom.getBoundingClientRect()
+            const computed = window.getComputedStyle(dom)
+            setBoxModel({
+                rect,
+                margin: {
+                    top: parseFloat(computed.marginTop) || 0,
+                    right: parseFloat(computed.marginRight) || 0,
+                    bottom: parseFloat(computed.marginBottom) || 0,
+                    left: parseFloat(computed.marginLeft) || 0,
+                },
+                padding: {
+                    top: parseFloat(computed.paddingTop) || 0,
+                    right: parseFloat(computed.paddingRight) || 0,
+                    bottom: parseFloat(computed.paddingBottom) || 0,
+                    left: parseFloat(computed.paddingLeft) || 0,
+                },
+            })
+        }
+
+        const handleMouseUp = () => {
+            document.removeEventListener("mousemove", handleMouseMove)
+            document.removeEventListener("mouseup", handleMouseUp)
+            document.body.style.cursor = ""
+
+            // Clear drag state
+            setSpacingDrag(null)
+
+            // Restore transition
+            dom.style.transition = originalTransition
+
+            // Sync final value to CraftJS state
+            actions.setProp(id, (prop: Record<string, any>) => {
+                if (type === "padding") {
+                    if (side === "top") prop.paddingTop = finalValue
+                    else if (side === "right") prop.paddingRight = finalValue
+                    else if (side === "bottom") prop.paddingBottom = finalValue
+                    else if (side === "left") prop.paddingLeft = finalValue
+                    // Also update base padding if it exists
+                    if (prop.padding !== undefined && side === "top") {
+                        prop.padding = finalValue
+                    }
+                } else {
+                    if (side === "top") prop.marginTop = finalValue
+                    else if (side === "right") prop.marginRight = finalValue
+                    else if (side === "bottom") prop.marginBottom = finalValue
+                    else if (side === "left") prop.marginLeft = finalValue
+                }
+            })
+        }
+
+        document.addEventListener("mousemove", handleMouseMove)
+        document.addEventListener("mouseup", handleMouseUp)
+        document.body.style.cursor = cursor
+    }
+
     return (
         <>
             {render}
@@ -269,6 +415,185 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                         boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
                     }}
                 />,
+                document.body
+            )}
+
+            {/* Render margin overlays (orange) - draggable */}
+            {enabled && boxModel && isActive && typeof window !== "undefined" && createPortal(
+                <>
+                    {/* Margin Top */}
+                    {boxModel.margin.top >= 0 && (
+                        <div
+                            onMouseDown={createSpacingDragHandler("margin", "top", "ns-resize")}
+                            style={{
+                                position: "fixed",
+                                top: boxModel.rect.top - Math.max(boxModel.margin.top, 8),
+                                left: boxModel.rect.left,
+                                width: boxModel.rect.width,
+                                height: Math.max(boxModel.margin.top, 8),
+                                background: boxModel.margin.top > 0 ? "rgba(255, 165, 0, 0.3)" : "transparent",
+                                cursor: "ns-resize",
+                                zIndex: 9998,
+                            }}
+                        />
+                    )}
+                    {/* Margin Bottom */}
+                    {boxModel.margin.bottom >= 0 && (
+                        <div
+                            onMouseDown={createSpacingDragHandler("margin", "bottom", "ns-resize")}
+                            style={{
+                                position: "fixed",
+                                top: boxModel.rect.bottom,
+                                left: boxModel.rect.left,
+                                width: boxModel.rect.width,
+                                height: Math.max(boxModel.margin.bottom, 8),
+                                background: boxModel.margin.bottom > 0 ? "rgba(255, 165, 0, 0.3)" : "transparent",
+                                cursor: "ns-resize",
+                                zIndex: 9998,
+                            }}
+                        />
+                    )}
+                    {/* Margin Left */}
+                    {boxModel.margin.left >= 0 && (
+                        <div
+                            onMouseDown={createSpacingDragHandler("margin", "left", "ew-resize")}
+                            style={{
+                                position: "fixed",
+                                top: boxModel.rect.top - boxModel.margin.top,
+                                left: boxModel.rect.left - Math.max(boxModel.margin.left, 8),
+                                width: Math.max(boxModel.margin.left, 8),
+                                height: boxModel.rect.height + boxModel.margin.top + boxModel.margin.bottom,
+                                background: boxModel.margin.left > 0 ? "rgba(255, 165, 0, 0.3)" : "transparent",
+                                cursor: "ew-resize",
+                                zIndex: 9998,
+                            }}
+                        />
+                    )}
+                    {/* Margin Right */}
+                    {boxModel.margin.right >= 0 && (
+                        <div
+                            onMouseDown={createSpacingDragHandler("margin", "right", "ew-resize")}
+                            style={{
+                                position: "fixed",
+                                top: boxModel.rect.top - boxModel.margin.top,
+                                left: boxModel.rect.right,
+                                width: Math.max(boxModel.margin.right, 8),
+                                height: boxModel.rect.height + boxModel.margin.top + boxModel.margin.bottom,
+                                background: boxModel.margin.right > 0 ? "rgba(255, 165, 0, 0.3)" : "transparent",
+                                cursor: "ew-resize",
+                                zIndex: 9998,
+                            }}
+                        />
+                    )}
+                </>,
+                document.body
+            )}
+
+            {/* Render padding overlays (green) - draggable */}
+            {enabled && boxModel && isActive && typeof window !== "undefined" && createPortal(
+                <>
+                    {/* Padding Top */}
+                    {boxModel.padding.top >= 0 && (
+                        <div
+                            onMouseDown={createSpacingDragHandler("padding", "top", "ns-resize")}
+                            style={{
+                                position: "fixed",
+                                top: boxModel.rect.top,
+                                left: boxModel.rect.left,
+                                width: boxModel.rect.width,
+                                height: Math.max(boxModel.padding.top, 8),
+                                background: boxModel.padding.top > 0 ? "rgba(0, 200, 100, 0.3)" : "transparent",
+                                cursor: "ns-resize",
+                                zIndex: 9998,
+                            }}
+                        />
+                    )}
+                    {/* Padding Bottom */}
+                    {boxModel.padding.bottom >= 0 && (
+                        <div
+                            onMouseDown={createSpacingDragHandler("padding", "bottom", "ns-resize")}
+                            style={{
+                                position: "fixed",
+                                top: boxModel.rect.bottom - Math.max(boxModel.padding.bottom, 8),
+                                left: boxModel.rect.left,
+                                width: boxModel.rect.width,
+                                height: Math.max(boxModel.padding.bottom, 8),
+                                background: boxModel.padding.bottom > 0 ? "rgba(0, 200, 100, 0.3)" : "transparent",
+                                cursor: "ns-resize",
+                                zIndex: 9998,
+                            }}
+                        />
+                    )}
+                    {/* Padding Left */}
+                    {boxModel.padding.left >= 0 && (
+                        <div
+                            onMouseDown={createSpacingDragHandler("padding", "left", "ew-resize")}
+                            style={{
+                                position: "fixed",
+                                top: boxModel.rect.top + boxModel.padding.top,
+                                left: boxModel.rect.left,
+                                width: Math.max(boxModel.padding.left, 8),
+                                height: boxModel.rect.height - boxModel.padding.top - boxModel.padding.bottom,
+                                background: boxModel.padding.left > 0 ? "rgba(0, 200, 100, 0.3)" : "transparent",
+                                cursor: "ew-resize",
+                                zIndex: 9998,
+                            }}
+                        />
+                    )}
+                    {/* Padding Right */}
+                    {boxModel.padding.right >= 0 && (
+                        <div
+                            onMouseDown={createSpacingDragHandler("padding", "right", "ew-resize")}
+                            style={{
+                                position: "fixed",
+                                top: boxModel.rect.top + boxModel.padding.top,
+                                left: boxModel.rect.right - Math.max(boxModel.padding.right, 8),
+                                width: Math.max(boxModel.padding.right, 8),
+                                height: boxModel.rect.height - boxModel.padding.top - boxModel.padding.bottom,
+                                background: boxModel.padding.right > 0 ? "rgba(0, 200, 100, 0.3)" : "transparent",
+                                cursor: "ew-resize",
+                                zIndex: 9998,
+                            }}
+                        />
+                    )}
+                </>,
+                document.body
+            )}
+
+            {/* Spacing drag tooltip */}
+            {spacingDrag && typeof window !== "undefined" && createPortal(
+                <div
+                    style={{
+                        position: "fixed",
+                        top: spacingDrag.y + 16,
+                        left: spacingDrag.x + 16,
+                        padding: "6px 12px",
+                        background: spacingDrag.type === "padding" ? "#00c864" : "#ffa500",
+                        color: spacingDrag.type === "padding" ? "white" : "black",
+                        fontSize: 12,
+                        fontWeight: 600,
+                        borderRadius: 6,
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+                        zIndex: 10000,
+                        pointerEvents: "none",
+                        whiteSpace: "nowrap",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 6,
+                    }}
+                >
+                    <span style={{ textTransform: "capitalize" }}>
+                        {spacingDrag.type} {spacingDrag.side}
+                    </span>
+                    <span style={{
+                        background: "rgba(0,0,0,0.15)",
+                        padding: "2px 6px",
+                        borderRadius: 4,
+                        fontFamily: "monospace",
+                    }}>
+                        {spacingDrag.value}px
+                    </span>
+                </div>,
                 document.body
             )}
         </>
