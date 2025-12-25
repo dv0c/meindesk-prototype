@@ -24,9 +24,22 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
         })
     )
 
-    const { actions, enabled } = useEditor((state) => ({
-        enabled: state.options.enabled,
-    }))
+    const { actions, enabled, isParentOfSelected } = useEditor((state) => {
+        const selected = state.events.selected
+        let isParent = false
+        if (selected.size > 0) {
+            const selectedId = selected.values().next().value
+            const node = state.nodes[selectedId]
+            if (node && node.data.parent === id) {
+                isParent = true
+            }
+        }
+
+        return {
+            enabled: state.options.enabled,
+            isParentOfSelected: isParent,
+        }
+    })
 
     const [indicatorPosition, setIndicatorPosition] = useState<{ top: number; left: number } | null>(null)
     const [resizeHandlePosition, setResizeHandlePosition] = useState<{ bottom: number; right: number } | null>(null)
@@ -45,7 +58,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
 
     // Update positions when element changes or scrolls
     useEffect(() => {
-        if (!dom || !enabled || (!isActive && !isHovered)) {
+        if (!dom || !enabled || (!isActive && !isHovered && !isParentOfSelected)) {
             setIndicatorPosition(null)
             setResizeHandlePosition(null)
             setBoxModel(null)
@@ -67,8 +80,8 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                 setResizeHandlePosition(null)
             }
 
-            // Get computed styles for margin and padding (only when selected)
-            if (isActive) {
+            // Get computed styles for margin and padding (only when selected or parent of selected)
+            if (isActive || isParentOfSelected) {
                 const computed = window.getComputedStyle(dom)
                 setBoxModel({
                     rect,
@@ -100,7 +113,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
             window.removeEventListener("scroll", updatePositions, true)
             window.removeEventListener("resize", updatePositions)
         }
-    }, [dom, isActive, isHovered, enabled, isResizable])
+    }, [dom, isActive, isHovered, enabled, isResizable, isParentOfSelected])
 
     // Apply outline styles
     useEffect(() => {
@@ -419,7 +432,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
             )}
 
             {/* Render margin overlays (orange) - draggable */}
-            {enabled && boxModel && isActive && typeof window !== "undefined" && createPortal(
+            {enabled && boxModel && (isActive || isParentOfSelected) && typeof window !== "undefined" && createPortal(
                 <>
                     {/* Margin Top */}
                     {boxModel.margin.top >= 0 && (
@@ -431,7 +444,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                                 left: boxModel.rect.left,
                                 width: boxModel.rect.width,
                                 height: Math.max(boxModel.margin.top, 8),
-                                background: boxModel.margin.top > 0 ? "rgba(255, 165, 0, 0.3)" : "transparent",
+                                background: boxModel.margin.top > 0 ? `rgba(255, 165, 0, ${isActive ? 0.3 : 0.1})` : "transparent",
                                 cursor: "ns-resize",
                                 zIndex: 9998,
                             }}
@@ -447,7 +460,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                                 left: boxModel.rect.left,
                                 width: boxModel.rect.width,
                                 height: Math.max(boxModel.margin.bottom, 8),
-                                background: boxModel.margin.bottom > 0 ? "rgba(255, 165, 0, 0.3)" : "transparent",
+                                background: boxModel.margin.bottom > 0 ? `rgba(255, 165, 0, ${isActive ? 0.3 : 0.1})` : "transparent",
                                 cursor: "ns-resize",
                                 zIndex: 9998,
                             }}
@@ -463,7 +476,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                                 left: boxModel.rect.left - Math.max(boxModel.margin.left, 8),
                                 width: Math.max(boxModel.margin.left, 8),
                                 height: boxModel.rect.height + boxModel.margin.top + boxModel.margin.bottom,
-                                background: boxModel.margin.left > 0 ? "rgba(255, 165, 0, 0.3)" : "transparent",
+                                background: boxModel.margin.left > 0 ? `rgba(255, 165, 0, ${isActive ? 0.3 : 0.1})` : "transparent",
                                 cursor: "ew-resize",
                                 zIndex: 9998,
                             }}
@@ -479,7 +492,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                                 left: boxModel.rect.right,
                                 width: Math.max(boxModel.margin.right, 8),
                                 height: boxModel.rect.height + boxModel.margin.top + boxModel.margin.bottom,
-                                background: boxModel.margin.right > 0 ? "rgba(255, 165, 0, 0.3)" : "transparent",
+                                background: boxModel.margin.right > 0 ? `rgba(255, 165, 0, ${isActive ? 0.3 : 0.1})` : "transparent",
                                 cursor: "ew-resize",
                                 zIndex: 9998,
                             }}
@@ -490,7 +503,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
             )}
 
             {/* Render padding overlays (green) - draggable */}
-            {enabled && boxModel && isActive && typeof window !== "undefined" && createPortal(
+            {enabled && boxModel && (isActive || isParentOfSelected) && typeof window !== "undefined" && createPortal(
                 <>
                     {/* Padding Top */}
                     {boxModel.padding.top >= 0 && (
@@ -502,7 +515,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                                 left: boxModel.rect.left,
                                 width: boxModel.rect.width,
                                 height: Math.max(boxModel.padding.top, 8),
-                                background: boxModel.padding.top > 0 ? "rgba(0, 200, 100, 0.3)" : "transparent",
+                                background: boxModel.padding.top > 0 ? `rgba(0, 200, 100, ${isActive ? 0.3 : 0.1})` : "transparent",
                                 cursor: "ns-resize",
                                 zIndex: 9998,
                             }}
@@ -518,7 +531,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                                 left: boxModel.rect.left,
                                 width: boxModel.rect.width,
                                 height: Math.max(boxModel.padding.bottom, 8),
-                                background: boxModel.padding.bottom > 0 ? "rgba(0, 200, 100, 0.3)" : "transparent",
+                                background: boxModel.padding.bottom > 0 ? `rgba(0, 200, 100, ${isActive ? 0.3 : 0.1})` : "transparent",
                                 cursor: "ns-resize",
                                 zIndex: 9998,
                             }}
@@ -534,7 +547,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                                 left: boxModel.rect.left,
                                 width: Math.max(boxModel.padding.left, 8),
                                 height: boxModel.rect.height - boxModel.padding.top - boxModel.padding.bottom,
-                                background: boxModel.padding.left > 0 ? "rgba(0, 200, 100, 0.3)" : "transparent",
+                                background: boxModel.padding.left > 0 ? `rgba(0, 200, 100, ${isActive ? 0.3 : 0.1})` : "transparent",
                                 cursor: "ew-resize",
                                 zIndex: 9998,
                             }}
@@ -550,7 +563,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                                 left: boxModel.rect.right - Math.max(boxModel.padding.right, 8),
                                 width: Math.max(boxModel.padding.right, 8),
                                 height: boxModel.rect.height - boxModel.padding.top - boxModel.padding.bottom,
-                                background: boxModel.padding.right > 0 ? "rgba(0, 200, 100, 0.3)" : "transparent",
+                                background: boxModel.padding.right > 0 ? `rgba(0, 200, 100, ${isActive ? 0.3 : 0.1})` : "transparent",
                                 cursor: "ew-resize",
                                 zIndex: 9998,
                             }}

@@ -49,31 +49,9 @@ export function CraftPropertiesPanel() {
                 </div>
             )}
 
-            {/* Delete Button */}
-            {node.isDeletable && (
-                <div className="pt-4 border-t">
-                    <DeleteButton />
-                </div>
-            )}
+
         </div>
     )
 }
 
-function DeleteButton() {
-    const { actions, selected } = useEditor((state) => ({
-        selected: state.events.selected?.values().next().value,
-    }))
 
-    return (
-        <button
-            onClick={() => {
-                if (selected) {
-                    actions.delete(selected)
-                }
-            }}
-            className="w-full h-9 px-4 text-sm font-medium text-destructive border border-destructive/30 rounded-md hover:bg-destructive/10 transition-colors"
-        >
-            Delete Component
-        </button>
-    )
-}

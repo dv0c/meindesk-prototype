@@ -31,9 +31,10 @@ export function CraftHeader({
     setShowSidebar,
     siteId,
 }: CraftHeaderProps) {
-    const { actions, canUndo, canRedo } = useEditor((state, query) => ({
+    const { actions, canUndo, canRedo, enabled } = useEditor((state, query) => ({
         canUndo: query.history.canUndo(),
         canRedo: query.history.canRedo(),
+        enabled: state.options.enabled,
     }))
 
     const [showLayers, setShowLayers] = useState(false)
@@ -104,57 +105,70 @@ export function CraftHeader({
 
                 {/* Right: Actions */}
                 <div className="flex items-center gap-2">
-                    {/* Layers Toggle */}
-                    <Button
-                        variant={showLayers ? "secondary" : "ghost"}
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => setShowLayers(!showLayers)}
-                        title="Toggle Layers Panel"
-                    >
-                        <Layers className="h-4 w-4" />
-                    </Button>
+                    {enabled && (
+                        <>
+                            {/* Layers Toggle */}
+                            <Button
+                                variant={showLayers ? "secondary" : "ghost"}
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => setShowLayers(!showLayers)}
+                                title="Toggle Layers Panel"
+                            >
+                                <Layers className="h-4 w-4" />
+                            </Button>
+
+                            <Button
+                                variant={showSidebar ? "secondary" : "ghost"}
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => setShowSidebar(!showSidebar)}
+                                title="Toggle Sidebar"
+                            >
+                                <SidebarClose className="h-4 w-4" />
+                            </Button>
+
+                            <div className="h-6 w-px bg-border/50 mx-1" />
+
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => actions.history.undo()}
+                                disabled={!canUndo}
+                                title="Undo (Ctrl+Z)"
+                            >
+                                <Undo className="h-4 w-4" />
+                            </Button>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => actions.history.redo()}
+                                disabled={!canRedo}
+                                title="Redo (Ctrl+Y)"
+                            >
+                                <Redo className="h-4 w-4" />
+                            </Button>
+
+                            <div className="h-6 w-px bg-border/50 mx-1" />
+                        </>
+                    )}
 
                     <Button
-                        variant={showSidebar ? "secondary" : "ghost"}
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => setShowSidebar(!showSidebar)}
-                        title="Toggle Sidebar"
+                        variant={!enabled ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => {
+                            const newEnabled = !enabled
+                            actions.setOptions((options) => (options.enabled = newEnabled))
+                            setShowSidebar(newEnabled)
+                            if (!newEnabled) {
+                                setShowLayers(false)
+                            }
+                        }}
                     >
-                        <SidebarClose className="h-4 w-4" />
-                    </Button>
-
-                    <div className="h-6 w-px bg-border/50 mx-1" />
-
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => actions.history.undo()}
-                        disabled={!canUndo}
-                        title="Undo (Ctrl+Z)"
-                    >
-                        <Undo className="h-4 w-4" />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => actions.history.redo()}
-                        disabled={!canRedo}
-                        title="Redo (Ctrl+Y)"
-                    >
-                        <Redo className="h-4 w-4" />
-                    </Button>
-
-                    <div className="h-6 w-px bg-border/50 mx-1" />
-
-                    <Button variant="outline" size="sm" asChild>
-                        <Link href={`/${siteId}`} target="_blank">
-                            <Eye className="h-4 w-4 mr-2" />
-                            Preview
-                        </Link>
+                        <Eye className="h-4 w-4 mr-2" />
+                        {!enabled ? "Exit Preview" : "Preview"}
                     </Button>
 
                     <Button size="sm" onClick={onSave} disabled={isSaving}>

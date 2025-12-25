@@ -19,8 +19,20 @@ interface HeadingProps {
     fontWeight?: string
     color?: string
     textAlign?: "left" | "center" | "right"
-    marginTop?: number
-    marginBottom?: number
+    textAlign?: "left" | "center" | "right"
+    marginTop?: string | number
+    marginRight?: string | number
+    marginBottom?: string | number
+    marginLeft?: string | number
+    paddingTop?: string | number
+    paddingRight?: string | number
+    paddingBottom?: string | number
+    paddingLeft?: string | number
+    backgroundColor?: string
+    borderRadius?: number
+    borderWidth?: number
+    borderColor?: string
+    boxShadow?: string
     className?: string
 }
 
@@ -31,8 +43,19 @@ export const Heading = ({
     fontWeight = "700",
     color = "#000000",
     textAlign = "left",
-    marginTop = 0,
-    marginBottom = 16,
+    marginTop,
+    marginRight,
+    marginBottom,
+    marginLeft,
+    paddingTop,
+    paddingRight,
+    paddingBottom,
+    paddingLeft,
+    backgroundColor,
+    borderRadius,
+    borderWidth,
+    borderColor,
+    boxShadow,
     className = "",
 }: HeadingProps) => {
     const {
@@ -53,12 +76,26 @@ export const Heading = ({
     const Tag = level
 
     const style: React.CSSProperties = {
+        width: "100%",
         fontSize,
         fontWeight,
         color,
         textAlign,
+        textAlign,
         marginTop,
+        marginRight,
         marginBottom,
+        marginLeft,
+        paddingTop,
+        paddingRight,
+        paddingBottom,
+        paddingLeft,
+        backgroundColor,
+        borderRadius: borderRadius ? `${borderRadius}px` : undefined,
+        borderWidth: borderWidth ? `${borderWidth}px` : undefined,
+        borderColor,
+        borderStyle: borderWidth ? "solid" : undefined,
+        boxShadow,
         lineHeight: 1.2,
         outline: isEditing ? "none" : undefined,
         cursor: isEditing ? "text" : "pointer",
@@ -170,7 +207,7 @@ export const HeadingSettings = () => {
     }[fontWeight || "700"] || "Bold"
 
     const typographySummary = `${fontSize}px, ${fontWeightLabel}, ${textAlign}`
-    const marginSummary = `${marginTop || 0}px ${marginBottom || 0}px`
+
 
     return (
         <div>
@@ -184,7 +221,23 @@ export const HeadingSettings = () => {
                 <PropertyRow label="Level">
                     <PropertySelect
                         value={level || "h2"}
-                        onChange={(v) => setProp((props: HeadingProps) => (props.level = v as HeadingProps["level"]))}
+                        onChange={(v) => {
+                            setProp((props: HeadingProps) => {
+                                props.level = v as HeadingProps["level"]
+                                // Update font size based on level
+                                const sizes: Record<string, number> = {
+                                    h1: 48,
+                                    h2: 32,
+                                    h3: 24,
+                                    h4: 20,
+                                    h5: 18,
+                                    h6: 16,
+                                }
+                                if (v && sizes[v]) {
+                                    props.fontSize = sizes[v]
+                                }
+                            })
+                        }}
                         options={[
                             { label: "H1", value: "h1" },
                             { label: "H2", value: "h2" },
@@ -241,24 +294,7 @@ export const HeadingSettings = () => {
                 </PropertyRow>
             </PropertySection>
 
-            <PropertySection title="Margin" summary={marginSummary} defaultOpen={false}>
-                <PropertyRow label="Top">
-                    <PropertySlider
-                        value={marginTop || 0}
-                        onChange={(v) => setProp((props: HeadingProps) => (props.marginTop = v))}
-                        min={0}
-                        max={100}
-                    />
-                </PropertyRow>
-                <PropertyRow label="Bottom">
-                    <PropertySlider
-                        value={marginBottom || 0}
-                        onChange={(v) => setProp((props: HeadingProps) => (props.marginBottom = v))}
-                        min={0}
-                        max={100}
-                    />
-                </PropertyRow>
-            </PropertySection>
+
         </div>
     )
 }

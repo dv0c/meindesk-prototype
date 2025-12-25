@@ -26,7 +26,7 @@ import {
     PropertyColor,
     PropertyInput,
 } from "../components/PropertySection"
-import { GlobalDecorationSettings, GlobalAlignmentSettings } from "../components/GlobalSettings"
+
 
 // Navigation link type with submenu support
 interface NavLink {
@@ -584,6 +584,7 @@ export const NavbarSettings = () => {
         brandName,
         tagline,
         brandColor,
+        navBackgroundColor,
         backgroundColor,
         textColor,
         topBarBackground,
@@ -703,8 +704,7 @@ export const NavbarSettings = () => {
 
     return (
         <div>
-            <GlobalDecorationSettings />
-            <GlobalAlignmentSettings />
+
 
             <PropertySection title="Brand" summary={brandName}>
                 <PropertyRow label="Name">

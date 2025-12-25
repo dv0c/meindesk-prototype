@@ -1,6 +1,6 @@
 "use client"
 
-import { useNode } from "@craftjs/core"
+import { useNode, useEditor } from "@craftjs/core"
 import React from "react"
 import {
     PropertySection,
@@ -34,6 +34,10 @@ export const Grid = ({
         selected: state.events.selected,
     }))
 
+    const { enabled } = useEditor((state) => ({
+        enabled: state.options.enabled,
+    }))
+
     const style: React.CSSProperties = {
         display: "grid",
         gridTemplateColumns: `repeat(${columns}, 1fr)`,
@@ -55,7 +59,7 @@ export const Grid = ({
             className={className}
             style={style}
         >
-            {isEmpty ? (
+            {isEmpty && enabled ? (
                 // Show placeholder columns
                 Array.from({ length: columns }).map((_, i) => (
                     <div

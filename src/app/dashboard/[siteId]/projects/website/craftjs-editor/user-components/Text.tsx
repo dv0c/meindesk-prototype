@@ -18,8 +18,19 @@ interface TextProps {
     color?: string
     textAlign?: "left" | "center" | "right" | "justify"
     lineHeight?: number
-    marginTop?: number
-    marginBottom?: number
+    marginTop?: string | number
+    marginRight?: string | number
+    marginBottom?: string | number
+    marginLeft?: string | number
+    paddingTop?: string | number
+    paddingRight?: string | number
+    paddingBottom?: string | number
+    paddingLeft?: string | number
+    backgroundColor?: string
+    borderRadius?: number
+    borderWidth?: number
+    borderColor?: string
+    boxShadow?: string
     className?: string
 }
 
@@ -30,8 +41,19 @@ export const Text = ({
     color = "#374151",
     textAlign = "left",
     lineHeight = 1.6,
-    marginTop = 0,
-    marginBottom = 16,
+    marginTop,
+    marginRight,
+    marginBottom,
+    marginLeft,
+    paddingTop,
+    paddingRight,
+    paddingBottom,
+    paddingLeft,
+    backgroundColor,
+    borderRadius,
+    borderWidth,
+    borderColor,
+    boxShadow,
     className = "",
 }: TextProps) => {
     const {
@@ -50,13 +72,26 @@ export const Text = ({
     const contentRef = useRef<HTMLParagraphElement>(null)
 
     const style: React.CSSProperties = {
+        width: "100%",
         fontSize,
         fontWeight,
         color,
         textAlign,
         lineHeight,
         marginTop,
+        marginRight,
         marginBottom,
+        marginLeft,
+        paddingTop,
+        paddingRight,
+        paddingBottom,
+        paddingLeft,
+        backgroundColor,
+        borderRadius: borderRadius ? `${borderRadius}px` : undefined,
+        borderWidth: borderWidth ? `${borderWidth}px` : undefined,
+        borderColor,
+        borderStyle: borderWidth ? "solid" : undefined,
+        boxShadow,
         outline: isEditing ? "none" : undefined,
         cursor: isEditing ? "text" : "pointer",
         whiteSpace: isEditing ? "pre-wrap" : undefined,
@@ -163,7 +198,7 @@ export const TextSettings = () => {
     }[fontWeight || "400"] || "Regular"
 
     const typographySummary = `${fontSize}px, ${fontWeightLabel}, ${textAlign}`
-    const marginSummary = `${marginTop || 0}px ${marginBottom || 0}px`
+
 
     return (
         <div>
@@ -232,24 +267,7 @@ export const TextSettings = () => {
                 </PropertyRow>
             </PropertySection>
 
-            <PropertySection title="Margin" summary={marginSummary} defaultOpen={false}>
-                <PropertyRow label="Top">
-                    <PropertySlider
-                        value={marginTop || 0}
-                        onChange={(v) => setProp((props: TextProps) => (props.marginTop = v))}
-                        min={0}
-                        max={100}
-                    />
-                </PropertyRow>
-                <PropertyRow label="Bottom">
-                    <PropertySlider
-                        value={marginBottom || 0}
-                        onChange={(v) => setProp((props: TextProps) => (props.marginBottom = v))}
-                        min={0}
-                        max={100}
-                    />
-                </PropertyRow>
-            </PropertySection>
+
         </div>
     )
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { useNode } from "@craftjs/core"
+import { useNode, useEditor } from "@craftjs/core"
 import React from "react"
 import {
     PropertySection,
@@ -11,7 +11,7 @@ import {
     PropertyInput,
     PropertySelect,
 } from "../components/PropertySection"
-import { GlobalDecorationSettings, GlobalAlignmentSettings } from "../components/GlobalSettings"
+
 
 interface ContainerProps {
     children?: React.ReactNode
@@ -65,6 +65,10 @@ export const Container = ({
         selected: state.events.selected,
     }))
 
+    const { enabled } = useEditor((state) => ({
+        enabled: state.options.enabled,
+    }))
+
     const style: React.CSSProperties = {
         backgroundColor,
         borderRadius: `${borderRadius}px`,
@@ -102,7 +106,7 @@ export const Container = ({
             className={className}
             style={style}
         >
-            {isEmpty ? (
+            {isEmpty && enabled ? (
                 <div
                     style={{
                         display: "flex",
@@ -175,8 +179,7 @@ export const ContainerSettings = () => {
 
     return (
         <div>
-            <GlobalAlignmentSettings />
-            <GlobalDecorationSettings />
+
 
             <PropertySection title="Dimensions" summary={dimensionsSummary}>
                 <PropertyRow label="Max Width">

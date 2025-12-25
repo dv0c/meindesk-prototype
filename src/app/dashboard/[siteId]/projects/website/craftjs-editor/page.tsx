@@ -1,6 +1,6 @@
 "use client"
 
-import { use, useState, useCallback } from "react"
+import { use, useState, useCallback, useEffect } from "react"
 import { Editor, Frame, Element } from "@craftjs/core"
 import { CraftHeader } from "./components/CraftHeader"
 import { CraftSidebar } from "./components/CraftSidebar"
