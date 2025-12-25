@@ -9,13 +9,15 @@ import { cn } from "@/lib/utils"
 import { CraftToolbox } from "./CraftToolbox"
 import { CraftPropertiesPanel } from "./CraftPropertiesPanel"
 import { GlobalStylesPanel } from "./GlobalSettings"
+import { DesignPanel } from "./DesignPanel"
 
 export function CraftSidebar() {
-    const { selected, isDeletable, actions } = useEditor((state) => {
+    const { selected, name, isDeletable, actions } = useEditor((state) => {
         const currentNodeId = state.events.selected?.values().next().value
         const node = currentNodeId ? state.nodes[currentNodeId] : null
         return {
             selected: currentNodeId,
+            name: node?.data.custom.displayName || node?.data.displayName || node?.data.name,
             isDeletable: node && node.data.custom.isDeletable !== false,
         }
     })
@@ -38,7 +40,7 @@ export function CraftSidebar() {
                                         <ChevronLeft className="h-4 w-4" />
                                     </Button>
                                     <div>
-                                        <h3 className="font-semibold text-sm tracking-tight">Edit Component</h3>
+                                        <h3 className="font-semibold text-sm tracking-tight">{name || 'Component'}</h3>
                                     </div>
                                 </div>
                                 {isDeletable && (
@@ -135,10 +137,8 @@ export function CraftSidebar() {
                         <CraftToolbox />
                     </TabsContent>
 
-                    <TabsContent value="settings" className="flex-1 mt-0 overflow-hidden">
-                        <div className="p-4 text-center text-muted-foreground text-sm">
-                            Global settings coming soon
-                        </div>
+                    <TabsContent value="settings" className="flex-1 mt-0 overflow-y-auto">
+                        <DesignPanel />
                     </TabsContent>
                 </Tabs>
             )}

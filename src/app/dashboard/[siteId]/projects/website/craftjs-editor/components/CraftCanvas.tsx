@@ -6,7 +6,14 @@ import { Plus } from "lucide-react"
 
 export function CraftCanvas() {
     return (
-        <div className="canvas-interactive-area relative min-h-full transition-all duration-300 overflow-auto">
+        <div
+            className="canvas-interactive-area relative min-h-full transition-all duration-300 overflow-auto"
+            style={{
+                backgroundImage:
+                    "radial-gradient(circle at 1px 1px, rgba(0,0,0,0.1) 1px, transparent 0)",
+                backgroundSize: "20px 20px",
+            }}
+        >
             <Frame>
                 <Element
                     is={Container}
@@ -15,11 +22,13 @@ export function CraftCanvas() {
                     backgroundColor="transparent"
                     minHeight={400}
                     className="min-h-full"
+                    custom={{ displayName: "App", isDeletable: false }}
                 >
                     {/* Empty state is handled by Container rendering */}
                 </Element>
             </Frame>
         </div>
+
     )
 }
 

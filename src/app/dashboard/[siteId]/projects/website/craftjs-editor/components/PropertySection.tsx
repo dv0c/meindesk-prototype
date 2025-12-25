@@ -1,8 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronDown, ChevronRight } from "lucide-react"
+import { ChevronDown, ChevronRight, AlignCenter, AlignLeft, AlignRight, AlignJustify, ArrowDown, ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { motion, AnimatePresence } from "framer-motion"
 
 interface PropertySectionProps {
     title: string
@@ -40,18 +41,29 @@ export function PropertySection({
                             {summary}
                         </span>
                     )}
-                    {isOpen ? (
-                        <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                    ) : (
+                    <motion.div
+                        animate={{ rotate: isOpen ? 90 : 0 }}
+                        transition={{ duration: 0.2 }}
+                    >
                         <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                    )}
+                    </motion.div>
                 </div>
             </button>
-            {isOpen && (
-                <div className="px-4 pb-4 space-y-3">
-                    {children}
-                </div>
-            )}
+            <AnimatePresence initial={false}>
+                {isOpen && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="overflow-hidden"
+                    >
+                        <div className="px-4 pb-4 space-y-3">
+                            {children}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     )
 }
@@ -285,6 +297,42 @@ export function PropertyButtonGroup({ value, onChange, options }: PropertyButton
     )
 }
 
+
+interface PropertyIconButtonGroupProps {
+    value: string
+    onChange: (value: string) => void
+    options: {
+        value: string
+        label: string
+        icon: React.ElementType
+    }[]
+}
+
+export function PropertyIconButtonGroup({ value, onChange, options }: PropertyIconButtonGroupProps) {
+    return (
+        <div className="flex rounded-md border bg-muted/50 p-1">
+            {options.map((option) => {
+                const Icon = option.icon
+                return (
+                    <button
+                        key={option.value}
+                        className={cn(
+                            "flex-1 flex justify-center p-1 rounded-sm transition-all",
+                            value === option.value
+                                ? "bg-background shadow-sm text-foreground"
+                                : "hover:bg-background/50 text-muted-foreground"
+                        )}
+                        onClick={() => onChange(option.value)}
+                        title={option.label}
+                    >
+                        <Icon size={16} />
+                    </button>
+                )
+            })}
+        </div>
+    )
+}
+
 interface PropertyCheckboxProps {
     id: string
     label: string
@@ -327,6 +375,53 @@ export function PropertySpacing({ values, onChange }: PropertySpacingProps) {
                     />
                 </div>
             ))}
+        </div>
+    )
+}
+
+interface PropertyShadowSelectProps {
+    value: string
+    onChange: (value: string) => void
+}
+
+export function PropertyShadowSelect({ value, onChange }: PropertyShadowSelectProps) {
+    const shadowOptions = [
+        { label: "None", value: "none", css: "none" },
+        { label: "Small", value: "sm", css: "0 1px 2px 0 rgb(0 0 0 / 0.05)" },
+        { label: "Medium", value: "md", css: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)" },
+        { label: "Large", value: "lg", css: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)" },
+        { label: "Extra Large", value: "xl", css: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)" },
+        { label: "2XL", value: "2xl", css: "0 25px 50px -12px rgb(0 0 0 / 0.25)" },
+    ]
+
+    // Helper to find the matching preset key from the CSS value
+    const currentPreset = shadowOptions.find(opt => opt.css === value || (value && opt.css !== "none" && value.includes(opt.css)))?.value || "custom"
+
+    const handleChange = (newValue: string) => {
+        const option = shadowOptions.find(opt => opt.value === newValue)
+        if (option) {
+            onChange(option.css)
+        }
+    }
+
+    return (
+        <div className="space-y-2">
+            <select
+                value={currentPreset === "custom" ? "" : currentPreset}
+                onChange={(e) => handleChange(e.target.value)}
+                className="w-full h-9 px-3 text-sm border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+                {currentPreset === "custom" && <option value="custom">Custom</option>}
+                {shadowOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                        {option.label}
+                    </option>
+                ))}
+            </select>
+            {/* Show raw input only if it's a custom value not matching presets, or maybe just always show it for advanced users?
+                For now, let's keep it simple as per request 'more user friendly'. 
+                We can add a toggle for 'Advanced' later if needed.
+            */}
         </div>
     )
 }

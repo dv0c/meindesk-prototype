@@ -15,7 +15,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
             isActive: node.events.selected,
             isHovered: node.events.hovered,
             dom: node.dom,
-            name: node.data.displayName || node.data.name || "Component",
+            name: node.data.custom?.displayName || node.data.displayName || node.data.name || "Component",
             moveable: node.data.custom?.moveable !== false,
             deletable: node.data.custom?.deletable !== false,
             parent: node.data.parent,
@@ -352,7 +352,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                         fontSize: 11,
                         fontWeight: 500,
                         borderRadius: "4px 4px 0 0",
-                        zIndex: 9999,
+                        zIndex: 5,
                         pointerEvents: "auto",
                         whiteSpace: "nowrap",
                     }}
@@ -424,7 +424,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                         border: "2px solid white",
                         borderRadius: 2,
                         cursor: "se-resize",
-                        zIndex: 9999,
+                        zIndex: 5,
                         boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
                     }}
                 />,
@@ -446,7 +446,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                                 height: Math.max(boxModel.margin.top, 8),
                                 background: boxModel.margin.top > 0 ? `rgba(255, 165, 0, ${isActive ? 0.3 : 0.1})` : "transparent",
                                 cursor: "ns-resize",
-                                zIndex: 9998,
+                                zIndex: 4,
                             }}
                         />
                     )}
@@ -462,7 +462,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                                 height: Math.max(boxModel.margin.bottom, 8),
                                 background: boxModel.margin.bottom > 0 ? `rgba(255, 165, 0, ${isActive ? 0.3 : 0.1})` : "transparent",
                                 cursor: "ns-resize",
-                                zIndex: 9998,
+                                zIndex: 4,
                             }}
                         />
                     )}
@@ -478,7 +478,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                                 height: boxModel.rect.height + boxModel.margin.top + boxModel.margin.bottom,
                                 background: boxModel.margin.left > 0 ? `rgba(255, 165, 0, ${isActive ? 0.3 : 0.1})` : "transparent",
                                 cursor: "ew-resize",
-                                zIndex: 9998,
+                                zIndex: 4,
                             }}
                         />
                     )}
@@ -494,7 +494,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                                 height: boxModel.rect.height + boxModel.margin.top + boxModel.margin.bottom,
                                 background: boxModel.margin.right > 0 ? `rgba(255, 165, 0, ${isActive ? 0.3 : 0.1})` : "transparent",
                                 cursor: "ew-resize",
-                                zIndex: 9998,
+                                zIndex: 4,
                             }}
                         />
                     )}
@@ -517,7 +517,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                                 height: Math.max(boxModel.padding.top, 8),
                                 background: boxModel.padding.top > 0 ? `rgba(0, 200, 100, ${isActive ? 0.3 : 0.1})` : "transparent",
                                 cursor: "ns-resize",
-                                zIndex: 9998,
+                                zIndex: 4,
                             }}
                         />
                     )}
@@ -533,7 +533,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                                 height: Math.max(boxModel.padding.bottom, 8),
                                 background: boxModel.padding.bottom > 0 ? `rgba(0, 200, 100, ${isActive ? 0.3 : 0.1})` : "transparent",
                                 cursor: "ns-resize",
-                                zIndex: 9998,
+                                zIndex: 4,
                             }}
                         />
                     )}
@@ -549,7 +549,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                                 height: boxModel.rect.height - boxModel.padding.top - boxModel.padding.bottom,
                                 background: boxModel.padding.left > 0 ? `rgba(0, 200, 100, ${isActive ? 0.3 : 0.1})` : "transparent",
                                 cursor: "ew-resize",
-                                zIndex: 9998,
+                                zIndex: 4,
                             }}
                         />
                     )}
@@ -565,7 +565,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                                 height: boxModel.rect.height - boxModel.padding.top - boxModel.padding.bottom,
                                 background: boxModel.padding.right > 0 ? `rgba(0, 200, 100, ${isActive ? 0.3 : 0.1})` : "transparent",
                                 cursor: "ew-resize",
-                                zIndex: 9998,
+                                zIndex: 4,
                             }}
                         />
                     )}
@@ -587,7 +587,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                         fontWeight: 600,
                         borderRadius: 6,
                         boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-                        zIndex: 10000,
+                        zIndex: 5,
                         pointerEvents: "none",
                         whiteSpace: "nowrap",
                         display: "flex",

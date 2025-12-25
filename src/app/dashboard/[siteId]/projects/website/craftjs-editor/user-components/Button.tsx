@@ -12,6 +12,7 @@ import {
     PropertyButtonGroup,
     PropertyCheckbox,
 } from "../components/PropertySection"
+import { useDesign } from "../components/DesignContext"
 
 interface ButtonProps {
     text?: string
@@ -79,22 +80,47 @@ export const Button = ({
 
     const { actions: editorActions } = useEditor()
 
+    // Get design settings from context - called unconditionally
+    const { settings: designSettings } = useDesign()
+
     const [isEditing, setIsEditing] = useState(false)
     const contentRef = useRef<HTMLButtonElement>(null)
 
     const variantStyle = variantStyles[variant]
     const sizeStyle = sizeStyles[size]
 
+    // Determine if button should use outline style based on variant AND design setting
+    // If design button style is "outline", primary buttons render as outline
+    const designButtonStyle = designSettings.buttonStyle || "filled"
+    const isOutline = variant === "outline" || (variant === "primary" && designButtonStyle === "outline")
+    const isGhost = variant === "ghost" || (variant === "primary" && designButtonStyle === "ghost")
+    const isFilled = !isOutline && !isGhost
+
+    // Use CSS variables from design context with fallbacks
     const style: React.CSSProperties = {
-        backgroundColor: backgroundColor || variantStyle.bg,
-        color: textColor || variantStyle.text,
-        borderColor: variantStyle.border,
-        borderWidth: variant === "outline" ? 2 : 0,
+        // For primary variant, use design primary color. For outline, transparent bg
+        backgroundColor: backgroundColor || (
+            isOutline || isGhost
+                ? "transparent"
+                : "var(--design-primary, #000000)"
+        ),
+        // Text color: white for filled primary, design primary for outline
+        color: textColor || (
+            isOutline
+                ? "var(--design-primary, #000000)"
+                : isFilled
+                    ? "#ffffff"
+                    : variantStyle.text
+        ),
+        // Border: use design primary for outline variant
+        borderColor: isOutline ? "var(--design-primary, #000000)" : variantStyle.border,
+        borderWidth: isOutline ? 2 : 0,
         borderStyle: "solid",
-        borderRadius,
+        borderRadius: `var(--design-button-radius, ${borderRadius}px)`,
         padding: sizeStyle.padding,
         fontSize: sizeStyle.fontSize,
         fontWeight: 500,
+        fontFamily: "var(--design-font-base, inherit)",
         cursor: isEditing ? "text" : "pointer",
         display: "inline-flex",
         alignItems: "center",

@@ -8,6 +8,7 @@ export { Grid, GridSettings } from "./Grid"
 export { Divider, DividerSettings } from "./Divider"
 export { Spacer, SpacerSettings } from "./Spacer"
 export { Navbar, NavbarSettings } from "./Navbar"
+export { NavigationLinks, NavigationLinksSettings } from "./NavigationLinks"
 
 // Component definitions for the toolbox
 export const componentDefinitions = [
@@ -25,6 +26,11 @@ export const componentDefinitions = [
         name: "Navbar",
         category: "Navigation",
         description: "A header navigation bar",
+    },
+    {
+        name: "NavigationLinks",
+        category: "Navigation",
+        description: "A list of navigation links",
     },
     {
         name: "Heading",

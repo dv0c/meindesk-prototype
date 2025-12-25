@@ -147,10 +147,16 @@ interface CraftLayersPopupProps {
 }
 
 export function CraftLayersPopup({ isOpen, onClose }: CraftLayersPopupProps) {
-    const [position, setPosition] = useState({ x: window.innerWidth - 340, y: 80 })
+    const [position, setPosition] = useState({ x: 0, y: 80 })
     const [isDragging, setIsDragging] = useState(false)
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
     const panelRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            setPosition({ x: window.innerWidth - 340, y: 80 })
+        }
+    }, [])
 
     const { nodeIds } = useEditor((state) => {
         const rootNode = state.nodes["ROOT"]

@@ -1,14 +1,14 @@
 "use client"
 
-import { use, useState, useCallback, useEffect } from "react"
-import { Editor, Frame, Element } from "@craftjs/core"
+import { Editor, Element, Frame } from "@craftjs/core"
+import { use, useCallback, useState } from "react"
+import { toast } from "sonner"
 import { CraftHeader } from "./components/CraftHeader"
 import { CraftSidebar } from "./components/CraftSidebar"
 import { RenderNode } from "./components/RenderNode"
-import { Container, Heading, Text, Button, Image, Grid, Divider, Spacer } from "./user-components"
+import { Button, Container, Divider, Grid, Heading, Image, NavigationLinks, Spacer, Text } from "./user-components"
 import { Navbar } from "./user-components/Navbar"
-import { toast } from "sonner"
-import { Plus } from "lucide-react"
+import { DesignProvider, useDesign } from "./components/DesignContext"
 
 // Resolver for all user components
 const resolver = {
@@ -21,6 +21,7 @@ const resolver = {
     Divider,
     Spacer,
     Navbar,
+    NavigationLinks,
 }
 
 export default function CraftJSEditorPage({ params }: { params: { siteId: string } }) {
@@ -56,6 +57,29 @@ export default function CraftJSEditorPage({ params }: { params: { siteId: string
     }
 
     return (
+        <DesignProvider>
+            <EditorWithDesign
+                resolver={resolver}
+                pageName={pageName}
+                setPageName={setPageName}
+                deviceMode={deviceMode}
+                setDeviceMode={setDeviceMode}
+                onSave={handleSave}
+                isSaving={isSaving}
+                showSidebar={showSidebar}
+                setShowSidebar={setShowSidebar}
+                siteId={siteId}
+                getCanvasWidth={getCanvasWidth}
+            />
+        </DesignProvider>
+    )
+}
+
+// Separate component to access design context
+function EditorWithDesign({ resolver, pageName, setPageName, deviceMode, setDeviceMode, onSave, isSaving, showSidebar, setShowSidebar, siteId, getCanvasWidth }: any) {
+    const { getCssVariables } = useDesign()
+
+    return (
         <Editor resolver={resolver} onRender={RenderNode}>
             <div className="h-screen flex flex-col bg-muted/10 overflow-hidden">
                 {/* Header */}
@@ -64,7 +88,7 @@ export default function CraftJSEditorPage({ params }: { params: { siteId: string
                     setPageName={setPageName}
                     deviceMode={deviceMode}
                     setDeviceMode={setDeviceMode}
-                    onSave={handleSave}
+                    onSave={onSave}
                     isSaving={isSaving}
                     showSidebar={showSidebar}
                     setShowSidebar={setShowSidebar}
@@ -80,38 +104,55 @@ export default function CraftJSEditorPage({ params }: { params: { siteId: string
                     <div className="flex-1 h-full overflow-hidden flex flex-col relative">
                         <div className="overflow-auto h-full bg-zinc-50 dark:bg-zinc-900 p-5">
                             <div
-                                className="canvas-preview shadow-lg transition-all duration-300 bg-white dark:bg-zinc-950 mx-auto h-full"
+                                className="canvas-preview shadow-lg transition-all duration-300 mx-auto h-full"
                                 style={{
                                     width: getCanvasWidth(),
                                     minHeight: "100%",
+                                    backgroundColor: "var(--design-background, #ffffff)",
+                                    ...Object.fromEntries(
+                                        getCssVariables()
+                                            .split(';')
+                                            .filter(s => s.trim())
+                                            .map(s => {
+                                                const [key, value] = s.split(':').map(x => x.trim())
+                                                return [key, value]
+                                            })
+                                    )
                                 }}
                             >
                                 <Frame>
                                     <Element
                                         is={Container}
                                         canvas
-                                        padding={20}
-                                        backgroundColor="#ffffff"
+                                        padding={40}
+                                        backgroundColor="var(--design-background, #ffffff)"
                                         minHeight={0}
                                         className="h-full min-h-full"
+                                        custom={{ displayName: "App", isDeletable: false }}
                                     >
-                                        {/* Empty canvas placeholder */}
+                                        {/* Demo Article Content */}
+                                        <Element is={Heading} text="Welcome to the Page Builder" level="h1" fontSize={42} fontWeight="700" textAlign="left" />
+                                        <Element is={Spacer} height={16} />
+                                        <Element is={Text} text="This is a demo page to help you get started with the CraftJS editor. You can edit any text by clicking on it, and customize styles using the properties panel on the right." fontSize={18} color="#666666" />
+                                        <Element is={Spacer} height={32} />
+                                        <Element is={Heading} text="Getting Started" level="h2" fontSize={28} fontWeight="600" textAlign="left" />
+                                        <Element is={Spacer} height={12} />
+                                        <Element is={Text} text="Use the sidebar on the left to add new components. Click on any element to select it and see its properties. Try changing colors, fonts, and button styles from the Design panel!" fontSize={16} color="#444444" />
+                                        <Element is={Spacer} height={24} />
+                                        <Element is={Button} text="Learn More" variant="primary" size="lg" />
+                                        <Element is={Spacer} height={48} />
+                                        <Element is={Divider} />
+                                        <Element is={Spacer} height={24} />
+                                        <Element is={Text} text="Pro tip: Use the Design panel to change themes, colors, and fonts globally across your page." fontSize={14} color="#888888" />
                                     </Element>
                                 </Frame>
                             </div>
                         </div>
-
-                        {/* Empty State Helper */}
-                        <EmptyStateOverlay />
                     </div>
                 </div>
             </div>
-        </Editor>
+        </Editor >
     )
 }
 
-// Component to show helpful overlay when canvas is empty
-function EmptyStateOverlay() {
-    // This will be shown as part of the Container component when empty
-    return null
-}
+

@@ -10,7 +10,10 @@ import {
     PropertyColor,
     PropertyInput,
     PropertySelect,
+    PropertyShadowSelect,
+    PropertyIconButtonGroup,
 } from "../components/PropertySection"
+import { Plus, ArrowRight, ArrowDown, AlignLeft, AlignCenter, AlignRight, AlignJustify } from "lucide-react"
 
 
 interface ContainerProps {
@@ -61,8 +64,10 @@ export const Container = ({
     const {
         connectors: { connect, drag },
         selected,
+        isApp,
     } = useNode((state) => ({
         selected: state.events.selected,
+        isApp: (state.data as any).custom?.displayName === "App",
     }))
 
     const { enabled } = useEditor((state) => ({
@@ -88,6 +93,7 @@ export const Container = ({
         marginRight,
         marginBottom,
         marginLeft,
+        // Paddings
         paddingTop,
         paddingRight,
         paddingBottom,
@@ -107,23 +113,38 @@ export const Container = ({
             style={style}
         >
             {isEmpty && enabled ? (
-                <div
-                    style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        minHeight: `calc(${minHeight} - ${padding * 2}px)`, // Use legacy padding for empty state
-                        border: "2px dashed #e5e7eb",
-                        borderRadius: 8,
-                        color: "#9ca3af",
-                        fontSize: 14,
-                        fontWeight: 500,
-                        padding: 20,
-                        textAlign: "center",
-                    }}
-                >
-                    Drop components here
-                </div>
+                isApp ? (
+                    <div className="text-center space-y-4 max-w-sm m-auto p-8 border-2 border-dashed rounded-xl transition-all duration-200 border-muted-foreground/20 bg-muted/5">
+                        <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto bg-muted/10">
+                            <Plus className="w-8 h-8 text-muted-foreground" />
+                        </div>
+                        <div>
+                            <h3 className="font-semibold text-muted text-lg">Start Building</h3>
+                            <p className="text-sm text-muted-foreground">
+                                Drag elements from the sidebar to get started.
+                            </p>
+                        </div>
+                    </div>
+                ) : (
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            width: "100%",
+                            minHeight: `calc(${minHeight} - ${padding * 2}px)`, // Use legacy padding for empty state
+                            border: "2px dashed #e5e7eb",
+                            borderRadius: 8,
+                            color: "#9ca3af",
+                            fontSize: 14,
+                            fontWeight: 500,
+                            padding: 20,
+                            textAlign: "center",
+                        }}
+                    >
+                        Drop components here
+                    </div>
+                )
             ) : (
                 children
             )}
@@ -135,29 +156,39 @@ export const Container = ({
 export const ContainerSettings = () => {
     const {
         actions: { setProp },
-        padding, // Kept for summary/empty state calculation
-        backgroundColor, // Kept for summary
-        borderRadius, // Kept for summary
+        backgroundColor,
+        borderRadius,
+        borderWidth,
+        borderColor,
         minHeight,
         maxWidth,
-        borderWidth, // Kept for summary
-        borderColor, // Kept for summary
         gap,
         flexDirection,
         alignItems,
         justifyContent,
+        marginTop, marginRight, marginBottom, marginLeft,
+        paddingTop, paddingRight, paddingBottom, paddingLeft,
+        boxShadow,
     } = useNode((node) => ({
-        padding: node.data.props.padding,
         backgroundColor: node.data.props.backgroundColor,
         borderRadius: node.data.props.borderRadius,
-        minHeight: node.data.props.minHeight,
-        maxWidth: node.data.props.maxWidth,
         borderWidth: node.data.props.borderWidth,
         borderColor: node.data.props.borderColor,
+        minHeight: node.data.props.minHeight,
+        maxWidth: node.data.props.maxWidth,
         gap: node.data.props.gap,
         flexDirection: node.data.props.flexDirection,
         alignItems: node.data.props.alignItems,
         justifyContent: node.data.props.justifyContent,
+        marginTop: node.data.props.marginTop,
+        marginRight: node.data.props.marginRight,
+        marginBottom: node.data.props.marginBottom,
+        marginLeft: node.data.props.marginLeft,
+        paddingTop: node.data.props.paddingTop,
+        paddingRight: node.data.props.paddingRight,
+        paddingBottom: node.data.props.paddingBottom,
+        paddingLeft: node.data.props.paddingLeft,
+        boxShadow: node.data.props.boxShadow,
     }))
 
     // Parse value with unit helper
@@ -175,7 +206,6 @@ export const ContainerSettings = () => {
     const { value: minHeightValue, unit: minHeightUnit } = parseValueWithUnit(minHeight, 'px', 100)
 
     const dimensionsSummary = `${maxWidth || "100%"} × ${minHeight || "100px"}`
-    const borderSummary = borderWidth ? `${borderWidth}px` : "None"
 
     return (
         <div>
@@ -202,10 +232,33 @@ export const ContainerSettings = () => {
                 <PropertyRow label="Direction">
                     <PropertySelect
                         value={flexDirection || "column"}
-                        onChange={(v) => setProp((props: ContainerProps) => (props.flexDirection = v))}
+                        onChange={(v) => setProp((props: ContainerProps) => (props.flexDirection = v as ContainerProps["flexDirection"]))}
                         options={[
-                            { label: "Column", value: "column" },
-                            { label: "Row", value: "row" },
+                            { label: "Row", value: "row", icon: ArrowRight },
+                            { label: "Column", value: "column", icon: ArrowDown },
+                        ]}
+                    />
+                </PropertyRow>
+                <PropertyRow label="Align Items">
+                    <PropertyIconButtonGroup
+                        value={alignItems || "flex-start"}
+                        onChange={(v) => setProp((props: ContainerProps) => (props.alignItems = v as ContainerProps["alignItems"]))}
+                        options={[
+                            { label: "Start", value: "flex-start", icon: AlignLeft },
+                            { label: "Center", value: "center", icon: AlignCenter },
+                            { label: "End", value: "flex-end", icon: AlignRight },
+                        ]}
+                    />
+                </PropertyRow>
+                <PropertyRow label="Justify Content">
+                    <PropertyIconButtonGroup
+                        value={justifyContent || "flex-start"}
+                        onChange={(v) => setProp((props: ContainerProps) => (props.justifyContent = v as ContainerProps["justifyContent"]))}
+                        options={[
+                            { label: "Start", value: "flex-start", icon: AlignLeft },
+                            { label: "Center", value: "center", icon: AlignCenter },
+                            { label: "End", value: "flex-end", icon: AlignRight },
+                            { label: "Between", value: "space-between", icon: AlignJustify },
                         ]}
                     />
                 </PropertyRow>
@@ -217,29 +270,41 @@ export const ContainerSettings = () => {
                         max={100}
                     />
                 </PropertyRow>
-                <PropertyRow label="Align Items">
-                    <PropertySelect
-                        value={alignItems || "flex-start"}
-                        onChange={(v) => setProp((props: ContainerProps) => (props.alignItems = v))}
-                        options={[
-                            { label: "Start", value: "flex-start" },
-                            { label: "Center", value: "center" },
-                            { label: "End", value: "flex-end" },
-                            { label: "Stretch", value: "stretch" },
-                        ]}
+            </PropertySection>
+
+            <PropertySection title="Decoration" summary={`${borderRadius ? `${borderRadius}px` : "0px"} / ${boxShadow ? "Shadow" : "None"}`} defaultOpen={false}>
+                <PropertyRow label="Background">
+                    <PropertyColor
+                        value={backgroundColor}
+                        onChange={(color) => setProp((props: ContainerProps) => (props.backgroundColor = color))}
                     />
                 </PropertyRow>
-                <PropertyRow label="Justify Content">
-                    <PropertySelect
-                        value={justifyContent || "flex-start"}
-                        onChange={(v) => setProp((props: ContainerProps) => (props.justifyContent = v))}
-                        options={[
-                            { label: "Start", value: "flex-start" },
-                            { label: "Center", value: "center" },
-                            { label: "End", value: "flex-end" },
-                            { label: "Between", value: "space-between" },
-                            { label: "Around", value: "space-around" },
-                        ]}
+                <PropertyRow label="Border Width">
+                    <PropertySlider
+                        value={borderWidth || 0}
+                        onChange={(v) => setProp((props: ContainerProps) => (props.borderWidth = v))}
+                        max={20}
+                        unit="px"
+                    />
+                </PropertyRow>
+                <PropertyRow label="Border Color">
+                    <PropertyColor
+                        value={borderColor}
+                        onChange={(color) => setProp((props: ContainerProps) => (props.borderColor = color))}
+                    />
+                </PropertyRow>
+                <PropertyRow label="Border Radius">
+                    <PropertySlider
+                        value={borderRadius || 0}
+                        onChange={(v) => setProp((props: ContainerProps) => (props.borderRadius = v))}
+                        max={50}
+                        unit="px"
+                    />
+                </PropertyRow>
+                <PropertyRow label="Shadow">
+                    <PropertyShadowSelect
+                        value={boxShadow || ""}
+                        onChange={(val) => setProp((props: ContainerProps) => (props.boxShadow = val))}
                     />
                 </PropertyRow>
             </PropertySection>

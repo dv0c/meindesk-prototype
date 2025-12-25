@@ -3,10 +3,11 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { ArrowLeft, Monitor, Tablet, Smartphone, Save, Eye, Undo, Redo, SidebarClose, Layers } from "lucide-react"
+import { ArrowLeft, Monitor, Tablet, Smartphone, Save, Eye, Undo, Redo, SidebarClose, Layers, LayoutTemplate } from "lucide-react"
 import { useEditor } from "@craftjs/core"
 import Link from "next/link"
 import { CraftLayersPopup } from "./CraftLayers"
+import { TemplatesDialog } from "./TemplatesDialog"
 
 interface CraftHeaderProps {
     pageName: string
@@ -38,6 +39,7 @@ export function CraftHeader({
     }))
 
     const [showLayers, setShowLayers] = useState(false)
+    const [showTemplates, setShowTemplates] = useState(false)
 
     return (
         <>
@@ -107,6 +109,20 @@ export function CraftHeader({
                 <div className="flex items-center gap-2">
                     {enabled && (
                         <>
+                            {/* Templates Button */}
+                            <Button
+                                variant={showTemplates ? "secondary" : "ghost"}
+                                size="sm"
+                                className="h-8 px-2"
+                                onClick={() => setShowTemplates(true)}
+                                title="Insert Template"
+                            >
+                                <LayoutTemplate className="h-4 w-4 mr-2" />
+                                Templates
+                            </Button>
+
+                            <div className="h-6 w-px bg-border/50 mx-1" />
+
                             {/* Layers Toggle */}
                             <Button
                                 variant={showLayers ? "secondary" : "ghost"}
@@ -180,6 +196,9 @@ export function CraftHeader({
 
             {/* Floating Layers Popup */}
             <CraftLayersPopup isOpen={showLayers} onClose={() => setShowLayers(false)} />
+
+            {/* Templates Dialog */}
+            <TemplatesDialog open={showTemplates} onOpenChange={setShowTemplates} />
         </>
     )
 }

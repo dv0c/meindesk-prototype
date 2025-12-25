@@ -78,9 +78,9 @@ export const Heading = ({
     const style: React.CSSProperties = {
         width: "100%",
         fontSize,
-        fontWeight,
-        color,
-        textAlign,
+        fontWeight: "var(--design-font-weight-heading, " + fontWeight + ")",
+        fontFamily: "var(--design-font-heading, inherit)",
+        color: color === "#000000" ? "var(--design-neutral, #000000)" : color,
         textAlign,
         marginTop,
         marginRight,

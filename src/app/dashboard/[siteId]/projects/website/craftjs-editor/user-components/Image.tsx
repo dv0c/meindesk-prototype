@@ -1,6 +1,11 @@
 "use client"
 
 import { useNode } from "@craftjs/core"
+import { useState } from "react"
+import { useParams } from "next/navigation"
+import MediaLibraryDialog, { MediaItem } from "@/components/MediaGallery/media-select"
+import { Button } from "@/components/ui/button"
+import { ImageIcon } from "lucide-react"
 import {
     PropertySection,
     PropertyRow,
@@ -76,18 +81,57 @@ export const ImageSettings = () => {
         borderRadius: node.data.props.borderRadius,
     }))
 
+    const params = useParams()
+    const siteId = params.siteId as string
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
+
+    const handleMediaSelect = (items: MediaItem[]) => {
+        if (items.length > 0) {
+            const selectedImage = items[0]
+            setProp((props: ImageProps) => {
+                props.src = selectedImage.url
+                if (selectedImage.alt) props.alt = selectedImage.alt
+            })
+        }
+    }
+
     const dimensionsSummary = `${width} × ${height}`
 
     return (
         <div>
             <PropertySection title="Source">
-                <PropertyRow label="Image URL">
-                    <PropertyInput
-                        type="url"
-                        value={src || ""}
-                        onChange={(v) => setProp((props: ImageProps) => (props.src = v))}
-                        placeholder="https://..."
-                    />
+                <PropertyRow label="Image">
+                    <div className="flex flex-col gap-2 w-full">
+                        {src ? (
+                            <div className="relative group w-full aspect-video bg-muted rounded-md overflow-hidden border border-border">
+                                <img
+                                    src={src}
+                                    alt="Preview"
+                                    className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <Button
+                                        variant="secondary"
+                                        size="sm"
+                                        className="h-8 text-xs"
+                                        onClick={() => setIsDialogOpen(true)}
+                                    >
+                                        Change Image
+                                    </Button>
+                                </div>
+                            </div>
+                        ) : (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="w-full flex items-center justify-center gap-2 h-20 border-dashed"
+                                onClick={() => setIsDialogOpen(true)}
+                            >
+                                <ImageIcon className="w-5 h-5 text-muted-foreground" />
+                                <span className="text-muted-foreground">Select Image</span>
+                            </Button>
+                        )}
+                    </div>
                 </PropertyRow>
                 <PropertyRow label="Alt Text">
                     <PropertyInput
@@ -127,16 +171,13 @@ export const ImageSettings = () => {
                 </PropertyRow>
             </PropertySection>
 
-            <PropertySection title="Decoration" summary={`${borderRadius}px radius`} defaultOpen={false}>
-                <PropertyRow label="Border Radius">
-                    <PropertySlider
-                        value={borderRadius || 0}
-                        onChange={(v) => setProp((props: ImageProps) => (props.borderRadius = v))}
-                        min={0}
-                        max={50}
-                    />
-                </PropertyRow>
-            </PropertySection>
+            <MediaLibraryDialog
+                siteId={siteId}
+                isOpen={isDialogOpen}
+                onClose={() => setIsDialogOpen(false)}
+                onSelect={handleMediaSelect}
+                multiSelect={false}
+            />
         </div>
     )
 }

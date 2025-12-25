@@ -7,7 +7,41 @@ import {
     PropertyColor,
     PropertySlider,
     PropertySpacing,
+    PropertyShadowSelect,
+    PropertySelect,
 } from "./PropertySection"
+
+// Font options - matching DesignPanel
+const fontOptions = [
+    { label: "Inter", value: "Inter" },
+    { label: "Roboto", value: "Roboto" },
+    { label: "Open Sans", value: "Open Sans" },
+    { label: "Lato", value: "Lato" },
+    { label: "Poppins", value: "Poppins" },
+    { label: "Montserrat", value: "Montserrat" },
+    { label: "Nunito Sans", value: "Nunito Sans" },
+    { label: "Outfit", value: "Outfit" },
+    { label: "Manrope", value: "Manrope" },
+    { label: "Space Grotesk", value: "Space Grotesk" },
+    { label: "Archivo", value: "Archivo" },
+    { label: "Karla", value: "Karla" },
+    { label: "Playfair Display", value: "Playfair Display" },
+    { label: "Fraunces", value: "Fraunces" },
+    { label: "Source Serif 4", value: "Source Serif 4" },
+    { label: "Merriweather", value: "Merriweather" },
+    { label: "Bitter", value: "Bitter" },
+    { label: "Alegreya", value: "Alegreya" },
+    { label: "Lora", value: "Lora" },
+    { label: "Oswald", value: "Oswald" },
+    { label: "IBM Plex Sans", value: "IBM Plex Sans" },
+    { label: "IBM Plex Serif", value: "IBM Plex Serif" },
+    { label: "Roboto Slab", value: "Roboto Slab" },
+    { label: "Instrument Serif", value: "Instrument Serif" },
+    { label: "Figtree", value: "Figtree" },
+    { label: "JetBrains Mono", value: "JetBrains Mono" },
+    { label: "Inconsolata", value: "Inconsolata" },
+    { label: "Fira Code", value: "Fira Code" },
+]
 
 export const GlobalStylesPanel = () => {
     const { id, currentProps, actions } = useEditor((state) => {
@@ -34,10 +68,35 @@ export const GlobalStylesPanel = () => {
         borderWidth,
         borderColor,
         boxShadow,
+        fontFamily,
+        fontSize,
+        fontWeight,
     } = currentProps
 
     return (
         <div className="space-y-6">
+            {/* Typography Section */}
+            <PropertySection title="Typography" defaultOpen={false}>
+                <PropertyRow label="Font Family">
+                    <PropertySelect
+                        value={fontFamily || "Inter"}
+                        onChange={(val) => setProp((props: any) => props.fontFamily = val)}
+                        options={fontOptions}
+                    />
+                </PropertyRow>
+                {fontSize !== undefined && (
+                    <PropertyRow label="Font Size">
+                        <PropertySlider
+                            value={fontSize || 16}
+                            onChange={(val) => setProp((props: any) => props.fontSize = val)}
+                            min={8}
+                            max={120}
+                            unit="px"
+                        />
+                    </PropertyRow>
+                )}
+            </PropertySection>
+
             <PropertySection title="Spacing & Alignment" defaultOpen={true}>
                 <PropertyRow label="Margin (px/auto)">
                     <PropertySpacing
@@ -96,11 +155,9 @@ export const GlobalStylesPanel = () => {
                     </div>
                 </PropertyRow>
                 <PropertyRow label="Shadow">
-                    <input
-                        className="w-full h-8 px-2 text-xs border rounded-md"
+                    <PropertyShadowSelect
                         value={boxShadow || ""}
-                        onChange={(e) => setProp((props: any) => props.boxShadow = e.target.value)}
-                        placeholder="e.g. 0 4px 6px rgba(0,0,0,0.1)"
+                        onChange={(val) => setProp((props: any) => props.boxShadow = val)}
                     />
                 </PropertyRow>
             </PropertySection>
