@@ -234,6 +234,9 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings: WebsiteSettings = site?.settings as WebsiteSettings || {} as WebsiteSettings;
   const seo = settings.seo || {};
 
+
+
+
   // Build metadata object
   const metadata: Metadata = {
     title: seo.metaTitle || settings.title || site?.title || 'Website',
@@ -257,6 +260,9 @@ export async function generateMetadata(): Promise<Metadata> {
       title: seo.ogTitle || seo.metaTitle || settings.title || site?.title,
       description: seo.ogDescription || seo.metaDescription || settings.description,
       images: seo.ogImage ? [seo.ogImage] : undefined,
+    },
+    icons: {
+      icon: settings.favicon || '/favicon.ico'
     },
   };
 
