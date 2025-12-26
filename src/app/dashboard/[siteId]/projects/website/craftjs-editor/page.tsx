@@ -118,14 +118,7 @@ function EditorWithDesign({ resolver, pageName, setPageName, deviceMode, setDevi
                                     <Element
                                         is={Container}
                                         canvas
-                                        padding={40}
-                                        paddingTop="0"
-                                        paddingRight="0"
-                                        paddingBottom="0"
-                                        paddingLeft="0"
-                                        gap={16}
-                                        backgroundColor="var(--design-background, #ffffff)"
-                                        minHeight="100%"
+                                        minHeight="100vh"
                                         flexDirection="column"
                                         alignItems="stretch"
                                         custom={{ displayName: "App", isDeletable: false }}

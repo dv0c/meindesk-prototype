@@ -73,7 +73,7 @@ export function CraftSidebar() {
                         <PropertiesView
                             selected={selected}
                             name={name}
-                            isDeletable={isDeletable}
+                            isDeletable={isDeletable as boolean}
                             onBack={() => actions.selectNode(undefined)}
                             onDelete={() => {
                                 if (selected) actions.delete(selected)

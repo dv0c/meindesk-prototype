@@ -4,6 +4,14 @@ import { useState } from "react"
 import { ChevronDown, ChevronRight, AlignCenter, AlignLeft, AlignRight, AlignJustify, ArrowDown, ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
+import { Switch } from "@/components/ui/switch"
+import { Button } from "@/components/ui/button"
+import { Code, Trash2 } from "lucide-react"
+import { Editor } from "@/components/blocks/editor-x/editor"
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { $generateHtmlFromNodes } from '@lexical/html'
+import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
+import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 
 interface PropertySectionProps {
     title: string
@@ -357,6 +365,25 @@ export function PropertyCheckbox({ id, label, checked, onChange }: PropertyCheck
     )
 }
 
+
+interface PropertyToggleProps {
+    value: boolean
+    onChange: (checked: boolean) => void
+    label?: string
+}
+
+export function PropertyToggle({ value, onChange, label }: PropertyToggleProps) {
+    return (
+        <div className="flex items-center justify-between">
+            {label && <span className="text-xs text-muted-foreground">{label}</span>}
+            <Switch
+                checked={value}
+                onCheckedChange={onChange}
+            />
+        </div>
+    )
+}
+
 interface PropertySpacingProps {
     values: Partial<Record<"top" | "right" | "bottom" | "left", string>>
     onChange: (side: "top" | "right" | "bottom" | "left", value: string) => void
@@ -422,6 +449,132 @@ export function PropertyShadowSelect({ value, onChange }: PropertyShadowSelectPr
                 For now, let's keep it simple as per request 'more user friendly'. 
                 We can add a toggle for 'Advanced' later if needed.
             */}
+        </div>
+    )
+}
+
+interface PropertyRichTextProps {
+    value: string
+    onChange: (value: string) => void
+    label?: string
+}
+
+export function PropertyRichText({ value, onChange, label }: PropertyRichTextProps) {
+    const [open, setOpen] = useState(false)
+    const [editorInstance, setEditorInstance] = useState<any>(null)
+    const [pendingState, setPendingState] = useState<string | null>(null)
+
+    // Extract HTML for preview
+    let htmlContent = ""
+    try {
+        if (value && value.trim().startsWith('{')) {
+            const parsed = JSON.parse(value)
+            if (parsed.html) htmlContent = parsed.html
+        } else if (value && value.includes('<')) {
+            htmlContent = value
+        }
+    } catch { }
+
+    const handleSave = () => {
+        if (pendingState) {
+            onChange(pendingState)
+        }
+        setOpen(false)
+    }
+
+    return (
+        <div className="space-y-2">
+            {label && <label className="text-xs font-medium text-muted-foreground">{label}</label>}
+
+            <div className="space-y-2 border rounded-md p-3 bg-muted/10">
+                <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium text-muted-foreground">Rich Text Content</span>
+                    <div className="flex gap-2">
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 text-xs"
+                            onClick={() => onChange("")}
+                            title="Clear content"
+                        >
+                            Clear
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="h-7 text-xs"
+                            onClick={() => setOpen(true)}
+                            title="Edit in Rich Text Editor"
+                        >
+                            <Code className="h-3 w-3 mr-1" />
+                            Edit in Editor
+                        </Button>
+                    </div>
+                </div>
+                {htmlContent ? (
+                    <div
+                        className="text-xs text-muted-foreground prose prose-sm max-w-none overflow-hidden"
+                        dangerouslySetInnerHTML={{ __html: htmlContent }}
+                        style={{ maxHeight: '100px', overflow: 'hidden' }}
+                    />
+                ) : (
+                    <div className="text-xs text-muted-foreground italic p-2 text-center">
+                        Empty content
+                    </div>
+                )}
+
+            </div>
+
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogContent className="max-w-[95vw]! overflow-auto w-[95vw] h-[95vh] max-h-[95vh] flex flex-col p-0">
+                    <DialogHeader className="px-6 pt-6 pb-4 border-b">
+                        <DialogTitle className="text-xl">Edit {label || "Content"}</DialogTitle>
+                    </DialogHeader>
+
+                    <div className="flex-1 overflow-auto px-6 relative flex flex-col">
+                        <Editor
+                            editorSerializedState={(() => {
+                                try {
+                                    if (value && value.trim().startsWith('{')) {
+                                        const parsed = JSON.parse(value)
+                                        if (parsed.editorState) {
+                                            return parsed.editorState
+                                        }
+                                        return parsed
+                                    }
+                                    return undefined
+                                } catch (e) {
+                                    return undefined
+                                }
+                            })()}
+                            onEditorReady={setEditorInstance}
+                            onChange={(editorState) => {
+                                if (!editorInstance) return;
+
+                                editorState.read(() => {
+                                    const html = $generateHtmlFromNodes(editorInstance, null)
+                                    const payload = JSON.stringify({
+                                        html: html,
+                                        editorState: editorState.toJSON()
+                                    })
+                                    setPendingState(payload)
+                                })
+                            }}
+                        />
+                    </div>
+
+                    <DialogFooter className="px-6 py-4 border-t bg-muted/30">
+                        <Button variant="outline" onClick={() => setOpen(false)}>
+                            Cancel
+                        </Button>
+                        <Button onClick={handleSave}>
+                            Save
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

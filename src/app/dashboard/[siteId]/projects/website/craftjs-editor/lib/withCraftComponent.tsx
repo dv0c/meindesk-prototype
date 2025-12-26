@@ -7,21 +7,21 @@ import { generateSettings, SettingsConfig } from './generateSettings'
  */
 export interface CraftComponentProps {
     // Spacing
-    marginTop?: number
-    marginRight?: number
-    marginBottom?: number
-    marginLeft?: number
-    paddingTop?: number
-    paddingRight?: number
-    paddingBottom?: number
-    paddingLeft?: number
+    marginTop?: number | string
+    marginRight?: number | string
+    marginBottom?: number | string
+    marginLeft?: number | string
+    paddingTop?: number | string
+    paddingRight?: number | string
+    paddingBottom?: number | string
+    paddingLeft?: number | string
 
     // Sizing
-    width?: string
-    height?: string
-    minWidth?: string
-    maxWidth?: string
-    minHeight?: string
+    width?: string | number
+    height?: string | number
+    minWidth?: string | number
+    maxWidth?: string | number
+    minHeight?: string | number
 
     // Colors
     backgroundColor?: string
@@ -32,6 +32,28 @@ export interface CraftComponentProps {
     borderWidth?: number
     borderColor?: string
     borderStyle?: 'solid' | 'dashed' | 'dotted' | 'none'
+
+    // Layout
+    display?: 'block' | 'flex' | 'grid' | 'inline-block' | 'none'
+    flexDirection?: 'row' | 'column' | 'row-reverse' | 'column-reverse'
+    alignItems?: 'flex-start' | 'center' | 'flex-end' | 'stretch' | 'baseline'
+    justifyContent?: 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'space-evenly'
+    gap?: number | string
+    flexWrap?: 'nowrap' | 'wrap' | 'wrap-reverse'
+
+    // Typography
+    fontSize?: number | string
+    fontWeight?: string | number
+    fontFamily?: string
+    lineHeight?: number | string
+    letterSpacing?: number | string
+    textAlign?: 'left' | 'center' | 'right' | 'justify'
+    textDecoration?: 'none' | 'underline' | 'line-through' | 'overline'
+
+    // Effects
+    boxShadow?: string
+    opacity?: number
+    overflow?: 'visible' | 'hidden' | 'scroll' | 'auto'
 
     // Other
     className?: string
@@ -51,34 +73,68 @@ interface WithCraftComponentOptions<P> {
 /**
  * Convert component props to inline styles
  */
+/**
+ * Helper to convert value to CSS string
+ */
+function toCssValue(value: string | number | undefined): string | undefined {
+    if (value === undefined) return undefined
+    if (typeof value === 'number') return `${value}px`
+    return value
+}
+
+/**
+ * Convert component props to inline styles
+ */
 export function propsToStyle(props: CraftComponentProps): React.CSSProperties {
     const style: React.CSSProperties = { ...props.style }
 
     // Spacing
-    if (props.marginTop !== undefined) style.marginTop = `${props.marginTop}px`
-    if (props.marginRight !== undefined) style.marginRight = `${props.marginRight}px`
-    if (props.marginBottom !== undefined) style.marginBottom = `${props.marginBottom}px`
-    if (props.marginLeft !== undefined) style.marginLeft = `${props.marginLeft}px`
-    if (props.paddingTop !== undefined) style.paddingTop = `${props.paddingTop}px`
-    if (props.paddingRight !== undefined) style.paddingRight = `${props.paddingRight}px`
-    if (props.paddingBottom !== undefined) style.paddingBottom = `${props.paddingBottom}px`
-    if (props.paddingLeft !== undefined) style.paddingLeft = `${props.paddingLeft}px`
+    if (props.marginTop !== undefined) style.marginTop = toCssValue(props.marginTop)
+    if (props.marginRight !== undefined) style.marginRight = toCssValue(props.marginRight)
+    if (props.marginBottom !== undefined) style.marginBottom = toCssValue(props.marginBottom)
+    if (props.marginLeft !== undefined) style.marginLeft = toCssValue(props.marginLeft)
+    if (props.paddingTop !== undefined) style.paddingTop = toCssValue(props.paddingTop)
+    if (props.paddingRight !== undefined) style.paddingRight = toCssValue(props.paddingRight)
+    if (props.paddingBottom !== undefined) style.paddingBottom = toCssValue(props.paddingBottom)
+    if (props.paddingLeft !== undefined) style.paddingLeft = toCssValue(props.paddingLeft)
 
     // Sizing
-    if (props.width) style.width = props.width
-    if (props.height) style.height = props.height
-    if (props.minWidth) style.minWidth = props.minWidth
-    if (props.maxWidth) style.maxWidth = props.maxWidth
-    if (props.minHeight) style.minHeight = props.minHeight
+    if (props.width !== undefined) style.width = toCssValue(props.width)
+    if (props.height !== undefined) style.height = toCssValue(props.height)
+    if (props.minWidth !== undefined) style.minWidth = toCssValue(props.minWidth)
+    if (props.maxWidth !== undefined) style.maxWidth = toCssValue(props.maxWidth)
+    if (props.minHeight !== undefined) style.minHeight = toCssValue(props.minHeight)
 
     // Colors
     if (props.backgroundColor) style.backgroundColor = props.backgroundColor
     if (props.color) style.color = props.color
 
+    // Layout
+    if (props.display) style.display = props.display
+    if (props.flexDirection) style.flexDirection = props.flexDirection
+    if (props.alignItems) style.alignItems = props.alignItems
+    if (props.justifyContent) style.justifyContent = props.justifyContent
+    if (props.gap !== undefined) style.gap = toCssValue(props.gap)
+    if (props.flexWrap) style.flexWrap = props.flexWrap
+
+    // Typography
+    if (props.fontSize !== undefined) style.fontSize = toCssValue(props.fontSize)
+    if (props.fontWeight !== undefined) style.fontWeight = props.fontWeight
+    if (props.fontFamily) style.fontFamily = props.fontFamily
+    if (props.lineHeight !== undefined) style.lineHeight = toCssValue(props.lineHeight)
+    if (props.letterSpacing !== undefined) style.letterSpacing = toCssValue(props.letterSpacing)
+    if (props.textAlign) style.textAlign = props.textAlign
+    if (props.textDecoration) style.textDecoration = props.textDecoration
+
+    // Effects
+    if (props.boxShadow) style.boxShadow = props.boxShadow
+    if (props.opacity !== undefined) style.opacity = props.opacity
+    if (props.overflow) style.overflow = props.overflow
+
     // Border
-    if (props.borderRadius !== undefined) style.borderRadius = `${props.borderRadius}px`
+    if (props.borderRadius !== undefined) style.borderRadius = toCssValue(props.borderRadius)
     if (props.borderWidth !== undefined) {
-        style.borderWidth = `${props.borderWidth}px`
+        style.borderWidth = toCssValue(props.borderWidth)
         style.borderStyle = props.borderStyle || 'solid'
         if (props.borderColor) style.borderColor = props.borderColor
     }
@@ -96,8 +152,8 @@ export function cn(...classes: (string | undefined | null | false)[]): string {
 /**
  * Higher-order component that wraps a component with CraftJS functionality
  */
-export function withCraftComponent<P extends CraftComponentProps>(
-    Component: React.ForwardRefExoticComponent<P & React.RefAttributes<HTMLElement>>,
+export function withCraftComponent<P extends CraftComponentProps, E extends HTMLElement = HTMLElement>(
+    Component: React.ForwardRefExoticComponent<P & React.RefAttributes<E>>,
     options: Partial<WithCraftComponentOptions<P>>
 ) {
     const WrappedComponent: React.FC<P> = (props) => {
@@ -106,7 +162,7 @@ export function withCraftComponent<P extends CraftComponentProps>(
         return (
             <Component
                 {...props}
-                ref={(el: HTMLElement | null) => {
+                ref={(el: E | null) => {
                     if (el) {
                         connect(drag(el))
                     }

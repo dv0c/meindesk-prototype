@@ -391,7 +391,7 @@ const NavbarComponent = React.forwardRef<HTMLDivElement, NavbarProps>(({
 NavbarComponent.displayName = "NavbarComponent"
 
 // Export with withCraftComponent wrapper (settings will be auto-generated)
-export const Navbar = withCraftComponent<NavbarProps>(
+export const Navbar = withCraftComponent(
     NavbarComponent,
     {
         displayName: 'Navbar',

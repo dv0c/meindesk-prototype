@@ -17,6 +17,7 @@ import {
     Navigation,
     Link as LinkIcon,
     CreditCard,
+    GalleryHorizontal,
 } from 'lucide-react'
 
 // Import all components
@@ -31,6 +32,7 @@ import { Spacer, SpacerSettings } from './Spacer'
 import { Navbar } from './Navbar'
 import { NavigationLinks, NavigationLinksSettings } from './NavigationLinks'
 import { Card } from './ExampleCard'
+import { Hero } from './Hero'
 
 /**
  * Component metadata interface
@@ -149,6 +151,14 @@ export const componentRegistry: ComponentRegistration[] = [
         description: 'A card component with image, title, and description',
         icon: <CreditCard className="h-5 w-5" />,
     },
+    {
+        name: 'Hero',
+        component: Hero,
+        category: 'Content',
+        description: 'A rich text hero section with floating image',
+        icon: <LayoutGrid className="h-5 w-5" />,
+    },
+
 ]
 
 /**
@@ -205,4 +215,6 @@ export {
     NavigationLinks,
     NavigationLinksSettings,
     Card,
+    Hero,
+
 }

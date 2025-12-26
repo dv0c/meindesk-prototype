@@ -101,6 +101,17 @@ export function DesignProvider({ children, initialSettings }: DesignProviderProp
                 : "9999px"
 
         return `
+            --primary: ${settings.primary};
+            --primary-foreground: #ffffff;
+            --background: ${settings.background};
+            --foreground: ${settings.neutral};
+            --muted: ${settings.secondary};
+            --muted-foreground: ${settings.neutral}aa;
+            --border: ${settings.secondary};
+            
+            --font-sans: ${settings.baseFont}, sans-serif;
+            --font-serif: ${settings.headingFont}, serif;
+
             --design-primary: ${settings.primary};
             --design-secondary: ${settings.secondary};
             --design-background: ${settings.background};

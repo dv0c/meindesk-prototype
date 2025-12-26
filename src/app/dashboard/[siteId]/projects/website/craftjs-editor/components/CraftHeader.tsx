@@ -7,6 +7,9 @@ import { ArrowLeft, Monitor, Tablet, Smartphone, Save, Eye, Undo, Redo, SidebarC
 import { useEditor } from "@craftjs/core"
 import Link from "next/link"
 import { CraftLayersPopup } from "./CraftLayers"
+import { Element } from "@craftjs/core"
+import { Navbar } from "../user-components/Navbar"
+import { Hero } from "../user-components/Hero"
 
 interface CraftHeaderProps {
     pageName: string
@@ -31,7 +34,7 @@ export function CraftHeader({
     setShowSidebar,
     siteId,
 }: CraftHeaderProps) {
-    const { actions, canUndo, canRedo, enabled, selected } = useEditor((state, query) => {
+    const { actions, query, canUndo, canRedo, enabled, selected } = useEditor((state, query) => {
         const currentNodeId = state.events.selected?.values().next().value
         return {
             canUndo: query.history.canUndo(),
@@ -42,6 +45,37 @@ export function CraftHeader({
     })
 
     const [showLayers, setShowLayers] = useState(false)
+
+    const handleQuickSetup = () => {
+        // Greek text content provided by user
+        const greekContent = `
+            <p>Από νωρίς στη ζωή μου με συγκινούσε η ανθρώπινη εμπειρία· η ανάγκη να κατανοώ, να αφουγκράζομαι και να αναζητώ το ουσιαστικό πίσω από τις λέξεις και τις συμπεριφορές. Η σύνδεση με τον άλλον, η παρουσία, η φροντίδα και η αλήθεια στη σχέση είναι για μένα θεμέλια της προσωπικής και επαγγελματικής μου ταυτότητας.</p>
+            <p>Αυτή η βαθιά ανάγκη για κατανόηση και ουσιαστική επικοινωνία με τους ανθρώπους με οδήγησε φυσικά στον χώρο της ψυχικής υγείας και της θεραπευτικής.</p>
+            <p>Είμαι Σύμβουλος Ψυχικής Υγείας Ενηλίκων, Εφήβων και Γονέων, και παρέχω επίσης συνεδρίες Θεραπείας Ζεύγους. Μέσα από τις σπουδές και την επαγγελματική μου πορεία έχω εξελίξει την ενσυναίσθησή μου και έχω αποκτήσει εμπειρία στο να συνοδεύω ανθρώπους στο προσωπικό τους ταξίδι αυτογνωσίας και εξέλιξης.</p>
+            <p>Έχω εκπαιδευτεί σε διάφορες θεραπευτικές προσεγγίσεις και τεχνικές, γεγονός που μας επιτρέπει, μέσα από τη θεραπευτική σχέση, να αφουγκραστούμε τις ανάγκες σας και να τις διαχειριστούμε με τον πιο κατάλληλο τρόπο.</p>
+            <p>Οι εκπαιδεύσεις μου αφορούν στις ακόλουθες προσεγγίσεις: Ψυχοδυναμική Συμβουλευτική, Γνωσιακή Συμπεριφοριστική Θεραπεία (CBT), Gestalt, Συστημική Αναπαράσταση, Art Therapy, Drama Therapy, Ομαδική Ανάλυση, Θεραπεία Ζεύγους, Σωματικά Επικεντρωμένη Ψυχοθεραπεία Gestalt. Για χρόνια ασχολήθηκα με το Θεατρικό Παιχνίδι, δουλεύοντας με ομάδες παιδιών και ενηλίκων.</p>
+            <p>Συνεχίζω να επιμορφώνομαι σε θέματα ψυχολογίας, θεραπευτικών προσεγγίσεων και προσωπικής ανάπτυξης, παραμένοντας ανοιχτή στη συνεχή εξέλιξη.</p>
+            <p>Μαζί μπορούμε να διερευνήσουμε όσα σας απασχολούν, σας δυσκολεύουν ή σας αγχώνουν, όσα ίσως στερούν την ικανοποίηση και τη χαρά από την καθημερινότητά σας και να αναδείξουμε το δυναμικό που υπάρχει μέσα σας, ξεπερνώντας τα εμπόδια που σας κρατούν μακριά από τη ζωή που επιθυμείτε.</p>
+            <p>Αγαπημένη μου φράση "Κάθε στιγμή είναι η κατάλληλη στιγμή για μια νέα αρχή".</p>
+        `
+
+        // 1. Get the Root Node
+        const rootNodeId = "ROOT"
+
+        // 2. Create the Navbar Node
+        const navbarNode = query.createNode(<Navbar />)
+
+        // 3. Create the Hero Node with custom content
+        const heroNode = query.createNode(<Hero content={greekContent} />)
+
+        // 4. Add them to the canvas
+        if (navbarNode && navbarNode.data.type) {
+            actions.add(navbarNode, rootNodeId)
+        }
+        if (heroNode && heroNode.data.type) {
+            actions.add(heroNode, rootNodeId)
+        }
+    }
 
     return (
         <>
@@ -143,6 +177,16 @@ export function CraftHeader({
                                 title="Undo (Ctrl+Z)"
                             >
                                 <Undo className="h-4 w-4" />
+                            </Button>
+
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-blue-600 hover:bg-blue-50"
+                                onClick={handleQuickSetup}
+                                title="Quick Setup (Demo)"
+                            >
+                                <LayoutTemplate className="h-4 w-4" />
                             </Button>
                             <Button
                                 variant="ghost"

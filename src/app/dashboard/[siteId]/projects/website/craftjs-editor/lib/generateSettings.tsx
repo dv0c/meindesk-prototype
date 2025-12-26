@@ -4,7 +4,9 @@
 import React, { useState } from 'react'
 import { useNode } from '@craftjs/core'
 import { useParams } from 'next/navigation'
-import { PropertySection, PropertyRow, PropertyInput, PropertySlider, PropertySelect, PropertyColor, PropertyCheckbox } from '../components/PropertySection'
+import { PropertySection, PropertyRow, PropertyInput, PropertySlider, PropertySelect, PropertyColor, PropertyCheckbox, PropertyRichText, PropertySpacing, PropertyShadowSelect } from '../components/PropertySection'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Box, Palette, WholeWord } from 'lucide-react'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { ImageIcon } from 'lucide-react'
@@ -33,7 +35,7 @@ import { CSS } from "@dnd-kit/utilities"
  */
 export interface PropConfig {
     label: string
-    type?: 'text' | 'number' | 'textarea' | 'color' | 'select' | 'checkbox' | 'media' | 'slider' | 'array'
+    type?: 'text' | 'number' | 'textarea' | 'color' | 'select' | 'checkbox' | 'media' | 'slider' | 'array' | 'richtext'
     placeholder?: string
     options?: { label: string; value: string | number }[]
     min?: number
@@ -139,175 +141,192 @@ export function generateSettings<P extends Record<string, any>>(
         })
         const summary = summaryParts.slice(0, 2).join(', ')
 
+
         return (
-            <div>
-                <PropertySection title={sectionTitle} summary={summary}>
-                    {Object.entries(config).map(([propName, propConfig]) => {
-                        const defaultValue = defaultProps?.[propName]
-                        const normalized = normalizeConfig(propName, propConfig, defaultValue !== undefined ? defaultValue : props[propName])
-                        const value = props[propName]
+            <div className="flex flex-col h-full">
+                <div className="flex-1 overflow-auto space-y-4">
+                    <PropertySection title={sectionTitle} summary={summary}>
+                        {Object.entries(config).map(([propName, propConfig]) => {
+                            const defaultValue = defaultProps?.[propName]
+                            const normalized = normalizeConfig(propName, propConfig, defaultValue !== undefined ? defaultValue : props[propName])
+                            const value = props[propName]
 
-                        // Text input
-                        if (normalized.type === 'text' || normalized.type === 'number') {
-                            return (
-                                <PropertyRow key={propName} label={normalized.label}>
-                                    <PropertyInput
-                                        type={normalized.type}
-                                        value={value || ''}
-                                        onChange={(v) => setProp((p: P) => {
-                                            p[propName] = normalized.type === 'number' ? Number(v) : v
-                                        })}
-                                        placeholder={normalized.placeholder}
-                                        min={normalized.min}
-                                        max={normalized.max}
-                                        step={normalized.step}
-                                    />
-                                </PropertyRow>
-                            )
-                        }
-
-                        // Textarea
-                        if (normalized.type === 'textarea') {
-                            return (
-                                <PropertyRow key={propName} label={normalized.label}>
-                                    <Textarea
-                                        value={value || ''}
-                                        onChange={(e) => setProp((p: P) => {
-                                            p[propName] = e.target.value
-                                        })}
-                                        placeholder={normalized.placeholder}
-                                        rows={normalized.rows || 3}
-                                        className="text-xs"
-                                    />
-                                </PropertyRow>
-                            )
-                        }
-
-                        // Color picker
-                        if (normalized.type === 'color') {
-                            return (
-                                <PropertyRow key={propName} label={normalized.label}>
-                                    <PropertyColor
+                            // Rich Text
+                            if (normalized.type === 'richtext') {
+                                return (
+                                    <PropertyRichText
+                                        key={propName}
+                                        label={normalized.label}
                                         value={value || ''}
                                         onChange={(v) => setProp((p: P) => {
                                             p[propName] = v
                                         })}
-                                        placeholder={normalized.placeholder}
                                     />
-                                </PropertyRow>
-                            )
-                        }
+                                )
+                            }
 
-                        // Select dropdown
-                        if (normalized.type === 'select' && normalized.options) {
-                            return (
-                                <PropertyRow key={propName} label={normalized.label}>
-                                    <PropertySelect
-                                        value={String(value || normalized.options[0]?.value || '')}
+                            // Text input
+                            if (normalized.type === 'text' || normalized.type === 'number') {
+                                return (
+                                    <PropertyRow key={propName} label={normalized.label}>
+                                        <PropertyInput
+                                            type={normalized.type}
+                                            value={value || ''}
+                                            onChange={(v) => setProp((p: P) => {
+                                                p[propName] = normalized.type === 'number' ? Number(v) : v
+                                            })}
+                                            placeholder={normalized.placeholder}
+                                            min={normalized.min}
+                                            max={normalized.max}
+                                            step={normalized.step}
+                                        />
+                                    </PropertyRow>
+                                )
+                            }
+
+                            // Textarea
+                            if (normalized.type === 'textarea') {
+                                return (
+                                    <PropertyRow key={propName} label={normalized.label}>
+                                        <Textarea
+                                            value={value || ''}
+                                            onChange={(e) => setProp((p: P) => {
+                                                p[propName] = e.target.value
+                                            })}
+                                            placeholder={normalized.placeholder}
+                                            rows={normalized.rows || 3}
+                                            className="text-xs"
+                                        />
+                                    </PropertyRow>
+                                )
+                            }
+
+                            // Color picker
+                            if (normalized.type === 'color') {
+                                return (
+                                    <PropertyRow key={propName} label={normalized.label}>
+                                        <PropertyColor
+                                            value={value || ''}
+                                            onChange={(v) => setProp((p: P) => {
+                                                p[propName] = v
+                                            })}
+                                            placeholder={normalized.placeholder}
+                                        />
+                                    </PropertyRow>
+                                )
+                            }
+
+                            // Select dropdown
+                            if (normalized.type === 'select' && normalized.options) {
+                                return (
+                                    <PropertyRow key={propName} label={normalized.label}>
+                                        <PropertySelect
+                                            value={String(value || normalized.options[0]?.value || '')}
+                                            onChange={(v) => setProp((p: P) => {
+                                                p[propName] = v
+                                            })}
+                                            options={normalized.options.map(opt => ({
+                                                label: opt.label,
+                                                value: String(opt.value)
+                                            }))}
+                                        />
+                                    </PropertyRow>
+                                )
+                            }
+
+                            // Checkbox
+                            if (normalized.type === 'checkbox') {
+                                return (
+                                    <PropertyCheckbox
+                                        key={propName}
+                                        id={propName}
+                                        label={normalized.label}
+                                        checked={Boolean(value)}
                                         onChange={(v) => setProp((p: P) => {
                                             p[propName] = v
                                         })}
-                                        options={normalized.options.map(opt => ({
-                                            label: opt.label,
-                                            value: String(opt.value)
-                                        }))}
                                     />
-                                </PropertyRow>
-                            )
-                        }
+                                )
+                            }
 
-                        // Checkbox
-                        if (normalized.type === 'checkbox') {
-                            return (
-                                <PropertyCheckbox
-                                    key={propName}
-                                    id={propName}
-                                    label={normalized.label}
-                                    checked={Boolean(value)}
-                                    onChange={(v) => setProp((p: P) => {
-                                        p[propName] = v
-                                    })}
-                                />
-                            )
-                        }
+                            // Slider
+                            if (normalized.type === 'slider') {
+                                return (
+                                    <PropertyRow key={propName} label={normalized.label}>
+                                        <PropertySlider
+                                            value={Number(value) || 0}
+                                            onChange={(v) => setProp((p: P) => {
+                                                p[propName] = v
+                                            })}
+                                            min={normalized.min}
+                                            max={normalized.max}
+                                            step={normalized.step}
+                                            unit={normalized.unit}
+                                        />
+                                    </PropertyRow>
+                                )
+                            }
 
-                        // Slider
-                        if (normalized.type === 'slider') {
-                            return (
-                                <PropertyRow key={propName} label={normalized.label}>
-                                    <PropertySlider
-                                        value={Number(value) || 0}
-                                        onChange={(v) => setProp((p: P) => {
-                                            p[propName] = v
-                                        })}
-                                        min={normalized.min}
-                                        max={normalized.max}
-                                        step={normalized.step}
-                                        unit={normalized.unit}
-                                    />
-                                </PropertyRow>
-                            )
-                        }
-
-                        // Media selector
-                        if (normalized.type === 'media') {
-                            return (
-                                <PropertyRow key={propName} label={normalized.label}>
-                                    <div className="flex flex-col gap-2 w-full">
-                                        {value ? (
-                                            <div className="relative group w-full aspect-video bg-muted rounded-md overflow-hidden border border-border">
-                                                <img
-                                                    src={value}
-                                                    alt="Preview"
-                                                    className="w-full h-full object-cover"
-                                                />
-                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                    <Button
-                                                        variant="secondary"
-                                                        size="sm"
-                                                        className="h-8 text-xs"
-                                                        onClick={() => openMediaDialog(propName)}
-                                                    >
-                                                        Change Image
-                                                    </Button>
+                            // Media selector
+                            if (normalized.type === 'media') {
+                                return (
+                                    <PropertyRow key={propName} label={normalized.label}>
+                                        <div className="flex flex-col gap-2 w-full">
+                                            {value ? (
+                                                <div className="relative group w-full aspect-video bg-muted rounded-md overflow-hidden border border-border">
+                                                    <img
+                                                        src={value}
+                                                        alt="Preview"
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                        <Button
+                                                            variant="secondary"
+                                                            size="sm"
+                                                            className="h-8 text-xs"
+                                                            onClick={() => openMediaDialog(propName)}
+                                                        >
+                                                            Change Image
+                                                        </Button>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        ) : (
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="w-full flex items-center justify-center gap-2 h-20 border-dashed"
-                                                onClick={() => openMediaDialog(propName)}
-                                            >
-                                                <ImageIcon className="w-5 h-5 text-muted-foreground" />
-                                                <span className="text-muted-foreground">Select Image</span>
-                                            </Button>
-                                        )}
-                                    </div>
-                                </PropertyRow>
-                            )
-                        }
+                                            ) : (
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="w-full flex items-center justify-center gap-2 h-20 border-dashed"
+                                                    onClick={() => openMediaDialog(propName)}
+                                                >
+                                                    <ImageIcon className="w-5 h-5 text-muted-foreground" />
+                                                    <span className="text-muted-foreground">Select Image</span>
+                                                </Button>
+                                            )}
+                                        </div>
+                                    </PropertyRow>
+                                )
+                            }
 
-                        // Array of objects (Sortable List)
-                        if (normalized.type === 'array' && normalized.arrayFields) {
-                            return (
-                                <ArrayEditor
-                                    key={propName}
-                                    propName={propName}
-                                    label={normalized.label}
-                                    value={value as any[]}
-                                    arrayFields={normalized.arrayFields}
-                                    onChange={(newValue) => setProp((p: P) => {
-                                        p[propName] = newValue
-                                    })}
-                                />
-                            )
-                        }
+                            // Array of objects (Sortable List)
+                            if (normalized.type === 'array' && normalized.arrayFields) {
+                                return (
+                                    <ArrayEditor
+                                        key={propName}
+                                        propName={propName}
+                                        label={normalized.label}
+                                        value={value as any[]}
+                                        arrayFields={normalized.arrayFields}
+                                        onChange={(newValue) => setProp((p: P) => {
+                                            p[propName] = newValue
+                                        })}
+                                    />
+                                )
+                            }
 
-                        return null
-                    })}
-                </PropertySection>
-
+                            return null
+                        })}
+                    </PropertySection>
+                </div>
+                {/* Dialogs outside to avoid clipping */}
                 <MediaLibraryDialog
                     siteId={siteId}
                     isOpen={isDialogOpen}
