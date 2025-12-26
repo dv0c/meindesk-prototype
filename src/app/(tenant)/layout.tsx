@@ -262,7 +262,7 @@ export async function generateMetadata(): Promise<Metadata> {
       images: seo.ogImage ? [seo.ogImage] : undefined,
     },
     icons: {
-      icon: settings.favicon || '/favicon.ico'
+      icon: settings.favicon
     },
   };
 

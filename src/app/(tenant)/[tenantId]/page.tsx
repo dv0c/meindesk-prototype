@@ -1,23 +1,18 @@
 
-import { notFound } from "next/navigation"
+import { getCachedSiteDetails } from "@/lib/actions/helpers/cached-tenant"
 import { db } from "@/lib/db"
-import { isValidObjectId } from "@/lib/actions/helpers/cached-tenant"
-import ClientPreview from "./ClientPreview"
 import { PageData } from "@/lib/types"
 import { Metadata } from "next"
+import { notFound } from "next/navigation"
+import ClientPreview from "./ClientPreview"
 
 interface PreviewPageProps {
   params: { tenantId: string }
 }
 
 async function getPageData(tenantId: string) {
-  if (!isValidObjectId(tenantId)) return null
-
-  // Fetch tenant/site
-  const tenant = await db.site.findUnique({
-    where: { id: tenantId },
-    select: { id: true, title: true, description: true, home_Id: true, settings: true },
-  })
+  // Fetch tenant/site using cached helper with smart fallback
+  const tenant = await getCachedSiteDetails(tenantId)
 
   if (!tenant || !tenant.home_Id) return null
 
@@ -75,9 +70,9 @@ export async function generateMetadata({ params }: PreviewPageProps): Promise<Me
       images: seo.ogImage ? [{ url: seo.ogImage }] : [],
       type: 'website',
     },
-    icons: {
-      icon: seo.favicon || (tenant.settings as any)?.favicon || '/favicon.ico'
-    },
+    icons: seo.favicon || (tenant.settings as any)?.favicon ? {
+      icon: seo.favicon || (tenant.settings as any)?.favicon
+    } : undefined,
     robots: {
       index: !seo.preventIndexing,
       follow: !seo.preventIndexing,

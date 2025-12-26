@@ -3,20 +3,15 @@
 import { notFound } from "next/navigation"
 import { db } from "@/lib/db"
 import type { PageData } from "@/lib/types"
-import { isValidObjectId } from "@/lib/actions/helpers/cached-tenant"
+import { isValidObjectId, getCachedSiteDetails } from "@/lib/actions/helpers/cached-tenant"
 import ClientPreview from "../ClientPreview" // adjust path if needed
 
 import { Metadata } from "next"
 
 // Shared data fetcher
 async function getPageData(tenantId: string, slug: string) {
-  if (!isValidObjectId(tenantId)) return null
-
-  // 1. Confirm tenant exists
-  const tenant = await db.site.findUnique({
-    where: { id: tenantId },
-    select: { id: true, title: true, description: true, settings: true },
-  })
+  // Fetch tenant/site using cached helper with smart fallback
+  const tenant = await getCachedSiteDetails(tenantId)
   if (!tenant) return null
 
   // 2. Get the specific page under that tenant
@@ -71,9 +66,9 @@ export async function generateMetadata({
       images: seo.ogImage ? [{ url: seo.ogImage }] : [],
       type: 'website',
     },
-    icons: {
-      icon: seo.favicon || (tenant.settings as any)?.favicon || '/favicon.ico'
-    },
+    icons: seo.favicon || (tenant.settings as any)?.favicon ? {
+      icon: seo.favicon || (tenant.settings as any)?.favicon
+    } : undefined,
     robots: {
       index: !seo.preventIndexing,
       follow: !seo.preventIndexing,
