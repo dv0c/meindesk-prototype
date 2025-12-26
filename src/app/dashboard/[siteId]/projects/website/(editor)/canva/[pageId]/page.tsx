@@ -149,6 +149,7 @@ function EditorWithDesign({ resolver, pageName, setPageName, pageStatus, setPage
 // Inner component that has access to useEditor
 function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLocked, setIsLocked, deviceMode, setDeviceMode, isSaving, setIsSaving, showSidebar, setShowSidebar, siteId, pageId, getCanvasWidth, getCssVariables }: any) {
     const { query, actions } = useEditor()
+    const { settings, updateSettings, registerSaveHandler } = useDesign()
     const [isLoading, setIsLoading] = useState(true)
     const hasLoaded = useRef(false)
 
@@ -166,6 +167,11 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                     setPageName(page.title || "Untitled Page")
                     setPageStatus(page.status || "DRAFT")
                     setIsLocked(page.locked || false)
+
+                    // Load Design Settings if available
+                    if (page.meta && page.meta.design) {
+                        updateSettings(page.meta.design)
+                    }
 
                     // Deserialize the layout into CraftJS
                     // Layout is stored as Json[] with the CraftJS state as first element
@@ -200,6 +206,10 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                 body: JSON.stringify({
                     name: pageName,
                     status: pageStatus,
+                    // Save design settings in meta
+                    meta: {
+                        design: settings
+                    },
                     // CraftJS serializes to JSON string, Prisma expects Json[] so wrap in array
                     layout: [JSON.parse(json)],
                 }),
@@ -217,7 +227,12 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
         } finally {
             setIsSaving(false)
         }
-    }, [query, pageName, pageStatus, siteId, pageId, setIsSaving])
+    }, [query, pageName, pageStatus, siteId, pageId, setIsSaving, settings])
+
+    // Register the save handler with DesignContext so DesignPanel can use it
+    useEffect(() => {
+        registerSaveHandler(handleSave)
+    }, [registerSaveHandler, handleSave])
 
     return (
         <div className="h-screen flex flex-col bg-muted/10 overflow-hidden">

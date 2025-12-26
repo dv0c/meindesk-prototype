@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useDesign } from "./DesignContext"
+import { fontPairings, isFontshare, FontPairing } from "@/lib/design-system"
 import { HexColorPicker } from "react-colorful"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { motion, AnimatePresence } from "framer-motion"
@@ -173,9 +174,6 @@ function ColorsPanel({ onBack, design, setDesign }: {
                 <button onClick={onBack} className="flex items-center gap-1 text-sm hover:text-foreground text-muted-foreground">
                     <ChevronLeft className="w-4 h-4" />
                     Back
-                </button>
-                <button className="px-4 py-2 bg-foreground text-background rounded-lg text-sm font-medium">
-                    Save
                 </button>
             </div>
 
@@ -362,9 +360,6 @@ function ButtonsPanel({ onBack, primaryColor }: { onBack: () => void; primaryCol
                 <button onClick={onBack} className="flex items-center gap-1 text-sm hover:text-foreground text-muted-foreground">
                     <ChevronLeft className="w-4 h-4" />
                     Back
-                </button>
-                <button className="px-4 py-2 bg-foreground text-background rounded-lg text-sm font-medium">
-                    Save
                 </button>
             </div>
 
@@ -585,9 +580,6 @@ function FormsPanel({ onBack }: { onBack: () => void }) {
                     <ChevronLeft className="w-4 h-4" />
                     Back
                 </button>
-                <button className="px-4 py-2 bg-foreground text-background rounded-lg text-sm font-medium">
-                    Save
-                </button>
             </div>
 
             <h2 className="text-2xl font-bold">Forms</h2>
@@ -667,67 +659,7 @@ function FormsPanel({ onBack }: { onBack: () => void }) {
 }
 
 // Font options - supporting both Google Fonts and Fontshare
-interface FontPairing {
-    id: string
-    heading: string
-    body: string
-    type?: "google" | "fontshare" // Default to google if undefined
-}
-
-const fontPairings: FontPairing[] = [
-    // --- Sans-serif Pairings ---
-    { id: "inter", heading: "Inter", body: "Inter" }, // Google
-    { id: "poppins-inter", heading: "Poppins", body: "Inter" }, // Google
-    { id: "clash-display", heading: "Clash Display", body: "Clash Grotesk", type: "fontshare" },
-    { id: "plein-switzer", heading: "Plein", body: "Switzer", type: "fontshare" },
-    { id: "bricolage-manrope", heading: "Bricolage Grotesque", body: "Manrope" }, // Google
-    { id: "syne-space", heading: "Syne", body: "Space Grotesk" }, // Google
-    { id: "pilcrow-archivo", heading: "Pilcrow Rounded", body: "Archivo", type: "fontshare" },
-    { id: "outfit-switzer", heading: "Outfit", body: "Switzer", type: "fontshare" }, // Outfit is Google, Switzer is Fontshare - mixed need handling
-    { id: "oswald-source", heading: "Oswald", body: "Source Sans 3" }, // Google
-    { id: "roboto-inconsolata", heading: "Roboto", body: "Inconsolata" }, // Google
-    { id: "general-gambetta", heading: "General Sans", body: "Gambetta", type: "fontshare" },
-    { id: "chubbo-supreme", heading: "Chubbo", body: "Supreme", type: "fontshare" },
-
-    // --- Serif Pairings ---
-    { id: "instrument", heading: "Instrument Serif", body: "Instrument Sans" }, // Google
-    { id: "libre-caslon", heading: "Libre Caslon Condensed", body: "Inter" }, // Google (Text/Condensed)
-    { id: "ibm-plex", heading: "IBM Plex Serif", body: "IBM Plex Sans" }, // Google
-    { id: "merriweather", heading: "Merriweather", body: "Merriweather Sans" }, // Google
-    { id: "fraunces-mona", heading: "Fraunces", body: "Mona Sans", type: "fontshare" }, // Fraunces is Google, Mona is Fontshare
-    { id: "bespoke-serif", heading: "Bespoke Serif", body: "Bespoke Sans", type: "fontshare" },
-    { id: "alegreya", heading: "Alegreya", body: "Source Sans 3" }, // Google
-    { id: "fraunces-inter", heading: "Fraunces", body: "Inter" }, // Google
-    { id: "playfair", heading: "Playfair Display", body: "Libre Franklin" }, // Google
-    { id: "boska-switzer", heading: "Boska", body: "Switzer", type: "fontshare" },
-    { id: "roboto-slab", heading: "Roboto Slab", body: "Open Sans" }, // Google
-
-    // --- Monospace / Tech ---
-    { id: "inconsolata-karla", heading: "Inconsolata", body: "Karla" }, // Google
-    { id: "jetbrains", heading: "JetBrains Mono", body: "JetBrains Mono" }, // Google
-    { id: "space-lora", heading: "Space Grotesk", body: "Lora" }, // Google
-
-    // --- Single/Other Fonts (as options) --- 
-    { id: "general-sans", heading: "General Sans", body: "General Sans", type: "fontshare" },
-    { id: "satoshi", heading: "Satoshi", body: "Satoshi", type: "fontshare" },
-    { id: "cabinet", heading: "Cabinet Grotesk", body: "Cabinet Grotesk", type: "fontshare" },
-    { id: "supreme", heading: "Supreme", body: "Supreme", type: "fontshare" },
-    { id: "switzer", heading: "Switzer", body: "Switzer", type: "fontshare" },
-    { id: "work-sans", heading: "Work Sans", body: "Work Sans" }, // Google
-    { id: "figtree", heading: "Figtree", body: "Figtree" }, // Google
-    { id: "source-sans", heading: "Source Sans 3", body: "Source Sans 3" }, // Google
-]
-
-// Determine if a specific font name is likely Fontshare based on known list if type isn't explicit on the pair
-// Or simply load all unique names from their respective sources. 
-const isFontshare = (fontName: string) => {
-    const fontshareFonts = [
-        "General Sans", "Clash Display", "Clash Grotesk", "Plein", "Switzer",
-        "Pilcrow Rounded", "Gambetta", "Chubbo", "Supreme", "Mona Sans",
-        "Bespoke Serif", "Bespoke Sans", "Boska", "Satoshi", "Cabinet Grotesk"
-    ]
-    return fontshareFonts.includes(fontName)
-}
+// Font options imported from shared lib
 
 // Fonts Detail Panel
 function FontsPanel({ onBack }: { onBack: () => void }) {

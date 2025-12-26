@@ -4,6 +4,8 @@ import { useEffect, memo } from "react"
 import { Editor, Frame } from "@craftjs/core"
 import { resolverWithFallback } from "@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/user-components/registry"
 import { PageData } from "@/lib/types"
+import { DesignSystemStyles } from "@/components/DesignSystemStyles"
+import { DesignSettings } from "@/lib/design-system"
 
 interface ClientPreviewProps {
   tenantId: string
@@ -43,8 +45,12 @@ function ClientPreview({ tenantId, page }: ClientPreviewProps) {
     )
   }
 
+  // Extract design settings from page metadata
+  const designSettings = (page as any).meta?.design as DesignSettings | undefined
+
   return (
     <main>
+      <DesignSystemStyles settings={designSettings} />
       <Editor
         enabled={false} // Read-only mode
         resolver={resolverWithFallback}

@@ -2,58 +2,18 @@
 
 import React, { createContext, useContext, useState, useMemo, useCallback } from "react"
 
-export interface DesignSettings {
-    // Colors
-    background: string
-    neutral: string
-    primary: string
-    secondary: string
-    tertiary: string
+import { DesignSettings, defaultSettings, getDesignCssVariables } from "@/lib/design-system"
 
-    // Fonts
-    baseFont: string
-    headingFont: string
-    headingWeight: string
-
-    // Buttons
-    buttonShape: "rounded" | "pill" | "soft" | "square"
-    buttonStyle: "filled" | "outline" | "ghost"
-    buttonSize: "sm" | "md" | "lg"
-    buttonBorder: "0" | "1" | "2"
-
-    // Forms
-    formShape: "rounded" | "pill" | "soft" | "square"
-    formStyle: "fill" | "outline"
-
-    // Theme selection
-    selectedTheme: string | null
-    selectedPalette: string | null
-}
-
-const defaultSettings: DesignSettings = {
-    background: "#ffffff",
-    neutral: "#1a1b20",
-    primary: "#3a69f3",
-    secondary: "#f0f0f2",
-    tertiary: "#f7f8f8",
-    baseFont: "Inter",
-    headingFont: "Inter",
-    headingWeight: "Medium",
-    buttonShape: "rounded",
-    buttonStyle: "filled",
-    buttonSize: "md",
-    buttonBorder: "0",
-    formShape: "soft",
-    formStyle: "outline",
-    selectedTheme: "default",
-    selectedPalette: "default",
-}
+// Re-export for compatibility if needed, but prefer importing from lib
+export type { DesignSettings }
 
 interface DesignContextType {
     settings: DesignSettings
     updateSettings: (updates: Partial<DesignSettings>) => void
     resetSettings: () => void
-    getCssVariables: () => string
+    saveDesign: () => Promise<void>
+    registerSaveHandler: (handler: () => Promise<void>) => void
+    isSaving: boolean
 }
 
 const DesignContext = createContext<DesignContextType | null>(null)
@@ -64,6 +24,9 @@ const defaultContextValue: DesignContextType = {
     updateSettings: () => { },
     resetSettings: () => { },
     getCssVariables: () => "",
+    saveDesign: async () => { },
+    registerSaveHandler: () => { },
+    isSaving: false,
 }
 
 export function useDesign() {
@@ -85,6 +48,8 @@ export function DesignProvider({ children, initialSettings }: DesignProviderProp
         ...defaultSettings,
         ...initialSettings,
     })
+    const [isSaving, setIsSaving] = useState(false)
+    const saveHandlerRef = React.useRef<(() => Promise<void>) | null>(null)
 
     const updateSettings = useCallback((updates: Partial<DesignSettings>) => {
         setSettings((prev) => ({ ...prev, ...updates }))
@@ -94,35 +59,26 @@ export function DesignProvider({ children, initialSettings }: DesignProviderProp
         setSettings(defaultSettings)
     }, [])
 
+    const registerSaveHandler = useCallback((handler: () => Promise<void>) => {
+        saveHandlerRef.current = handler
+    }, [])
+
+    const saveDesign = useCallback(async () => {
+        if (saveHandlerRef.current) {
+            setIsSaving(true)
+            try {
+                await saveHandlerRef.current()
+            } finally {
+                setIsSaving(false)
+            }
+        } else {
+            console.warn("No save handler registered (DesignContext)")
+        }
+    }, [])
+
     // Generate CSS variables for injection into canvas
     const getCssVariables = useCallback(() => {
-        const borderRadius = settings.buttonShape === "square" ? "0px"
-            : settings.buttonShape === "soft" ? "8px"
-                : "9999px"
-
-        return `
-            --primary: ${settings.primary};
-            --primary-foreground: #ffffff;
-            --background: ${settings.background};
-            --foreground: ${settings.neutral};
-            --muted: ${settings.secondary};
-            --muted-foreground: ${settings.neutral}aa;
-            --border: ${settings.secondary};
-            
-            --font-sans: ${settings.baseFont}, sans-serif;
-            --font-serif: ${settings.headingFont}, serif;
-
-            --design-primary: ${settings.primary};
-            --design-secondary: ${settings.secondary};
-            --design-background: ${settings.background};
-            --design-neutral: ${settings.neutral};
-            --design-tertiary: ${settings.tertiary};
-            --design-font-base: ${settings.baseFont}, sans-serif;
-            --design-font-heading: ${settings.headingFont}, sans-serif;
-            --design-font-weight-heading: ${settings.headingWeight === "Bold" ? "700" : settings.headingWeight === "SemiBold" ? "600" : settings.headingWeight === "Medium" ? "500" : "400"};
-            --design-button-radius: ${borderRadius};
-            --design-button-style: ${settings.buttonStyle};
-        `
+        return getDesignCssVariables(settings)
     }, [settings])
 
     const value = useMemo(
@@ -131,8 +87,11 @@ export function DesignProvider({ children, initialSettings }: DesignProviderProp
             updateSettings,
             resetSettings,
             getCssVariables,
+            saveDesign,
+            registerSaveHandler,
+            isSaving,
         }),
-        [settings, updateSettings, resetSettings, getCssVariables]
+        [settings, updateSettings, resetSettings, getCssVariables, saveDesign, registerSaveHandler, isSaving]
     )
 
     return (
