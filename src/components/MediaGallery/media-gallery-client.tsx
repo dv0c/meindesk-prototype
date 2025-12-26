@@ -246,7 +246,7 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
           onSuccess={handleUploadSuccess}
           onError={handleUploadError}
           onClose={() => setIsUploading(false)}
-          uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "esiln4yu"}
+          uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "prototype"}
         >
           <Button disabled={isUploading}>
             {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UploadCloud className="mr-2 h-4 w-4" />}

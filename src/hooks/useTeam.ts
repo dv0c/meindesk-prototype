@@ -1,7 +1,7 @@
 "use client"
 
 import axios from "axios"
-import { usePathname, useSearchParams } from "next/navigation"
+import { usePathname, useSearchParams, useRouter } from "next/navigation"
 import { useEffect, useState, useRef, useMemo } from "react"
 
 export interface Site {
@@ -39,6 +39,7 @@ const fetchPromises = new Map<string, Promise<Site>>()
 export function useTeam(fallbackId?: string, tenantPrefix?: string) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const router = useRouter()
   const mounted = useRef(true)
 
   // 1. Resolve ID logic
@@ -188,10 +189,29 @@ export function useTeam(fallbackId?: string, tenantPrefix?: string) {
           return
         }
 
-        // 3. Give up
+        // 3. All fallbacks exhausted - redirect to valid team or setup
+        console.warn(`Team not found for ID: ${idToUse}, redirecting...`)
+
+        // Clear the invalid team from localStorage
+        if (typeof window !== "undefined") {
+          localStorage.removeItem(LOCAL_STORAGE_KEY)
+          // Also clear from cache if it was somehow cached
+          teamCache.delete(idToUse)
+        }
+
         setError(err.response?.data?.error || err.message || "Failed to fetch site")
         setTeam(null)
         setLoading(false)
+
+        // Redirect to setup page if this was a 404 (team deleted)
+        if (err.response?.status === 404 || err.response?.status === 403) {
+          // Redirect after a small delay to allow state updates
+          setTimeout(() => {
+            if (mounted.current) {
+              router.replace("/setup")
+            }
+          }, 100)
+        }
       }
     }
 

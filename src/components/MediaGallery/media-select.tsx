@@ -90,8 +90,8 @@ function MediaItemCard({
   return (
     <div
       className={`relative aspect-square rounded-lg overflow-hidden cursor-pointer border-2 transition-all duration-200 group ${isSelected
-          ? "border-primary shadow-lg scale-[1.02] ring-2 ring-primary/20"
-          : "border-transparent hover:border-primary/40 hover:shadow-md hover:scale-[1.02]"
+        ? "border-primary shadow-lg scale-[1.02] ring-2 ring-primary/20"
+        : "border-transparent hover:border-primary/40 hover:shadow-md hover:scale-[1.02]"
         }`}
       onClick={onSelect}
       onMouseEnter={handleMouseEnter}
@@ -356,7 +356,7 @@ export default function MediaLibraryDialog({
                     upload_source: "media_gallery",
                   },
                 }}
-                uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "esiln4yu"}
+                uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "prototype"}
                 onSuccess={handleUploadSuccess}
                 className={`w-full h-full border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 ${isDragging
                   ? "border-primary bg-primary/5 scale-[0.98]"

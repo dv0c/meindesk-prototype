@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import axios from "axios"
 
 export interface Site {
@@ -34,6 +34,12 @@ export interface Site {
 let teamsCache: Site[] | null = null
 let teamsFetchPromise: Promise<Site[]> | null = null
 
+// Function to clear the global cache (callable from outside the hook)
+export function clearTeamsCache() {
+  teamsCache = null
+  teamsFetchPromise = null
+}
+
 export function useTeams() {
   const [teams, setTeams] = useState<Site[]>(() => teamsCache || [])
   const [loading, setLoading] = useState<boolean>(() => !teamsCache)
@@ -47,42 +53,53 @@ export function useTeams() {
     }
   }, [])
 
-  useEffect(() => {
-    // If we already have data in cache, we might want to background refresh or just use it.
-    // For now, if we have cache, we just ensure loading is false.
-    if (teamsCache) {
+  const fetchTeams = useCallback(async (force = false) => {
+    // If force refresh, clear cache
+    if (force) {
+      teamsCache = null
+      teamsFetchPromise = null
+    }
+
+    // If we already have data in cache and not forcing, use it
+    if (teamsCache && !force) {
       setTeams(teamsCache)
       setLoading(false)
       return
     }
 
-    const fetchTeams = async () => {
-      if (!teamsFetchPromise) {
-        teamsFetchPromise = axios.get<{ teams: Site[] }>("/api/team").then(res => res.data.teams)
-      }
+    setLoading(true)
 
-      try {
-        const data = await teamsFetchPromise
-        teamsCache = data
-        if (mounted.current) {
-          setTeams(data)
-          setLoading(false)
-          setError(null)
-        }
-      } catch (err: any) {
-        // Reset promise on error so we can retry later
-        teamsFetchPromise = null
-        if (mounted.current) {
-          setError(err.response?.data?.error || err.message || "Failed to fetch teams")
-          setTeams([])
-          setLoading(false)
-        }
-      }
+    if (!teamsFetchPromise) {
+      teamsFetchPromise = axios.get<{ teams: Site[] }>("/api/team").then(res => res.data.teams)
     }
 
-    fetchTeams()
+    try {
+      const data = await teamsFetchPromise
+      teamsCache = data
+      if (mounted.current) {
+        setTeams(data)
+        setLoading(false)
+        setError(null)
+      }
+    } catch (err: any) {
+      // Reset promise on error so we can retry later
+      teamsFetchPromise = null
+      if (mounted.current) {
+        setError(err.response?.data?.error || err.message || "Failed to fetch teams")
+        setTeams([])
+        setLoading(false)
+      }
+    }
   }, [])
 
-  // Expose a mutate function if needed in future to clear cache
-  return { teams, loading, error }
+  useEffect(() => {
+    fetchTeams()
+  }, [fetchTeams])
+
+  // Mutate function to refresh teams list
+  const mutate = useCallback(() => {
+    fetchTeams(true)
+  }, [fetchTeams])
+
+  return { teams, loading, error, mutate }
 }

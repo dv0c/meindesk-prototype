@@ -106,14 +106,19 @@ export async function PUT(
     // Determine final slug
     // ------------------------
     // Determine final slug
-    let finalSlug: string;
+    let finalSlug = page.slug;
 
-    // Treat any slug starting with "untitled" as empty
-    if (!body.slug || /^untitled/i.test(body.slug)) {
-      finalSlug = await generateSlug(body.name, "page", siteId);
-    } else {
+    // If a new slug is explicitly provided and not "untitled", use it
+    if (body.slug && !/^untitled/i.test(body.slug)) {
       finalSlug = body.slug;
     }
+    // Otherwise, if the CURRENT page slug is "untitled" (and no new valid slug provided), 
+    // try to generate a real one from the name.
+    else if (!page.slug || /^untitled/i.test(page.slug)) {
+      finalSlug = await generateSlug(body.name, "page", siteId);
+    }
+    // Else: Keep existing page.slug
+    // This prevents "home" -> "home-1" when body.slug is missing in generic updates
 
 
 

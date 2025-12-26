@@ -1,8 +1,9 @@
 "use client"
 
-import { useEffect, useMemo, memo } from "react"
-import RenderNodePreview from "./RenderNodePreview"
-import type { PageData } from "@/lib/types"
+import { useEffect, memo } from "react"
+import { Editor, Frame } from "@craftjs/core"
+import { resolverWithFallback } from "@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/user-components/registry"
+import { PageData } from "@/lib/types"
 
 interface ClientPreviewProps {
   tenantId: string
@@ -10,39 +11,50 @@ interface ClientPreviewProps {
 }
 
 function ClientPreview({ tenantId, page }: ClientPreviewProps) {
-  // Optimize localStorage update - only run when tenantId changes
+  // Set teamId in localStorage for any components that need it
   useEffect(() => {
     if (typeof window !== "undefined") {
       localStorage.setItem("teamId_session-key", tenantId)
     }
   }, [tenantId])
 
-  // Memoize the rendered layout nodes to prevent re-creating on every render
-  const renderedLayout = useMemo(() => {
-    if (page.layout.length === 0) {
-      return (
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <p className="text-lg text-muted-foreground">This page is empty</p>
-            <p className="text-sm text-muted-foreground mt-2">Add components in the editor to see them here</p>
-          </div>
-        </div>
-      )
-    }
+  // CraftJS stores layout as [craftState] where craftState is the serialized editor state
+  // The craftState is a flat object with stringified JSON
+  // We need to pass the serialized string to the Frame json prop, or deserialized object?
+  // <Frame json={...}> accepts the serialized JSON string.
 
+  // page.layout is Json[] from Prisma. 
+  // In page.tsx (editor), we save implementation:
+  // layout: [JSON.parse(json)] where json is query.serialize() which returns a string.
+  // So page.layout[0] is an Object (the deserialized state).
+
+  // CraftJS Frame `json` prop expects a string.
+  const craftStateObj = page.layout?.[0]
+  const craftStateJson = craftStateObj ? JSON.stringify(craftStateObj) : null
+
+  if (!craftStateJson) {
     return (
-      <main>
-        {page.layout.map((node) => (
-          <RenderNodePreview key={node.id} node={node} tenantId={tenantId} />
-        ))}
-      </main>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <p className="text-lg text-muted-foreground">This page is empty</p>
+          <p className="text-sm text-muted-foreground mt-2">Add components in the editor to see them here</p>
+        </div>
+      </div>
     )
-  }, [page.layout])
+  }
 
   return (
-    <div>
-      <main>{renderedLayout}</main>
-    </div>
+    <main>
+      <Editor
+        enabled={false} // Read-only mode
+        resolver={resolverWithFallback}
+      >
+        <Frame json={craftStateJson}>
+          {/* Frame content is hydrated from json, children here are ignored/replaced */}
+          <div />
+        </Frame>
+      </Editor>
+    </main>
   )
 }
 

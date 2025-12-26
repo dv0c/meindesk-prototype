@@ -1,6 +1,7 @@
 // app/api/team/[siteId]/route.ts
 import { getAuthSession } from "@/lib/auth"; // your auth helper
 import { db } from "@/lib/db"; // Prisma client
+import { deleteResourcesByTag } from "@/lib/cloudinary";
 import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -75,7 +76,16 @@ export async function DELETE(
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
 
-    // 4. Delete the site and any related records if necessary
+    // 4. Delete all Cloudinary images tagged with this siteId
+    try {
+      const cloudinaryResult = await deleteResourcesByTag(siteId);
+      console.log(`Deleted ${cloudinaryResult.deleted} Cloudinary resources for site ${siteId}`);
+    } catch (cloudinaryError) {
+      console.error("Failed to delete Cloudinary resources, continuing with site deletion:", cloudinaryError);
+      // Continue with site deletion even if Cloudinary cleanup fails
+    }
+
+    // 5. Delete the site and any related records if necessary
     // Also triple-check if user owns the site
     await db.site.delete({
       where: { id: siteId, userId: session.user.id },

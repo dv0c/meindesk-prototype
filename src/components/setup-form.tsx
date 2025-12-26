@@ -10,6 +10,7 @@ import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { createSite } from "@/lib/actions/site/create-site-action" // Your server action
+import { clearTeamsCache } from "@/hooks/useTeams"
 import { Label } from "@/components/ui/label";
 import { Link2Icon } from "lucide-react";
 
@@ -92,7 +93,10 @@ export function SetupForm({ className, ...props }: React.ComponentProps<"div">) 
         throw new Error(res?.error);
       }
 
-      // 4. Success: Redirect
+      // 4. Success: Clear teams cache so it refreshes on navigation
+      clearTeamsCache()
+
+      // 5. Redirect to new team dashboard
       router.push("/dashboard/" + res.id)
 
     } catch (err: any) {
