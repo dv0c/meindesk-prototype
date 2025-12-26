@@ -125,6 +125,7 @@ export const fontPairings: FontPairing[] = [
     { id: "work-sans", heading: "Work Sans", body: "Work Sans" }, // Google
     { id: "figtree", heading: "Figtree", body: "Figtree" }, // Google
     { id: "source-sans", heading: "Source Sans 3", body: "Source Sans 3" }, // Google
+    { id: "literata", heading: "Literata", body: "Literata" }, // Google
 ]
 
 export const isFontshare = (fontName: string) => {

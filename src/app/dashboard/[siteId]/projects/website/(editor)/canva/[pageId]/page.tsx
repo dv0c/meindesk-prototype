@@ -3,6 +3,7 @@
 import { Editor, Element, Frame, useEditor } from "@craftjs/core"
 import { use, useCallback, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
+import { Button as UIButton } from "@/components/ui/button"
 import { CraftHeader } from "./components/CraftHeader"
 import { CraftSidebar } from "./components/CraftSidebar"
 import { RenderNode } from "./components/RenderNode"
@@ -247,60 +248,81 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
 
     return (
         <div className="h-screen flex flex-col bg-muted/10 overflow-hidden">
-            {/* Header */}
-            <CraftHeader
-                pageName={pageName}
-                setPageName={setPageName}
-                pageStatus={pageStatus}
-                setPageStatus={setPageStatus}
-                isLocked={isLocked}
-                deviceMode={deviceMode}
-                setDeviceMode={setDeviceMode}
-                onSave={handleSave}
-                isSaving={isSaving}
-                showSidebar={showSidebar}
-                setShowSidebar={setShowSidebar}
-                siteId={siteId}
-            />
+            {/* Mobile/Tablet Warning Overlay */}
+            <div className="flex md:hidden flex-col items-center justify-center h-full p-6 text-center bg-background">
+                <div className="w-16 h-16 bg-muted rounded-2xl flex items-center justify-center mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
+                        <rect width="20" height="14" x="2" y="3" rx="2" />
+                        <line x1="8" x2="16" y1="21" y2="21" />
+                        <line x1="12" x2="12" y1="17" y2="21" />
+                    </svg>
+                </div>
+                <h2 className="text-xl font-semibold mb-2">Desktop Only</h2>
+                <p className="text-muted-foreground max-w-xs mb-6">
+                    The website editor is optimized for desktop experience. Please open this page on a larger screen to edit your site.
+                </p>
+                <UIButton onClick={() => window.history.back()} variant="outline">
+                    Go Back
+                </UIButton>
+            </div>
 
-            {/* Main Content */}
-            <div className="flex-1 flex h-full overflow-hidden">
-                {/* Sidebar */}
-                {showSidebar && <CraftSidebar />}
+            {/* Desktop Editor Interface */}
+            <div className="hidden md:flex flex-col h-full overflow-hidden">
+                {/* Header */}
+                <CraftHeader
+                    pageName={pageName}
+                    setPageName={setPageName}
+                    pageStatus={pageStatus}
+                    setPageStatus={setPageStatus}
+                    isLocked={isLocked}
+                    deviceMode={deviceMode}
+                    setDeviceMode={setDeviceMode}
+                    onSave={handleSave}
+                    isSaving={isSaving}
+                    showSidebar={showSidebar}
+                    setShowSidebar={setShowSidebar}
+                    siteId={siteId}
+                />
 
-                {/* Canvas Area */}
-                <div className="flex-1 h-full overflow-hidden flex flex-col relative">
-                    <div className="overflow-auto h-full bg-zinc-50 dark:bg-zinc-900 p-5">
-                        <div
-                            className="canvas-preview shadow-lg transition-all duration-300 mx-auto h-full overflow-y-auto overflow-x-hidden"
-                            style={{
-                                width: getCanvasWidth(),
-                                minHeight: "100%",
-                                backgroundColor: "var(--design-background, #ffffff)",
-                                containerType: "inline-size",
-                                ...Object.fromEntries(
-                                    getCssVariables()
-                                        .split(';')
-                                        .filter((s: string) => s.trim())
-                                        .map((s: string) => {
-                                            const [key, value] = s.split(':').map((x: string) => x.trim())
-                                            return [key, value]
-                                        })
-                                )
-                            }}
-                        >
-                            <Frame>
-                                <Element
-                                    is={Container}
-                                    canvas
-                                    minHeight="100vh"
-                                    flexDirection="column"
-                                    alignItems="stretch"
-                                    custom={{ displayName: "App", isDeletable: false }}
-                                >
-                                    {/* Components will be added here */}
-                                </Element>
-                            </Frame>
+                {/* Main Content */}
+                <div className="flex-1 flex h-full overflow-hidden">
+                    {/* Sidebar */}
+                    {showSidebar && <CraftSidebar />}
+
+                    {/* Canvas Area */}
+                    <div className="flex-1 h-full overflow-hidden flex flex-col relative">
+                        <div className="overflow-auto h-full bg-zinc-50 dark:bg-zinc-900 p-5">
+                            <div
+                                className="canvas-preview shadow-lg transition-all duration-300 mx-auto h-full overflow-y-auto overflow-x-hidden"
+                                style={{
+                                    width: getCanvasWidth(),
+                                    minHeight: "100%",
+                                    backgroundColor: "var(--design-background, #ffffff)",
+                                    containerType: "inline-size",
+                                    ...Object.fromEntries(
+                                        getCssVariables()
+                                            .split(';')
+                                            .filter((s: string) => s.trim())
+                                            .map((s: string) => {
+                                                const [key, value] = s.split(':').map((x: string) => x.trim())
+                                                return [key, value]
+                                            })
+                                    )
+                                }}
+                            >
+                                <Frame>
+                                    <Element
+                                        is={Container}
+                                        canvas
+                                        minHeight="100vh"
+                                        flexDirection="column"
+                                        alignItems="stretch"
+                                        custom={{ displayName: "App", isDeletable: false }}
+                                    >
+                                        {/* Components will be added here */}
+                                    </Element>
+                                </Frame>
+                            </div>
                         </div>
                     </div>
                 </div>

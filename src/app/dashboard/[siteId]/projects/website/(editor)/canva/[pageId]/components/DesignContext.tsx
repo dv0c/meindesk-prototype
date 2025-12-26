@@ -14,6 +14,7 @@ interface DesignContextType {
     saveDesign: () => Promise<void>
     registerSaveHandler: (handler: () => Promise<void>) => void
     isSaving: boolean
+    getCssVariables: () => string
 }
 
 const DesignContext = createContext<DesignContextType | null>(null)
