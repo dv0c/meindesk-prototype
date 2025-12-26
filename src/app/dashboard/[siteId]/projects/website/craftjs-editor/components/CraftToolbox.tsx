@@ -4,48 +4,12 @@ import { useEditor, Element } from "@craftjs/core"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
-import { Search, Box, Type, Heading as HeadingIcon, Image as ImageIcon, LayoutGrid, Minus, Square, Navigation, Link as LinkIcon, Sparkles } from "lucide-react"
-import {
-    Container,
-    Heading,
-    Text,
-    Button,
-    Image,
-    Grid,
-    Divider,
-    Spacer,
-    Navbar,
-    NavigationLinks,
-    componentDefinitions,
-} from "../user-components"
+import { Search } from "lucide-react"
+import { componentRegistry, componentDefinitions } from "../user-components"
 import { useMarketplaceSafe } from "./MarketplaceContext"
 import { Badge } from "@/components/ui/badge"
+import { Sparkles } from "lucide-react"
 
-const iconMap: Record<string, React.ReactNode> = {
-    Container: <Box className="h-5 w-5" />,
-    Grid: <LayoutGrid className="h-5 w-5" />,
-    Heading: <HeadingIcon className="h-5 w-5" />,
-    Text: <Type className="h-5 w-5" />,
-    Button: <Square className="h-5 w-5" />,
-    Image: <ImageIcon className="h-5 w-5" />,
-    Divider: <Minus className="h-5 w-5" />,
-    Spacer: <Box className="h-5 w-5" />,
-    Navbar: <Navigation className="h-5 w-5" />,
-    NavigationLinks: <LinkIcon className="h-5 w-5" />,
-}
-
-const componentMap: Record<string, React.ComponentType<any>> = {
-    Container,
-    Heading,
-    Text,
-    Button,
-    Image,
-    Grid,
-    Divider,
-    Spacer,
-    Navbar,
-    NavigationLinks,
-}
 
 export function CraftToolbox() {
     const { connectors } = useEditor()
@@ -113,18 +77,23 @@ export function CraftToolbox() {
                             <div className="grid grid-cols-2 gap-2">
                                 {filteredComponents
                                     .filter((c) => c.category === category)
-                                    .map((component) => {
-                                        const Component = componentMap[component.name]
-                                        // Determine if this component accepts children
-                                        const isContainer = component.name === "Container" || component.name === "Grid"
-                                        const themeName = getComponentTheme(component.name)
+                                    .map((componentDef) => {
+                                        // Find the full registration from the registry
+                                        const registration = componentRegistry.find(
+                                            (r) => r.name === componentDef.name
+                                        )
+
+                                        if (!registration) return null
+
+                                        const Component = registration.component
+                                        const themeName = getComponentTheme(componentDef.name)
 
                                         return (
                                             <div
-                                                key={component.name}
+                                                key={componentDef.name}
                                                 ref={(ref) => {
                                                     if (ref) {
-                                                        if (isContainer) {
+                                                        if (registration.isContainer) {
                                                             connectors.create(ref, <Element is={Component} canvas />)
                                                         } else {
                                                             connectors.create(ref, <Component />)
@@ -143,10 +112,10 @@ export function CraftToolbox() {
                                                     </Badge>
                                                 )}
                                                 <div className="text-muted-foreground group-hover:text-primary transition-colors">
-                                                    {iconMap[component.name] || <Box className="h-5 w-5" />}
+                                                    {registration.icon}
                                                 </div>
                                                 <span className="text-xs font-medium mt-2 text-center leading-tight">
-                                                    {component.name}
+                                                    {componentDef.name}
                                                 </span>
                                             </div>
                                         )

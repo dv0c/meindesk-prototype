@@ -3,6 +3,7 @@
 import { useNode, useEditor } from "@craftjs/core"
 import { useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
+import { CraftContextMenu } from "./CraftContextMenu"
 
 interface RenderNodeProps {
     render: React.ReactElement
@@ -10,7 +11,7 @@ interface RenderNodeProps {
 
 export const RenderNode = ({ render }: RenderNodeProps) => {
     const { id } = useNode()
-    const { isActive, isHovered, dom, name, moveable, deletable, parent, isResizable } = useNode(
+    const { isActive, isHovered, dom, name, moveable, deletable, parent, isResizable, connectors } = useNode(
         (node) => ({
             isActive: node.events.selected,
             isHovered: node.events.hovered,
@@ -21,10 +22,11 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
             parent: node.data.parent,
             isResizable: node.data.custom?.resizable === true ||
                 ["Container", "Image", "Spacer", "Grid"].includes(node.data.displayName || node.data.name || ""),
+            connectors: node.related.connectors,
         })
     )
 
-    const { actions, enabled, isParentOfSelected } = useEditor((state) => {
+    const { actions, enabled, isParentOfSelected, query } = useEditor((state) => {
         const selected = state.events.selected
         let isParent = false
         if (selected.size > 0) {
@@ -55,6 +57,81 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
         x: number
         y: number
     } | null>(null)
+    const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null)
+
+    // Handle right-click
+    const handleContextMenu = (e: React.MouseEvent) => {
+        if (!enabled) return
+        e.preventDefault()
+        e.stopPropagation()
+
+        // Select the node first
+        actions.selectNode(id)
+
+        // Show context menu
+        setContextMenu({ x: e.clientX, y: e.clientY })
+    }
+
+    // Listen for custom events from context menu
+    useEffect(() => {
+        const handleDuplicate = (e: CustomEvent) => {
+            if (e.detail.nodeId === id) {
+                try {
+                    const nodeTree = query.node(id).toSerializedNode()
+                    if (parent) {
+                        // Parse the serialized node to get a proper tree
+                        const parsedTree = query.parseSerializedNode(nodeTree).toNode()
+                        actions.add(parsedTree, parent)
+                    }
+                } catch (err) {
+                    console.error("Error duplicating node:", err)
+                }
+            }
+        }
+
+        const handleMoveUp = (e: CustomEvent) => {
+            if (e.detail.nodeId === id && parent) {
+                const parentNode = query.node(parent).get()
+                const childNodes = parentNode.data.nodes || []
+                const currentIndex = childNodes.indexOf(id)
+
+                if (currentIndex > 0) {
+                    actions.move(id, parent, currentIndex - 1)
+                }
+            }
+        }
+
+        const handleMoveDown = (e: CustomEvent) => {
+            if (e.detail.nodeId === id && parent) {
+                const parentNode = query.node(parent).get()
+                const childNodes = parentNode.data.nodes || []
+                const currentIndex = childNodes.indexOf(id)
+
+                if (currentIndex < childNodes.length - 1) {
+                    actions.move(id, parent, currentIndex + 1)
+                }
+            }
+        }
+
+        const handleDeleteNode = (e: CustomEvent) => {
+            // Only prevent deletion if this is a direct child of ROOT
+            if (e.detail.nodeId === id && deletable && parent !== 'ROOT') {
+                actions.delete(id)
+            }
+        }
+
+        window.addEventListener('craftjs-duplicate', handleDuplicate as EventListener)
+        window.addEventListener('craftjs-moveup', handleMoveUp as EventListener)
+        window.addEventListener('craftjs-movedown', handleMoveDown as EventListener)
+        window.addEventListener('craftjs-delete', handleDeleteNode as EventListener)
+
+        return () => {
+            window.removeEventListener('craftjs-duplicate', handleDuplicate as EventListener)
+            window.removeEventListener('craftjs-moveup', handleMoveUp as EventListener)
+            window.removeEventListener('craftjs-movedown', handleMoveDown as EventListener)
+            window.removeEventListener('craftjs-delete', handleDeleteNode as EventListener)
+        }
+    }, [id, parent, actions, query])
 
     // Update positions when element changes or scrolls
     useEffect(() => {
@@ -138,7 +215,10 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
     }
 
     const handleDelete = () => {
-        actions.delete(id)
+        // Only prevent deletion if this is a direct child of ROOT
+        if (deletable && parent !== 'ROOT') {
+            actions.delete(id)
+        }
     }
 
     const handleResizeMouseDown = (e: React.MouseEvent) => {
@@ -334,7 +414,9 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
 
     return (
         <>
-            {render}
+            <div onContextMenu={handleContextMenu}>
+                {render}
+            </div>
 
             {/* Render indicator as a portal outside the component DOM */}
             {enabled && indicatorPosition && (isHovered || isActive) && typeof window !== "undefined" && createPortal(
@@ -385,7 +467,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                             </svg>
                         </button>
                     )}
-                    {deletable && (
+                    {deletable && parent !== 'ROOT' && (
                         <button
                             onClick={handleDelete}
                             style={{
@@ -607,6 +689,18 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                         {spacingDrag.value}px
                     </span>
                 </div>,
+                document.body
+            )}
+
+            {/* Context Menu */}
+            {contextMenu && typeof window !== "undefined" && createPortal(
+                <CraftContextMenu
+                    x={contextMenu.x}
+                    y={contextMenu.y}
+                    nodeId={id}
+                    onClose={() => setContextMenu(null)}
+                    isTopLevel={parent === 'ROOT'}
+                />,
                 document.body
             )}
         </>

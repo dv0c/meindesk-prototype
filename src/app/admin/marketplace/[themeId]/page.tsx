@@ -18,19 +18,15 @@ import { toast } from "sonner"
 // @ts-ignore
 import { CldUploadButton, type CldUploadWidgetResults } from "next-cloudinary"
 
-// CraftJS component definitions (these are the components available in CraftJS)
-const CRAFTJS_COMPONENTS = [
-    { name: "Container", category: "Layout", description: "A container for grouping elements" },
-    { name: "Grid", category: "Layout", description: "A responsive grid layout" },
-    { name: "Heading", category: "Typography", description: "A heading element (h1-h6)" },
-    { name: "Text", category: "Typography", description: "A paragraph of text" },
-    { name: "Button", category: "Interactive", description: "A clickable button" },
-    { name: "Image", category: "Media", description: "An image element" },
-    { name: "Divider", category: "Layout", description: "A horizontal divider line" },
-    { name: "Spacer", category: "Layout", description: "Vertical spacing element" },
-    { name: "Navbar", category: "Navigation", description: "Professional navbar with top bar and banner" },
-    { name: "NavigationLinks", category: "Navigation", description: "Styled navigation links list" },
-]
+import { componentRegistry } from "@/app/dashboard/[siteId]/projects/website/craftjs-editor/user-components/registry"
+
+// Use the actual CraftJS registry instead of hardcoded list
+const CRAFTJS_COMPONENTS = componentRegistry.map(comp => ({
+    name: comp.name,
+    category: comp.category,
+    description: comp.description,
+    isCore: comp.isCore || false,
+}))
 
 interface ThemeBlock {
     id?: string

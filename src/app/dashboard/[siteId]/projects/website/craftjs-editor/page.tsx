@@ -6,24 +6,14 @@ import { toast } from "sonner"
 import { CraftHeader } from "./components/CraftHeader"
 import { CraftSidebar } from "./components/CraftSidebar"
 import { RenderNode } from "./components/RenderNode"
-import { Button, Container, Divider, Grid, Heading, Image, NavigationLinks, Spacer, Text } from "./user-components"
+import { Button, Container, Divider, Grid, Heading, Image, NavigationLinks, Spacer, Text, Card, componentMap } from "./user-components"
 import { Navbar } from "./user-components/Navbar"
 import { DesignProvider, useDesign } from "./components/DesignContext"
 import { MarketplaceProvider } from "./components/MarketplaceContext"
 
-// Resolver for all user components
-const resolver = {
-    Container,
-    Heading,
-    Text,
-    Button,
-    Image,
-    Grid,
-    Divider,
-    Spacer,
-    Navbar,
-    NavigationLinks,
-}
+// Resolver for all user components - now using componentMap from registry
+// This automatically includes all components registered in registry.tsx
+const resolver = componentMap
 
 export default function CraftJSEditorPage({ params }: { params: { siteId: string } }) {
     const { siteId } = use(params as unknown as Promise<{ siteId: string }>)

@@ -160,14 +160,16 @@ export function MarketplaceProvider({ children }: MarketplaceProviderProps) {
         }
     }, [siteId, fetchInstalledThemes])
 
-    // Check if a component is available
+    // Check if a component is available (from installed themes)
     const isComponentAvailable = useCallback((componentName: string) => {
-        // If no themes are loaded yet, allow all (prevents flash of missing components)
-        if (isLoading || installedThemes.length === 0) {
-            return true
+        // If no themes are loaded yet, show nothing (prevents showing unavailable components)
+        if (isLoading) {
+            return false
         }
+
+        // Component must be in an installed theme to be available
         return availableComponents.includes(componentName)
-    }, [availableComponents, isLoading, installedThemes.length])
+    }, [availableComponents, isLoading])
 
     const value: MarketplaceContextType = {
         installedThemes,

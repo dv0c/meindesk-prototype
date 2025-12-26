@@ -3,11 +3,10 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { ArrowLeft, Monitor, Tablet, Smartphone, Save, Eye, Undo, Redo, SidebarClose, Layers, LayoutTemplate } from "lucide-react"
+import { ArrowLeft, Monitor, Tablet, Smartphone, Save, Eye, Undo, Redo, SidebarClose, Layers, LayoutTemplate, FileCode } from "lucide-react"
 import { useEditor } from "@craftjs/core"
 import Link from "next/link"
 import { CraftLayersPopup } from "./CraftLayers"
-import { TemplatesDialog } from "./TemplatesDialog"
 
 interface CraftHeaderProps {
     pageName: string
@@ -32,14 +31,17 @@ export function CraftHeader({
     setShowSidebar,
     siteId,
 }: CraftHeaderProps) {
-    const { actions, canUndo, canRedo, enabled } = useEditor((state, query) => ({
-        canUndo: query.history.canUndo(),
-        canRedo: query.history.canRedo(),
-        enabled: state.options.enabled,
-    }))
+    const { actions, canUndo, canRedo, enabled, selected } = useEditor((state, query) => {
+        const currentNodeId = state.events.selected?.values().next().value
+        return {
+            canUndo: query.history.canUndo(),
+            canRedo: query.history.canRedo(),
+            enabled: state.options.enabled,
+            selected: currentNodeId,
+        }
+    })
 
     const [showLayers, setShowLayers] = useState(false)
-    const [showTemplates, setShowTemplates] = useState(false)
 
     return (
         <>
@@ -109,20 +111,6 @@ export function CraftHeader({
                 <div className="flex items-center gap-2">
                     {enabled && (
                         <>
-                            {/* Templates Button */}
-                            <Button
-                                variant={showTemplates ? "secondary" : "ghost"}
-                                size="sm"
-                                className="h-8 px-2"
-                                onClick={() => setShowTemplates(true)}
-                                title="Insert Template"
-                            >
-                                <LayoutTemplate className="h-4 w-4 mr-2" />
-                                Templates
-                            </Button>
-
-                            <div className="h-6 w-px bg-border/50 mx-1" />
-
                             {/* Layers Toggle */}
                             <Button
                                 variant={showLayers ? "secondary" : "ghost"}
@@ -192,13 +180,11 @@ export function CraftHeader({
                         {isSaving ? "Saving..." : "Save"}
                     </Button>
                 </div>
-            </header>
+            </header >
 
             {/* Floating Layers Popup */}
-            <CraftLayersPopup isOpen={showLayers} onClose={() => setShowLayers(false)} />
-
-            {/* Templates Dialog */}
-            <TemplatesDialog open={showTemplates} onOpenChange={setShowTemplates} />
+            < CraftLayersPopup isOpen={showLayers} onClose={() => setShowLayers(false)
+            } />
         </>
     )
 }
