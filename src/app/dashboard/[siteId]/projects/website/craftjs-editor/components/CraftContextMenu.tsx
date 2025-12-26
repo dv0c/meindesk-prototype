@@ -125,7 +125,7 @@ export function CraftContextMenu({ x, y, nodeId, onClose, isTopLevel = false }: 
                     {/* Divider */}
                     <div className="border-t border-border/50 my-1.5" />
 
-                    {/* Delete - only for nested nodes */}
+                    {/* Delete - show for all nodes except ROOT itself */}
                     {!isTopLevel && (
                         <ContextMenuItem
                             icon={<Trash2 className="h-4 w-4 text-destructive" />}

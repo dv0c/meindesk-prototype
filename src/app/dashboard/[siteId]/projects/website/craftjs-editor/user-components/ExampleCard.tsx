@@ -1,28 +1,23 @@
 /**
- * EXAMPLE: How to create a CraftJS component using the wrapper system
+ * EXAMPLE: Card Component with AUTO-GENERATED Settings
  * 
- * This example shows how to create a simple Card component with minimal code
- * by leveraging the wrapper system for common functionality.
+ * This example shows how to create a CraftJS component with automatic settings
+ * generation - NO manual settings code needed!
  */
 
 import React from 'react'
-import { useNode } from '@craftjs/core'
 import { withCraftComponent, CraftComponentProps, propsToStyle } from '../lib/withCraftComponent'
-import { CommonSettings, SettingsSection, SettingControl } from '../lib/CommonSettings'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 
-// 1. Define component-specific props (extends common props)
+// 1. Define component-specific props
 interface CardProps extends CraftComponentProps {
     title?: string
     content?: string
     imageUrl?: string
 }
 
-// 2. Create the base component (no CraftJS logic needed!)
+// 2. Create the base component
 const CardBase = React.forwardRef<HTMLDivElement, CardProps>(
     ({ title, content, imageUrl, ...props }, ref) => {
-        // propsToStyle converts common props to inline styles
         const style = propsToStyle(props)
 
         return (
@@ -55,7 +50,7 @@ const CardBase = React.forwardRef<HTMLDivElement, CardProps>(
 
 CardBase.displayName = 'CardBase'
 
-// 3. Wrap with CraftJS logic using HOC
+// 3. Wrap with CraftJS and AUTO-GENERATE settings!
 export const Card = withCraftComponent(CardBase, {
     displayName: 'Card',
     defaultProps: {
@@ -67,67 +62,16 @@ export const Card = withCraftComponent(CardBase, {
         paddingRight: 0,
         paddingBottom: 0,
         paddingLeft: 0,
-    }
+    },
+    // AUTO-GENERATE SETTINGS - No manual settings component needed!
+    settingsConfig: {
+        title: 'Title',
+        content: { label: 'Description', type: 'textarea', rows: 3 },
+        imageUrl: { label: 'Image', type: 'media' },
+    },
+    sectionTitle: 'Content'
 })
 
-// 4. Create Settings component (use common settings + custom ones)
-const CardSettings = () => {
-    const { actions: { setProp }, props } = useNode((node) => ({
-        props: node.data.props as CardProps
-    }))
+// That's it! Settings are automatically generated.
+// No need for manual CardSettings component! 🎉
 
-    return (
-        <div className="space-y-4 p-4">
-            {/* Custom card-specific settings */}
-            <SettingsSection title="Content">
-                <SettingControl label="Title">
-                    <Input
-                        value={props.title || ''}
-                        onChange={(e) => setProp((p: CardProps) => p.title = e.target.value)}
-                        placeholder="Enter title"
-                        className="h-8 text-xs"
-                    />
-                </SettingControl>
-
-                <SettingControl label="Description">
-                    <Textarea
-                        value={props.content || ''}
-                        onChange={(e) => setProp((p: CardProps) => p.content = e.target.value)}
-                        placeholder="Enter description"
-                        className="text-xs min-h-[60px]"
-                    />
-                </SettingControl>
-
-                <SettingControl label="Image URL">
-                    <Input
-                        value={props.imageUrl || ''}
-                        onChange={(e) => setProp((p: CardProps) => p.imageUrl = e.target.value)}
-                        placeholder="https://..."
-                        className="h-8 text-xs"
-                    />
-                </SettingControl>
-            </SettingsSection>
-
-            {/* Common settings (spacing, sizing, appearance) */}
-            <CommonSettings />
-        </div>
-    )
-}
-
-// 5. Attach settings and craft config
-Card.craft = {
-    displayName: 'Card',
-    props: {
-        title: 'Card Title',
-        content: 'Card description goes here...',
-        borderRadius: 8,
-        backgroundColor: '#ffffff',
-    },
-    related: {
-        settings: CardSettings,
-    },
-    custom: {
-        resizable: true,
-        deletable: true,
-    }
-}

@@ -25,7 +25,6 @@ const CRAFTJS_COMPONENTS = componentRegistry.map(comp => ({
     name: comp.name,
     category: comp.category,
     description: comp.description,
-    isCore: comp.isCore || false,
 }))
 
 interface ThemeBlock {
@@ -140,7 +139,6 @@ export default function ThemeEditorPage({ params }: { params: Promise<{ themeId:
                     componentDefinition: {
                         category: component?.category || "Other",
                         description: component?.description || "",
-                        isCore: false,
                     }
                 }
             })

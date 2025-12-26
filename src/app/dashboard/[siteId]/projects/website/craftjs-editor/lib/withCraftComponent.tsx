@@ -1,13 +1,11 @@
 import { useNode, UserComponent } from '@craftjs/core'
 import React from 'react'
+import { generateSettings, SettingsConfig } from './generateSettings'
 
 /**
- * Common props that all wrapped components will accept
+ * Common props that all Craft components can have
  */
 export interface CraftComponentProps {
-    className?: string
-    style?: React.CSSProperties
-
     // Spacing
     marginTop?: number
     marginRight?: number
@@ -34,6 +32,20 @@ export interface CraftComponentProps {
     borderWidth?: number
     borderColor?: string
     borderStyle?: 'solid' | 'dashed' | 'dotted' | 'none'
+
+    // Other
+    className?: string
+    style?: React.CSSProperties
+}
+
+/**
+ * Options for withCraftComponent HOC
+ */
+interface WithCraftComponentOptions<P> {
+    displayName: string
+    defaultProps?: Partial<P>
+    settingsConfig?: SettingsConfig  // NEW: Auto-generate settings
+    sectionTitle?: string  // NEW: Section title for auto-generated settings
 }
 
 /**
@@ -82,36 +94,47 @@ export function cn(...classes: (string | undefined | null | false)[]): string {
 }
 
 /**
- * Higher-Order Component that wraps CraftJS components with common logic
+ * Higher-order component that wraps a component with CraftJS functionality
  */
 export function withCraftComponent<P extends CraftComponentProps>(
-    Component: React.ComponentType<P>,
-    config?: {
-        displayName?: string
-        defaultProps?: Partial<P>
-    }
-): UserComponent<P> {
-    const WrappedComponent = (props: P) => {
+    Component: React.ForwardRefExoticComponent<P & React.RefAttributes<HTMLElement>>,
+    options: Partial<WithCraftComponentOptions<P>>
+) {
+    const WrappedComponent: React.FC<P> = (props) => {
         const { connectors: { connect, drag } } = useNode()
-
-        // Merge default props
-        const mergedProps = { ...config?.defaultProps, ...props } as P
-
-        // Convert props to styles
-        const style = propsToStyle(mergedProps)
-        const className = cn(mergedProps.className)
 
         return (
             <Component
-                {...mergedProps}
-                ref={(ref: HTMLElement | null) => ref && connect(drag(ref))}
-                style={style}
-                className={className}
+                {...props}
+                ref={(el: HTMLElement | null) => {
+                    if (el) {
+                        connect(drag(el))
+                    }
+                }}
             />
         )
     }
 
-    WrappedComponent.displayName = config?.displayName || Component.displayName || 'CraftComponent'
+    WrappedComponent.displayName = options.displayName || Component.displayName || 'WrappedComponent'
 
-    return WrappedComponent as UserComponent<P>
+    const craftComponent = WrappedComponent as unknown as UserComponent<P>
+
+    craftComponent.craft = {
+        displayName: options.displayName || 'Component',
+        props: options.defaultProps || {},
+        related: {
+            // If settingsConfig provided, auto-generate settings
+            // Otherwise, settings must be manually attached later
+            settings: options.settingsConfig
+                ? generateSettings<P>(options.settingsConfig, options.sectionTitle)
+                : undefined as any
+        },
+        custom: {
+            resizable: true,
+            deletable: true,
+        }
+    }
+
+    return craftComponent
 }
+

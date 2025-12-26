@@ -31,9 +31,11 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
         let isParent = false
         if (selected.size > 0) {
             const selectedId = selected.values().next().value
-            const node = state.nodes[selectedId]
-            if (node && node.data.parent === id) {
-                isParent = true
+            if (selectedId) {
+                const node = state.nodes[selectedId]
+                if (node && node.data.parent === id) {
+                    isParent = true
+                }
             }
         }
 
@@ -114,8 +116,8 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
         }
 
         const handleDeleteNode = (e: CustomEvent) => {
-            // Only prevent deletion if this is a direct child of ROOT
-            if (e.detail.nodeId === id && deletable && parent !== 'ROOT') {
+            // Allow deletion unless this IS the ROOT node itself
+            if (e.detail.nodeId === id && deletable && id !== 'ROOT') {
                 actions.delete(id)
             }
         }
@@ -215,8 +217,8 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
     }
 
     const handleDelete = () => {
-        // Only prevent deletion if this is a direct child of ROOT
-        if (deletable && parent !== 'ROOT') {
+        // Allow deletion unless this IS the ROOT node itself
+        if (deletable && id !== 'ROOT') {
             actions.delete(id)
         }
     }
@@ -467,7 +469,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                             </svg>
                         </button>
                     )}
-                    {deletable && parent !== 'ROOT' && (
+                    {deletable && id !== 'ROOT' && (
                         <button
                             onClick={handleDelete}
                             style={{
@@ -699,7 +701,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                     y={contextMenu.y}
                     nodeId={id}
                     onClose={() => setContextMenu(null)}
-                    isTopLevel={parent === 'ROOT'}
+                    isTopLevel={id === 'ROOT'}
                 />,
                 document.body
             )}
