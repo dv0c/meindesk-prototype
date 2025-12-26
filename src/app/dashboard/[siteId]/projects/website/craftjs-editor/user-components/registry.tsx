@@ -32,7 +32,8 @@ import { Spacer, SpacerSettings } from './Spacer'
 import { Navbar } from './Navbar'
 import { NavigationLinks, NavigationLinksSettings } from './NavigationLinks'
 import { Card } from './ExampleCard'
-import { Hero } from './Hero'
+import { Hero } from './themes/SophiaPlatanisioti/Hero'
+import { Footer } from './themes/SophiaPlatanisioti/Footer'
 
 /**
  * Component metadata interface
@@ -92,8 +93,8 @@ export const componentRegistry: ComponentRegistration[] = [
     {
         name: 'Navbar',
         component: Navbar,
-        category: 'Navigation',
-        description: 'A header navigation bar',
+        category: 'Sophia Navigation',
+        description: 'Sophia Platanisioti Header',
         icon: <Navigation className="h-5 w-5" />,
     },
     {
@@ -154,8 +155,15 @@ export const componentRegistry: ComponentRegistration[] = [
     {
         name: 'Hero',
         component: Hero,
-        category: 'Content',
+        category: 'Sophia Content',
         description: 'A rich text hero section with floating image',
+        icon: <LayoutGrid className="h-5 w-5" />,
+    },
+    {
+        name: 'Footer',
+        component: Footer,
+        category: 'Sophia Navigation',
+        description: 'Sophia Platanisioti Footer',
         icon: <LayoutGrid className="h-5 w-5" />,
     },
 

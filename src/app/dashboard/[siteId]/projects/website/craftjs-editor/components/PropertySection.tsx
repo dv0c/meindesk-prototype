@@ -350,17 +350,15 @@ interface PropertyCheckboxProps {
 
 export function PropertyCheckbox({ id, label, checked, onChange }: PropertyCheckboxProps) {
     return (
-        <div className="flex items-center gap-2">
-            <input
-                type="checkbox"
-                id={id}
-                checked={checked}
-                onChange={(e) => onChange(e.target.checked)}
-                className="h-4 w-4 rounded border"
-            />
+        <div className="flex items-center justify-between py-1">
             <label htmlFor={id} className="text-xs text-muted-foreground cursor-pointer">
                 {label}
             </label>
+            <Switch
+                id={id}
+                checked={checked}
+                onCheckedChange={onChange}
+            />
         </div>
     )
 }

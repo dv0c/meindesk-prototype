@@ -1,7 +1,7 @@
 "use client"
 
 import { Editor, Element, Frame } from "@craftjs/core"
-import { use, useCallback, useState } from "react"
+import { use, useCallback, useEffect, useState } from "react"
 import { toast } from "sonner"
 import { CraftHeader } from "./components/CraftHeader"
 import { CraftSidebar } from "./components/CraftSidebar"
@@ -70,7 +70,63 @@ export default function CraftJSEditorPage({ params }: { params: { siteId: string
 
 // Separate component to access design context
 function EditorWithDesign({ resolver, pageName, setPageName, deviceMode, setDeviceMode, onSave, isSaving, showSidebar, setShowSidebar, siteId, getCanvasWidth }: any) {
-    const { getCssVariables } = useDesign()
+    const { getCssVariables, settings } = useDesign()
+
+    // Helper to detect Fontshare fonts
+    const isFontshare = (fontName: string) => {
+        const fontshareFonts = [
+            "General Sans", "Clash Display", "Clash Grotesk", "Plein", "Switzer",
+            "Pilcrow Rounded", "Gambetta", "Chubbo", "Supreme", "Mona Sans",
+            "Bespoke Serif", "Bespoke Sans", "Boska", "Satoshi", "Cabinet Grotesk"
+        ]
+        return fontshareFonts.includes(fontName)
+    }
+
+    // Load fonts globally when settings change
+    useEffect(() => {
+        const fonts = [settings.baseFont, settings.headingFont].filter(f => f && f !== "inherit")
+        if (fonts.length === 0) return
+
+        const googleToLoad = new Set<string>()
+        const fontshareToLoad = new Set<string>()
+
+        fonts.forEach(f => {
+            if (isFontshare(f)) fontshareToLoad.add(f)
+            else googleToLoad.add(f)
+        })
+
+        // Load Google Fonts
+        if (googleToLoad.size > 0) {
+            const fontQuery = Array.from(googleToLoad).map(f => f.replace(/ /g, "+") + ":wght@300;400;500;600;700").join("&family=")
+            const linkId = "design-selected-google-fonts"
+            const existing = document.getElementById(linkId)
+            if (existing) existing.remove()
+
+            const link = document.createElement("link")
+            link.id = linkId
+            link.rel = "stylesheet"
+            link.href = `https://fonts.googleapis.com/css2?family=${fontQuery}&display=swap`
+            document.head.appendChild(link)
+        }
+
+        // Load Fontshare Fonts
+        if (fontshareToLoad.size > 0) {
+            const fsQuery = Array.from(fontshareToLoad).map(f => {
+                const kebab = f.toLowerCase().replace(/ /g, "-")
+                return `f[]=${kebab}@300,400,500,600,700`
+            }).join("&")
+
+            const linkId = "design-selected-fontshare-fonts"
+            const existing = document.getElementById(linkId)
+            if (existing) existing.remove()
+
+            const link = document.createElement("link")
+            link.id = linkId
+            link.rel = "stylesheet"
+            link.href = `https://api.fontshare.com/v2/css?${fsQuery}&display=swap`
+            document.head.appendChild(link)
+        }
+    }, [settings.baseFont, settings.headingFont])
 
     return (
         <Editor resolver={resolver} onRender={RenderNode}>

@@ -9,7 +9,7 @@ import Link from "next/link"
 import { CraftLayersPopup } from "./CraftLayers"
 import { Element } from "@craftjs/core"
 import { Navbar } from "../user-components/Navbar"
-import { Hero } from "../user-components/Hero"
+import { Hero } from "../user-components"
 
 interface CraftHeaderProps {
     pageName: string
@@ -66,7 +66,7 @@ export function CraftHeader({
         const navbarNode = query.createNode(<Navbar />)
 
         // 3. Create the Hero Node with custom content
-        const heroNode = query.createNode(<Hero content={greekContent} />)
+        const heroNode = query.createNode(<Hero content={greekContent} marginTop={50} thumbnail="https://www.sophiaplatanisioti.gr/_next/image?url=https%3A%2F%2Fres.cloudinary.com%2Fdiqgnn64x%2Fimage%2Fupload%2Fv1750415004%2F66f2bad889534a0c7ffb5fde%2Fuploads%2Fqsjvpd3vo50cz4kjuijw_vyhwn1.webp&w=828&q=100" />)
 
         // 4. Add them to the canvas
         if (navbarNode && navbarNode.data.type) {

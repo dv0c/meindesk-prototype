@@ -943,6 +943,63 @@ export function DesignPanel() {
         })
     }
 
+    // Preload all fonts used in theme presets for preview
+    useEffect(() => {
+        const uniqueFonts = new Set<string>()
+        presetThemes.forEach(theme => {
+            uniqueFonts.add(theme.headingFont)
+            uniqueFonts.add(theme.baseFont)
+        })
+
+        // Helper to check if font is Fontshare
+        const isFontshare = (fontName: string) => {
+            const fontshareFonts = [
+                "General Sans", "Clash Display", "Clash Grotesk", "Plein", "Switzer",
+                "Pilcrow Rounded", "Gambetta", "Chubbo", "Supreme", "Mona Sans",
+                "Bespoke Serif", "Bespoke Sans", "Boska", "Satoshi", "Cabinet Grotesk"
+            ]
+            return fontshareFonts.includes(fontName)
+        }
+
+        const googleFonts = new Set<string>()
+        const fontshareFonts = new Set<string>()
+
+        uniqueFonts.forEach(f => {
+            if (isFontshare(f)) fontshareFonts.add(f)
+            else googleFonts.add(f)
+        })
+
+        // Load Google Fonts for theme previews
+        if (googleFonts.size > 0) {
+            const fontQuery = Array.from(googleFonts).map(f => f.replace(/ /g, "+") + ":wght@400;500;600;700").join("&family=")
+            const linkId = "design-theme-preview-google-fonts"
+            if (!document.getElementById(linkId)) {
+                const link = document.createElement("link")
+                link.id = linkId
+                link.rel = "stylesheet"
+                link.href = `https://fonts.googleapis.com/css2?family=${fontQuery}&display=swap`
+                document.head.appendChild(link)
+            }
+        }
+
+        // Load Fontshare Fonts for theme previews
+        if (fontshareFonts.size > 0) {
+            const fsQuery = Array.from(fontshareFonts).map(f => {
+                const kebab = f.toLowerCase().replace(/ /g, "-")
+                return `f[]=${kebab}@400,500,600,700`
+            }).join("&")
+
+            const linkId = "design-theme-preview-fontshare-fonts"
+            if (!document.getElementById(linkId)) {
+                const link = document.createElement("link")
+                link.id = linkId
+                link.rel = "stylesheet"
+                link.href = `https://api.fontshare.com/v2/css?${fsQuery}&display=swap`
+                document.head.appendChild(link)
+            }
+        }
+    }, [])
+
     // Animation variants for panel transitions
     const panelVariants = {
         initial: { x: 20, opacity: 0 },
