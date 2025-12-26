@@ -41,7 +41,7 @@ const HeroBase = React.forwardRef<HTMLDivElement, HeroProps>(({
                         <img
                             width={380}
                             height={460}
-                            className="float-left mr-8 mb-5 object-cover max-w-full sm:max-w-[380px] rounded-md"
+                            className="float-left mr-8 mb-5 object-cover max-w-full sm:max-w-[380px] "
                             alt="Hero Image"
                             src={thumbnail}
                         />
