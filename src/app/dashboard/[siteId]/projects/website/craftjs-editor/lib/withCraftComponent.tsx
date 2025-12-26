@@ -157,11 +157,14 @@ export function withCraftComponent<P extends CraftComponentProps, E extends HTML
     options: Partial<WithCraftComponentOptions<P>>
 ) {
     const WrappedComponent: React.FC<P> = (props) => {
-        const { connectors: { connect, drag } } = useNode()
+        const { connectors: { connect, drag }, nodeProps } = useNode((node) => ({
+            nodeProps: node.data.props
+        }))
 
         return (
             <Component
                 {...props}
+                {...(nodeProps as Partial<P>)}
                 ref={(el: E | null) => {
                     if (el) {
                         connect(drag(el))

@@ -2,7 +2,7 @@
 "use client"
 
 import React, { useState } from 'react'
-import { useNode } from '@craftjs/core'
+import { useNode, useEditor } from '@craftjs/core'
 import { useParams } from 'next/navigation'
 import { PropertySection, PropertyRow, PropertyInput, PropertySlider, PropertySelect, PropertyColor, PropertyCheckbox, PropertyRichText, PropertySpacing, PropertyShadowSelect } from '../components/PropertySection'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -100,9 +100,22 @@ export function generateSettings<P extends Record<string, any>>(
     defaultProps?: Partial<P>
 ) {
     const GeneratedSettings = () => {
-        const { actions: { setProp }, props } = useNode((node) => ({
-            props: node.data.props as P
-        }))
+        const { actions, selectedId, nodeProps } = useEditor((state) => {
+            const [currentId] = state.events.selected
+            return {
+                selectedId: currentId,
+                nodeProps: currentId ? state.nodes[currentId].data.props : null,
+                actions: state.actions
+            }
+        })
+
+        const props = (nodeProps || {}) as P
+
+        const setProp = (cb: (props: P) => void) => {
+            if (selectedId) {
+                actions.setProp(selectedId, cb)
+            }
+        }
 
         const params = useParams()
         const siteId = params?.siteId as string
@@ -122,6 +135,8 @@ export function generateSettings<P extends Record<string, any>>(
             setIsDialogOpen(true)
         }
 
+        if (!selectedId || !nodeProps) return null
+
         // Generate summary
         const summaryParts: string[] = []
         Object.entries(config).forEach(([propName, propConfig]) => {
@@ -140,6 +155,7 @@ export function generateSettings<P extends Record<string, any>>(
             }
         })
         const summary = summaryParts.slice(0, 2).join(', ')
+
 
 
         return (
