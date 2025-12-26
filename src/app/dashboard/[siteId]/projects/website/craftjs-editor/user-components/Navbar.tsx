@@ -1,38 +1,10 @@
 "use client"
 
-import { useNode, useEditor } from "@craftjs/core"
 import React, { useState, useEffect } from "react"
-import { Menu, ChevronDown, ChevronUp, Mail, Phone, Plus, Trash2, GripVertical, ImageIcon } from "lucide-react"
+import { Menu, Mail, Phone } from "lucide-react"
 import Image from "next/image"
-import { useParams } from "next/navigation"
-import {
-    DndContext,
-    closestCenter,
-    KeyboardSensor,
-    PointerSensor,
-    useSensor,
-    useSensors,
-    DragEndEvent,
-} from "@dnd-kit/core"
-import {
-    arrayMove,
-    SortableContext,
-    sortableKeyboardCoordinates,
-    verticalListSortingStrategy,
-    useSortable,
-} from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
-import {
-    PropertySection,
-    PropertyRow,
-    PropertyColor,
-    PropertyInput,
-    PropertySlider,
-} from "../components/PropertySection"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import MediaLibraryDialog, { MediaItem } from "@/components/MediaGallery/media-select"
+import { withCraftComponent, CraftComponentProps } from '../lib/withCraftComponent'
 
 // Navigation link type with submenu support
 interface NavLink {
@@ -42,7 +14,7 @@ interface NavLink {
     submenu?: NavLink[]
 }
 
-interface NavbarProps {
+interface NavbarProps extends CraftComponentProps {
     // Brand
     brandName?: string
     tagline?: string
@@ -238,10 +210,7 @@ function FixedNav({ links, brandName, brandColor, textColor, maxWidth, isScrolle
 }) {
     return (
         <nav
-            className={cn(
-                "opacity-0 invisible fixed top-0 left-0 w-full shadow-md bg-white transition-all duration-300 z-50 px-5 border-b",
-                isScrolled && "opacity-100 visible",
-            )}
+            className={`opacity-0 invisible fixed top-0 left-0 w-full shadow-md bg-white transition-all duration-300 z-50 px-5 border-b ${isScrolled && "opacity-100 visible"}`}
         >
             <div
                 className="mx-auto md:py-5 py-5 flex justify-between lg:gap-20 items-center"
@@ -265,7 +234,8 @@ function FixedNav({ links, brandName, brandColor, textColor, maxWidth, isScrolle
     )
 }
 
-export const Navbar = ({
+// Main Navbar Component
+const NavbarComponent = React.forwardRef<HTMLDivElement, NavbarProps>(({
     brandName = "Σοφία Πλατανησιώτη",
     tagline = "Σύμβουλος Ψυχικής Υγείας",
     brandColor = "#5a5933",
@@ -287,19 +257,7 @@ export const Navbar = ({
     maxWidth = "90vw",
     bannerImage = "",
     bannerOpacity = 80,
-}: NavbarProps) => {
-    const {
-        connectors: { connect, drag },
-        selected,
-    } = useNode((state) => ({
-        selected: state.events.selected,
-    }))
-
-    const { enabled } = useEditor((state) => ({
-        enabled: state.options.enabled,
-    }))
-
-    // Simple scroll detection for the fixed nav
+}, ref) => {
     const [isScrolled, setIsScrolled] = useState(false)
 
     useEffect(() => {
@@ -312,7 +270,7 @@ export const Navbar = ({
 
     return (
         <div
-            ref={(ref) => ref && connect(drag(ref)) as any}
+            ref={ref}
             className="w-full max-w-full relative @container overflow-hidden"
             style={{ fontFamily: "var(--design-font-base, sans-serif)" }}
         >
@@ -428,632 +386,79 @@ export const Navbar = ({
             />
         </div>
     )
-}
+})
 
-// Sortable Submenu Item
-interface SortableSubmenuItemProps {
-    sub: NavLink
-    subIdx: number
-    updateSubmenuItem: (idx: number, field: string, value: string) => void
-    removeSubmenuItem: (idx: number) => void
-}
+NavbarComponent.displayName = "NavbarComponent"
 
-const SortableSubmenuItem = ({ sub, subIdx, updateSubmenuItem, removeSubmenuItem }: SortableSubmenuItemProps) => {
-    const {
-        attributes,
-        listeners,
-        setNodeRef,
-        transform,
-        transition,
-        isDragging,
-    } = useSortable({ id: sub.id || `sub-${subIdx}` })
+// Export with withCraftComponent wrapper (settings will be auto-generated)
+export const Navbar = withCraftComponent<NavbarProps>(
+    NavbarComponent,
+    {
+        displayName: 'Navbar',
+        defaultProps: {
+            brandName: "Σοφία Πλατανησιώτη",
+            tagline: "Σύμβουλος Ψυχικής Υγείας",
+            brandColor: "#5a5933",
+            navBackgroundColor: "#a9c8be",
+            textColor: "#000000",
+            topBarBackground: "#000000",
+            topBarTextColor: "#ffffff",
+            email: "platanisiotisophia@gmail.com",
+            phone: "+30 6947777532",
+            facebookUrl: "https://www.facebook.com/PlatanisiotiSophia",
+            instagramUrl: "https://www.instagram.com/sophia.platanisioti",
+            showTopBar: true,
+            maxWidth: "90vw",
+            bannerImage: "",
+            bannerOpacity: 80,
+            links: [
+                { id: "nav-1", label: "ΑΡΧΙΚΗ", href: "/" },
+                { id: "nav-2", label: "ΥΠΗΡΕΣΙΕΣ", href: "/services" },
+                { id: "nav-3", label: "ΒΙΟΓΡΑΦΙΚΟ", href: "/about" },
+                { id: "nav-4", label: "ΕΠΙΚΟΙΝΩΝΙΑ", href: "/contact" },
+            ],
+        },
+        settingsConfig: {
+            // Brand
+            brandName: { label: 'Brand Name', type: 'text' },
+            tagline: { label: 'Tagline', type: 'text' },
+            brandColor: { label: 'Brand Color', type: 'color' },
+            // Colors
+            navBackgroundColor: { label: 'Nav Background', type: 'color' },
+            textColor: { label: 'Text Color', type: 'color' },
+            topBarBackground: { label: 'Top Bar Background', type: 'color' },
+            topBarTextColor: { label: 'Top Bar Text', type: 'color' },
+            // Contact
+            email: { label: 'Email', type: 'text', placeholder: 'email@example.com' },
+            phone: { label: 'Phone', type: 'text', placeholder: '+30 123 456 789' },
+            facebookUrl: { label: 'Facebook URL', type: 'text', placeholder: 'https://facebook.com/...' },
+            instagramUrl: { label: 'Instagram URL', type: 'text', placeholder: 'https://instagram.com/...' },
+            // Layout
+            showTopBar: { label: 'Show Top Bar', type: 'checkbox' },
+            maxWidth: { label: 'Max Width', type: 'text', placeholder: '90vw' },
+            // Banner
+            bannerImage: { label: 'Banner Image', type: 'media' },
+            bannerOpacity: { label: 'Banner Opacity', type: 'slider', min: 0, max: 100, unit: '%' },
 
-    const style = {
-        transform: CSS.Transform.toString(transform),
-        transition,
-        opacity: isDragging ? 0.5 : 1,
-        zIndex: isDragging ? 999 : "auto",
-    }
-
-    return (
-        <div
-            ref={setNodeRef}
-            style={style}
-            className="group relative flex gap-2 mb-2 p-2 bg-background border border-border/50 rounded-md items-start hover:border-border transition-colors"
-        >
-            <div
-                {...attributes}
-                {...listeners}
-                className="mt-2 cursor-grab active:cursor-grabbing text-muted-foreground/30 hover:text-muted-foreground transition-colors"
-            >
-                <GripVertical size={14} />
-            </div>
-            <div className="flex-1 space-y-2">
-                <div className="space-y-1">
-                    <label className="text-[10px] uppercase text-muted-foreground font-medium">Label</label>
-                    <input
-                        value={sub.label}
-                        onChange={(e) => updateSubmenuItem(subIdx, "label", e.target.value)}
-                        placeholder="Label"
-                        className="w-full h-8 px-2 text-xs border border-input rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring"
-                    />
-                </div>
-                <div className="space-y-1">
-                    <label className="text-[10px] uppercase text-muted-foreground font-medium">URL</label>
-                    <input
-                        value={sub.href}
-                        onChange={(e) => updateSubmenuItem(subIdx, "href", e.target.value)}
-                        placeholder="URL"
-                        className="w-full h-8 px-2 text-xs border border-input rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring"
-                    />
-                </div>
-            </div>
-            <button
-                onClick={() => removeSubmenuItem(subIdx)}
-                className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors opacity-0 group-hover:opacity-100"
-            >
-                <Trash2 size={14} />
-            </button>
-        </div>
-    )
-}
-
-// Accordion-style link editor
-interface LinkEditorProps {
-    link: NavLink
-    index: number
-    isOpen: boolean
-    onToggle: () => void
-    onChange: (field: string, value: any) => void
-    onRemove: () => void
-}
-
-const LinkEditor = ({
-    link,
-    index,
-    isOpen,
-    onToggle,
-    onChange,
-    onRemove,
-}: LinkEditorProps) => {
-    const {
-        attributes,
-        listeners,
-        setNodeRef,
-        transform,
-        transition,
-        isDragging,
-    } = useSortable({ id: link.id || `link-${index}` })
-
-    const style = {
-        transform: CSS.Transform.toString(transform),
-        transition,
-        opacity: isDragging ? 0.5 : 1,
-        zIndex: isDragging ? 999 : "auto",
-        position: 'relative' as 'relative',
-    }
-
-    const sensors = useSensors(
-        useSensor(PointerSensor),
-        useSensor(KeyboardSensor, {
-            coordinateGetter: sortableKeyboardCoordinates,
-        })
-    )
-
-    const addSubmenuItem = () => {
-        const newSubmenu = [...(link.submenu || []), { id: `sub-${Date.now()}`, label: "New Submenu", href: "/" }]
-        onChange("submenu", newSubmenu)
-    }
-
-    const removeSubmenuItem = (subIndex: number) => {
-        const newSubmenu = (link.submenu || []).filter((_, i) => i !== subIndex)
-        onChange("submenu", newSubmenu.length > 0 ? newSubmenu : undefined)
-    }
-
-    const updateSubmenuItem = (subIndex: number, field: string, value: string) => {
-        const newSubmenu = [...(link.submenu || [])]
-        newSubmenu[subIndex] = { ...newSubmenu[subIndex], [field]: value }
-        onChange("submenu", newSubmenu)
-    }
-
-    const handleSubDragEnd = (event: DragEndEvent) => {
-        const { active, over } = event
-        if (over && active.id !== over.id) {
-            const currentSubmenu = link.submenu || []
-            const oldIndex = currentSubmenu.findIndex((sub) => (sub.id || `sub-${currentSubmenu.indexOf(sub)}`) === active.id)
-            const newIndex = currentSubmenu.findIndex((sub) => (sub.id || `sub-${currentSubmenu.indexOf(sub)}`) === over.id)
-
-            if (oldIndex !== -1 && newIndex !== -1) {
-                const newSubmenu = arrayMove(currentSubmenu, oldIndex, newIndex)
-                onChange("submenu", newSubmenu)
-            }
-        }
-    }
-
-    return (
-        <div
-            ref={setNodeRef}
-            style={style}
-            className={`border rounded-md overflow-hidden mb-2 bg-background ${isOpen ? 'ring-1 ring-ring border-transparent' : 'border-border'}`}
-        >
-            <div
-                className={`flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-muted/50 transition-colors ${isOpen ? 'bg-muted/30' : ''}`}
-                onClick={onToggle}
-            >
-                <div className="flex items-center gap-2 flex-1 overflow-hidden">
-                    <div
-                        {...attributes}
-                        {...listeners}
-                        onClick={(e) => e.stopPropagation()}
-                        className="cursor-grab active:cursor-grabbing p-1 -ml-1 text-muted-foreground/30 hover:text-muted-foreground transition-colors"
-                    >
-                        <GripVertical size={14} />
-                    </div>
-
-                    <span className="text-xs font-medium truncate">
-                        {link.label || `Link ${index + 1}`}
-                    </span>
-                    {link.submenu && link.submenu.length > 0 && (
-                        <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded ml-auto mr-2">
-                            {link.submenu.length}
-                        </span>
-                    )}
-                </div>
-                {isOpen ? <ChevronUp size={14} className="text-muted-foreground" /> : <ChevronDown size={14} className="text-muted-foreground" />}
-            </div>
-
-            {isOpen && (
-                <div className="p-3 space-y-3 border-t bg-muted/10">
-                    <div className="space-y-1">
-                        <label className="text-[10px] uppercase text-muted-foreground font-medium">
-                            Label
-                        </label>
-                        <input
-                            value={link.label}
-                            onChange={(e) => onChange("label", e.target.value)}
-                            className="w-full h-8 px-2 text-xs border border-input rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring"
-                        />
-                    </div>
-                    <div className="space-y-1">
-                        <label className="text-[10px] uppercase text-muted-foreground font-medium">
-                            URL
-                        </label>
-                        <input
-                            value={link.href}
-                            onChange={(e) => onChange("href", e.target.value)}
-                            className="w-full h-8 px-2 text-xs border border-input rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring"
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                            <span className="text-[10px] uppercase text-muted-foreground font-medium">Submenu Items</span>
-                            <button
-                                onClick={addSubmenuItem}
-                                className="flex items-center gap-1 px-2 py-1 h-6 text-[10px] font-medium bg-secondary text-secondary-foreground rounded hover:bg-secondary/80 transition-colors"
-                            >
-                                <Plus size={10} />
-                                Add
-                            </button>
-                        </div>
-
-                        {(!link.submenu || link.submenu.length === 0) && (
-                            <div className="text-center py-2 border border-dashed rounded-md">
-                                <p className="text-[10px] text-muted-foreground">
-                                    No submenu items
-                                </p>
-                            </div>
-                        )}
-
-                        {link.submenu && link.submenu.length > 0 && (
-                            <div className="space-y-2 pl-3 border-l-2 border-muted">
-                                <DndContext
-                                    sensors={sensors}
-                                    collisionDetection={closestCenter}
-                                    onDragEnd={handleSubDragEnd}
-                                >
-                                    <SortableContext
-                                        items={(link.submenu || []).map((sub, idx) => sub.id || `sub-${idx}`)}
-                                        strategy={verticalListSortingStrategy}
-                                    >
-                                        {link.submenu?.map((sub, subIdx) => (
-                                            <SortableSubmenuItem
-                                                key={sub.id || `sub-${subIdx}`}
-                                                sub={sub}
-                                                subIdx={subIdx}
-                                                updateSubmenuItem={updateSubmenuItem}
-                                                removeSubmenuItem={removeSubmenuItem}
-                                            />
-                                        ))}
-                                    </SortableContext>
-                                </DndContext>
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="flex justify-between items-center pt-2 mt-2 border-t">
-                        <span className="text-[10px] text-muted-foreground">
-                            ID: {link.id?.split('-')[1]}
-                        </span>
-                        <button
-                            onClick={onRemove}
-                            className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-destructive hover:bg-destructive/10 rounded transition-colors"
-                        >
-                            <Trash2 size={12} />
-                            Delete
-                        </button>
-                    </div>
-                </div>
-            )}
-        </div>
-    )
-}
-
-// Settings component for Navbar
-export const NavbarSettings = () => {
-    const {
-        actions: { setProp },
-        brandName,
-        tagline,
-        brandColor,
-        navBackgroundColor,
-        textColor,
-        topBarBackground,
-        topBarTextColor,
-        email,
-        phone,
-        facebookUrl,
-        instagramUrl,
-        showTopBar,
-        links,
-        bannerImage,
-        bannerOpacity,
-    } = useNode((node) => ({
-        brandName: node.data.props.brandName,
-        tagline: node.data.props.tagline,
-        brandColor: node.data.props.brandColor,
-        navBackgroundColor: node.data.props.navBackgroundColor,
-        textColor: node.data.props.textColor,
-        topBarBackground: node.data.props.topBarBackground,
-        topBarTextColor: node.data.props.topBarTextColor,
-        email: node.data.props.email,
-        phone: node.data.props.phone,
-        facebookUrl: node.data.props.facebookUrl,
-        instagramUrl: node.data.props.instagramUrl,
-        showTopBar: node.data.props.showTopBar,
-        links: node.data.props.links,
-        bannerImage: node.data.props.bannerImage,
-        bannerOpacity: node.data.props.bannerOpacity,
-    }))
-
-    const [openLinkIndex, setOpenLinkIndex] = useState<number | null>(null)
-    const [isBannerDialogOpen, setIsBannerDialogOpen] = useState(false)
-
-    const params = useParams()
-    const siteId = params.siteId as string
-
-    const handleBannerSelect = (items: MediaItem[]) => {
-        if (items.length > 0) {
-            const selectedImage = items[0]
-            setProp((props: NavbarProps) => {
-                props.bannerImage = selectedImage.url
-            })
-        }
-    }
-
-    // Ensure links have IDs
-    useEffect(() => {
-        if (links) {
-            let hasMissingId = false
-            const newLinks = links.map((link: NavLink) => {
-                let linkChanged = false
-                let newLink = { ...link }
-
-                if (!link.id) {
-                    hasMissingId = true
-                    linkChanged = true
-                    newLink.id = `link-${Math.random().toString(36).substr(2, 9)}`
-                }
-
-                if (link.submenu) {
-                    const newSubmenu = link.submenu.map((sub: NavLink) => {
-                        if (!sub.id) {
-                            hasMissingId = true
-                            linkChanged = true
-                            return { ...sub, id: `sub-${Math.random().toString(36).substr(2, 9)}` }
+            // Navigation Links
+            links: {
+                label: 'Navigation Links',
+                type: 'array',
+                arrayFields: {
+                    label: { label: 'Label', type: 'text' },
+                    href: { label: 'URL', type: 'text' },
+                    submenu: {
+                        label: 'Submenu Items',
+                        type: 'array',
+                        arrayFields: {
+                            label: { label: 'Label', type: 'text' },
+                            href: { label: 'URL', type: 'text' }
                         }
-                        return sub
-                    })
-                    if (JSON.stringify(newSubmenu) !== JSON.stringify(link.submenu)) {
-                        newLink.submenu = newSubmenu
-                        linkChanged = true
                     }
                 }
-                return newLink
-            })
-
-            if (hasMissingId) {
-                setProp((props: NavbarProps) => {
-                    props.links = newLinks
-                })
             }
-        }
-    }, [links, setProp])
-
-    const handleLinkChange = (index: number, field: string, value: any) => {
-        setProp((props: NavbarProps) => {
-            if (props.links) {
-                props.links = [...props.links]
-                props.links[index] = { ...props.links[index], [field]: value }
-            }
-        })
+        },
+        sectionTitle: 'Navbar Settings'
     }
+)
 
-    const addLink = () => {
-        setProp((props: NavbarProps) => {
-            const newLink = {
-                id: `link-${Date.now()}`,
-                label: "New Link",
-                href: "/"
-            }
-            props.links = [...(props.links || []), newLink]
-        })
-        setOpenLinkIndex((links || []).length)
-    }
-
-    const removeLink = (index: number) => {
-        setProp((props: NavbarProps) => {
-            props.links = (props.links || []).filter((_, i) => i !== index)
-        })
-        setOpenLinkIndex(null)
-    }
-
-    const sensors = useSensors(
-        useSensor(PointerSensor),
-        useSensor(KeyboardSensor, {
-            coordinateGetter: sortableKeyboardCoordinates,
-        })
-    )
-
-    const handleDragEnd = (event: DragEndEvent) => {
-        const { active, over } = event
-        if (over && active.id !== over.id) {
-            setProp((props: NavbarProps) => {
-                const oldIndex = (props.links || []).findIndex((item) => item.id === active.id)
-                const newIndex = (props.links || []).findIndex((item) => item.id === over.id)
-
-                if (oldIndex !== -1 && newIndex !== -1) {
-                    props.links = arrayMove(props.links || [], oldIndex, newIndex)
-                }
-            })
-        }
-    }
-
-    return (
-        <div>
-            <PropertySection title="Brand" summary={brandName}>
-                <PropertyRow label="Name">
-                    <PropertyInput
-                        value={brandName || ""}
-                        onChange={(v) => setProp((props: NavbarProps) => (props.brandName = v))}
-                        placeholder="Your Brand"
-                    />
-                </PropertyRow>
-                <PropertyRow label="Tagline">
-                    <PropertyInput
-                        value={tagline || ""}
-                        onChange={(v) => setProp((props: NavbarProps) => (props.tagline = v))}
-                        placeholder="Optional tagline"
-                    />
-                </PropertyRow>
-                <PropertyRow label="Brand Color">
-                    <PropertyColor
-                        value={brandColor || "#5a5933"}
-                        onChange={(v) => setProp((props: NavbarProps) => (props.brandColor = v))}
-                    />
-                </PropertyRow>
-            </PropertySection>
-
-            <PropertySection title="Colors" summary="" defaultOpen={false}>
-                <PropertyRow label="Nav Background">
-                    <PropertyColor
-                        value={navBackgroundColor || "#a9c8be"}
-                        onChange={(v) => setProp((props: NavbarProps) => (props.navBackgroundColor = v))}
-                        placeholder="#a9c8be"
-                    />
-                </PropertyRow>
-                <PropertyRow label="Text Color">
-                    <PropertyColor
-                        value={textColor || "#000000"}
-                        onChange={(v) => setProp((props: NavbarProps) => (props.textColor = v))}
-                    />
-                </PropertyRow>
-            </PropertySection>
-
-            <PropertySection title="Banner Image" summary="" defaultOpen={false}>
-                <PropertyRow label="Image">
-                    <div className="flex flex-col gap-2 w-full">
-                        {bannerImage ? (
-                            <div className="relative group w-full aspect-[3/1] bg-muted rounded-md overflow-hidden border border-border">
-                                <img
-                                    src={bannerImage}
-                                    alt="Banner Preview"
-                                    className="w-full h-full object-cover"
-                                />
-                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                    <Button
-                                        variant="secondary"
-                                        size="sm"
-                                        className="h-8 text-xs"
-                                        onClick={() => setIsBannerDialogOpen(true)}
-                                    >
-                                        Change
-                                    </Button>
-                                    <Button
-                                        variant="destructive"
-                                        size="sm"
-                                        className="h-8 text-xs"
-                                        onClick={() => setProp((props: NavbarProps) => (props.bannerImage = ""))}
-                                    >
-                                        Remove
-                                    </Button>
-                                </div>
-                            </div>
-                        ) : (
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="w-full flex items-center justify-center gap-2 h-16 border-dashed"
-                                onClick={() => setIsBannerDialogOpen(true)}
-                            >
-                                <ImageIcon className="w-5 h-5 text-muted-foreground" />
-                                <span className="text-muted-foreground">Select Banner Image</span>
-                            </Button>
-                        )}
-                    </div>
-                </PropertyRow>
-                <PropertyRow label="Opacity">
-                    <PropertySlider
-                        value={bannerOpacity ?? 80}
-                        onChange={(v) => setProp((props: NavbarProps) => (props.bannerOpacity = v))}
-                        min={0}
-                        max={100}
-                        unit="%"
-                    />
-                </PropertyRow>
-            </PropertySection>
-
-            <MediaLibraryDialog
-                siteId={siteId}
-                isOpen={isBannerDialogOpen}
-                onClose={() => setIsBannerDialogOpen(false)}
-                onSelect={handleBannerSelect}
-                multiSelect={false}
-            />
-
-            <PropertySection title="Top Bar" summary={showTopBar ? "Visible" : "Hidden"} defaultOpen={false}>
-                <PropertyRow label="Show Top Bar">
-                    <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-                        <input
-                            type="checkbox"
-                            checked={showTopBar}
-                            onChange={(e) => setProp((props: NavbarProps) => (props.showTopBar = e.target.checked))}
-                        />
-                        <span style={{ fontSize: 13 }}>Show top bar</span>
-                    </label>
-                </PropertyRow>
-                <PropertyRow label="Background">
-                    <PropertyColor
-                        value={topBarBackground || "#000000"}
-                        onChange={(v) => setProp((props: NavbarProps) => (props.topBarBackground = v))}
-                    />
-                </PropertyRow>
-                <PropertyRow label="Text Color">
-                    <PropertyColor
-                        value={topBarTextColor || "#ffffff"}
-                        onChange={(v) => setProp((props: NavbarProps) => (props.topBarTextColor = v))}
-                    />
-                </PropertyRow>
-            </PropertySection>
-
-            <PropertySection title="Contact Info" summary="" defaultOpen={false}>
-                <PropertyRow label="Email">
-                    <PropertyInput
-                        value={email || ""}
-                        onChange={(v) => setProp((props: NavbarProps) => (props.email = v))}
-                        placeholder="email@example.com"
-                    />
-                </PropertyRow>
-                <PropertyRow label="Phone">
-                    <PropertyInput
-                        value={phone || ""}
-                        onChange={(v) => setProp((props: NavbarProps) => (props.phone = v))}
-                        placeholder="+1 234 567 890"
-                    />
-                </PropertyRow>
-                <PropertyRow label="Facebook URL">
-                    <PropertyInput
-                        value={facebookUrl || ""}
-                        onChange={(v) => setProp((props: NavbarProps) => (props.facebookUrl = v))}
-                        placeholder="https://facebook.com/..."
-                    />
-                </PropertyRow>
-                <PropertyRow label="Instagram URL">
-                    <PropertyInput
-                        value={instagramUrl || ""}
-                        onChange={(v) => setProp((props: NavbarProps) => (props.instagramUrl = v))}
-                        placeholder="https://instagram.com/..."
-                    />
-                </PropertyRow>
-            </PropertySection>
-
-            <PropertySection title="Navigation Links" summary={`${(links || []).length} links`}>
-                <div className="space-y-3 border rounded-md p-3 bg-muted/30">
-                    <DndContext
-                        sensors={sensors}
-                        collisionDetection={closestCenter}
-                        onDragEnd={handleDragEnd}
-                    >
-                        <SortableContext
-                            items={(links || []).map((link: NavLink) => link.id || "")}
-                            strategy={verticalListSortingStrategy}
-                        >
-                            {(links || []).map((link: NavLink, index: number) => (
-                                <LinkEditor
-                                    key={link.id || index}
-                                    link={link}
-                                    index={index}
-                                    isOpen={openLinkIndex === index}
-                                    onToggle={() => setOpenLinkIndex(openLinkIndex === index ? null : index)}
-                                    onChange={(field, value) => handleLinkChange(index, field, value)}
-                                    onRemove={() => removeLink(index)}
-                                />
-                            ))}
-                        </SortableContext>
-                    </DndContext>
-
-                    <button
-                        onClick={addLink}
-                        className="w-full py-2 px-3 bg-secondary text-secondary-foreground rounded-md text-xs font-medium flex items-center justify-center gap-1.5 hover:bg-secondary/80 transition-colors"
-                    >
-                        <Plus size={14} />
-                        Add Navigation Link
-                    </button>
-                </div>
-            </PropertySection>
-        </div>
-    )
-}
-
-Navbar.craft = {
-    displayName: "Navbar",
-    props: {
-        brandName: "Σοφία Πλατανησιώτη",
-        tagline: "Σύμβουλος Ψυχικής Υγείας",
-        brandColor: "#5a5933",
-        navBackgroundColor: "#a9c8be",
-        textColor: "#000000",
-        topBarBackground: "#000000",
-        topBarTextColor: "#ffffff",
-        email: "platanisiotisophia@gmail.com",
-        phone: "+30 6947777532",
-        facebookUrl: "https://www.facebook.com/PlatanisiotiSophia",
-        instagramUrl: "https://www.instagram.com/sophia.platanisioti",
-        showTopBar: true,
-        maxWidth: "90vw",
-        bannerImage: "/banner.webp",
-        bannerOpacity: 80,
-        links: [
-            { id: "nav-1", label: "ΑΡΧΙΚΗ", href: "/" },
-            { id: "nav-2", label: "ΥΠΗΡΕΣΙΕΣ", href: "/services" },
-            { id: "nav-3", label: "ΒΙΟΓΡΑΦΙΚΟ", href: "/about" },
-            { id: "nav-4", label: "ΕΠΙΚΟΙΝΩΝΙΑ", href: "/contact" },
-        ],
-    },
-    rules: {
-        canDrag: () => true,
-    },
-    related: {
-        settings: NavbarSettings,
-    },
-}

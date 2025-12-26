@@ -28,7 +28,7 @@ import { Image, ImageSettings } from './Image'
 import { Grid, GridSettings } from './Grid'
 import { Divider, DividerSettings } from './Divider'
 import { Spacer, SpacerSettings } from './Spacer'
-import { Navbar, NavbarSettings } from './Navbar'
+import { Navbar } from './Navbar'
 import { NavigationLinks, NavigationLinksSettings } from './NavigationLinks'
 import { Card } from './ExampleCard'
 
@@ -93,7 +93,6 @@ export const componentRegistry: ComponentRegistration[] = [
         category: 'Navigation',
         description: 'A header navigation bar',
         icon: <Navigation className="h-5 w-5" />,
-        settings: NavbarSettings,
     },
     {
         name: 'NavigationLinks',
@@ -203,7 +202,6 @@ export {
     Spacer,
     SpacerSettings,
     Navbar,
-    NavbarSettings,
     NavigationLinks,
     NavigationLinksSettings,
     Card,

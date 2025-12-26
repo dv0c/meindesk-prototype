@@ -124,9 +124,9 @@ export function withCraftComponent<P extends CraftComponentProps>(
         props: options.defaultProps || {},
         related: {
             // If settingsConfig provided, auto-generate settings
-            // Otherwise, settings must be manually attached later
+            // Pass defaultProps so generateSettings can auto-detect types
             settings: options.settingsConfig
-                ? generateSettings<P>(options.settingsConfig, options.sectionTitle)
+                ? generateSettings<P>(options.settingsConfig, options.sectionTitle, options.defaultProps)
                 : undefined as any
         },
         custom: {
