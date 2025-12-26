@@ -43,7 +43,6 @@ export interface ComponentRegistration {
     icon: React.ReactNode
     settings?: React.ComponentType<any>
     isContainer?: boolean
-    isCore?: boolean  // Core components are always available, regardless of themes
 }
 
 /**
@@ -182,25 +181,6 @@ export const componentDefinitions = componentRegistry.map((item) => ({
     description: item.description,
 }))
 
-/**
- * Helper functions for admin/marketplace management
- */
-
-// Get all core components (always available)
-export const getCoreComponents = () =>
-    componentRegistry.filter(comp => comp.isCore === true)
-
-// Get all non-core components (from themes)
-export const getNonCoreComponents = () =>
-    componentRegistry.filter(comp => !comp.isCore)
-
-// Get component by name
-export const getComponentByName = (name: string) =>
-    componentRegistry.find(comp => comp.name === name)
-
-// Check if a component is core
-export const isComponentCore = (name: string) =>
-    componentRegistry.some(comp => comp.name === name && comp.isCore === true)
 
 /**
  * Re-export all components for convenience
