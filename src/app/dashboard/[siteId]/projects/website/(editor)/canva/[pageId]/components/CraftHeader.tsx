@@ -7,6 +7,8 @@ import { ArrowLeft, Monitor, Tablet, Smartphone, Save, Eye, Undo, Redo, SidebarC
 import { useEditor } from "@craftjs/core"
 import Link from "next/link"
 import { CraftLayersPopup } from "./CraftLayers"
+import { TemplatesDialog } from "./TemplatesDialog"
+import { LayoutTemplate } from "lucide-react"
 
 interface CraftHeaderProps {
     pageName: string
@@ -47,7 +49,10 @@ export function CraftHeader({
         }
     })
 
+
+
     const [showLayers, setShowLayers] = useState(false)
+    const [showTemplates, setShowTemplates] = useState(false)
 
 
 
@@ -147,6 +152,16 @@ export function CraftHeader({
                                 <SidebarClose className="h-4 w-4" />
                             </Button>
 
+                            <Button
+                                variant={showTemplates ? "secondary" : "ghost"}
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => setShowTemplates(true)}
+                                title="Templates"
+                            >
+                                <LayoutTemplate className="h-4 w-4" />
+                            </Button>
+
                             <div className="h-6 w-px bg-border/50 mx-1" />
 
                             <Button
@@ -199,8 +214,10 @@ export function CraftHeader({
             </header >
 
             {/* Floating Layers Popup */}
-            < CraftLayersPopup isOpen={showLayers} onClose={() => setShowLayers(false)
-            } />
+            <CraftLayersPopup isOpen={showLayers} onClose={() => setShowLayers(false)} />
+
+            {/* Templates Dialog */}
+            <TemplatesDialog open={showTemplates} onOpenChange={setShowTemplates} />
         </>
     )
 }

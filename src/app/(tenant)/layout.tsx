@@ -157,10 +157,7 @@ export default async function TenantLayout({ children }: { children: React.React
   // 6. Render with Global Settings
   return (
     <>
-      {/* Favicon */}
-      {settings.favicon && (
-        <link rel="icon" href={settings.favicon} />
-      )}
+
 
       {/* Google Fonts */}
       {safeFontFamily && safeFontFamily !== 'Inter' && (

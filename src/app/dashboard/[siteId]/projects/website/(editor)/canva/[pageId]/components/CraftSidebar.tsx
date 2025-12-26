@@ -4,13 +4,14 @@ import { useEditor } from "@craftjs/core"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, Trash2, FileCode } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Package, Palette, LayoutTemplate } from "lucide-react"
+import { Package, Palette, Search } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { CraftToolbox } from "./CraftToolbox"
 import { CraftPropertiesPanel } from "./CraftPropertiesPanel"
 import { GlobalStylesPanel } from "./GlobalSettings"
 import { DesignPanel } from "./DesignPanel"
-import { TemplatesDialog } from "./TemplatesDialog"
+import { SEOPanel } from "./seo"
+
 import { motion, AnimatePresence } from "framer-motion"
 import { useState, useEffect } from "react"
 
@@ -235,15 +236,8 @@ function PropertiesView({
 // Palette View Component
 const PaletteView = () => {
     const [activeTab, setActiveTab] = useState("elements")
-    const [showTemplatesDialog, setShowTemplatesDialog] = useState(false)
 
-    // When templates tab is clicked, open dialog and switch back to elements
-    useEffect(() => {
-        if (activeTab === "templates") {
-            setShowTemplatesDialog(true)
-            setActiveTab("elements") // Switch back to elements tab
-        }
-    }, [activeTab])
+
 
     return (
         <>
@@ -263,8 +257,7 @@ const PaletteView = () => {
                 >
                     <div className="p-4">
                         <motion.h2
-                            className="text-lg font-bold tracking-tight mb-4"
-                            initial={{ opacity: 0, y: -5 }}
+                            Initial={{ opacity: 0, y: -5 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
                         >
@@ -274,35 +267,36 @@ const PaletteView = () => {
                             <TabsTrigger
                                 value="elements"
                                 className={cn(
-                                    "relative flex items-center gap-1 px-2 py-2 rounded-md transition-all duration-200",
+                                    "relative flex items-center justify-center gap-1 px-1 py-2 rounded-md transition-all duration-200",
                                     "data-[state=active]:bg-background data-[state=active]:shadow-sm",
                                     "hover:bg-background/50"
                                 )}
                             >
                                 <Package className="w-4 h-4" />
-                                <span className="font-medium text-xs">Elements</span>
+                                <span className="font-medium text-[10px] sm:text-xs hidden sm:inline">Add</span>
                             </TabsTrigger>
-                            <TabsTrigger
-                                value="templates"
-                                className={cn(
-                                    "relative flex items-center gap-1 px-2 py-2 rounded-md transition-all duration-200",
-                                    "data-[state=active]:bg-background data-[state=active]:shadow-sm",
-                                    "hover:bg-background/50"
-                                )}
-                            >
-                                <LayoutTemplate className="w-4 h-4" />
-                                <span className="font-medium text-xs">Templates</span>
-                            </TabsTrigger>
+
                             <TabsTrigger
                                 value="design"
                                 className={cn(
-                                    "relative flex items-center gap-1 px-2 py-2 rounded-md transition-all duration-200",
+                                    "relative flex items-center justify-center gap-1 px-1 py-2 rounded-md transition-all duration-200",
                                     "data-[state=active]:bg-background data-[state=active]:shadow-sm",
                                     "hover:bg-background/50"
                                 )}
                             >
                                 <Palette className="w-4 h-4" />
-                                <span className="font-medium text-xs">Design</span>
+                                <span className="font-medium text-[10px] sm:text-xs hidden sm:inline">Design</span>
+                            </TabsTrigger>
+                            <TabsTrigger
+                                value="seo"
+                                className={cn(
+                                    "relative flex items-center justify-center gap-1 px-1 py-2 rounded-md transition-all duration-200",
+                                    "data-[state=active]:bg-background data-[state=active]:shadow-sm",
+                                    "hover:bg-background/50"
+                                )}
+                            >
+                                <Search className="w-4 h-4" />
+                                <span className="font-medium text-[10px] sm:text-xs hidden sm:inline">SEO</span>
                             </TabsTrigger>
                         </TabsList>
                     </div>
@@ -325,25 +319,7 @@ const PaletteView = () => {
                     </TabsContent>
                 </AnimatePresence>
 
-                <AnimatePresence mode="wait">
-                    <TabsContent value="templates" className="flex-1 mt-0 overflow-hidden" asChild>
-                        <motion.div
-                            key="templates-tab"
-                            variants={contentVariants}
-                            initial="initial"
-                            animate="animate"
-                            exit="exit"
-                            transition={{ duration: 0.15 }}
-                            className="h-full flex items-center justify-center p-4"
-                        >
-                            <div className="text-center text-sm text-muted-foreground">
-                                <LayoutTemplate className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                                <p className="font-medium">Templates</p>
-                                <p className="text-xs mt-1">Use the Templates button in the header to insert templates</p>
-                            </div>
-                        </motion.div>
-                    </TabsContent>
-                </AnimatePresence>
+
 
                 <AnimatePresence mode="wait">
                     <TabsContent value="design" className="flex-1 mt-0 overflow-y-auto" asChild>
@@ -359,13 +335,24 @@ const PaletteView = () => {
                         </motion.div>
                     </TabsContent>
                 </AnimatePresence>
+
+                <AnimatePresence mode="wait">
+                    <TabsContent value="seo" className="flex-1 mt-0 overflow-y-auto" asChild>
+                        <motion.div
+                            key="seo-tab"
+                            variants={contentVariants}
+                            initial="initial"
+                            animate="animate"
+                            exit="exit"
+                            transition={{ duration: 0.15 }}
+                            className="h-full"
+                        >
+                            <SEOPanel onBack={() => setActiveTab("elements")} />
+                        </motion.div>
+                    </TabsContent>
+                </AnimatePresence>
             </Tabs>
 
-            {/* Templates Dialog */}
-            <TemplatesDialog
-                open={showTemplatesDialog}
-                onOpenChange={setShowTemplatesDialog}
-            />
         </>
     )
 }

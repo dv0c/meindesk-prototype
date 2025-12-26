@@ -10,6 +10,7 @@ import { Button, Container, Divider, Grid, Heading, Image, NavigationLinks, Spac
 import { Navbar } from "./user-components/Navbar"
 import { DesignProvider, useDesign } from "./components/DesignContext"
 import { MarketplaceProvider } from "./components/MarketplaceContext"
+import { SEOProvider, useSEO } from "./components/seo"
 
 // Resolver for all user components - now using resolverWithFallback from registry
 // This automatically handles missing components (e.g., from uninstalled themes)
@@ -39,24 +40,26 @@ export default function CraftJSEditorPage({ params }: { params: { siteId: string
     return (
         <DesignProvider>
             <MarketplaceProvider>
-                <EditorWithDesign
-                    resolver={resolver}
-                    pageName={pageName}
-                    setPageName={setPageName}
-                    pageStatus={pageStatus}
-                    setPageStatus={setPageStatus}
-                    isLocked={isLocked}
-                    setIsLocked={setIsLocked}
-                    deviceMode={deviceMode}
-                    setDeviceMode={setDeviceMode}
-                    isSaving={isSaving}
-                    setIsSaving={setIsSaving}
-                    showSidebar={showSidebar}
-                    setShowSidebar={setShowSidebar}
-                    siteId={siteId}
-                    pageId={pageId}
-                    getCanvasWidth={getCanvasWidth}
-                />
+                <SEOProvider>
+                    <EditorWithDesign
+                        resolver={resolver}
+                        pageName={pageName}
+                        setPageName={setPageName}
+                        pageStatus={pageStatus}
+                        setPageStatus={setPageStatus}
+                        isLocked={isLocked}
+                        setIsLocked={setIsLocked}
+                        deviceMode={deviceMode}
+                        setDeviceMode={setDeviceMode}
+                        isSaving={isSaving}
+                        setIsSaving={setIsSaving}
+                        showSidebar={showSidebar}
+                        setShowSidebar={setShowSidebar}
+                        siteId={siteId}
+                        pageId={pageId}
+                        getCanvasWidth={getCanvasWidth}
+                    />
+                </SEOProvider>
             </MarketplaceProvider>
         </DesignProvider>
     )
@@ -150,6 +153,7 @@ function EditorWithDesign({ resolver, pageName, setPageName, pageStatus, setPage
 function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLocked, setIsLocked, deviceMode, setDeviceMode, isSaving, setIsSaving, showSidebar, setShowSidebar, siteId, pageId, getCanvasWidth, getCssVariables }: any) {
     const { query, actions } = useEditor()
     const { settings, updateSettings, registerSaveHandler } = useDesign()
+    const { seoSettings, updateSEOSettings, registerSEOSaveHandler } = useSEO()
     const [isLoading, setIsLoading] = useState(true)
     const hasLoaded = useRef(false)
 
@@ -171,6 +175,11 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                     // Load Design Settings if available
                     if (page.meta && page.meta.design) {
                         updateSettings(page.meta.design)
+                    }
+
+                    // Load SEO Settings if available
+                    if (page.meta && page.meta.seo) {
+                        updateSEOSettings(page.meta.seo)
                     }
 
                     // Deserialize the layout into CraftJS
@@ -208,7 +217,8 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                     status: pageStatus,
                     // Save design settings in meta
                     meta: {
-                        design: settings
+                        design: settings,
+                        seo: seoSettings
                     },
                     // CraftJS serializes to JSON string, Prisma expects Json[] so wrap in array
                     layout: [JSON.parse(json)],
@@ -227,12 +237,13 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
         } finally {
             setIsSaving(false)
         }
-    }, [query, pageName, pageStatus, siteId, pageId, setIsSaving, settings])
+    }, [query, pageName, pageStatus, siteId, pageId, setIsSaving, settings, seoSettings])
 
-    // Register the save handler with DesignContext so DesignPanel can use it
+    // Register the save handler with DesignContext and SEOContext
     useEffect(() => {
         registerSaveHandler(handleSave)
-    }, [registerSaveHandler, handleSave])
+        registerSEOSaveHandler(handleSave)
+    }, [registerSaveHandler, registerSEOSaveHandler, handleSave])
 
     return (
         <div className="h-screen flex flex-col bg-muted/10 overflow-hidden">

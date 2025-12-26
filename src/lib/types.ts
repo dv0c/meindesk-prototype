@@ -36,4 +36,5 @@ export interface PageData {
     siteId?: string
     createdAt?: Date
     updatedAt?: Date
+    meta?: Record<string, any>
 }

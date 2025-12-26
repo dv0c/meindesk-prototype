@@ -6,28 +6,25 @@ import type { PageData } from "@/lib/types"
 import { isValidObjectId } from "@/lib/actions/helpers/cached-tenant"
 import ClientPreview from "../ClientPreview" // adjust path if needed
 
-export default async function TenantPage({
-  params,
-}: {
-  params: { tenantId: string; slug: string }
-}) {
-  const { tenantId, slug } = await params
+import { Metadata } from "next"
 
-  if (!isValidObjectId(tenantId)) notFound()
+// Shared data fetcher
+async function getPageData(tenantId: string, slug: string) {
+  if (!isValidObjectId(tenantId)) return null
 
   // 1. Confirm tenant exists
   const tenant = await db.site.findUnique({
     where: { id: tenantId },
-    select: { id: true, title: true },
+    select: { id: true, title: true, description: true, settings: true },
   })
-  if (!tenant) notFound()
+  if (!tenant) return null
 
   // 2. Get the specific page under that tenant
   const pageRecord = await db.page.findFirst({
     where: { slug, siteId: tenantId },
     select: { id: true },
   })
-  if (!pageRecord) notFound()
+  if (!pageRecord) return null
 
   // 3. Fetch through API for consistent rendering logic
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
@@ -35,9 +32,66 @@ export default async function TenantPage({
     cache: "no-store",
   })
 
-  if (!response.ok) notFound()
+  if (!response.ok) return null
   const page: PageData = await response.json()
 
-  // 4. Reuse your client renderer
-  return <ClientPreview tenantId={tenant.id} page={page} />
+  return { tenant, page }
 }
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { tenantId: string; slug: string }
+}): Promise<Metadata> {
+  const { tenantId, slug } = await params
+  const data = await getPageData(tenantId, slug)
+
+  if (!data) return {}
+
+  const { page, tenant } = data
+  const seo = (page.meta?.seo || {}) as {
+    title?: string
+    description?: string
+    ogImage?: string
+    favicon?: string
+    preventIndexing?: boolean
+    keywords?: string
+  }
+
+  const title = seo.title || page.title || tenant.title || "Untitled"
+  const description = seo.description || tenant.description || ""
+
+  return {
+    title,
+    description,
+    keywords: seo.keywords ? seo.keywords.split(',').map(k => k.trim()) : [],
+    openGraph: {
+      title,
+      description,
+      images: seo.ogImage ? [{ url: seo.ogImage }] : [],
+      type: 'website',
+    },
+    icons: {
+      icon: seo.favicon || (tenant.settings as any)?.favicon || '/favicon.ico'
+    },
+    robots: {
+      index: !seo.preventIndexing,
+      follow: !seo.preventIndexing,
+    }
+  }
+}
+
+export default async function TenantPage({
+  params,
+}: {
+  params: { tenantId: string; slug: string }
+}) {
+  const { tenantId, slug } = await params
+  const data = await getPageData(tenantId, slug)
+
+  if (!data) notFound()
+
+  // 4. Reuse your client renderer
+  return <ClientPreview tenantId={data.tenant.id} page={data.page} />
+}
+
