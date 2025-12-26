@@ -17,8 +17,8 @@ import { ArrowLeft, Save, Loader2, Trash2, ImageIcon, UploadCloud } from "lucide
 import { toast } from "sonner"
 // @ts-ignore
 import { CldUploadButton, type CldUploadWidgetResults } from "next-cloudinary"
+import { componentRegistry } from "@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/user-components"
 
-import { componentRegistry } from "@/app/dashboard/[siteId]/projects/website/craftjs-editor/user-components/registry"
 
 // Use the actual CraftJS registry instead of hardcoded list
 const CRAFTJS_COMPONENTS = componentRegistry.map(comp => ({

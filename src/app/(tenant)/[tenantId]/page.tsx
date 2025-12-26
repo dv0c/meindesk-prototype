@@ -2,9 +2,9 @@
 
 import { notFound } from "next/navigation"
 import { db } from "@/lib/db"
-import type { PageData } from "@/lib/types"
 import { isValidObjectId } from "@/lib/actions/helpers/cached-tenant"
 import ClientPreview from "./ClientPreview"
+import { PageData } from "@/lib/types"
 
 interface PreviewPageProps {
   params: { tenantId: string }
