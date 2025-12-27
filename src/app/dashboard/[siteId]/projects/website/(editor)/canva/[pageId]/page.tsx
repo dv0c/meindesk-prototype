@@ -158,6 +158,9 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
     const { seoSettings, updateSEOSettings, registerSEOSaveHandler } = useSEO()
     const [isLoading, setIsLoading] = useState(true)
     const [pageSlug, setPageSlug] = useState("")
+    const [siteUrl, setSiteUrl] = useState("")
+    const [subdomain, setSubdomain] = useState("")
+    const [seoScore, setSeoScore] = useState(0)
     const hasLoaded = useRef(false)
 
     // Load page data on mount only
@@ -168,6 +171,7 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
 
         async function loadPage() {
             try {
+                // Fetch page data
                 const response = await fetch(`/api/team/${siteId}/pages/${pageId}`)
                 if (response.ok) {
                     const page = await response.json()
@@ -184,6 +188,17 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                     // Load SEO Settings if available
                     if (page.meta && page.meta.seo) {
                         updateSEOSettings(page.meta.seo)
+                        // Calculate mock SEO score based on SEO settings completeness
+                        const seo = page.meta.seo
+                        let score = 0
+                        if (seo.title) score += 20
+                        if (seo.description) score += 20
+                        if (seo.keywords && seo.keywords.length > 0) score += 15
+                        if (seo.ogImage) score += 15
+                        if (seo.favicon) score += 10
+                        if (seo.title && seo.title.length >= 30 && seo.title.length <= 60) score += 10
+                        if (seo.description && seo.description.length >= 120 && seo.description.length <= 160) score += 10
+                        setSeoScore(score)
                     }
 
                     // Deserialize the layout into CraftJS
@@ -194,6 +209,14 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                             actions.deserialize(JSON.stringify(craftState))
                         }
                     }
+                }
+
+                // Fetch site data
+                const siteResponse = await fetch(`/api/team/${siteId}`)
+                if (siteResponse.ok) {
+                    const data = await siteResponse.json()
+                    setSiteUrl(data.site?.url || "")
+                    setSubdomain(data.site?.subdomain || "")
                 }
             } catch (error) {
                 console.error("Failed to load page:", error)
@@ -285,6 +308,10 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                     showSidebar={showSidebar}
                     setShowSidebar={setShowSidebar}
                     siteId={siteId}
+                    siteUrl={siteUrl}
+                    subdomain={subdomain}
+                    seoScore={seoScore}
+                    pageSlug={pageSlug}
                 />
 
                 {/* Main Content */}

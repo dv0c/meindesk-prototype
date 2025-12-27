@@ -1,7 +1,6 @@
 "use server";
 import { db } from "@/lib/db";
 import { getAuthSession } from "@/lib/auth";
-import InitialTemplateTheme from "@/lib/initialTemplateTheme.json";
 export async function createSite(formData: FormData) {
   // Get current logged-in user
   const session = await getAuthSession();
@@ -31,11 +30,29 @@ export async function createSite(formData: FormData) {
         url,
         logo,
         subdomain,
-        template_schema: InitialTemplateTheme,
+        template_schema: null,
         userId: session.user.id, // link site to logged-in user
       },
     });
 
+    // Create the Home page and link it to the site
+    const homePage = await db.page.create({
+      data: {
+        title: "Home",
+        slug: "home",
+        status: "PUBLISHED",
+        siteId: site.id,
+        locked: true
+      },
+    });
+
+    // Update the site with the home page ID
+    await db.site.update({
+      where: { id: site.id },
+      data: { home_Id: homePage.id },
+    });
+
+    // Create other resources in parallel
     await Promise.all([
       db.subscription.create({
         data: {
@@ -65,16 +82,6 @@ export async function createSite(formData: FormData) {
 
       db.page.create({
         data: {
-          title: "Home",
-          slug: "home",
-          status: "PUBLISHED",
-          siteId: site.id,
-          locked: true
-        },
-      }),
-
-      db.page.create({
-        data: {
           title: "article",
           slug: "article",
           status: "PUBLISHED",
@@ -82,6 +89,7 @@ export async function createSite(formData: FormData) {
           locked: true
         },
       }),
+
     ]);
 
     return site;

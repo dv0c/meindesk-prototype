@@ -3,12 +3,13 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { ArrowLeft, Monitor, Tablet, Smartphone, Save, Eye, Undo, Redo, SidebarClose, Layers } from "lucide-react"
+import { ArrowLeft, Monitor, Tablet, Smartphone, Eye, Undo, Redo, SidebarClose, Layers } from "lucide-react"
 import { useEditor } from "@craftjs/core"
 import Link from "next/link"
 import { CraftLayersPopup } from "./CraftLayers"
 import { TemplatesDialog } from "./TemplatesDialog"
 import { LayoutTemplate } from "lucide-react"
+import { PublishDropdown } from "./PublishDropdown"
 
 interface CraftHeaderProps {
     pageName: string
@@ -23,6 +24,10 @@ interface CraftHeaderProps {
     showSidebar: boolean
     setShowSidebar: (show: boolean) => void
     siteId: string
+    siteUrl?: string
+    subdomain?: string
+    seoScore?: number
+    pageSlug?: string
 }
 
 export function CraftHeader({
@@ -38,6 +43,10 @@ export function CraftHeader({
     showSidebar,
     setShowSidebar,
     siteId,
+    siteUrl,
+    subdomain,
+    seoScore = 0,
+    pageSlug,
 }: CraftHeaderProps) {
     const { actions, query, canUndo, canRedo, enabled, selected } = useEditor((state, query) => {
         const currentNodeId = state.events.selected?.values().next().value
@@ -206,10 +215,15 @@ export function CraftHeader({
                         {!enabled ? "Exit Preview" : "Preview"}
                     </Button>
 
-                    <Button size="sm" onClick={onSave} disabled={isSaving}>
-                        <Save className="h-4 w-4 mr-2" />
-                        {isSaving ? "Saving..." : "Save"}
-                    </Button>
+                    <PublishDropdown
+                        pageStatus={pageStatus}
+                        pageSlug={pageSlug}
+                        siteUrl={siteUrl}
+                        subdomain={subdomain}
+                        seoScore={seoScore}
+                        onSave={onSave}
+                        isSaving={isSaving}
+                    />
                 </div>
             </header >
 
