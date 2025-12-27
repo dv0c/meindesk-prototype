@@ -34,6 +34,7 @@ import { NavigationLinks, NavigationLinksSettings } from './NavigationLinks'
 import { Card } from './ExampleCard'
 import { Hero } from './themes/SophiaPlatanisioti/Hero'
 import { Footer } from './themes/SophiaPlatanisioti/Footer'
+import { Articles } from './Articles'
 
 /**
  * Component metadata interface
@@ -164,6 +165,13 @@ export const componentRegistry: ComponentRegistration[] = [
         category: 'Sophia Navigation',
         description: 'Sophia Platanisioti Footer',
         icon: <LayoutGrid className="h-5 w-5" />,
+    },
+    {
+        name: 'Articles',
+        component: Articles,
+        category: 'Content',
+        description: 'Dynamic article list with multiple styles',
+        icon: <GalleryHorizontal className="h-5 w-5" />,
     },
 
 ]

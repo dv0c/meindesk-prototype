@@ -32,9 +32,10 @@ export async function SaveFeed({
       },
     });
   } else {
-    // 3. Create new feed
+    // 3. Create new feed (exclude site_name as it's only for RssItem)
+    const { site_name, ...rssData } = data;
     feed = await db.rss.create({
-      data: { ...data, siteId },
+      data: { ...rssData, siteId },
     });
   }
 
