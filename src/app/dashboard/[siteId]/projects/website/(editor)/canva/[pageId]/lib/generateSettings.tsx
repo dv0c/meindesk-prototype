@@ -44,6 +44,10 @@ export interface PropConfig {
     rows?: number
     unit?: string
     arrayFields?: Record<string, PropConfig>
+    /** Section name for grouping - props with same section appear together in a collapsible panel */
+    section?: string
+    /** Whether this section should be collapsed by default (only applies to first prop in a section) */
+    defaultCollapsed?: boolean
 }
 
 /**
@@ -137,210 +141,243 @@ export function generateSettings<P extends Record<string, any>>(
 
         if (!selectedId || !nodeProps) return null
 
-        // Generate summary
-        const summaryParts: string[] = []
+        // Group props by section
+        const sections = new Map<string, { propName: string; propConfig: PropConfig | string; defaultCollapsed?: boolean }[]>()
+
         Object.entries(config).forEach(([propName, propConfig]) => {
+            const normalized = typeof propConfig === 'string' ? { label: propConfig } : propConfig
+            const sectionName = normalized.section || sectionTitle
+
+            if (!sections.has(sectionName)) {
+                sections.set(sectionName, [])
+            }
+            sections.get(sectionName)!.push({
+                propName,
+                propConfig,
+                defaultCollapsed: normalized.defaultCollapsed
+            })
+        })
+
+        // Helper to render a single prop control
+        const renderPropControl = (propName: string, propConfig: PropConfig | string) => {
             const defaultValue = defaultProps?.[propName]
             const normalized = normalizeConfig(propName, propConfig, defaultValue !== undefined ? defaultValue : props[propName])
             const value = props[propName]
 
-            if (value && normalized.type !== 'media') {
-                if (typeof value === 'string' && value.length > 20) {
-                    summaryParts.push(`${value.substring(0, 20)}...`)
-                } else {
-                    summaryParts.push(String(value))
-                }
-            } else if (value && normalized.type === 'media') {
-                summaryParts.push('Has image')
+            // Rich Text
+            if (normalized.type === 'richtext') {
+                return (
+                    <PropertyRichText
+                        key={propName}
+                        label={normalized.label}
+                        value={value || ''}
+                        onChange={(v) => setProp((p: P) => {
+                            p[propName] = v
+                        })}
+                    />
+                )
             }
-        })
-        const summary = summaryParts.slice(0, 2).join(', ')
 
+            // Text input
+            if (normalized.type === 'text' || normalized.type === 'number') {
+                return (
+                    <PropertyRow key={propName} label={normalized.label}>
+                        <PropertyInput
+                            type={normalized.type}
+                            value={value || ''}
+                            onChange={(v) => setProp((p: P) => {
+                                p[propName] = normalized.type === 'number' ? Number(v) : v
+                            })}
+                            placeholder={normalized.placeholder}
+                            min={normalized.min}
+                            max={normalized.max}
+                            step={normalized.step}
+                        />
+                    </PropertyRow>
+                )
+            }
 
+            // Textarea
+            if (normalized.type === 'textarea') {
+                return (
+                    <PropertyRow key={propName} label={normalized.label}>
+                        <Textarea
+                            value={value || ''}
+                            onChange={(e) => setProp((p: P) => {
+                                p[propName] = e.target.value
+                            })}
+                            placeholder={normalized.placeholder}
+                            rows={normalized.rows || 3}
+                            className="text-xs"
+                        />
+                    </PropertyRow>
+                )
+            }
+
+            // Color picker
+            if (normalized.type === 'color') {
+                return (
+                    <PropertyRow key={propName} label={normalized.label}>
+                        <PropertyColor
+                            value={value || ''}
+                            onChange={(v) => setProp((p: P) => {
+                                p[propName] = v
+                            })}
+                            placeholder={normalized.placeholder}
+                        />
+                    </PropertyRow>
+                )
+            }
+
+            // Select dropdown
+            if (normalized.type === 'select' && normalized.options) {
+                return (
+                    <PropertyRow key={propName} label={normalized.label}>
+                        <PropertySelect
+                            value={String(value || normalized.options[0]?.value || '')}
+                            onChange={(v) => setProp((p: P) => {
+                                p[propName] = v
+                            })}
+                            options={normalized.options.map(opt => ({
+                                label: opt.label,
+                                value: String(opt.value)
+                            }))}
+                        />
+                    </PropertyRow>
+                )
+            }
+
+            // Checkbox
+            if (normalized.type === 'checkbox') {
+                return (
+                    <PropertyCheckbox
+                        key={propName}
+                        id={propName}
+                        label={normalized.label}
+                        checked={Boolean(value)}
+                        onChange={(v) => setProp((p: P) => {
+                            p[propName] = v
+                        })}
+                    />
+                )
+            }
+
+            // Slider
+            if (normalized.type === 'slider') {
+                return (
+                    <PropertyRow key={propName} label={normalized.label}>
+                        <PropertySlider
+                            value={Number(value) || 0}
+                            onChange={(v) => setProp((p: P) => {
+                                p[propName] = v
+                            })}
+                            min={normalized.min}
+                            max={normalized.max}
+                            step={normalized.step}
+                            unit={normalized.unit}
+                        />
+                    </PropertyRow>
+                )
+            }
+
+            // Media selector
+            if (normalized.type === 'media') {
+                return (
+                    <PropertyRow key={propName} label={normalized.label}>
+                        <div className="flex flex-col gap-2 w-full">
+                            {value ? (
+                                <div className="relative group w-full aspect-video bg-muted rounded-md overflow-hidden border border-border">
+                                    <img
+                                        src={value}
+                                        alt="Preview"
+                                        className="w-full h-full object-cover"
+                                    />
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <Button
+                                            variant="secondary"
+                                            size="sm"
+                                            className="h-8 text-xs"
+                                            onClick={() => openMediaDialog(propName)}
+                                        >
+                                            Change Image
+                                        </Button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="w-full flex items-center justify-center gap-2 h-20 border-dashed"
+                                    onClick={() => openMediaDialog(propName)}
+                                >
+                                    <ImageIcon className="w-5 h-5 text-muted-foreground" />
+                                    <span className="text-muted-foreground">Select Image</span>
+                                </Button>
+                            )}
+                        </div>
+                    </PropertyRow>
+                )
+            }
+
+            // Array of objects (Sortable List)
+            if (normalized.type === 'array' && normalized.arrayFields) {
+                return (
+                    <ArrayEditor
+                        key={propName}
+                        propName={propName}
+                        label={normalized.label}
+                        value={value as any[]}
+                        arrayFields={normalized.arrayFields}
+                        onChange={(newValue) => setProp((p: P) => {
+                            p[propName] = newValue
+                        })}
+                    />
+                )
+            }
+
+            return null
+        }
 
         return (
             <div className="flex flex-col h-full">
-                <div className="flex-1 overflow-auto space-y-4">
-                    <PropertySection title={sectionTitle} summary={summary}>
-                        {Object.entries(config).map(([propName, propConfig]) => {
-                            const defaultValue = defaultProps?.[propName]
-                            const normalized = normalizeConfig(propName, propConfig, defaultValue !== undefined ? defaultValue : props[propName])
-                            const value = props[propName]
+                <div className="flex-1 overflow-auto">
+                    {Array.from(sections.entries()).map(([sectionName, sectionProps], index) => {
+                        // Generate summary for this section
+                        const sectionSummary = sectionProps
+                            .slice(0, 2)
+                            .map(({ propName, propConfig }) => {
+                                const normalized = normalizeConfig(propName, propConfig, defaultProps?.[propName])
+                                const value = props[propName]
+                                if (value && normalized.type !== 'media' && normalized.type !== 'array') {
+                                    if (typeof value === 'string' && value.length > 15) {
+                                        return `${value.substring(0, 15)}...`
+                                    }
+                                    return String(value)
+                                }
+                                if (normalized.type === 'array' && Array.isArray(value)) {
+                                    return `${value.length} items`
+                                }
+                                return null
+                            })
+                            .filter(Boolean)
+                            .join(', ')
 
-                            // Rich Text
-                            if (normalized.type === 'richtext') {
-                                return (
-                                    <PropertyRichText
-                                        key={propName}
-                                        label={normalized.label}
-                                        value={value || ''}
-                                        onChange={(v) => setProp((p: P) => {
-                                            p[propName] = v
-                                        })}
-                                    />
-                                )
-                            }
+                        // Check if section should be collapsed by default
+                        const firstPropCollapsed = sectionProps[0]?.defaultCollapsed
 
-                            // Text input
-                            if (normalized.type === 'text' || normalized.type === 'number') {
-                                return (
-                                    <PropertyRow key={propName} label={normalized.label}>
-                                        <PropertyInput
-                                            type={normalized.type}
-                                            value={value || ''}
-                                            onChange={(v) => setProp((p: P) => {
-                                                p[propName] = normalized.type === 'number' ? Number(v) : v
-                                            })}
-                                            placeholder={normalized.placeholder}
-                                            min={normalized.min}
-                                            max={normalized.max}
-                                            step={normalized.step}
-                                        />
-                                    </PropertyRow>
-                                )
-                            }
-
-                            // Textarea
-                            if (normalized.type === 'textarea') {
-                                return (
-                                    <PropertyRow key={propName} label={normalized.label}>
-                                        <Textarea
-                                            value={value || ''}
-                                            onChange={(e) => setProp((p: P) => {
-                                                p[propName] = e.target.value
-                                            })}
-                                            placeholder={normalized.placeholder}
-                                            rows={normalized.rows || 3}
-                                            className="text-xs"
-                                        />
-                                    </PropertyRow>
-                                )
-                            }
-
-                            // Color picker
-                            if (normalized.type === 'color') {
-                                return (
-                                    <PropertyRow key={propName} label={normalized.label}>
-                                        <PropertyColor
-                                            value={value || ''}
-                                            onChange={(v) => setProp((p: P) => {
-                                                p[propName] = v
-                                            })}
-                                            placeholder={normalized.placeholder}
-                                        />
-                                    </PropertyRow>
-                                )
-                            }
-
-                            // Select dropdown
-                            if (normalized.type === 'select' && normalized.options) {
-                                return (
-                                    <PropertyRow key={propName} label={normalized.label}>
-                                        <PropertySelect
-                                            value={String(value || normalized.options[0]?.value || '')}
-                                            onChange={(v) => setProp((p: P) => {
-                                                p[propName] = v
-                                            })}
-                                            options={normalized.options.map(opt => ({
-                                                label: opt.label,
-                                                value: String(opt.value)
-                                            }))}
-                                        />
-                                    </PropertyRow>
-                                )
-                            }
-
-                            // Checkbox
-                            if (normalized.type === 'checkbox') {
-                                return (
-                                    <PropertyCheckbox
-                                        key={propName}
-                                        id={propName}
-                                        label={normalized.label}
-                                        checked={Boolean(value)}
-                                        onChange={(v) => setProp((p: P) => {
-                                            p[propName] = v
-                                        })}
-                                    />
-                                )
-                            }
-
-                            // Slider
-                            if (normalized.type === 'slider') {
-                                return (
-                                    <PropertyRow key={propName} label={normalized.label}>
-                                        <PropertySlider
-                                            value={Number(value) || 0}
-                                            onChange={(v) => setProp((p: P) => {
-                                                p[propName] = v
-                                            })}
-                                            min={normalized.min}
-                                            max={normalized.max}
-                                            step={normalized.step}
-                                            unit={normalized.unit}
-                                        />
-                                    </PropertyRow>
-                                )
-                            }
-
-                            // Media selector
-                            if (normalized.type === 'media') {
-                                return (
-                                    <PropertyRow key={propName} label={normalized.label}>
-                                        <div className="flex flex-col gap-2 w-full">
-                                            {value ? (
-                                                <div className="relative group w-full aspect-video bg-muted rounded-md overflow-hidden border border-border">
-                                                    <img
-                                                        src={value}
-                                                        alt="Preview"
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                        <Button
-                                                            variant="secondary"
-                                                            size="sm"
-                                                            className="h-8 text-xs"
-                                                            onClick={() => openMediaDialog(propName)}
-                                                        >
-                                                            Change Image
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    className="w-full flex items-center justify-center gap-2 h-20 border-dashed"
-                                                    onClick={() => openMediaDialog(propName)}
-                                                >
-                                                    <ImageIcon className="w-5 h-5 text-muted-foreground" />
-                                                    <span className="text-muted-foreground">Select Image</span>
-                                                </Button>
-                                            )}
-                                        </div>
-                                    </PropertyRow>
-                                )
-                            }
-
-                            // Array of objects (Sortable List)
-                            if (normalized.type === 'array' && normalized.arrayFields) {
-                                return (
-                                    <ArrayEditor
-                                        key={propName}
-                                        propName={propName}
-                                        label={normalized.label}
-                                        value={value as any[]}
-                                        arrayFields={normalized.arrayFields}
-                                        onChange={(newValue) => setProp((p: P) => {
-                                            p[propName] = newValue
-                                        })}
-                                    />
-                                )
-                            }
-
-                            return null
-                        })}
-                    </PropertySection>
+                        return (
+                            <PropertySection
+                                key={sectionName}
+                                title={sectionName}
+                                summary={sectionSummary}
+                                defaultOpen={firstPropCollapsed !== true}
+                            >
+                                {sectionProps.map(({ propName, propConfig }) =>
+                                    renderPropControl(propName, propConfig)
+                                )}
+                            </PropertySection>
+                        )
+                    })}
                 </div>
                 {/* Dialogs outside to avoid clipping */}
                 <MediaLibraryDialog
@@ -416,10 +453,10 @@ function ArrayEditor({ propName, label, value = [], arrayFields, onChange }: Arr
     }
 
     return (
-        <div className="space-y-3 border rounded-md p-3 bg-muted/30">
+        <div className="space-y-2">
             <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-muted-foreground">{label}</span>
-                <span className="text-[10px] text-muted-foreground">{value.length} items</span>
+                <span className="text-xs font-medium text-muted-foreground">{label}</span>
+                <span className="text-xs text-muted-foreground">{value.length} items</span>
             </div>
 
             <DndContext
@@ -449,7 +486,7 @@ function ArrayEditor({ propName, label, value = [], arrayFields, onChange }: Arr
 
             <button
                 onClick={addItem}
-                className="w-full py-2 px-3 bg-secondary text-secondary-foreground rounded-md text-xs font-medium flex items-center justify-center gap-1.5 hover:bg-secondary/80 transition-colors"
+                className="w-full py-2.5 px-3 bg-muted/50 border border-dashed border-border text-muted-foreground rounded-md text-xs font-medium flex items-center justify-center gap-1.5 hover:bg-muted hover:text-foreground hover:border-solid transition-all"
             >
                 <Plus size={14} />
                 Add Item
@@ -494,10 +531,10 @@ function SortableArrayItem({ id, item, index, arrayFields, isOpen, onToggle, onC
         <div
             ref={setNodeRef}
             style={style}
-            className={`border rounded-md overflow-hidden mb-2 bg-background ${isOpen ? 'ring-1 ring-ring border-transparent' : 'border-border'}`}
+            className={`border rounded-md overflow-hidden mb-2 bg-background ${isOpen ? 'ring-2 ring-ring ring-offset-1 border-transparent' : 'border-border hover:border-muted-foreground/30'} transition-all`}
         >
             <div
-                className={`flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-muted/50 transition-colors ${isOpen ? 'bg-muted/30' : ''}`}
+                className={`flex items-center justify-between px-3 py-2.5 cursor-pointer hover:bg-muted/50 transition-colors ${isOpen ? 'bg-muted/30' : ''}`}
                 onClick={onToggle}
             >
                 <div className="flex items-center gap-2 flex-1 overflow-hidden">
@@ -505,19 +542,19 @@ function SortableArrayItem({ id, item, index, arrayFields, isOpen, onToggle, onC
                         {...attributes}
                         {...listeners}
                         onClick={(e) => e.stopPropagation()}
-                        className="cursor-grab active:cursor-grabbing p-1 -ml-1 text-muted-foreground/30 hover:text-muted-foreground transition-colors"
+                        className="cursor-grab active:cursor-grabbing p-1 -ml-1 text-muted-foreground/40 hover:text-muted-foreground transition-colors"
                     >
                         <GripVertical size={14} />
                     </div>
 
-                    <span className="text-xs font-medium truncate">
+                    <span className="text-sm font-medium truncate">
                         {previewLabel}
                     </span>
                     {/* Show nested array count if available */}
                     {Object.entries(arrayFields).map(([key, config]) => {
                         if (config.type === 'array' && Array.isArray(item[key])) {
                             return (
-                                <span key={key} className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded ml-auto mr-2">
+                                <span key={key} className="text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded ml-auto mr-2">
                                     {item[key].length}
                                 </span>
                             )
@@ -525,19 +562,16 @@ function SortableArrayItem({ id, item, index, arrayFields, isOpen, onToggle, onC
                         return null
                     })}
                 </div>
-                {isOpen ? <ChevronUp size={14} className="text-muted-foreground" /> : <ChevronDown size={14} className="text-muted-foreground" />}
+                {isOpen ? <ChevronUp size={16} className="text-muted-foreground" /> : <ChevronDown size={16} className="text-muted-foreground" />}
             </div>
 
             {isOpen && (
-                <div className="p-3 space-y-3 border-t bg-muted/10">
+                <div className="px-4 pb-4 pt-3 space-y-3 border-t bg-muted/5">
                     {Object.entries(arrayFields).map(([fieldKey, fieldConfig]) => {
                         // Nested Array (Recursive)
                         if (fieldConfig.type === 'array' && fieldConfig.arrayFields) {
                             return (
-                                <div key={fieldKey} className="mt-2 border-t pt-2">
-                                    <label className="text-[10px] uppercase text-muted-foreground font-medium mb-1 block">
-                                        {fieldConfig.label || fieldKey}
-                                    </label>
+                                <div key={fieldKey} className="pt-3 mt-2 border-t">
                                     <ArrayEditor
                                         propName={fieldKey}
                                         label={fieldConfig.label}
@@ -550,8 +584,8 @@ function SortableArrayItem({ id, item, index, arrayFields, isOpen, onToggle, onC
                         }
 
                         return (
-                            <div key={fieldKey} className="space-y-1">
-                                <label className="text-[10px] uppercase text-muted-foreground font-medium">
+                            <div key={fieldKey} className="space-y-1.5">
+                                <label className="text-xs font-medium text-muted-foreground">
                                     {fieldConfig.label || fieldKey}
                                 </label>
                                 {/* Simple text input for string fields */}
@@ -559,7 +593,7 @@ function SortableArrayItem({ id, item, index, arrayFields, isOpen, onToggle, onC
                                     <input
                                         value={item[fieldKey] || ''}
                                         onChange={(e) => onChange(fieldKey, e.target.value)}
-                                        className="w-full h-8 px-2 text-xs border border-input rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring"
+                                        className="w-full h-9 px-3 text-sm border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
                                         placeholder={fieldConfig.placeholder}
                                     />
                                 )}
@@ -569,20 +603,19 @@ function SortableArrayItem({ id, item, index, arrayFields, isOpen, onToggle, onC
                                         type="number"
                                         value={item[fieldKey] || ''}
                                         onChange={(e) => onChange(fieldKey, Number(e.target.value))}
-                                        className="w-full h-8 px-2 text-xs border border-input rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring"
+                                        className="w-full h-9 px-3 text-sm border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
                                     />
                                 )}
                             </div>
                         )
                     })}
 
-                    <div className="flex justify-between items-center pt-2 mt-2 border-t">
-                        <span className="text-[10px] text-muted-foreground">ID: {id.split('-').pop()?.substring(0, 6)}</span>
+                    <div className="flex justify-end items-center pt-3 mt-3 border-t">
                         <button
                             onClick={onRemove}
-                            className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-destructive hover:bg-destructive/10 rounded transition-colors"
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-destructive hover:bg-destructive/10 rounded-md transition-colors"
                         >
-                            <Trash2 size={12} />
+                            <Trash2 size={14} />
                             Delete
                         </button>
                     </div>

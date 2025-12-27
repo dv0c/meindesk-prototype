@@ -1,5 +1,5 @@
 import { useNode, useEditor, UserComponent } from '@craftjs/core'
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+import React, { useState, useRef, useEffect, useCallback, type JSX } from 'react'
 import { generateSettings, SettingsConfig } from './generateSettings'
 import { useSite } from '@/components/Contexts/site-id-context'
 import MediaLibraryDialog, { MediaItem } from '@/components/MediaGallery/media-select'
@@ -152,6 +152,19 @@ export function cn(...classes: (string | undefined | null | false)[]): string {
 }
 
 /**
+ * Allowed text element types for EditableText
+ * Using a constrained union instead of `keyof JSX.IntrinsicElements` 
+ * to avoid "union type too complex" TypeScript errors
+ */
+type TextElementType =
+    | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+    | 'p' | 'span' | 'div' | 'label'
+    | 'strong' | 'em' | 'b' | 'i' | 'u' | 's'
+    | 'small' | 'mark' | 'sub' | 'sup'
+    | 'blockquote' | 'q' | 'cite'
+    | 'a' | 'li'
+
+/**
  * Props for EditableText component
  */
 interface EditableTextProps {
@@ -160,7 +173,7 @@ interface EditableTextProps {
     /** Current value of the text */
     value: string
     /** HTML tag to render (default: 'span') */
-    as?: keyof JSX.IntrinsicElements
+    as?: TextElementType
     /** Additional class names */
     className?: string
     /** Additional inline styles */

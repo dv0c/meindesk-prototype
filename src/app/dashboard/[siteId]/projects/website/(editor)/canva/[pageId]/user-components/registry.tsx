@@ -22,7 +22,7 @@ import {
 
 // Import all components
 import { Container, ContainerSettings } from './Container'
-import { Heading, HeadingSettings } from './Heading'
+import { Heading } from './Heading'
 import { Text, TextSettings } from './Text'
 import { Button, ButtonSettings } from './Button'
 import { Image, ImageSettings } from './Image'
@@ -113,7 +113,6 @@ export const componentRegistry: ComponentRegistration[] = [
         category: 'Typography',
         description: 'A heading element (h1-h6)',
         icon: <HeadingIcon className="h-5 w-5" />,
-        settings: HeadingSettings,
     },
     {
         name: 'Text',
@@ -224,7 +223,6 @@ export {
     Container,
     ContainerSettings,
     Heading,
-    HeadingSettings,
     Text,
     TextSettings,
     Button,

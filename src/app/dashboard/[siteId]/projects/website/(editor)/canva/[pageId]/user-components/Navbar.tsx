@@ -419,31 +419,35 @@ export const Navbar = withCraftComponent(
             ],
         },
         settingsConfig: {
-            // Brand
-            brandName: { label: 'Brand Name', type: 'text' },
-            tagline: { label: 'Tagline', type: 'text' },
-            brandColor: { label: 'Brand Color', type: 'color' },
-            // Colors
-            navBackgroundColor: { label: 'Nav Background', type: 'color' },
-            textColor: { label: 'Text Color', type: 'color' },
-            topBarBackground: { label: 'Top Bar Background', type: 'color' },
-            topBarTextColor: { label: 'Top Bar Text', type: 'color' },
-            // Contact
-            email: { label: 'Email', type: 'text', placeholder: 'email@example.com' },
-            phone: { label: 'Phone', type: 'text', placeholder: '+30 123 456 789' },
-            facebookUrl: { label: 'Facebook URL', type: 'text', placeholder: 'https://facebook.com/...' },
-            instagramUrl: { label: 'Instagram URL', type: 'text', placeholder: 'https://instagram.com/...' },
-            // Layout
-            showTopBar: { label: 'Show Top Bar', type: 'checkbox' },
-            maxWidth: { label: 'Max Width', type: 'text', placeholder: '90vw' },
-            // Banner
-            bannerImage: { label: 'Banner Image', type: 'media' },
-            bannerOpacity: { label: 'Banner Opacity', type: 'slider', min: 0, max: 100, unit: '%' },
+            // Brand Section
+            brandName: { label: 'Brand Name', type: 'text', section: 'Brand' },
+            tagline: { label: 'Tagline', type: 'text', section: 'Brand' },
+            brandColor: { label: 'Brand Color', type: 'color', section: 'Brand' },
 
-            // Navigation Links
+            // Colors Section
+            navBackgroundColor: { label: 'Nav Background', type: 'color', section: 'Colors' },
+            textColor: { label: 'Text Color', type: 'color', section: 'Colors' },
+            topBarBackground: { label: 'Top Bar Background', type: 'color', section: 'Colors' },
+            topBarTextColor: { label: 'Top Bar Text', type: 'color', section: 'Colors' },
+
+            // Contact Section
+            email: { label: 'Email', type: 'text', placeholder: 'email@example.com', section: 'Contact' },
+            phone: { label: 'Phone', type: 'text', placeholder: '+30 123 456 789', section: 'Contact' },
+            facebookUrl: { label: 'Facebook URL', type: 'text', placeholder: 'https://facebook.com/...', section: 'Contact' },
+            instagramUrl: { label: 'Instagram URL', type: 'text', placeholder: 'https://instagram.com/...', section: 'Contact' },
+
+            // Layout Section
+            showTopBar: { label: 'Show Top Bar', type: 'checkbox', section: 'Layout' },
+            maxWidth: { label: 'Max Width', type: 'text', placeholder: '90vw', section: 'Layout' },
+            bannerImage: { label: 'Banner Image', type: 'media', section: 'Layout' },
+            bannerOpacity: { label: 'Banner Opacity', type: 'slider', min: 0, max: 100, unit: '%', section: 'Layout' },
+
+            // Navigation Links Section (collapsed by default)
             links: {
                 label: 'Navigation Links',
                 type: 'array',
+                section: 'Navigation Links',
+                defaultCollapsed: true,
                 arrayFields: {
                     label: { label: 'Label', type: 'text' },
                     href: { label: 'URL', type: 'text' },
@@ -458,7 +462,7 @@ export const Navbar = withCraftComponent(
                 }
             }
         },
-        sectionTitle: 'Navbar Settings'
+        sectionTitle: 'Navbar'
     }
 )
 
