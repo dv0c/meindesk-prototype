@@ -1,7 +1,7 @@
 "use client"
 
 import { useNode, useEditor } from "@craftjs/core"
-import { useState, useRef, useEffect, useCallback } from "react"
+import React from "react"
 import {
     PropertySection,
     PropertyRow,
@@ -11,6 +11,7 @@ import {
     PropertySelect,
     PropertyButtonGroup,
 } from "../components/PropertySection"
+import { useInlineEdit } from "../lib/withCraftComponent"
 
 interface HeadingProps {
     text?: string
@@ -58,21 +59,11 @@ export const Heading = ({
     className = "",
 }: HeadingProps) => {
     const {
-        connectors: { connect, drag },
-        selected,
-        id,
-        actions: { setProp },
-    } = useNode((state) => ({
-        selected: state.events.selected,
-        id: state.id,
-    }))
-
-    const { actions: editorActions, enabled } = useEditor((state) => ({
-        enabled: state.options.enabled,
-    }))
-
-    const [isEditing, setIsEditing] = useState(false)
-    const contentRef = useRef<HTMLElement>(null)
+        isEditing,
+        refCallback,
+        editableProps,
+        editableStyle,
+    } = useInlineEdit<HTMLHeadingElement>("text", text || "")
 
     const Tag = level
 
@@ -98,79 +89,15 @@ export const Heading = ({
         borderStyle: borderWidth ? "solid" : undefined,
         boxShadow,
         lineHeight: 1.2,
-        outline: isEditing ? "none" : undefined,
-        cursor: enabled ? (isEditing ? "text" : "pointer") : undefined,
+        ...editableStyle,
     }
-
-    // Single click to edit when already selected (only in editor mode)
-    const handleClick = useCallback((e: React.MouseEvent) => {
-        if (!enabled) return // Don't handle clicks on live/preview site
-        e.stopPropagation()
-        if (selected) {
-            // Already selected, enter edit mode
-            setIsEditing(true)
-        } else {
-            // Select this node
-            editorActions.selectNode(id)
-        }
-    }, [enabled, selected, editorActions, id])
-
-    const handleBlur = useCallback(() => {
-        setIsEditing(false)
-        if (contentRef.current) {
-            const newText = contentRef.current.innerText.trim()
-            if (newText) {
-                setProp((props: HeadingProps) => {
-                    props.text = newText
-                })
-            }
-        }
-    }, [setProp])
-
-    const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-        if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault()
-            contentRef.current?.blur()
-        }
-        if (e.key === "Escape") {
-            setIsEditing(false)
-            if (contentRef.current) {
-                contentRef.current.innerText = text || ""
-            }
-        }
-    }, [text])
-
-    // When deselected, exit edit mode
-    useEffect(() => {
-        if (!selected && isEditing) {
-            setIsEditing(false)
-        }
-    }, [selected, isEditing])
-
-    useEffect(() => {
-        if (isEditing && contentRef.current) {
-            contentRef.current.focus()
-            const range = document.createRange()
-            range.selectNodeContents(contentRef.current)
-            const selection = window.getSelection()
-            selection?.removeAllRanges()
-            selection?.addRange(range)
-        }
-    }, [isEditing])
 
     return (
         <Tag
-            ref={(ref) => {
-                contentRef.current = ref
-                if (ref) connect(drag(ref))
-            }}
+            ref={refCallback}
             className={className}
             style={style}
-            contentEditable={isEditing}
-            suppressContentEditableWarning
-            onClick={handleClick}
-            onBlur={handleBlur}
-            onKeyDown={handleKeyDown}
+            {...editableProps}
         >
             {text}
         </Tag>

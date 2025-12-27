@@ -1,6 +1,8 @@
-import { useNode, UserComponent } from '@craftjs/core'
-import React from 'react'
+import { useNode, useEditor, UserComponent } from '@craftjs/core'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { generateSettings, SettingsConfig } from './generateSettings'
+import { useSite } from '@/components/Contexts/site-id-context'
+import MediaLibraryDialog, { MediaItem } from '@/components/MediaGallery/media-select'
 
 /**
  * Common props that all Craft components can have
@@ -147,6 +149,342 @@ export function propsToStyle(props: CraftComponentProps): React.CSSProperties {
  */
 export function cn(...classes: (string | undefined | null | false)[]): string {
     return classes.filter(Boolean).join(' ')
+}
+
+/**
+ * Props for EditableText component
+ */
+interface EditableTextProps {
+    /** The prop name to update when text changes */
+    propName: string
+    /** Current value of the text */
+    value: string
+    /** HTML tag to render (default: 'span') */
+    as?: keyof JSX.IntrinsicElements
+    /** Additional class names */
+    className?: string
+    /** Additional inline styles */
+    style?: React.CSSProperties
+    /** Children to render (usually not needed, value is rendered) */
+    children?: React.ReactNode
+}
+
+/**
+ * A component that makes text editable inline in the CraftJS editor.
+ * Use this inside components wrapped with withCraftComponent.
+ * 
+ * Usage:
+ * <EditableText propName="heading" value={heading} as="h1" className="text-xl" />
+ */
+export function EditableText({
+    propName,
+    value,
+    as: Tag = 'span',
+    className,
+    style,
+    children,
+}: EditableTextProps) {
+    const {
+        selected,
+        actions: { setProp },
+    } = useNode((state) => ({
+        selected: state.events.selected,
+    }))
+
+    const { enabled } = useEditor((state) => ({
+        enabled: state.options.enabled,
+    }))
+
+    const [isEditing, setIsEditing] = useState(false)
+    const contentRef = useRef<HTMLElement>(null)
+
+    const handleClick = useCallback((e: React.MouseEvent) => {
+        if (!enabled) return
+        e.stopPropagation()
+        if (selected) {
+            setIsEditing(true)
+        }
+    }, [enabled, selected])
+
+    const handleBlur = useCallback(() => {
+        setIsEditing(false)
+        if (contentRef.current) {
+            const newText = contentRef.current.innerText.trim()
+            if (newText && newText !== value) {
+                setProp((props: Record<string, any>) => {
+                    props[propName] = newText
+                })
+            }
+        }
+    }, [setProp, propName, value])
+
+    const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault()
+            contentRef.current?.blur()
+        }
+        if (e.key === "Escape") {
+            setIsEditing(false)
+            if (contentRef.current) {
+                contentRef.current.innerText = value || ""
+            }
+        }
+    }, [value])
+
+    // When deselected, exit edit mode
+    useEffect(() => {
+        if (!selected && isEditing) {
+            setIsEditing(false)
+        }
+    }, [selected, isEditing])
+
+    // Focus and select text when entering edit mode
+    useEffect(() => {
+        if (isEditing && contentRef.current) {
+            contentRef.current.focus()
+            const range = document.createRange()
+            range.selectNodeContents(contentRef.current)
+            const selection = window.getSelection()
+            selection?.removeAllRanges()
+            selection?.addRange(range)
+        }
+    }, [isEditing])
+
+    const combinedStyle: React.CSSProperties = {
+        ...style,
+        outline: isEditing ? "none" : undefined,
+        cursor: enabled ? (isEditing ? "text" : "pointer") : undefined,
+    }
+
+    return (
+        <Tag
+            ref={contentRef as any}
+            className={className}
+            style={combinedStyle}
+            contentEditable={isEditing}
+            suppressContentEditableWarning
+            onClick={handleClick}
+            onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
+        >
+            {children ?? value}
+        </Tag>
+    )
+}
+
+/**
+ * Props for EditableImage component
+ */
+interface EditableImageProps {
+    /** The prop name to update when image changes */
+    propName: string
+    /** Current image URL */
+    src: string
+    /** Alt text for the image */
+    alt?: string
+    /** Additional class names */
+    className?: string
+    /** Additional inline styles */
+    style?: React.CSSProperties
+    /** Width of the image */
+    width?: number | string
+    /** Height of the image */
+    height?: number | string
+}
+
+/**
+ * A component that makes an image editable in the CraftJS editor.
+ * Clicking on the image opens the media picker dialog.
+ * Use this inside components wrapped with withCraftComponent.
+ * 
+ * Usage:
+ * <EditableImage propName="thumbnail" src={thumbnail} alt="Hero Image" className="w-full h-auto" />
+ */
+export function EditableImage({
+    propName,
+    src,
+    alt = "Image",
+    className,
+    style,
+    width,
+    height,
+}: EditableImageProps) {
+    const {
+        selected,
+        actions: { setProp },
+    } = useNode((state) => ({
+        selected: state.events.selected,
+    }))
+
+    const { enabled } = useEditor((state) => ({
+        enabled: state.options.enabled,
+    }))
+
+    const { siteId } = useSite()
+    const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false)
+
+    const handleClick = useCallback((e: React.MouseEvent) => {
+        if (!enabled) return
+        e.stopPropagation()
+        if (selected) {
+            setIsMediaPickerOpen(true)
+        }
+    }, [enabled, selected])
+
+    const handleMediaSelect = useCallback((items: MediaItem[]) => {
+        if (items.length > 0) {
+            setProp((props: Record<string, any>) => {
+                props[propName] = items[0].url
+            })
+        }
+        setIsMediaPickerOpen(false)
+    }, [setProp, propName])
+
+    const combinedStyle: React.CSSProperties = {
+        ...style,
+        cursor: enabled && selected ? "pointer" : undefined,
+    }
+
+    return (
+        <>
+            <img
+                src={src || "/placeholder.svg"}
+                alt={alt}
+                width={width}
+                height={height}
+                className={className}
+                style={combinedStyle}
+                onClick={handleClick}
+            />
+            {siteId && (
+                <MediaLibraryDialog
+                    siteId={siteId}
+                    isOpen={isMediaPickerOpen}
+                    onClose={() => setIsMediaPickerOpen(false)}
+                    onSelect={handleMediaSelect}
+                    multiSelect={false}
+                />
+            )}
+        </>
+    )
+}
+
+/**
+ * Hook for inline text editing in CraftJS components
+ * Returns props and handlers to make an element editable when clicked in the editor
+ */
+export function useInlineEdit<T extends HTMLElement = HTMLElement>(
+    propName: string,
+    currentValue: string
+) {
+    const {
+        connectors: { connect, drag },
+        selected,
+        id,
+        actions: { setProp },
+    } = useNode((state) => ({
+        selected: state.events.selected,
+        id: state.id,
+    }))
+
+    const { actions: editorActions, enabled } = useEditor((state) => ({
+        enabled: state.options.enabled,
+    }))
+
+    const [isEditing, setIsEditing] = useState(false)
+    const contentRef = useRef<T>(null)
+
+    // Single click to edit when already selected (only in editor mode)
+    const handleClick = useCallback((e: React.MouseEvent) => {
+        if (!enabled) return
+        e.stopPropagation()
+        if (selected) {
+            setIsEditing(true)
+        } else {
+            editorActions.selectNode(id)
+        }
+    }, [enabled, selected, editorActions, id])
+
+    const handleBlur = useCallback(() => {
+        setIsEditing(false)
+        if (contentRef.current) {
+            const newText = contentRef.current.innerText.trim()
+            if (newText) {
+                setProp((props: Record<string, any>) => {
+                    props[propName] = newText
+                })
+            }
+        }
+    }, [setProp, propName])
+
+    const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault()
+            contentRef.current?.blur()
+        }
+        if (e.key === "Escape") {
+            setIsEditing(false)
+            if (contentRef.current) {
+                contentRef.current.innerText = currentValue || ""
+            }
+        }
+    }, [currentValue])
+
+    // When deselected, exit edit mode
+    useEffect(() => {
+        if (!selected && isEditing) {
+            setIsEditing(false)
+        }
+    }, [selected, isEditing])
+
+    // Focus and select text when entering edit mode
+    useEffect(() => {
+        if (isEditing && contentRef.current) {
+            contentRef.current.focus()
+            const range = document.createRange()
+            range.selectNodeContents(contentRef.current)
+            const selection = window.getSelection()
+            selection?.removeAllRanges()
+            selection?.addRange(range)
+        }
+    }, [isEditing])
+
+    // Ref callback that combines content ref with CraftJS connectors
+    const refCallback = useCallback((ref: T | null) => {
+        (contentRef as React.MutableRefObject<T | null>).current = ref
+        if (ref) connect(drag(ref))
+    }, [connect, drag])
+
+    return {
+        // State
+        isEditing,
+        enabled,
+        selected,
+
+        // Refs
+        contentRef,
+        refCallback,
+
+        // Handlers
+        handleClick,
+        handleBlur,
+        handleKeyDown,
+
+        // Props to spread on the element
+        editableProps: {
+            contentEditable: isEditing,
+            suppressContentEditableWarning: true,
+            onClick: handleClick,
+            onBlur: handleBlur,
+            onKeyDown: handleKeyDown,
+        },
+
+        // Style helpers
+        editableStyle: {
+            outline: isEditing ? "none" : undefined,
+            cursor: enabled ? (isEditing ? "text" : "pointer") : undefined,
+        } as React.CSSProperties,
+    }
 }
 
 /**

@@ -5,7 +5,7 @@ import React, { useMemo } from "react"
 
 import { useEditorContent } from "@/hooks/useEditorContent"
 import { cn } from "@/lib/utils"
-import { CraftComponentProps, propsToStyle, withCraftComponent } from "../../../lib/withCraftComponent"
+import { CraftComponentProps, propsToStyle, withCraftComponent, EditableText, EditableImage } from "../../../lib/withCraftComponent"
 
 interface HeroProps extends CraftComponentProps {
     content?: string
@@ -39,12 +39,13 @@ const HeroBase = React.forwardRef<HTMLDivElement, HeroProps>(({
             <div className="max-w-[52.5rem] mx-auto">
                 <div className="text-[18px] space-y-5 text-muted-foreground">
                     {thumbnail && (
-                        <img
+                        <EditableImage
+                            propName="thumbnail"
+                            src={thumbnail}
+                            alt="Hero Image"
                             width={380}
                             height={460}
-                            className="float-left mr-8 mb-5 object-cover max-w-full sm:max-w-[380px] "
-                            alt="Hero Image"
-                            src={thumbnail}
+                            className="float-left mr-8 mb-5 object-cover max-w-full sm:max-w-[380px]"
                         />
                     )}
 
@@ -60,14 +61,20 @@ const HeroBase = React.forwardRef<HTMLDivElement, HeroProps>(({
                             <hr className="border-black/30 mb-10" />
                             <div className="text-center space-y-3 pb-20">
                                 {heading1 && (
-                                    <h2 className="text-[#7f2e2d] text-[120%] font-serif font-bold">
-                                        {heading1}
-                                    </h2>
+                                    <EditableText
+                                        propName="heading1"
+                                        value={heading1}
+                                        as="h2"
+                                        className="text-[#7f2e2d] text-[120%] font-serif font-bold"
+                                    />
                                 )}
                                 {heading2 && (
-                                    <h2 className="text-[#7f2e2d] text-[120%] font-serif font-bold">
-                                        {heading2}
-                                    </h2>
+                                    <EditableText
+                                        propName="heading2"
+                                        value={heading2}
+                                        as="h2"
+                                        className="text-[#7f2e2d] text-[120%] font-serif font-bold"
+                                    />
                                 )}
                             </div>
                         </div>

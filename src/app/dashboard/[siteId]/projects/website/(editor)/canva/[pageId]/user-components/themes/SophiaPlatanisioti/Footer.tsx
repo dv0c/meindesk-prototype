@@ -1,6 +1,6 @@
 'use client'
 import React from "react";
-import { CraftComponentProps, propsToStyle, withCraftComponent } from "../../../lib/withCraftComponent";
+import { CraftComponentProps, propsToStyle, withCraftComponent, EditableText } from "../../../lib/withCraftComponent";
 import { cn } from "@/lib/utils";
 
 interface FooterProps extends CraftComponentProps {
@@ -25,14 +25,16 @@ const FooterBase = React.forwardRef<HTMLDivElement, FooterProps>(({
         <div ref={ref} style={style} className={cn("w-full", props.className)}>
             {/* Main Footer Section */}
             <div className="bg-[#ccc0a8] truncate px-3 space-y-5 text-center py-10 text-[100%] font-normal text-[#5a5933]">
-                <h1>{heading}</h1>
+                <EditableText propName="heading" value={heading || ""} as="h1" />
                 {phone && (
                     <h2 className="font-light text-xl">
-                        <a href={`tel:${phone}`}>{phone}</a>
+                        <a href={`tel:${phone}`}>
+                            <EditableText propName="phone" value={phone} as="span" />
+                        </a>
                     </h2>
                 )}
                 {email && (
-                    <h2 className="font-light">{email}</h2>
+                    <EditableText propName="email" value={email} as="h2" className="font-light" />
                 )}
                 {facebook && (
                     <h2 className="overflow-hidden w-auto truncate">
