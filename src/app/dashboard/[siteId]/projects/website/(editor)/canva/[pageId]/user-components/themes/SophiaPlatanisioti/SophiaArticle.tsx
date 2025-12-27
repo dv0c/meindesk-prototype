@@ -42,11 +42,27 @@ interface SophiaArticleProps extends CraftComponentProps {
     showAuthor?: boolean
     showDate?: boolean
 
+    // Styling options
+    titleColor?: 'primary' | 'secondary' | 'tertiary' | 'background'
+    contentColor?: 'primary' | 'secondary' | 'tertiary' | 'background'
+    backgroundColor?: 'primary' | 'secondary' | 'tertiary' | 'background'
+
     // For editor preview only
     previewArticleId?: string
 
     // Server-side pre-fetched article data (for SSR)
     articleData?: ArticleData
+}
+
+// Helper to map color names to CSS variables
+const getColorVar = (color: string) => {
+    switch (color) {
+        case 'primary': return 'var(--design-primary)'
+        case 'secondary': return 'var(--design-secondary)'
+        case 'tertiary': return 'var(--design-tertiary)'
+        case 'background': return 'var(--design-background)'
+        default: return 'var(--design-primary)'
+    }
 }
 
 // Placeholder article for editor preview
@@ -81,6 +97,9 @@ const SophiaArticleBase = forwardRef<HTMLDivElement, SophiaArticleProps>(
             showCover = true,
             showAuthor = false,
             showDate = false,
+            titleColor = 'primary',
+            contentColor = 'primary',
+            backgroundColor = 'background',
             previewArticleId,
             articleData,
             className = "",
@@ -161,7 +180,7 @@ const SophiaArticleBase = forwardRef<HTMLDivElement, SophiaArticleProps>(
         // Loading state
         if (loading || teamLoading) {
             return (
-                <div ref={ref} className={`w-full ${className}`} style={{ backgroundColor: 'var(--design-tertiary, #f4eae0)' }}>
+                <div ref={ref} className={`w-full ${className}`} style={{ backgroundColor: getColorVar(backgroundColor) }}>
                     <div className="py-12 px-6">
                         <div className="max-w-4xl mx-auto">
                             <div className="h-12 bg-muted/50 animate-pulse rounded w-2/3 mx-auto mb-12" />
@@ -180,7 +199,7 @@ const SophiaArticleBase = forwardRef<HTMLDivElement, SophiaArticleProps>(
         // Error state
         if (error) {
             return (
-                <div ref={ref} className={`w-full ${className}`} style={{ backgroundColor: 'var(--design-tertiary, #f4eae0)' }}>
+                <div ref={ref} className={`w-full ${className}`} style={{ backgroundColor: getColorVar(backgroundColor) }}>
                     <div className="py-16 text-center">
                         <h2 className="text-2xl font-bold text-destructive mb-2">Article Not Found</h2>
                         <p className="text-muted-foreground">{error}</p>
@@ -192,7 +211,7 @@ const SophiaArticleBase = forwardRef<HTMLDivElement, SophiaArticleProps>(
         // No article
         if (!article) {
             return (
-                <div ref={ref} className={`w-full ${className}`} style={{ backgroundColor: 'var(--design-tertiary, #f4eae0)' }}>
+                <div ref={ref} className={`w-full ${className}`} style={{ backgroundColor: getColorVar(backgroundColor) }}>
                     <div className="py-16 text-center">
                         <p className="text-muted-foreground">No article to display</p>
                     </div>
@@ -201,7 +220,7 @@ const SophiaArticleBase = forwardRef<HTMLDivElement, SophiaArticleProps>(
         }
 
         return (
-            <div ref={ref} className={`w-full ${className}`} style={{ backgroundColor: 'var(--design-background, #f4eae0)' }}>
+            <div ref={ref} className={`w-full ${className}`} style={{ backgroundColor: getColorVar(backgroundColor) }}>
                 {/* Hero Section - Cover with Title Overlay */}
                 {showCover && article.cover && (
                     <div
@@ -221,7 +240,7 @@ const SophiaArticleBase = forwardRef<HTMLDivElement, SophiaArticleProps>(
                             <h1
                                 className="text-xl md:text-2xl lg:text-3xl font-serif font-bold text-center leading-tight"
                                 style={{
-                                    color: 'var(--design-tertiary, #f1e6df)',
+                                    color: getColorVar(titleColor === 'primary' ? 'tertiary' : titleColor), // Default to tertiary (light) on overlay if primary selected
                                     fontFamily: 'var(--design-font-heading, Literata), Georgia, serif',
                                 }}
                             >
@@ -237,7 +256,7 @@ const SophiaArticleBase = forwardRef<HTMLDivElement, SophiaArticleProps>(
                         <h1
                             className="text-xl md:text-2xl lg:text-3xl font-serif font-bold text-center leading-tight"
                             style={{
-                                color: 'var(--design-primary, #1e3a5f)',
+                                color: getColorVar(titleColor),
                                 fontFamily: 'var(--design-font-heading, Literata), Georgia, serif',
                             }}
                         >
@@ -289,7 +308,7 @@ const SophiaArticleBase = forwardRef<HTMLDivElement, SophiaArticleProps>(
                                 fontFamily: 'var(--design-font-base, Literata), Georgia, serif',
                                 fontSize: '18px',
                                 lineHeight: '32px',
-                                color: 'var(--design-primary, #374151)',
+                                color: getColorVar(contentColor),
                             }}
                             dangerouslySetInnerHTML={{ __html: article.html || article.content }}
                         />
@@ -307,6 +326,9 @@ const defaultProps: Partial<SophiaArticleProps> = {
     showCover: true,
     showAuthor: false,
     showDate: false,
+    titleColor: 'primary',
+    contentColor: 'primary',
+    backgroundColor: 'background',
 }
 
 // Wrap with CraftJS functionality
@@ -321,6 +343,41 @@ export const SophiaArticle = withCraftComponent<SophiaArticleProps, HTMLDivEleme
             showCover: { label: "Show Cover Image", type: "checkbox", section: "Display" },
             showAuthor: { label: "Show Author", type: "checkbox", section: "Display" },
             showDate: { label: "Show Date", type: "checkbox", section: "Display" },
+
+            // Colors Section
+            titleColor: {
+                label: "Title Color",
+                type: "select",
+                section: "Colors",
+                options: [
+                    { label: "Primary", value: "primary" },
+                    { label: "Secondary", value: "secondary" },
+                    { label: "Tertiary", value: "tertiary" },
+                    { label: "Background", value: "background" },
+                ]
+            },
+            contentColor: {
+                label: "Content Color",
+                type: "select",
+                section: "Colors",
+                options: [
+                    { label: "Primary", value: "primary" },
+                    { label: "Secondary", value: "secondary" },
+                    { label: "Tertiary", value: "tertiary" },
+                    { label: "Background", value: "background" },
+                ]
+            },
+            backgroundColor: {
+                label: "Background Color",
+                type: "select",
+                section: "Colors",
+                options: [
+                    { label: "Primary", value: "primary" },
+                    { label: "Secondary", value: "secondary" },
+                    { label: "Tertiary", value: "tertiary" },
+                    { label: "Background", value: "background" },
+                ]
+            },
         },
     }
 )
