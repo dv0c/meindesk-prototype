@@ -234,6 +234,10 @@ export function PropertySliderWithUnit({
     )
 }
 
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Palette, X } from "lucide-react"
+import { useDesign } from "./DesignContext"
+
 interface PropertyColorProps {
     value: string
     onChange: (value: string) => void
@@ -241,21 +245,118 @@ interface PropertyColorProps {
 }
 
 export function PropertyColor({ value, onChange, placeholder }: PropertyColorProps) {
+    const { settings } = useDesign()
+    const isVariable = value?.startsWith("var(--")
+
+    // Map design settings to CSS variables for the palette
+    const DESIGN_COLORS = [
+        { name: 'Primary', variable: 'var(--primary)', color: settings.primary },
+        { name: 'Background', variable: 'var(--background)', color: settings.background },
+        { name: 'Neutral', variable: 'var(--foreground)', color: settings.neutral },
+        { name: 'Secondary', variable: 'var(--muted)', color: settings.secondary }, // Mapped to muted in design system
+        { name: 'Tertiary', variable: 'var(--design-tertiary)', color: settings.tertiary },
+        // Add hardcoded defaults for others if needed, using standard CSS vars
+        { name: 'Light', variable: 'var(--primary-foreground)', color: '#ffffff' },
+        { name: 'Border', variable: 'var(--border)', color: settings.secondary },
+    ]
+
+    // Resolve color for preview
+    const resolveColor = (val: string) => {
+        if (!val) return null
+        if (!val.startsWith('var(--')) return val
+
+        // Try to find matching variable in our design set
+        const match = DESIGN_COLORS.find(c => c.variable === val)
+        if (match) return match.color
+
+        // Fallback for unknown variables (can't resolve easily without ref, show gray)
+        return '#808080'
+    }
+
+    const previewColor = isVariable ? resolveColor(value) : value
+
     return (
         <div className="flex items-center gap-2">
-            <input
-                type="color"
-                value={value || "#000000"}
-                onChange={(e) => onChange(e.target.value)}
-                className="h-9 w-12 rounded-md border cursor-pointer bg-background"
-            />
-            <input
-                type="text"
-                value={value || ""}
-                onChange={(e) => onChange(e.target.value)}
-                placeholder={placeholder || "transparent"}
-                className="flex-1 h-9 px-3 text-sm border rounded-md bg-background"
-            />
+            {!isVariable ? (
+                <input
+                    type="color"
+                    value={value || "#000000"}
+                    onChange={(e) => onChange(e.target.value)}
+                    className="h-9 w-9 rounded-md border cursor-pointer bg-background p-1"
+                />
+            ) : (
+                <div
+                    className="h-9 w-9 rounded-md border bg-background p-1 relative group cursor-help"
+                    title={`Variable: ${value}\nResovled: ${previewColor}`}
+                >
+                    <div
+                        className="w-full h-full rounded-sm border shadow-sm"
+                        style={{ backgroundColor: previewColor || 'transparent' }}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/50 text-white text-[8px] font-mono rounded-sm pointer-events-none">
+                        VAR
+                    </div>
+                </div>
+            )}
+
+            <div className="flex-1 flex gap-2">
+                <input
+                    type="text"
+                    value={value || ""}
+                    onChange={(e) => onChange(e.target.value)}
+                    placeholder={placeholder || "transparent"}
+                    className="flex-1 h-9 px-3 text-sm border rounded-md bg-background min-w-0"
+                />
+
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button variant="outline" size="icon" className="h-9 w-9 shrink-0">
+                            <Palette className="h-4 w-4" />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-64 p-3" align="end">
+                        <div className="space-y-3">
+                            <div className="font-medium text-xs text-muted-foreground pb-2 border-b">Design System Colors</div>
+                            <div className="grid grid-cols-4 gap-2">
+                                {DESIGN_COLORS.map((color) => (
+                                    <button
+                                        key={color.variable}
+                                        onClick={() => onChange(color.variable)}
+                                        className="group relative flex flex-col items-center gap-1"
+                                        title={`${color.name} (${color.variable})`}
+                                    >
+                                        <div
+                                            className={cn(
+                                                "w-10 h-10 rounded-md border shadow-sm transition-transform hover:scale-105",
+                                                value === color.variable && "ring-2 ring-primary ring-offset-2"
+                                            )}
+                                            style={{ backgroundColor: color.color }}
+                                        />
+                                        <span className="text-[10px] text-muted-foreground truncate w-full text-center">
+                                            {color.name}
+                                        </span>
+                                    </button>
+                                ))}
+                            </div>
+
+                            <div className="pt-2 border-t mt-2">
+                                <p className="text-[10px] text-muted-foreground mb-2 px-1">
+                                    Linked to global design settings.
+                                </p>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="w-full h-8 text-xs"
+                                    onClick={() => onChange("")}
+                                >
+                                    <X className="h-3 w-3 mr-2" />
+                                    Clear Color
+                                </Button>
+                            </div>
+                        </div>
+                    </PopoverContent>
+                </Popover>
+            </div>
         </div>
     )
 }
