@@ -6,8 +6,9 @@ import {
 } from '@lexical/react/LexicalComposer'
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
 import { EditorState, SerializedEditorState } from 'lexical'
-import { useEffect, ReactNode } from 'react'
+import { useEffect, useRef, ReactNode } from 'react'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { $generateHtmlFromNodes } from '@lexical/html'
 
 import { editorTheme } from '@/components/editor/themes/editor-theme'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -30,6 +31,29 @@ function EditorReadyPlugin({ onEditorReady }: { onEditorReady?: (editor: any) =>
   useEffect(() => {
     if (onEditorReady) onEditorReady(editor)
   }, [editor, onEditorReady])
+  return null
+}
+
+// Plugin to generate HTML on initial editor load
+function InitialHtmlPlugin({ onHtmlChange }: { onHtmlChange?: (html: string) => void }) {
+  const [editor] = useLexicalComposerContext()
+  const initializedRef = useRef(false)
+
+  useEffect(() => {
+    if (!onHtmlChange || initializedRef.current) return
+
+    // Generate initial HTML after editor mounts
+    const timeout = setTimeout(() => {
+      editor.read(() => {
+        const html = $generateHtmlFromNodes(editor, null)
+        onHtmlChange(html)
+        initializedRef.current = true
+      })
+    }, 100)
+
+    return () => clearTimeout(timeout)
+  }, [editor, onHtmlChange])
+
   return null
 }
 
@@ -82,6 +106,7 @@ export function EditorProvider({
   editorSerializedState,
   onChange,
   onSerializedChange,
+  onHtmlChange,
   onEditorReady,
   children,
 }: {
@@ -89,6 +114,7 @@ export function EditorProvider({
   editorSerializedState?: SerializedEditorState
   onChange?: (editorState: EditorState) => void
   onSerializedChange?: (editorSerializedState: SerializedEditorState) => void
+  onHtmlChange?: (html: string) => void
   onEditorReady?: (editor: any) => void
   children: ReactNode
 }) {
@@ -106,11 +132,20 @@ export function EditorProvider({
         {children}
         <OnChangePlugin
           ignoreSelectionChange={true}
-          onChange={(editorState) => {
+          onChange={(editorState, editor) => {
             onChange?.(editorState)
             onSerializedChange?.(editorState.toJSON())
+
+            // Generate HTML if callback provided
+            if (onHtmlChange) {
+              editor.read(() => {
+                const html = $generateHtmlFromNodes(editor, null)
+                onHtmlChange(html)
+              })
+            }
           }}
         />
+        <InitialHtmlPlugin onHtmlChange={onHtmlChange} />
         <EditorReadyPlugin onEditorReady={onEditorReady} />
       </TooltipProvider>
     </LexicalComposer>

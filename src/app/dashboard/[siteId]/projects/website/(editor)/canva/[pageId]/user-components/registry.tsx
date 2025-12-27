@@ -35,6 +35,8 @@ import { Card } from './ExampleCard'
 import { Hero } from './themes/SophiaPlatanisioti/Hero'
 import { Footer } from './themes/SophiaPlatanisioti/Footer'
 import { Articles } from './Articles'
+import { SingleArticle } from './SingleArticle'
+import { SophiaArticle } from './themes/SophiaPlatanisioti/SophiaArticle'
 
 /**
  * Component metadata interface
@@ -172,6 +174,20 @@ export const componentRegistry: ComponentRegistration[] = [
         category: 'Content',
         description: 'Dynamic article list with multiple styles',
         icon: <GalleryHorizontal className="h-5 w-5" />,
+    },
+    {
+        name: 'SingleArticle',
+        component: SingleArticle,
+        category: 'Content',
+        description: 'Single article display with dynamic loading',
+        icon: <Type className="h-5 w-5" />,
+    },
+    {
+        name: 'SophiaArticle',
+        component: SophiaArticle,
+        category: 'Sophia Content',
+        description: 'Sophia Platanisioti article theme',
+        icon: <Type className="h-5 w-5" />,
     },
 
 ]

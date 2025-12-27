@@ -27,6 +27,7 @@ export default function EditorPage({ params }: EditorPageProps) {
 
   const [title, setTitle] = useState("")
   const [editorState, setEditorState] = useState<SerializedEditorState>()
+  const [html, setHtml] = useState("")
   const [slug, setSlug] = useState("")
   const [excerpt, setExcerpt] = useState("")
   const [thumbnail, setThumbnail] = useState("")
@@ -74,6 +75,7 @@ export default function EditorPage({ params }: EditorPageProps) {
       await updateArticle(siteId, articleId, {
         title,
         content: editorState,
+        html,
         slug,
         excerpt,
         cover: thumbnail,
@@ -118,6 +120,7 @@ export default function EditorPage({ params }: EditorPageProps) {
     <EditorProvider
       editorSerializedState={editorState}
       onSerializedChange={(value) => setEditorState(value)}
+      onHtmlChange={(value) => setHtml(value)}
     >
       <div className="min-h-screen flex flex-col">
         {/* Header */}
