@@ -45,6 +45,7 @@ import { SophiaArticle } from './themes/SophiaPlatanisioti/SophiaArticle'
 import {
     ArticleTitle,
     ArticleCover,
+
     ArticleContent,
     ArticleAuthor,
     ArticleDate,
