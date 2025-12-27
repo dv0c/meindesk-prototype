@@ -347,6 +347,7 @@ export const SophiaArticle = withCraftComponent<SophiaArticleProps, HTMLDivEleme
             // Colors Section
             titleColor: {
                 label: "Title Color",
+                description: "Color of the main article title",
                 type: "select",
                 section: "Colors",
                 options: [
@@ -358,6 +359,7 @@ export const SophiaArticle = withCraftComponent<SophiaArticleProps, HTMLDivEleme
             },
             contentColor: {
                 label: "Content Color",
+                description: "Color of the article body text",
                 type: "select",
                 section: "Colors",
                 options: [
@@ -369,6 +371,7 @@ export const SophiaArticle = withCraftComponent<SophiaArticleProps, HTMLDivEleme
             },
             backgroundColor: {
                 label: "Background Color",
+                description: "Background color of the article section",
                 type: "select",
                 section: "Colors",
                 options: [

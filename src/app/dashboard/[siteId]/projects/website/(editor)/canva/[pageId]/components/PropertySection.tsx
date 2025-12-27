@@ -78,14 +78,18 @@ export function PropertySection({
 
 interface PropertyRowProps {
     label: string
+    description?: string
     children: React.ReactNode
     className?: string
 }
 
-export function PropertyRow({ label, children, className }: PropertyRowProps) {
+export function PropertyRow({ label, description, children, className }: PropertyRowProps) {
     return (
         <div className={cn("space-y-1.5", className)}>
-            <label className="text-xs font-medium text-muted-foreground">{label}</label>
+            <div className="flex flex-col gap-0.5">
+                <label className="text-xs font-medium text-muted-foreground">{label}</label>
+                {description && <p className="text-[10px] text-muted-foreground/70">{description}</p>}
+            </div>
             {children}
         </div>
     )
@@ -344,16 +348,20 @@ export function PropertyIconButtonGroup({ value, onChange, options }: PropertyIc
 interface PropertyCheckboxProps {
     id: string
     label: string
+    description?: string
     checked: boolean
     onChange: (checked: boolean) => void
 }
 
-export function PropertyCheckbox({ id, label, checked, onChange }: PropertyCheckboxProps) {
+export function PropertyCheckbox({ id, label, description, checked, onChange }: PropertyCheckboxProps) {
     return (
         <div className="flex items-center justify-between py-1">
-            <label htmlFor={id} className="text-xs text-muted-foreground cursor-pointer">
-                {label}
-            </label>
+            <div className="flex flex-col gap-0.5">
+                <label htmlFor={id} className="text-xs text-muted-foreground cursor-pointer">
+                    {label}
+                </label>
+                {description && <p className="text-[10px] text-muted-foreground/70">{description}</p>}
+            </div>
             <Switch
                 id={id}
                 checked={checked}
@@ -455,9 +463,10 @@ interface PropertyRichTextProps {
     value: string
     onChange: (value: string) => void
     label?: string
+    description?: string
 }
 
-export function PropertyRichText({ value, onChange, label }: PropertyRichTextProps) {
+export function PropertyRichText({ value, onChange, label, description }: PropertyRichTextProps) {
     const [open, setOpen] = useState(false)
     const [editorInstance, setEditorInstance] = useState<any>(null)
     const [pendingState, setPendingState] = useState<string | null>(null)
@@ -482,7 +491,10 @@ export function PropertyRichText({ value, onChange, label }: PropertyRichTextPro
 
     return (
         <div className="space-y-2">
-            {label && <label className="text-xs font-medium text-muted-foreground">{label}</label>}
+            <div>
+                {label && <label className="text-xs font-medium text-muted-foreground block">{label}</label>}
+                {description && <p className="text-[10px] text-muted-foreground/70 mt-0.5">{description}</p>}
+            </div>
 
             <div className="space-y-2 border rounded-md p-3 bg-muted/10">
                 <div className="flex items-center justify-between mb-2">

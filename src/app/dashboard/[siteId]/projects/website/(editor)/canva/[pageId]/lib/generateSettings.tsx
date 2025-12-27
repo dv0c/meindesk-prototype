@@ -35,6 +35,7 @@ import { CSS } from "@dnd-kit/utilities"
  */
 export interface PropConfig {
     label: string
+    description?: string
     type?: 'text' | 'number' | 'textarea' | 'color' | 'select' | 'checkbox' | 'media' | 'slider' | 'array' | 'richtext'
     placeholder?: string
     options?: { label: string; value: string | number }[]
@@ -170,6 +171,7 @@ export function generateSettings<P extends Record<string, any>>(
                     <PropertyRichText
                         key={propName}
                         label={normalized.label}
+                        description={normalized.description}
                         value={value || ''}
                         onChange={(v) => setProp((p: P) => {
                             p[propName] = v
@@ -181,7 +183,7 @@ export function generateSettings<P extends Record<string, any>>(
             // Text input
             if (normalized.type === 'text' || normalized.type === 'number') {
                 return (
-                    <PropertyRow key={propName} label={normalized.label}>
+                    <PropertyRow key={propName} label={normalized.label} description={normalized.description}>
                         <PropertyInput
                             type={normalized.type}
                             value={value || ''}
@@ -200,7 +202,7 @@ export function generateSettings<P extends Record<string, any>>(
             // Textarea
             if (normalized.type === 'textarea') {
                 return (
-                    <PropertyRow key={propName} label={normalized.label}>
+                    <PropertyRow key={propName} label={normalized.label} description={normalized.description}>
                         <Textarea
                             value={value || ''}
                             onChange={(e) => setProp((p: P) => {
@@ -217,7 +219,7 @@ export function generateSettings<P extends Record<string, any>>(
             // Color picker
             if (normalized.type === 'color') {
                 return (
-                    <PropertyRow key={propName} label={normalized.label}>
+                    <PropertyRow key={propName} label={normalized.label} description={normalized.description}>
                         <PropertyColor
                             value={value || ''}
                             onChange={(v) => setProp((p: P) => {
@@ -232,7 +234,7 @@ export function generateSettings<P extends Record<string, any>>(
             // Select dropdown
             if (normalized.type === 'select' && normalized.options) {
                 return (
-                    <PropertyRow key={propName} label={normalized.label}>
+                    <PropertyRow key={propName} label={normalized.label} description={normalized.description}>
                         <PropertySelect
                             value={String(value || normalized.options[0]?.value || '')}
                             onChange={(v) => setProp((p: P) => {
@@ -254,6 +256,7 @@ export function generateSettings<P extends Record<string, any>>(
                         key={propName}
                         id={propName}
                         label={normalized.label}
+                        description={normalized.description}
                         checked={Boolean(value)}
                         onChange={(v) => setProp((p: P) => {
                             p[propName] = v
@@ -265,7 +268,7 @@ export function generateSettings<P extends Record<string, any>>(
             // Slider
             if (normalized.type === 'slider') {
                 return (
-                    <PropertyRow key={propName} label={normalized.label}>
+                    <PropertyRow key={propName} label={normalized.label} description={normalized.description}>
                         <PropertySlider
                             value={Number(value) || 0}
                             onChange={(v) => setProp((p: P) => {
@@ -283,7 +286,7 @@ export function generateSettings<P extends Record<string, any>>(
             // Media selector
             if (normalized.type === 'media') {
                 return (
-                    <PropertyRow key={propName} label={normalized.label}>
+                    <PropertyRow key={propName} label={normalized.label} description={normalized.description}>
                         <div className="flex flex-col gap-2 w-full">
                             {value ? (
                                 <div className="relative group w-full aspect-video bg-muted rounded-md overflow-hidden border border-border">
