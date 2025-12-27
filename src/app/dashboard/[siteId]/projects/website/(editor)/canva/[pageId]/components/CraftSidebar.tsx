@@ -40,7 +40,7 @@ const headerVariants = {
     exit: { opacity: 0, y: 10 }
 }
 
-export function CraftSidebar() {
+export function CraftSidebar({ isArticlePage = false }: { isArticlePage?: boolean }) {
     const { selected, name, isDeletable, actions } = useEditor((state) => {
         const currentNodeId = state.events.selected?.values().next().value
         const node = currentNodeId ? state.nodes[currentNodeId] : null
@@ -91,7 +91,7 @@ export function CraftSidebar() {
                         transition={{ duration: 0.2, ease: "easeOut" }}
                         className="flex flex-col h-full"
                     >
-                        <PaletteView />
+                        <PaletteView isArticlePage={isArticlePage} />
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -234,7 +234,7 @@ function PropertiesView({
 }
 
 // Palette View Component
-const PaletteView = () => {
+const PaletteView = ({ isArticlePage }: { isArticlePage: boolean }) => {
     const [activeTab, setActiveTab] = useState("elements")
 
 
@@ -314,7 +314,7 @@ const PaletteView = () => {
                             transition={{ duration: 0.15 }}
                             className="h-full"
                         >
-                            <CraftToolbox />
+                            <CraftToolbox isArticlePage={isArticlePage} />
                         </motion.div>
                     </TabsContent>
                 </AnimatePresence>

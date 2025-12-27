@@ -201,7 +201,7 @@ const SophiaArticleBase = forwardRef<HTMLDivElement, SophiaArticleProps>(
         }
 
         return (
-            <div ref={ref} className={`w-full ${className}`} style={{ backgroundColor: 'var(--design-tertiary, #f4eae0)' }}>
+            <div ref={ref} className={`w-full ${className}`} style={{ backgroundColor: 'var(--design-background, #f4eae0)' }}>
                 {/* Hero Section - Cover with Title Overlay */}
                 {showCover && article.cover && (
                     <div
@@ -289,7 +289,7 @@ const SophiaArticleBase = forwardRef<HTMLDivElement, SophiaArticleProps>(
                                 fontFamily: 'var(--design-font-base, Literata), Georgia, serif',
                                 fontSize: '18px',
                                 lineHeight: '32px',
-                                color: 'var(--design-neutral, #374151)',
+                                color: 'var(--design-primary, #374151)',
                             }}
                             dangerouslySetInnerHTML={{ __html: article.html || article.content }}
                         />

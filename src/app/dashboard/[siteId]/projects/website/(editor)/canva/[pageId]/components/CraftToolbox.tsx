@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Sparkles } from "lucide-react"
 
 
-export function CraftToolbox() {
+export function CraftToolbox({ isArticlePage = false }: { isArticlePage?: boolean }) {
     const { connectors } = useEditor()
     const [searchQuery, setSearchQuery] = useState("")
     const { isComponentAvailable, installedThemes, isLoading } = useMarketplaceSafe()
@@ -24,6 +24,11 @@ export function CraftToolbox() {
             c.category.toLowerCase().includes(searchQuery.toLowerCase())
 
         if (!matchesSearch) return false
+
+        // Filter Article Blocks - only show on Article page
+        if (c.category === "Article Blocks" && !isArticlePage) {
+            return false
+        }
 
         // Then check if component is available (from installed themes)
         return isComponentAvailable(c.name)

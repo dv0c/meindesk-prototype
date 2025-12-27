@@ -18,6 +18,11 @@ import {
     Link as LinkIcon,
     CreditCard,
     GalleryHorizontal,
+    Newspaper,
+    FileText,
+    User,
+    Calendar,
+    Tag,
 } from 'lucide-react'
 
 // Import all components
@@ -37,6 +42,14 @@ import { Footer } from './themes/SophiaPlatanisioti/Footer'
 import { Articles } from './Articles'
 import { SingleArticle } from './SingleArticle'
 import { SophiaArticle } from './themes/SophiaPlatanisioti/SophiaArticle'
+import {
+    ArticleTitle,
+    ArticleCover,
+    ArticleContent,
+    ArticleAuthor,
+    ArticleDate,
+    ArticleCategories,
+} from './article'
 
 /**
  * Component metadata interface
@@ -188,6 +201,50 @@ export const componentRegistry: ComponentRegistration[] = [
         category: 'Sophia Content',
         description: 'Sophia Platanisioti article theme',
         icon: <Type className="h-5 w-5" />,
+    },
+
+    // Article Building Blocks - Modular article components
+    {
+        name: 'ArticleTitle',
+        component: ArticleTitle,
+        category: 'Article Blocks',
+        description: 'Displays the article title',
+        icon: <Newspaper className="h-5 w-5" />,
+    },
+    {
+        name: 'ArticleCover',
+        component: ArticleCover,
+        category: 'Article Blocks',
+        description: 'Displays the article cover image',
+        icon: <ImageIcon className="h-5 w-5" />,
+    },
+    {
+        name: 'ArticleContent',
+        component: ArticleContent,
+        category: 'Article Blocks',
+        description: 'Renders the article HTML content',
+        icon: <FileText className="h-5 w-5" />,
+    },
+    {
+        name: 'ArticleAuthor',
+        component: ArticleAuthor,
+        category: 'Article Blocks',
+        description: 'Displays article author info',
+        icon: <User className="h-5 w-5" />,
+    },
+    {
+        name: 'ArticleDate',
+        component: ArticleDate,
+        category: 'Article Blocks',
+        description: 'Displays article publication date',
+        icon: <Calendar className="h-5 w-5" />,
+    },
+    {
+        name: 'ArticleCategories',
+        component: ArticleCategories,
+        category: 'Article Blocks',
+        description: 'Displays article category tags',
+        icon: <Tag className="h-5 w-5" />,
     },
 
 ]

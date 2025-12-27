@@ -12,6 +12,7 @@ import { Navbar } from "./user-components/Navbar"
 import { DesignProvider, useDesign } from "./components/DesignContext"
 import { MarketplaceProvider } from "./components/MarketplaceContext"
 import { SEOProvider, useSEO } from "./components/seo"
+import { ArticleProvider } from "./user-components/article"
 
 // Resolver for all user components - now using resolverWithFallback from registry
 // This automatically handles missing components (e.g., from uninstalled themes)
@@ -156,6 +157,7 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
     const { settings, updateSettings, registerSaveHandler } = useDesign()
     const { seoSettings, updateSEOSettings, registerSEOSaveHandler } = useSEO()
     const [isLoading, setIsLoading] = useState(true)
+    const [pageSlug, setPageSlug] = useState("")
     const hasLoaded = useRef(false)
 
     // Load page data on mount only
@@ -171,6 +173,7 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                     const page = await response.json()
                     setPageName(page.title || "Untitled Page")
                     setPageStatus(page.status || "DRAFT")
+                    setPageSlug(page.slug || "")
                     setIsLocked(page.locked || false)
 
                     // Load Design Settings if available
@@ -287,7 +290,7 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                 {/* Main Content */}
                 <div className="flex-1 flex h-full overflow-hidden">
                     {/* Sidebar */}
-                    {showSidebar && <CraftSidebar />}
+                    {showSidebar && <CraftSidebar isArticlePage={pageSlug === 'article'} />}
 
                     {/* Canvas Area */}
                     <div className="flex-1 h-full overflow-hidden flex flex-col relative">
@@ -310,18 +313,20 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                                     )
                                 }}
                             >
-                                <Frame>
-                                    <Element
-                                        is={Container}
-                                        canvas
-                                        minHeight="100vh"
-                                        flexDirection="column"
-                                        alignItems="stretch"
-                                        custom={{ displayName: "App", isDeletable: false }}
-                                    >
-                                        {/* Components will be added here */}
-                                    </Element>
-                                </Frame>
+                                <ArticleProvider>
+                                    <Frame>
+                                        <Element
+                                            is={Container}
+                                            canvas
+                                            minHeight="100vh"
+                                            flexDirection="column"
+                                            alignItems="stretch"
+                                            custom={{ displayName: "App", isDeletable: false }}
+                                        >
+                                            {/* Components will be added here */}
+                                        </Element>
+                                    </Frame>
+                                </ArticleProvider>
                             </div>
                         </div>
                     </div>
