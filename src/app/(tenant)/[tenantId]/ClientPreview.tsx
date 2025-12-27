@@ -7,6 +7,8 @@ import { PageData } from "@/lib/types"
 import { DesignSystemStyles } from "@/components/DesignSystemStyles"
 import { DesignSettings } from "@/lib/design-system"
 
+import { ArticleProvider } from "@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/user-components/article"
+
 interface ClientPreviewProps {
   tenantId: string
   page: PageData
@@ -55,10 +57,12 @@ function ClientPreview({ tenantId, page }: ClientPreviewProps) {
         enabled={false} // Read-only mode
         resolver={resolverWithFallback}
       >
-        <Frame json={craftStateJson}>
-          {/* Frame content is hydrated from json, children here are ignored/replaced */}
-          <div />
-        </Frame>
+        <ArticleProvider>
+          <Frame json={craftStateJson}>
+            {/* Frame content is hydrated from json, children here are ignored/replaced */}
+            <div />
+          </Frame>
+        </ArticleProvider>
       </Editor>
     </main>
   )

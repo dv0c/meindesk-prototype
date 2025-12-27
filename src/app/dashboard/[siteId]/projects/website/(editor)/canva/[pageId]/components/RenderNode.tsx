@@ -260,15 +260,46 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
             const deltaX = moveEvent.clientX - startX
             const deltaY = moveEvent.clientY - startY
 
-            finalWidth = Math.max(50, startWidth + deltaX)
-            finalHeight = Math.max(20, startHeight + deltaY)
+            let newWidth = Math.max(50, startWidth + deltaX)
+            let newHeight = Math.max(20, startHeight + deltaY)
+
+            // Get parent width for % calculation
+            const parentWidth = dom.parentElement?.getBoundingClientRect().width || window.innerWidth
+
+            // Snapping Logic
+            const node = query.node(id).get()
+            const shouldSnap = node.data.props.enableSnapping === true
+
+            if (shouldSnap) {
+                const breakpoints = [640, 768, 1024, 1280, 1536]
+                const threshold = 20
+
+                for (const bp of breakpoints) {
+                    if (Math.abs(newWidth - bp) < threshold) {
+                        newWidth = bp
+                        break
+                    }
+                }
+            }
+
+            // Constraint: Don't go higher than screen width (or parent width)
+            // Applied AFTER snapping to ensure we don't snap outside the container
+            newWidth = Math.min(newWidth, parentWidth)
+
+            // Convert to percentage
+            let widthPercent = (newWidth / parentWidth) * 100
+
+            // Hard clamp to 100% to handle precision issues
+            if (widthPercent > 100) widthPercent = 100
+
+            finalWidth = newWidth // Keep pixel value for height calculation if needed
+            finalHeight = newHeight
 
             // Update DOM directly for smooth feedback
-            // Override all width-related properties to ensure expansion works
-            dom.style.width = `${finalWidth}px`
-            dom.style.minWidth = `${finalWidth}px`
-            dom.style.maxWidth = `${finalWidth}px`
-            dom.style.minHeight = `${finalHeight}px`
+            dom.style.width = `${widthPercent}%`
+            dom.style.minWidth = `${widthPercent}%`
+            dom.style.maxWidth = `${widthPercent}%`
+            dom.style.minHeight = `${finalHeight}px` // Height usually stays px for images unless ratio locked? 
             dom.style.height = `${finalHeight}px`
 
             // Update resize handle position
@@ -291,13 +322,17 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
             dom.style.minWidth = originalMinWidth
             dom.style.height = originalHeight
 
+            // Calculate final % for saving
+            const parentWidth = dom.parentElement?.getBoundingClientRect().width || window.innerWidth
+            const finalPercent = (finalWidth / parentWidth) * 100
+
             // Sync final values to CraftJS state
             actions.setProp(id, (prop: Record<string, any>) => {
                 if (prop.width !== undefined || name === "Container" || name === "Grid") {
-                    prop.width = `${finalWidth}px`
+                    prop.width = `${finalPercent.toFixed(2)}%`
                 }
                 if (prop.maxWidth !== undefined) {
-                    prop.maxWidth = `${finalWidth}px`
+                    prop.maxWidth = `${finalPercent.toFixed(2)}%`
                 }
                 if (prop.height !== undefined || name === "Spacer") {
                     prop.height = finalHeight

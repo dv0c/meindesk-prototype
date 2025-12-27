@@ -28,7 +28,7 @@ interface ImageProps {
 export const Image = ({
     src = "https://placehold.co/600x400/e2e8f0/64748b?text=Image",
     alt = "Image",
-    width = "100%",
+    width = "50%",
     height = "auto",
     objectFit = "cover",
     borderRadius = 0,
