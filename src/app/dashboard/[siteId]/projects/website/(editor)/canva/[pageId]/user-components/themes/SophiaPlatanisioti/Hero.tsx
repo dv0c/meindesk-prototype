@@ -1,6 +1,6 @@
 "use client"
 
-import { useNode } from "@craftjs/core"
+import { useNode, useEditor } from "@craftjs/core"
 import React, { useMemo } from "react"
 
 import { useEditorContent } from "@/hooks/useEditorContent"
@@ -25,6 +25,7 @@ const HeroBase = React.forwardRef<HTMLDivElement, HeroProps>(({
     contentFont = "font-sans",
     ...props
 }, ref) => {
+    const { enabled } = useEditor((state) => ({ enabled: state.options.enabled }))
     const htmlContent = useEditorContent(content)
     const style = propsToStyle(props)
 

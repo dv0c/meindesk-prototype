@@ -19,7 +19,6 @@ interface HeadingProps {
     fontWeight?: string
     color?: string
     textAlign?: "left" | "center" | "right"
-    textAlign?: "left" | "center" | "right"
     marginTop?: string | number
     marginRight?: string | number
     marginBottom?: string | number
@@ -68,7 +67,9 @@ export const Heading = ({
         id: state.id,
     }))
 
-    const { actions: editorActions } = useEditor()
+    const { actions: editorActions, enabled } = useEditor((state) => ({
+        enabled: state.options.enabled,
+    }))
 
     const [isEditing, setIsEditing] = useState(false)
     const contentRef = useRef<HTMLElement>(null)
@@ -98,11 +99,12 @@ export const Heading = ({
         boxShadow,
         lineHeight: 1.2,
         outline: isEditing ? "none" : undefined,
-        cursor: isEditing ? "text" : "pointer",
+        cursor: enabled ? (isEditing ? "text" : "pointer") : undefined,
     }
 
-    // Single click to edit when already selected
+    // Single click to edit when already selected (only in editor mode)
     const handleClick = useCallback((e: React.MouseEvent) => {
+        if (!enabled) return // Don't handle clicks on live/preview site
         e.stopPropagation()
         if (selected) {
             // Already selected, enter edit mode
@@ -111,7 +113,7 @@ export const Heading = ({
             // Select this node
             editorActions.selectNode(id)
         }
-    }, [selected, editorActions, id])
+    }, [enabled, selected, editorActions, id])
 
     const handleBlur = useCallback(() => {
         setIsEditing(false)
