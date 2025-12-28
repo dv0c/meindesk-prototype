@@ -1,7 +1,11 @@
-"use client"
-
+import { Metadata } from "next"
 import { MarketingPageWrapper } from "../../components/marketing-page-wrapper"
 import { Search } from "lucide-react"
+
+export const metadata: Metadata = {
+    title: "Help Center — PROTOTYPE",
+    description: "Find answers and solve technical hurdles with our resolution center.",
+}
 
 export default function HelpCenterPage() {
     return (

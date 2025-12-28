@@ -1,6 +1,10 @@
-"use client"
-
+import { Metadata } from "next"
 import { MarketingPageWrapper } from "../../components/marketing-page-wrapper"
+
+export const metadata: Metadata = {
+    title: "SEO Tools — PROTOTYPE",
+    description: "Automated search engine optimization. We handle the rankings so you can focus on writing.",
+}
 
 export default function SEOPage() {
     return (

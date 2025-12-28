@@ -1,6 +1,10 @@
-"use client"
-
+import { Metadata } from "next"
 import { MarketingPageWrapper } from "../../components/marketing-page-wrapper"
+
+export const metadata: Metadata = {
+    title: "Community — PROTOTYPE",
+    description: "Join thousands of PROTOTYPE crafters. Share templates, workflows, and insights.",
+}
 
 export default function CommunityPage() {
     return (
@@ -41,16 +45,18 @@ export default function CommunityPage() {
                     <div className="space-y-4">
                         <h3 className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Recent Activity</h3>
                         <div className="space-y-4">
-                            {[
-                                { user: "alex_v", action: "published theme 'GHOST'" },
-                                { user: "marina.s", action: "solved query #422" },
-                                { user: "dev_hq", action: "updated core build v2.5" },
-                            ].map((act, i) => (
-                                <div key={i} className="flex flex-col border-l border-white/10 pl-4 py-1">
-                                    <span className="font-mono text-[10px] text-white">{act.user}</span>
-                                    <span className="font-mono text-[9px] text-muted-foreground uppercase tracking-wider">{act.action}</span>
-                                </div>
-                            ))}
+                            <div className="flex flex-col border-l border-white/10 pl-4 py-1">
+                                <span className="font-mono text-[10px] text-white">alex_v</span>
+                                <span className="font-mono text-[9px] text-muted-foreground uppercase tracking-wider">published theme 'GHOST'</span>
+                            </div>
+                            <div className="flex flex-col border-l border-white/10 pl-4 py-1">
+                                <span className="font-mono text-[10px] text-white">marina.s</span>
+                                <span className="font-mono text-[9px] text-muted-foreground uppercase tracking-wider">solved query #422</span>
+                            </div>
+                            <div className="flex flex-col border-l border-white/10 pl-4 py-1">
+                                <span className="font-mono text-[10px] text-white">dev_hq</span>
+                                <span className="font-mono text-[9px] text-muted-foreground uppercase tracking-wider">updated core build v2.5</span>
+                            </div>
                         </div>
                     </div>
                 </div>

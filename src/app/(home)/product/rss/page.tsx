@@ -1,7 +1,10 @@
-"use client"
-
+import { Metadata } from "next"
 import { MarketingPageWrapper } from "../../components/marketing-page-wrapper"
-import { motion } from "framer-motion"
+
+export const metadata: Metadata = {
+    title: "RSS Scraper — PROTOTYPE",
+    description: "Automate your content ingestion with the world's most advanced RSS engine. Discover, scrape, and transform content seamlessly.",
+}
 
 export default function RSSPage() {
     return (

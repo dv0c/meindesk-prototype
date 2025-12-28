@@ -1,6 +1,10 @@
-"use client"
-
+import { Metadata } from "next"
 import { MarketingPageWrapper } from "../../components/marketing-page-wrapper"
+
+export const metadata: Metadata = {
+    title: "Theme Store — PROTOTYPE",
+    description: "Elite architectures for your blog. Curated collection of high-performance themes.",
+}
 
 export default function ThemesPage() {
     return (

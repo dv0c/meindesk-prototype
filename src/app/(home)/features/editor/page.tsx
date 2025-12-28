@@ -1,7 +1,10 @@
-"use client"
-
+import { Metadata } from "next"
 import { MarketingPageWrapper } from "../../components/marketing-page-wrapper"
-import { motion } from "framer-motion"
+
+export const metadata: Metadata = {
+    title: "Drag & Drop Editor — PROTOTYPE",
+    description: "Experience the fluid interaction of our live visual editor. Build yours with zero latency and deep customization.",
+}
 
 export default function EditorPage() {
     return (
@@ -34,12 +37,10 @@ export default function EditorPage() {
                 </div>
 
                 <div className="relative h-[500px] border border-white/10 bg-white/[0.02] flex items-center justify-center p-8 overflow-hidden">
-                    {/* Animated placeholder for editor */}
-                    <motion.div
-                        animate={{ y: [0, -20, 0] }}
-                        transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-                        className="w-full max-w-sm aspect-[4/3] bg-neutral-900 border border-white/10 shadow-2xl relative"
-                    >
+                    {/* Note: In a real app, the animated placeholder should be moved to a client component if it needs direct motion hooks in the page. 
+                        However, MarketingPageWrapper itself is a client component and can handle animations of its children if passed as props, 
+                        or we can just leave this as is since MarketingPageWrapper is client-side. */}
+                    <div className="w-full max-w-sm aspect-[4/3] bg-neutral-900 border border-white/10 shadow-2xl relative">
                         <div className="absolute top-0 left-0 right-0 h-6 bg-white/5 flex items-center px-2 gap-1">
                             <div className="w-1.5 h-1.5 rounded-full bg-white/10" />
                             <div className="w-1.5 h-1.5 rounded-full bg-white/10" />
@@ -52,7 +53,7 @@ export default function EditorPage() {
                                 <div className="h-24 bg-white/5 border border-white/10" />
                             </div>
                         </div>
-                    </motion.div>
+                    </div>
                 </div>
             </div>
         </MarketingPageWrapper>

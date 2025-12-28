@@ -1,6 +1,10 @@
-"use client"
-
+import { Metadata } from "next"
 import { MarketingPageWrapper } from "../../components/marketing-page-wrapper"
+
+export const metadata: Metadata = {
+    title: "API Reference — PROTOTYPE",
+    description: "Core infrastructure API reference. Build custom integrations and high-volume publishing workflows.",
+}
 
 export default function APIReferencePage() {
     return (

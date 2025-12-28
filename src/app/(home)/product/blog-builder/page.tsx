@@ -1,7 +1,10 @@
-"use client"
-
+import { Metadata } from "next"
 import { MarketingPageWrapper } from "../../components/marketing-page-wrapper"
-import { motion } from "framer-motion"
+
+export const metadata: Metadata = {
+    title: "Blog Builder — PROTOTYPE",
+    description: "Craft your identity with PROTOTYPE's intuitive blog builder. A canvas designed for pure expression and total creative control.",
+}
 
 export default function BlogBuilderPage() {
     return (

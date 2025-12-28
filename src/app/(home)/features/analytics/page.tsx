@@ -1,6 +1,10 @@
-"use client"
-
+import { Metadata } from "next"
 import { MarketingPageWrapper } from "../../components/marketing-page-wrapper"
+
+export const metadata: Metadata = {
+    title: "Analytics — PROTOTYPE",
+    description: "Privacy-first analytics for creators. Understand your audience flow without cookies.",
+}
 
 export default function AnalyticsPage() {
     return (
@@ -33,13 +37,13 @@ export default function AnalyticsPage() {
                 </div>
 
                 <div className="lg:col-span-4 self-center">
+                    {/* Note: Removed Math.random() usage in JSX to prevent hydration mismatch since this is now a server component. 
+                In a real app, this should be data-driven or handled in a client component. */}
                     <div className="space-y-1 font-mono text-[10px] uppercase tracking-tighter text-muted-foreground/30">
-                        {Array.from({ length: 20 }).map((_, i) => (
-                            <div key={i} className="flex gap-2">
-                                <span>0x{Math.random().toString(16).slice(2, 6)}</span>
-                                <div className="h-[2px] bg-white/5 flex-1" style={{ width: `${Math.random() * 100}%` }} />
-                            </div>
-                        ))}
+                        <div className="flex gap-2"><span>0x4A2B</span><div className="h-[2px] bg-white/5 flex-1 w-[40%]" /></div>
+                        <div className="flex gap-2"><span>0xF1C3</span><div className="h-[2px] bg-white/5 flex-1 w-[70%]" /></div>
+                        <div className="flex gap-2"><span>0xDEAD</span><div className="h-[2px] bg-white/5 flex-1 w-[20%]" /></div>
+                        <div className="flex gap-2"><span>0xBEEF</span><div className="h-[2px] bg-white/5 flex-1 w-[90%]" /></div>
                     </div>
                 </div>
             </div>

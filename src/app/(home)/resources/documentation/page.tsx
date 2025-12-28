@@ -1,6 +1,10 @@
-"use client"
-
+import { Metadata } from "next"
 import { MarketingPageWrapper } from "../../components/marketing-page-wrapper"
+
+export const metadata: Metadata = {
+    title: "Documentation — PROTOTYPE",
+    description: "Master the PROTOTYPE platform with our comprehensive guides and developer resources.",
+}
 
 export default function DocumentationPage() {
     return (

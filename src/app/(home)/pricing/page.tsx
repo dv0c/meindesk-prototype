@@ -1,8 +1,12 @@
-"use client"
-
+import { Metadata } from "next"
 import { MarketingPageWrapper } from "../components/marketing-page-wrapper"
 import { Check, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
+
+export const metadata: Metadata = {
+    title: "Pricing — PROTOTYPE",
+    description: "Investment in quality. Transparent pricing for creators, professionals, and enterprises.",
+}
 
 export default function PricingPage() {
     const plans = [

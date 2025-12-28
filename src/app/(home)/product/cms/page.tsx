@@ -1,7 +1,10 @@
-"use client"
-
+import { Metadata } from "next"
 import { MarketingPageWrapper } from "../../components/marketing-page-wrapper"
-import { motion } from "framer-motion"
+
+export const metadata: Metadata = {
+    title: "CMS Platform — PROTOTYPE",
+    description: "Manage your content with the universal content layer. An API-first, real-time CMS built for developers and creators.",
+}
 
 export default function CMSPage() {
     return (
