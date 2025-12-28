@@ -23,6 +23,51 @@ export const metadata: Metadata = {
   description:
     "Build stunning blogs with our intuitive drag-and-drop CMS. RSS feed scraper, SEO builder, custom themes, and a generous free tier. Total control over your content.",
   generator: "Meindesk Prototype Builder",
+  keywords: [
+    "blog builder",
+    "drag and drop cms",
+    "rss feed scraper",
+    "seo builder",
+    "custom themes",
+    "free tier",
+    "total control over your content",
+  ],
+  authors: [
+    {
+      name: "Meindesk",
+      url: "https://meindesk.com",
+    },
+  ],
+  openGraph: {
+    title: "PROTOTYPE — Blog Builder & Drag-Drop CMS",
+    description:
+      "Build stunning blogs with our intuitive drag-and-drop CMS. RSS feed scraper, SEO builder, custom themes, and a generous free tier. Total control over your content.",
+    type: "website",
+    locale: "en_US",
+    siteName: "Meindesk",
+    images: [
+      {
+        url: "/prototype-image.png",
+        width: 1200,
+        height: 630,
+        alt: "PROTOTYPE — Blog Builder & Drag-Drop CMS",
+      },
+    ],
+  },
+  twitter: {
+    title: "PROTOTYPE — Blog Builder & Drag-Drop CMS",
+    description:
+      "Build stunning blogs with our intuitive drag-and-drop CMS. RSS feed scraper, SEO builder, custom themes, and a generous free tier. Total control over your content.",
+    card: "summary_large_image",
+    images: [
+      {
+        url: "/prototype-image.png",
+        width: 1200,
+        height: 630,
+        alt: "PROTOTYPE — Blog Builder & Drag-Drop CMS",
+      },
+    ],
+  },
   icons: {
     icon: [
       {
