@@ -90,6 +90,14 @@ export async function createSite(formData: FormData) {
         },
       }),
 
+      // Install default "Core" theme
+      db.siteTheme.create({
+        data: {
+          siteId: site.id,
+          themeId: "000000000000000000000001",
+        },
+      }),
+
     ]);
 
     return site;
