@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   title: "PROTOTYPE — Blog Builder & Drag-Drop CMS",
   description:
     "Build stunning blogs with our intuitive drag-and-drop CMS. RSS feed scraper, SEO builder, custom themes, and a generous free tier. Total control over your content.",
-  generator: "Meindesk Prototype Builder",
+  generator: "Prototype Builder",
   keywords: [
     "blog builder",
     "drag and drop cms",
