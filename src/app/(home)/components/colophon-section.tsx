@@ -2,6 +2,7 @@
 
 import { useRef } from "react"
 import { motion, useInView } from "framer-motion"
+import { PrototypeBadge } from "@/components/PrototypeBadge"
 
 export function ColophonSection() {
   const headerRef = useRef<HTMLDivElement>(null)
@@ -140,7 +141,7 @@ export function ColophonSection() {
         initial={{ y: 20, opacity: 0 }}
         animate={footerInView ? { y: 0, opacity: 1 } : { y: 20, opacity: 0 }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className="mt-24 pt-8 border-t border-border/20 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+        className="relative mt-24 pt-8 border-t border-border/20 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
       >
         <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
           © 2025 Prototype. All rights reserved.

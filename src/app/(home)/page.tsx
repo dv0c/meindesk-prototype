@@ -4,6 +4,7 @@ import { WorkSection } from "./components/work-section"
 import { PrinciplesSection } from "./components/principles-section"
 import { ColophonSection } from "./components/colophon-section"
 import { SideNav } from "./components/side-nav"
+import { PrototypeBadge } from "@/components/PrototypeBadge"
 
 
 export default function Page() {
@@ -18,6 +19,7 @@ export default function Page() {
         <WorkSection />
         <PrinciplesSection />
         <ColophonSection />
+        <PrototypeBadge sticky={false} />
       </div>
     </main>
   )

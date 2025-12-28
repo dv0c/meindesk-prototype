@@ -19,6 +19,8 @@ type SiteData = {
   settings: any; // JsonValue from Prisma, will be converted to WebsiteSettings
 };
 
+import { PrototypeBadge } from "@/components/PrototypeBadge";
+
 // --- Main Layout Component ---
 
 export default async function TenantLayout({ children }: { children: React.ReactNode }) {
@@ -201,6 +203,7 @@ export default async function TenantLayout({ children }: { children: React.React
       {/* Wrapper with background and text color */}
       <div style={wrapperStyle} className={`min-h-screen ${themeClassName}`}>
         {children}
+        <PrototypeBadge />
       </div>
     </>
   )
