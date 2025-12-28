@@ -82,13 +82,24 @@ export async function createSite(formData: FormData) {
 
       db.page.create({
         data: {
-          title: "article",
+          title: "Article",
           slug: "article",
           status: "PUBLISHED",
           siteId: site.id,
           locked: true
         },
       }),
+
+      db.page.create({
+        data: {
+          title: "Articles",
+          slug: "articles",
+          status: "PUBLISHED",
+          siteId: site.id,
+          locked: true
+        },
+      }),
+
 
       // Install default "Core" theme
       db.siteTheme.create({
