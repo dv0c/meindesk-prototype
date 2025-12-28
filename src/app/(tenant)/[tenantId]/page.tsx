@@ -16,11 +16,11 @@ async function getPageData(tenantId: string) {
 
   if (!tenant || !tenant.home_Id) return null
 
-  // Fetch main page using compound unique: slug + siteId
+  // Fetch main page using compound unique: slug + siteId - searching for 'home' slug as requested
   const mainPage = await db.page.findUnique({
     where: {
       slug_siteId: {
-        slug: tenant.home_Id,
+        slug: "home",
         siteId: tenant.id,
       },
     },
