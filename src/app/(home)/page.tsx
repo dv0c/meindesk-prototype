@@ -5,6 +5,7 @@ import { PrinciplesSection } from "./components/principles-section"
 import { ColophonSection } from "./components/colophon-section"
 import { SideNav } from "./components/side-nav"
 
+
 export default function Page() {
   return (
     <main className="relative min-h-screen">

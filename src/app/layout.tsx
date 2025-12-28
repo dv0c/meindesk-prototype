@@ -19,9 +19,29 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Meindesk Prototype",
-  description: "Created for customers by Meintanis A.",
-};
+  title: "CMS | PROTOTYPE — Blog Builder & Drag-Drop CMS",
+  description:
+    "Build stunning blogs with our intuitive drag-and-drop CMS. RSS feed scraper, SEO builder, custom themes, and a generous free tier. Total control over your content.",
+  generator: "Meindesk Prototype Builder",
+  icons: {
+    icon: [
+      {
+        url: "/PrototypeFav.png",
+        media: "(prefers-color-scheme: light)",
+      },
+      {
+        url: "/PrototypeFav.png",
+        media: "(prefers-color-scheme: dark)",
+      },
+      {
+        url: "/PrototypeFav.svg",
+        type: "image/svg+xml",
+      },
+    ],
+    apple: "/PrototypeFav.png",
+  },
+}
+
 
 export default function RootLayout({
   children,
