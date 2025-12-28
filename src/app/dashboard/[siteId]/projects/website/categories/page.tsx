@@ -1,5 +1,9 @@
 import { CategoriesTable } from "@/components/CategoriesTable"
 
+export const metadata = {
+  title: "Categories | PROTOTYPE — Blog Builder & Drag-Drop CMS",
+}
+
 const CategoriesPage = () => {
   return (
     <div className="p-6 space-y-6">

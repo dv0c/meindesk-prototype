@@ -12,6 +12,10 @@ import {
 } from "@/components/ui/empty";
 import { X } from "lucide-react";
 
+export const metadata = {
+    title: "Articles | PROTOTYPE — Blog Builder & Drag-Drop CMS",
+}
+
 export default async function Page({ params }: { params: { siteId: string } }) {
     // if (site?.features?.articles === false) return <EmptyCard />
     const { siteId } = await params;

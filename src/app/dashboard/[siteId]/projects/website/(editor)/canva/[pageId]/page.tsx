@@ -14,6 +14,7 @@ import { MarketplaceProvider } from "./components/MarketplaceContext"
 import { SEOProvider, useSEO } from "./components/seo"
 import { ArticleProvider } from "./user-components/article"
 
+
 // Resolver for all user components - now using resolverWithFallback from registry
 // This automatically handles missing components (e.g., from uninstalled themes)
 const resolver = resolverWithFallback

@@ -11,6 +11,10 @@ interface layoutProps {
     }
 }
 
+export const metadata = {
+    title: "Editor | PROTOTYPE — Blog Builder & Drag-Drop CMS",
+}
+
 const layout: FC<layoutProps> = async ({ children, params }) => {
     const { siteId, id } = await params
     const session = await getAuthSession()

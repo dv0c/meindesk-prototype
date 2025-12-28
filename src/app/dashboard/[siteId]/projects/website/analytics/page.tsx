@@ -11,6 +11,10 @@ import {
 import { getActiveTeam } from "@/lib/actions/helpers/team";
 import { X } from "lucide-react";
 
+export const metadata = {
+    title: "Analytics | PROTOTYPE — Blog Builder & Drag-Drop CMS",
+}
+
 export default async function Page({ params }: { params: { siteId: string } }) {
     const { siteId } = await params
     const site = await getActiveTeam(siteId, "analytics")

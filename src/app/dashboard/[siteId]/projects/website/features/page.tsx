@@ -5,11 +5,14 @@ import { Switch } from "@/components/ui/switch"
 import { getSite } from "@/lib/actions/helpers/site"
 import { BarChart3, Eye, FileText, Zap } from "lucide-react"
 
+export const metadata = {
+    title: "Features | PROTOTYPE — Blog Builder & Drag-Drop CMS",
+}
 
 export default async function FeaturesPage() {
     const site = await getSite()
     if (!site) return <div>No site found.</div>
-    
+
     const features = site.features
     if (!features) return <div>Features are disabled</div>
 
