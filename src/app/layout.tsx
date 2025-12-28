@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CMS | PROTOTYPE — Blog Builder & Drag-Drop CMS",
+  title: "PROTOTYPE — Blog Builder & Drag-Drop CMS",
   description:
     "Build stunning blogs with our intuitive drag-and-drop CMS. RSS feed scraper, SEO builder, custom themes, and a generous free tier. Total control over your content.",
   generator: "Meindesk Prototype Builder",
