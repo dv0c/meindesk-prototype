@@ -36,14 +36,11 @@ export function SignalsSection() {
   const sectionRef = useRef<HTMLElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const [currentIndex, setCurrentIndex] = useState(signals.length)
+  const [currentIndex, setCurrentIndex] = useState(0)
   const [cardsPerView, setCardsPerView] = useState(3)
   const [isMobile, setIsMobile] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const controls = useAnimation()
-
-  // Triplicate signals for infinite loop
-  const displaySignals = [...signals, ...signals, ...signals]
 
   const headerInView = useInView(headerRef, { once: false, amount: 0.3 })
 
@@ -74,33 +71,14 @@ export function SignalsSection() {
     if (isMobile || isDragging) return
 
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => prev + 1)
+      setCurrentIndex((prev) => {
+        const next = prev + 1
+        return next > maxIndex ? 0 : next
+      })
     }, 5000)
 
     return () => clearInterval(interval)
-  }, [cardsPerView, isDragging, isMobile])
-
-  // Handle infinite loop reset when animation completes
-  const handleAnimationComplete = () => {
-    const N = signals.length
-    if (currentIndex >= 2 * N) {
-      // Reset to middle set start
-      const newIndex = currentIndex - N
-      setCurrentIndex(newIndex)
-      if (containerRef.current) {
-        const itemWidth = containerRef.current.offsetWidth / cardsPerView
-        controls.set({ x: -newIndex * itemWidth })
-      }
-    } else if (currentIndex < N) {
-      // Reset to middle set end
-      const newIndex = currentIndex + N
-      setCurrentIndex(newIndex)
-      if (containerRef.current) {
-        const itemWidth = containerRef.current.offsetWidth / cardsPerView
-        controls.set({ x: -newIndex * itemWidth })
-      }
-    }
-  }
+  }, [cardsPerView, isDragging, isMobile, maxIndex])
 
   // Animate to current index (desktop only)
   useEffect(() => {
@@ -141,15 +119,15 @@ export function SignalsSection() {
   }
 
   const nextSlide = () => {
-    setCurrentIndex((prev) => prev + 1)
+    setCurrentIndex((prev) => (prev + 1 > maxIndex ? 0 : prev + 1))
   }
 
   const prevSlide = () => {
-    setCurrentIndex((prev) => prev - 1)
+    setCurrentIndex((prev) => (prev - 1 < 0 ? maxIndex : prev - 1))
   }
 
   const goToSlide = (index: number) => {
-    setCurrentIndex(signals.length + index)
+    setCurrentIndex(Math.min(index, maxIndex))
   }
 
   return (
@@ -203,11 +181,10 @@ export function SignalsSection() {
               dragElastic={0.2}
               onDragStart={() => setIsDragging(true)}
               onDragEnd={handleDragEnd}
-              onAnimationComplete={handleAnimationComplete}
               animate={controls}
               className="flex"
             >
-              {displaySignals.map((signal, index) => (
+              {signals.map((signal, index) => (
                 <div
                   key={index}
                   className="flex-shrink-0 px-3"
@@ -264,29 +241,26 @@ export function SignalsSection() {
 
             {/* Progress Dots */}
             <div className="flex gap-2 ml-4">
-              {signals.map((_, index) => {
-                const effectiveIndex = (currentIndex - signals.length + signals.length * 3) % signals.length
-                return (
-                  <button
-                    key={index}
-                    onClick={() => goToSlide(index)}
-                    className={cn(
-                      "w-2 h-2 rounded-full transition-all duration-300",
-                      index === effectiveIndex
-                        ? "bg-accent w-8"
-                        : "bg-border/40 hover:bg-border",
-                    )}
-                    aria-label={`Go to slide ${index + 1}`}
-                  />
-                )
-              })}
+              {Array.from({ length: maxIndex + 1 }).map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToSlide(index)}
+                  className={cn(
+                    "w-2 h-2 rounded-full transition-all duration-300",
+                    index === currentIndex
+                      ? "bg-accent w-8"
+                      : "bg-border/40 hover:bg-border",
+                  )}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
             </div>
 
             {/* Counter */}
             <div className="ml-auto font-mono text-xs text-muted-foreground">
-              <span className="text-accent">{String(((currentIndex - signals.length + signals.length * 3) % signals.length) + 1).padStart(2, "0")}</span>
+              <span className="text-accent">{String(currentIndex + 1).padStart(2, "0")}</span>
               {" / "}
-              <span>{String(signals.length).padStart(2, "0")}</span>
+              <span>{String(maxIndex + 1).padStart(2, "0")}</span>
             </div>
           </div>
         </div>
