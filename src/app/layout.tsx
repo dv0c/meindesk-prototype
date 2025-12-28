@@ -1,13 +1,12 @@
+import LoadingBar from "@/components/LoadingBar";
 import SessionProvider from "@/components/Providers/sessionProvider";
+import { VersionProvider } from "@/components/Providers/VersionProvider";
 import { Toaster } from "@/components/ui/sonner";
+import { ScrollToTop } from "@/hooks/scrollToTop";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import LoadingBar from "@/components/LoadingBar";
-import { ThemeProvider } from "@/components/Homepage/theme-provider";
-import { ThemeTogglerButton } from "@/components/animate-ui/components/buttons/theme-toggler";
-import { VersionProvider } from "@/components/Providers/VersionProvider";
-import { ScrollToTop } from "@/hooks/scrollToTop";
+import { ThemeProvider } from "@/components/Providers/ThemeProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
