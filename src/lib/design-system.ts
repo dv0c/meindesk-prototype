@@ -112,6 +112,7 @@ export const fontPairings: FontPairing[] = [
     { id: "roboto-slab", heading: "Roboto Slab", body: "Open Sans" }, // Google
 
     // --- Monospace / Tech ---
+    { id: "bebas-mono", heading: "Bebas Neue", body: "monospace" }, // Meindesk Theme
     { id: "inconsolata-karla", heading: "Inconsolata", body: "Karla" }, // Google
     { id: "jetbrains", heading: "JetBrains Mono", body: "JetBrains Mono" }, // Google
     { id: "space-lora", heading: "Space Grotesk", body: "Lora" }, // Google

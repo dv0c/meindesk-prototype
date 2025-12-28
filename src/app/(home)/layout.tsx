@@ -20,23 +20,23 @@ export const metadata: Metadata = {
   title: "PROTOTYPE — Blog Builder & Drag-Drop CMS",
   description:
     "Build stunning blogs with our intuitive drag-and-drop CMS. RSS feed scraper, SEO builder, custom themes, and a generous free tier. Total control over your content.",
-  generator: "v0.app",
+  generator: "Meindesk Prototype Builder",
   icons: {
     icon: [
       {
-        url: "/icon-light-32x32.png",
+        url: "/PrototypeFav.png",
         media: "(prefers-color-scheme: light)",
       },
       {
-        url: "/icon-dark-32x32.png",
+        url: "/PrototypeFav.png",
         media: "(prefers-color-scheme: dark)",
       },
       {
-        url: "/icon.svg",
+        url: "/PrototypeFav.svg",
         type: "image/svg+xml",
       },
     ],
-    apple: "/apple-icon.png",
+    apple: "/PrototypeFav.png",
   },
 }
 

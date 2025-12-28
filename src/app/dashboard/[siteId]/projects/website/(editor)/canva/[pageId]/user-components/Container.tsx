@@ -1,7 +1,11 @@
 "use client"
 
 import { useNode, useEditor } from "@craftjs/core"
-import React from "react"
+import React, { useState } from "react"
+import { useParams } from "next/navigation"
+import MediaLibraryDialog, { MediaItem } from "@/components/MediaGallery/media-select"
+import { Button } from "@/components/ui/button"
+import { ImageIcon } from "lucide-react"
 import {
     PropertySection,
     PropertyRow,
@@ -20,6 +24,12 @@ interface ContainerProps {
     children?: React.ReactNode
     padding?: number // Legacy padding, used for empty state calculation
     backgroundColor?: string
+    backgroundImage?: string
+    backgroundSize?: "cover" | "contain" | "auto"
+    backgroundPosition?: string
+    backgroundRepeat?: "no-repeat" | "repeat" | "repeat-x" | "repeat-y"
+    enableGrid?: boolean
+    gridOpacity?: number
     borderRadius?: number
     borderWidth?: number
     borderColor?: string
@@ -47,6 +57,10 @@ interface ContainerProps {
 function getContainerStyle(props: ContainerProps): React.CSSProperties {
     return {
         backgroundColor: props.backgroundColor,
+        backgroundImage: props.backgroundImage ? `url(${props.backgroundImage})` : undefined,
+        backgroundSize: props.backgroundSize,
+        backgroundPosition: props.backgroundPosition,
+        backgroundRepeat: props.backgroundRepeat,
         borderRadius: `${props.borderRadius}px`,
         border: `${props.borderWidth}px solid ${props.borderColor}`,
         minHeight: props.minHeight,
@@ -75,6 +89,12 @@ export const Container = ({
     children,
     padding = 20, // Legacy padding, kept for empty state calculation
     backgroundColor = "transparent",
+    backgroundImage,
+    backgroundSize = "cover",
+    backgroundPosition = "center",
+    backgroundRepeat = "no-repeat",
+    enableGrid = false,
+    gridOpacity = 30,
     borderRadius = 0,
     borderWidth = 0,
     borderColor = "#e5e7eb",
@@ -104,6 +124,10 @@ export const Container = ({
 
     const style: React.CSSProperties = {
         backgroundColor,
+        backgroundImage: backgroundImage ? `url(${backgroundImage})` : undefined,
+        backgroundSize,
+        backgroundPosition,
+        backgroundRepeat,
         borderRadius: `${borderRadius}px`,
         border: `${borderWidth}px solid ${borderColor}`,
         minHeight,
@@ -140,6 +164,18 @@ export const Container = ({
             className={className}
             style={style}
         >
+            {/* Grid background overlay */}
+            {enableGrid && (
+                <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                        backgroundImage: `linear-gradient(to right, rgba(255, 255, 255, ${gridOpacity / 100}) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, ${gridOpacity / 100}) 1px, transparent 1px)`,
+                        backgroundSize: "60px 60px",
+                        opacity: gridOpacity / 100,
+                    }}
+                    aria-hidden="true"
+                />
+            )}
             {isEmpty && enabled ? (
                 isApp ? (
                     <div className="text-center space-y-4 max-w-sm m-auto p-8 border-2 border-dashed rounded-xl transition-all duration-200 border-muted-foreground/20 bg-muted/5">
@@ -185,6 +221,12 @@ export const ContainerSettings = () => {
     const {
         actions: { setProp },
         backgroundColor,
+        backgroundImage,
+        backgroundSize,
+        backgroundPosition,
+        backgroundRepeat,
+        enableGrid,
+        gridOpacity,
         borderRadius,
         borderWidth,
         borderColor,
@@ -199,6 +241,12 @@ export const ContainerSettings = () => {
         boxShadow,
     } = useNode((node) => ({
         backgroundColor: node.data.props.backgroundColor,
+        backgroundImage: node.data.props.backgroundImage,
+        backgroundSize: node.data.props.backgroundSize,
+        backgroundPosition: node.data.props.backgroundPosition,
+        backgroundRepeat: node.data.props.backgroundRepeat,
+        enableGrid: node.data.props.enableGrid,
+        gridOpacity: node.data.props.gridOpacity,
         borderRadius: node.data.props.borderRadius,
         borderWidth: node.data.props.borderWidth,
         borderColor: node.data.props.borderColor,
@@ -218,6 +266,19 @@ export const ContainerSettings = () => {
         paddingLeft: node.data.props.paddingLeft,
         boxShadow: node.data.props.boxShadow,
     }))
+
+    const params = useParams()
+    const siteId = params.siteId as string
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
+
+    const handleMediaSelect = (items: MediaItem[]) => {
+        if (items.length > 0) {
+            const selectedImage = items[0]
+            setProp((props: ContainerProps) => {
+                props.backgroundImage = selectedImage.url
+            })
+        }
+    }
 
     // Parse value with unit helper
     const parseValueWithUnit = (val: string | number | undefined, defaultUnit = 'px', defaultValue = 0): { value: number; unit: string } => {
@@ -301,12 +362,110 @@ export const ContainerSettings = () => {
             </PropertySection>
 
             <PropertySection title="Decoration" summary={`${borderRadius ? `${borderRadius}px` : "0px"} / ${boxShadow ? "Shadow" : "None"}`} defaultOpen={false}>
-                <PropertyRow label="Background">
+                <PropertyRow label="Background Color">
                     <PropertyColor
                         value={backgroundColor}
                         onChange={(color) => setProp((props: ContainerProps) => (props.backgroundColor = color))}
                     />
                 </PropertyRow>
+                <PropertyRow label="Background Image">
+                    <div className="flex flex-col gap-2 w-full">
+                        {backgroundImage ? (
+                            <div className="relative group w-full aspect-video bg-muted rounded-md overflow-hidden border border-border">
+                                <div
+                                    className="w-full h-full"
+                                    style={{
+                                        backgroundImage: `url(${backgroundImage})`,
+                                        backgroundSize: backgroundSize || 'cover',
+                                        backgroundPosition: backgroundPosition || 'center',
+                                        backgroundRepeat: backgroundRepeat || 'no-repeat',
+                                    }}
+                                />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                    <Button
+                                        variant="secondary"
+                                        size="sm"
+                                        className="h-8 text-xs"
+                                        onClick={() => setIsDialogOpen(true)}
+                                    >
+                                        Change Image
+                                    </Button>
+                                    <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        className="h-8 text-xs"
+                                        onClick={() => setProp((props: ContainerProps) => (props.backgroundImage = undefined))}
+                                    >
+                                        Remove
+                                    </Button>
+                                </div>
+                            </div>
+                        ) : (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="w-full flex items-center justify-center gap-2 h-20 border-dashed"
+                                onClick={() => setIsDialogOpen(true)}
+                            >
+                                <ImageIcon className="w-5 h-5 text-muted-foreground" />
+                                <span className="text-muted-foreground">Select Background Image</span>
+                            </Button>
+                        )}
+                    </div>
+                </PropertyRow>
+                {backgroundImage && (
+                    <>
+                        <PropertyRow label="Image Size">
+                            <PropertySelect
+                                value={backgroundSize || "cover"}
+                                onChange={(v) => setProp((props: ContainerProps) => (props.backgroundSize = v as ContainerProps["backgroundSize"]))}
+                                options={[
+                                    { label: "Cover", value: "cover" },
+                                    { label: "Contain", value: "contain" },
+                                    { label: "Auto", value: "auto" },
+                                ]}
+                            />
+                        </PropertyRow>
+                        <PropertyRow label="Image Position">
+                            <PropertyInput
+                                value={backgroundPosition || "center"}
+                                onChange={(val) => setProp((props: ContainerProps) => (props.backgroundPosition = val))}
+                                placeholder="center, top, bottom, left, right"
+                            />
+                        </PropertyRow>
+                        <PropertyRow label="Image Repeat">
+                            <PropertySelect
+                                value={backgroundRepeat || "no-repeat"}
+                                onChange={(v) => setProp((props: ContainerProps) => (props.backgroundRepeat = v as ContainerProps["backgroundRepeat"]))}
+                                options={[
+                                    { label: "No Repeat", value: "no-repeat" },
+                                    { label: "Repeat", value: "repeat" },
+                                    { label: "Repeat X", value: "repeat-x" },
+                                    { label: "Repeat Y", value: "repeat-y" },
+                                ]}
+                            />
+                        </PropertyRow>
+                    </>
+                )}
+                <PropertyRow label="Enable Grid Background">
+                    <input
+                        type="checkbox"
+                        checked={enableGrid || false}
+                        onChange={(e) => setProp((props: ContainerProps) => (props.enableGrid = e.target.checked))}
+                        className="h-4 w-4"
+                    />
+                </PropertyRow>
+                {enableGrid && (
+                    <PropertyRow label="Grid Opacity (%)">
+                        <PropertySlider
+                            value={gridOpacity || 30}
+                            onChange={(v) => setProp((props: ContainerProps) => (props.gridOpacity = v))}
+                            min={0}
+                            max={100}
+                            unit="%"
+                        />
+                    </PropertyRow>
+                )}
                 <PropertyRow label="Border Width">
                     <PropertySlider
                         value={borderWidth || 0}
@@ -336,6 +495,14 @@ export const ContainerSettings = () => {
                     />
                 </PropertyRow>
             </PropertySection>
+
+            <MediaLibraryDialog
+                siteId={siteId}
+                isOpen={isDialogOpen}
+                onClose={() => setIsDialogOpen(false)}
+                onSelect={handleMediaSelect}
+                multiSelect={false}
+            />
         </div>
     )
 }
@@ -345,6 +512,12 @@ Container.craft = {
     props: {
         padding: 20, // Kept for empty state calculation
         backgroundColor: "transparent",
+        backgroundImage: undefined,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        enableGrid: false,
+        gridOpacity: 30,
         borderRadius: 0,
         minHeight: "100px",
         maxWidth: "100%",

@@ -36,11 +36,14 @@ export function SignalsSection() {
   const sectionRef = useRef<HTMLElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const [currentIndex, setCurrentIndex] = useState(0)
+  const [currentIndex, setCurrentIndex] = useState(signals.length)
   const [cardsPerView, setCardsPerView] = useState(3)
   const [isMobile, setIsMobile] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const controls = useAnimation()
+
+  // Triplicate signals for infinite loop
+  const displaySignals = [...signals, ...signals, ...signals]
 
   const headerInView = useInView(headerRef, { once: false, amount: 0.3 })
 
@@ -71,21 +74,40 @@ export function SignalsSection() {
     if (isMobile || isDragging) return
 
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => {
-        const nextIndex = prev + 1
-        return nextIndex > maxIndex ? 0 : nextIndex
-      })
+      setCurrentIndex((prev) => prev + 1)
     }, 5000)
 
     return () => clearInterval(interval)
-  }, [cardsPerView, isDragging, maxIndex, isMobile])
+  }, [cardsPerView, isDragging, isMobile])
+
+  // Handle infinite loop reset when animation completes
+  const handleAnimationComplete = () => {
+    const N = signals.length
+    if (currentIndex >= 2 * N) {
+      // Reset to middle set start
+      const newIndex = currentIndex - N
+      setCurrentIndex(newIndex)
+      if (containerRef.current) {
+        const itemWidth = containerRef.current.offsetWidth / cardsPerView
+        controls.set({ x: -newIndex * itemWidth })
+      }
+    } else if (currentIndex < N) {
+      // Reset to middle set end
+      const newIndex = currentIndex + N
+      setCurrentIndex(newIndex)
+      if (containerRef.current) {
+        const itemWidth = containerRef.current.offsetWidth / cardsPerView
+        controls.set({ x: -newIndex * itemWidth })
+      }
+    }
+  }
 
   // Animate to current index (desktop only)
   useEffect(() => {
     if (isMobile || !containerRef.current) return
 
-    const containerWidth = containerRef.current.offsetWidth
-    const targetX = -currentIndex * containerWidth
+    const itemWidth = containerRef.current.offsetWidth / cardsPerView
+    const targetX = -currentIndex * itemWidth
 
     controls.start({
       x: targetX,
@@ -95,7 +117,7 @@ export function SignalsSection() {
         damping: 30,
       },
     })
-  }, [currentIndex, controls, isMobile])
+  }, [currentIndex, controls, isMobile, cardsPerView])
 
   const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     setIsDragging(false)
@@ -119,15 +141,15 @@ export function SignalsSection() {
   }
 
   const nextSlide = () => {
-    setCurrentIndex((prev) => Math.min(prev + 1, maxIndex))
+    setCurrentIndex((prev) => prev + 1)
   }
 
   const prevSlide = () => {
-    setCurrentIndex((prev) => Math.max(prev - 1, 0))
+    setCurrentIndex((prev) => prev - 1)
   }
 
   const goToSlide = (index: number) => {
-    setCurrentIndex(Math.min(index, maxIndex))
+    setCurrentIndex(signals.length + index)
   }
 
   return (
@@ -181,10 +203,11 @@ export function SignalsSection() {
               dragElastic={0.2}
               onDragStart={() => setIsDragging(true)}
               onDragEnd={handleDragEnd}
+              onAnimationComplete={handleAnimationComplete}
               animate={controls}
               className="flex"
             >
-              {signals.map((signal, index) => (
+              {displaySignals.map((signal, index) => (
                 <div
                   key={index}
                   className="flex-shrink-0 px-3"
@@ -200,12 +223,8 @@ export function SignalsSection() {
           <div className="flex items-center gap-4 mt-8">
             <button
               onClick={prevSlide}
-              disabled={currentIndex === 0}
               className={cn(
-                "group p-3 border border-border/40 transition-all duration-300",
-                currentIndex === 0
-                  ? "opacity-30 cursor-not-allowed"
-                  : "hover:border-accent",
+                "group p-3 border border-border/40 transition-all duration-300 hover:border-accent",
               )}
               aria-label="Previous slide"
             >
@@ -226,21 +245,14 @@ export function SignalsSection() {
 
             <button
               onClick={nextSlide}
-              disabled={currentIndex >= maxIndex}
               className={cn(
-                "group p-3 border border-border/40 transition-all duration-300",
-                currentIndex >= maxIndex
-                  ? "opacity-30 cursor-not-allowed"
-                  : "hover:border-accent",
+                "group p-3 border border-border/40 transition-all duration-300 hover:border-accent",
               )}
               aria-label="Next slide"
             >
               <svg
                 className={cn(
-                  "w-5 h-5 transition-colors duration-300",
-                  currentIndex >= maxIndex
-                    ? "text-muted-foreground/30"
-                    : "text-muted-foreground group-hover:text-accent",
+                  "w-5 h-5 transition-colors duration-300 text-muted-foreground group-hover:text-accent",
                 )}
                 fill="none"
                 stroke="currentColor"
@@ -252,26 +264,29 @@ export function SignalsSection() {
 
             {/* Progress Dots */}
             <div className="flex gap-2 ml-4">
-              {Array.from({ length: maxIndex + 1 }).map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => goToSlide(index)}
-                  className={cn(
-                    "w-2 h-2 rounded-full transition-all duration-300",
-                    index === currentIndex
-                      ? "bg-accent w-8"
-                      : "bg-border/40 hover:bg-border",
-                  )}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
+              {signals.map((_, index) => {
+                const effectiveIndex = (currentIndex - signals.length + signals.length * 3) % signals.length
+                return (
+                  <button
+                    key={index}
+                    onClick={() => goToSlide(index)}
+                    className={cn(
+                      "w-2 h-2 rounded-full transition-all duration-300",
+                      index === effectiveIndex
+                        ? "bg-accent w-8"
+                        : "bg-border/40 hover:bg-border",
+                    )}
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
+                )
+              })}
             </div>
 
             {/* Counter */}
             <div className="ml-auto font-mono text-xs text-muted-foreground">
-              <span className="text-accent">{String(currentIndex + 1).padStart(2, "0")}</span>
+              <span className="text-accent">{String(((currentIndex - signals.length + signals.length * 3) % signals.length) + 1).padStart(2, "0")}</span>
               {" / "}
-              <span>{String(maxIndex + 1).padStart(2, "0")}</span>
+              <span>{String(signals.length).padStart(2, "0")}</span>
             </div>
           </div>
         </div>

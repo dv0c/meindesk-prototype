@@ -1,0 +1,5 @@
+export { HeroSection } from './HeroSection'
+export { FeaturesGrid } from './FeaturesGrid'
+export { PrinciplesSection } from './PrinciplesSection'
+export { UpdatesCarousel } from './UpdatesCarousel'
+export { FooterInfo } from './FooterInfo'

@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import { CraftContextMenu } from "./CraftContextMenu"
 import { componentMap } from "../user-components"
-import { MissingComponent } from "../user-components/MissingComponent"
 
 interface RenderNodeProps {
     render: React.ReactElement
@@ -13,12 +12,8 @@ interface RenderNodeProps {
 
 export const RenderNode = ({ render }: RenderNodeProps) => {
     const { id } = useNode()
-    const { isActive, isHovered, dom, name, moveable, deletable, parent, isResizable, connectors, componentType, isMissingComponent } = useNode(
+    const { isActive, isHovered, dom, name, moveable, deletable, parent, isResizable, connectors } = useNode(
         (node) => {
-            // Check if this component type exists in our registry
-            const typeName = node.data.displayName || node.data.name || ""
-            const isMissing = typeName && typeName !== "Component" && !(typeName in componentMap)
-
             return {
                 isActive: node.events.selected,
                 isHovered: node.events.hovered,
@@ -30,8 +25,6 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                 isResizable: node.data.custom?.resizable === true ||
                     ["Container", "Image", "Spacer", "Grid"].includes(node.data.displayName || node.data.name || ""),
                 connectors: node.related.connectors,
-                componentType: typeName,
-                isMissingComponent: isMissing,
             }
         }
     )
@@ -462,11 +455,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
     return (
         <>
             <div onContextMenu={handleContextMenu}>
-                {isMissingComponent ? (
-                    <MissingComponent componentName={componentType} />
-                ) : (
-                    render
-                )}
+                {render}
             </div>
 
             {/* Render indicator as a portal outside the component DOM */}

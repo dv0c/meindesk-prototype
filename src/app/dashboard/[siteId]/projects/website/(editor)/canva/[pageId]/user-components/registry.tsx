@@ -51,6 +51,14 @@ import {
     ArticleDate,
     ArticleCategories,
 } from './article'
+import {
+    HeroSection,
+    FeaturesGrid,
+    PrinciplesSection,
+    UpdatesCarousel,
+    FooterInfo,
+} from './themes/Meindesk'
+import { MeindeskContainer } from './themes/Meindesk/MeindeskContainer'
 
 /**
  * Component metadata interface
@@ -248,13 +256,52 @@ export const componentRegistry: ComponentRegistration[] = [
         icon: <Tag className="h-5 w-5" />,
     },
 
+    // Meindesk Theme Components
+    {
+        name: 'HeroSection',
+        component: HeroSection,
+        category: 'Meindesk Theme',
+        description: 'Animated hero section with parallax effect',
+        icon: <LayoutGrid className="h-5 w-5" />,
+    },
+    {
+        name: 'MeindeskContainer',
+        component: MeindeskContainer,
+        isContainer: true,
+        category: 'Meindesk Theme',
+        description: 'Container with grid and noise background',
+        icon: <LayoutGrid className="h-5 w-5" />,
+    },
+    {
+        name: 'FeaturesGrid',
+        component: FeaturesGrid,
+        category: 'Meindesk Theme',
+        description: 'Asymmetric grid of features with hover effects',
+        icon: <LayoutGrid className="h-5 w-5" />,
+    },
+    {
+        name: 'PrinciplesSection',
+        component: PrinciplesSection,
+        category: 'Meindesk Theme',
+        description: 'Philosophy section with highlighted text',
+        icon: <FileText className="h-5 w-5" />,
+    },
+    {
+        name: 'UpdatesCarousel',
+        component: UpdatesCarousel,
+        category: 'Meindesk Theme',
+        description: 'Draggable carousel with updates/releases',
+        icon: <GalleryHorizontal className="h-5 w-5" />,
+    },
+    {
+        name: 'FooterInfo',
+        component: FooterInfo,
+        category: 'Meindesk Theme',
+        description: 'Multi-column footer with links',
+        icon: <Navigation className="h-5 w-5" />,
+    },
+
 ]
-
-/**
- * Derived exports for convenience
- */
-
-import { MissingComponent } from './MissingComponent'
 
 // Component map (name -> component)
 export const componentMap = componentRegistry.reduce(
@@ -266,20 +313,10 @@ export const componentMap = componentRegistry.reduce(
 )
 
 /**
- * Resolver with fallback for missing components
- * Uses a Proxy to return MissingComponent for unregistered component names
+ * Resolver for CraftJS - maps component names to components
+ * Directly uses the componentMap without any proxy wrapper
  */
-export const resolverWithFallback = new Proxy(componentMap, {
-    get(target, prop: string) {
-        if (prop in target) {
-            return target[prop]
-        }
-        // Return a wrapped MissingComponent that knows its original name
-        const WrappedMissing = (props: any) => <MissingComponent componentName={prop} {...props} />
-        WrappedMissing.craft = MissingComponent.craft
-        return WrappedMissing
-    }
-})
+export const resolverWithFallback = componentMap
 
 // Icon map (name -> icon)
 export const iconMap = componentRegistry.reduce(
@@ -322,5 +359,11 @@ export {
     NavigationLinksSettings,
     Card,
     Hero,
-
+    // Meindesk Theme Components
+    HeroSection,
+    FeaturesGrid,
+    PrinciplesSection,
+    UpdatesCarousel,
+    FooterInfo,
+    MeindeskContainer,
 }

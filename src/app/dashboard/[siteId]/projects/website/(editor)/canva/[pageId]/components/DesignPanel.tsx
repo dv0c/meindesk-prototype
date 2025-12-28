@@ -36,7 +36,8 @@ const colorPalettes = [
     { id: "purple-deep", colors: ["#4c1d95", "#8b5cf6", "#ddd6fe", "#f5f3ff"] },
     { id: "navy-gold", colors: ["#1e3a5f", "#fbbf24", "#f0f9ff", "#fffbeb"] },
 
-    // Row 6 - Dark themes
+    // Row 6 - Meindesk + Dark themes
+    { id: "meindesk-orange", colors: ["#ffffff", "#f97316", "#1a1a1a", "#0a0a0a"] },
     { id: "dark-blue", colors: ["#ffffff", "#3b82f6", "#1e3a8a", "#0f172a"] },
     { id: "dark-purple", colors: ["#f5f3ff", "#8b5cf6", "#4c1d95", "#1e1b4b"] },
     { id: "dark-emerald", colors: ["#ecfdf5", "#10b981", "#064e3b", "#022c22"] },
@@ -63,6 +64,9 @@ const presetThemes = [
     { id: "bold-rounded", headingFont: "Pilcrow Rounded", baseFont: "Archivo", colors: ["#1e293b", "#ef4444", "#fee2e2", "#f1f5f9"], buttonColor: "#ef4444", bgColor: "#f1f5f9" },
     { id: "minimal", headingFont: "Inter", baseFont: "Inter", colors: ["#1a1a1a", "#1a1a1a", "#e5e5e5", "#f5f5f5"], buttonColor: "#1a1a1a", bgColor: "#ffffff" },
     { id: "emerald", headingFont: "Inter", baseFont: "Inter", colors: ["#064e3b", "#10b981", "#a7f3d0", "#ecfdf5"], buttonColor: "#10b981", bgColor: "#ffffff" },
+
+    // Meindesk Dark Theme
+    { id: "meindesk", headingFont: "Bebas Neue", baseFont: "monospace", colors: ["#ffffff", "#f97316", "#1a1a1a", "#0a0a0a"], buttonColor: "#f97316", bgColor: "#000000" },
 
     // Dark themes
     { id: "dark-indigo", headingFont: "Inter", baseFont: "Inter", colors: ["#ffffff", "#6366f1", "#312e81", "#0f172a"], buttonColor: "#6366f1", bgColor: "#0f172a" },
