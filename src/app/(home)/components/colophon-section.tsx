@@ -3,6 +3,7 @@
 import { useRef } from "react"
 import { motion, useInView } from "framer-motion"
 import { PrototypeBadge } from "@/components/PrototypeBadge"
+import Link from "next/link"
 
 export function ColophonSection() {
   const headerRef = useRef<HTMLDivElement>(null)
@@ -41,9 +42,9 @@ export function ColophonSection() {
         >
           <h4 className="font-mono text-[9px] uppercase tracking-[0.3em] text-muted-foreground mb-4">Product</h4>
           <ul className="space-y-2">
-            <li className="font-mono text-xs text-foreground/80">Blog Builder</li>
-            <li className="font-mono text-xs text-foreground/80">CMS Platform</li>
-            <li className="font-mono text-xs text-foreground/80">RSS Scraper</li>
+            <li><Link href="/product/blog-builder" className="font-mono text-xs text-foreground/80 hover:text-orange-500 transition-colors">Blog Builder</Link></li>
+            <li><Link href="/product/cms" className="font-mono text-xs text-foreground/80 hover:text-orange-500 transition-colors">CMS Platform</Link></li>
+            <li><Link href="/product/rss" className="font-mono text-xs text-foreground/80 hover:text-orange-500 transition-colors">RSS Scraper</Link></li>
           </ul>
         </motion.div>
 
@@ -56,10 +57,10 @@ export function ColophonSection() {
         >
           <h4 className="font-mono text-[9px] uppercase tracking-[0.3em] text-muted-foreground mb-4">Features</h4>
           <ul className="space-y-2">
-            <li className="font-mono text-xs text-foreground/80">Drag & Drop</li>
-            <li className="font-mono text-xs text-foreground/80">SEO Tools</li>
-            <li className="font-mono text-xs text-foreground/80">Analytics</li>
-            <li className="font-mono text-xs text-foreground/80">Theme Store</li>
+            <li><Link href="/features/editor" className="font-mono text-xs text-foreground/80 hover:text-orange-500 transition-colors">Drag & Drop</Link></li>
+            <li><Link href="/features/seo" className="font-mono text-xs text-foreground/80 hover:text-orange-500 transition-colors">SEO Tools</Link></li>
+            <li><Link href="/features/analytics" className="font-mono text-xs text-foreground/80 hover:text-orange-500 transition-colors">Analytics</Link></li>
+            <li><Link href="/features/themes" className="font-mono text-xs text-foreground/80 hover:text-orange-500 transition-colors">Theme Store</Link></li>
           </ul>
         </motion.div>
 
@@ -72,9 +73,9 @@ export function ColophonSection() {
         >
           <h4 className="font-mono text-[9px] uppercase tracking-[0.3em] text-muted-foreground mb-4">Pricing</h4>
           <ul className="space-y-2">
-            <li className="font-mono text-xs text-foreground/80">Free Tier</li>
-            <li className="font-mono text-xs text-foreground/80">Pro Plan</li>
-            <li className="font-mono text-xs text-foreground/80">Enterprise</li>
+            <li><Link href="/pricing" className="font-mono text-xs text-foreground/80 hover:text-orange-500 transition-colors">Free Tier</Link></li>
+            <li><Link href="/pricing#pro" className="font-mono text-xs text-foreground/80 hover:text-orange-500 transition-colors">Pro Plan</Link></li>
+            <li><Link href="/pricing#enterprise" className="font-mono text-xs text-foreground/80 hover:text-orange-500 transition-colors">Enterprise</Link></li>
           </ul>
         </motion.div>
 
@@ -87,8 +88,8 @@ export function ColophonSection() {
         >
           <h4 className="font-mono text-[9px] uppercase tracking-[0.3em] text-muted-foreground mb-4">Resources</h4>
           <ul className="space-y-2">
-            <li className="font-mono text-xs text-foreground/80">Documentation</li>
-            <li className="font-mono text-xs text-foreground/80">API Reference</li>
+            <li><Link href="/resources/documentation" className="font-mono text-xs text-foreground/80 hover:text-orange-500 transition-colors">Documentation</Link></li>
+            <li><Link href="/resources/api-reference" className="font-mono text-xs text-foreground/80 hover:text-orange-500 transition-colors">API Reference</Link></li>
           </ul>
         </motion.div>
 
@@ -102,20 +103,20 @@ export function ColophonSection() {
           <h4 className="font-mono text-[9px] uppercase tracking-[0.3em] text-muted-foreground mb-4">Contact</h4>
           <ul className="space-y-2">
             <li>
-              <a
+              <Link
                 href="mailto:hello@prototype.app"
-                className="font-mono text-xs text-foreground/80 hover:text-accent transition-colors duration-200"
+                className="font-mono text-xs text-foreground/80 hover:text-orange-500 transition-colors duration-200"
               >
                 Email
-              </a>
+              </Link>
             </li>
             <li>
-              <a
+              <Link
                 href="#"
-                className="font-mono text-xs text-foreground/80 hover:text-accent transition-colors duration-200"
+                className="font-mono text-xs text-foreground/80 hover:text-orange-500 transition-colors duration-200"
               >
                 Twitter/X
-              </a>
+              </Link>
             </li>
           </ul>
         </motion.div>
@@ -129,8 +130,8 @@ export function ColophonSection() {
         >
           <h4 className="font-mono text-[9px] uppercase tracking-[0.3em] text-muted-foreground mb-4">Support</h4>
           <ul className="space-y-2">
-            <li className="font-mono text-xs text-foreground/80">Help Center</li>
-            <li className="font-mono text-xs text-foreground/80">Community</li>
+            <li><Link href="/support/help-center" className="font-mono text-xs text-foreground/80 hover:text-orange-500 transition-colors">Help Center</Link></li>
+            <li><Link href="/support/community" className="font-mono text-xs text-foreground/80 hover:text-orange-500 transition-colors">Community</Link></li>
           </ul>
         </motion.div>
       </div>
@@ -147,6 +148,7 @@ export function ColophonSection() {
           © 2025 Prototype. All rights reserved.
         </p>
         <p className="font-mono text-[10px] text-muted-foreground">Build your vision. Own your content.</p>
+        <PrototypeBadge sticky={false} />
       </motion.div>
     </section>
   )
