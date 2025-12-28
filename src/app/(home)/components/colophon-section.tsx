@@ -148,7 +148,6 @@ export function ColophonSection() {
           © 2025 Prototype. All rights reserved.
         </p>
         <p className="font-mono text-[10px] text-muted-foreground">Build your vision. Own your content.</p>
-        <PrototypeBadge sticky={false} />
       </motion.div>
     </section>
   )
