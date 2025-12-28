@@ -23,7 +23,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { useTeam } from "@/hooks/useTeam"
+import { useSite } from "./Contexts/site-id-context"
 import { Skeleton } from "./ui/skeleton"
 import Link from "next/link"
 
@@ -37,12 +37,12 @@ export function NavProjects({
   }[]
 }) {
   const { isMobile } = useSidebar()
-  const siteId = useTeam().team?.id
+  const { siteId } = useSite()
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Content Managment</SidebarGroupLabel>
       <SidebarMenu>
-        {siteId !== undefined && projects !== null ? projects.map((item) => (
+        {siteId && projects ? projects.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild>
               <Link href={'/dashboard/' + siteId + '/' + item.url}>
@@ -79,8 +79,8 @@ export function NavProjects({
             </DropdownMenu>
           </SidebarMenuItem>
         )) : Array.from({ length: 5 }).map((_, idx) => (
-            <Skeleton key={idx} className="w-full h-5 mb-2" />
-          ))}
+          <Skeleton key={idx} className="w-full h-5 mb-2" />
+        ))}
         {/* <SidebarMenuItem>
           <SidebarMenuButton className="text-sidebar-foreground/70">
             <MoreHorizontal className="text-sidebar-foreground/70" />

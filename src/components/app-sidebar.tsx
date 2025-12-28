@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/sidebar"
 import { useTeam } from "@/hooks/useTeam"
 import { useTeams } from "@/hooks/useTeams"
+import { useSite } from "./Contexts/site-id-context"
 import {
   FileIcon,
   FileText,
@@ -36,7 +37,11 @@ import { Skeleton } from "./ui/skeleton"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { teams, loading: loadingTeams } = useTeams()
-  const { team: activeTeam, loading: loadingTeam } = useTeam()
+  // Retrieve siteId from context provided by Layout
+  const { siteId } = useSite()
+  // Pass siteId as fallback to useTeam ensuring we attempt to load the correct site
+  const { team: activeTeam, loading: loadingTeam } = useTeam(siteId || undefined)
+
   const [hovered, setHovered] = useState(false)
   const { newOpen, setNewOpen } = useSidebar()
   const [isMobile, setIsMobile] = useState(false)
@@ -139,7 +144,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   // Build filtered data based on features
   const filteredData = React.useMemo(() => {
-    if (!teams?.length || !activeTeam) {
+    if (!activeTeam) {
       return { navMain: defaultNavMain, projects: null, teams: [], rss: rsscontent }
     }
 
