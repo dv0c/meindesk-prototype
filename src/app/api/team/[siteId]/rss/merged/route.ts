@@ -73,7 +73,8 @@ export async function POST(
             );
         }
 
-        const feed = await db.mergedFeed.create({
+        // Create merged feed config
+        const mergedFeed = await db.mergedFeed.create({
             data: {
                 siteId,
                 name: body.name,
@@ -84,7 +85,23 @@ export async function POST(
             },
         });
 
-        return NextResponse.json(feed, { status: 201 });
+        // Also create an Rss entry so import functionality works
+        const mergedFeedUrl = `/api/rss/merged/${mergedFeed.id}`;
+        const sourceCount = body.sources.length;
+
+        await db.rss.create({
+            data: {
+                siteId,
+                title: body.name,
+                url: mergedFeedUrl,
+                description: body.description || `Merged feed with ${sourceCount} sources`,
+                icon: null,
+                autoImport: false,
+                site_name: "Merged Feed",
+            },
+        });
+
+        return NextResponse.json(mergedFeed, { status: 201 });
     } catch (err: any) {
         console.error("Error creating merged feed:", err.message);
         return NextResponse.json(

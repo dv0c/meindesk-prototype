@@ -14,37 +14,19 @@ export async function GET(
       return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
-    // Fetch regular RSS feeds
+    // Fetch all RSS feeds (including merged feeds which now save here)
     const rssFeeds = await db.rss.findMany({
       where: { siteId },
       include: { site: true },
     });
 
-    // Fetch merged feeds
-    const mergedFeeds = await db.mergedFeed.findMany({
-      where: { siteId },
-    });
+    // Mark merged feeds for UI display (purple icon)
+    const feedsWithMergedFlag = rssFeeds.map((feed) => ({
+      ...feed,
+      isMerged: feed.url?.includes("/api/rss/merged/") || false,
+    }));
 
-    // Transform merged feeds to match the Feed interface
-    const transformedMerged = mergedFeeds.map((feed) => {
-      const sources = feed.sources as { type: string; value: string }[];
-      return {
-        id: feed.id,
-        title: feed.name,
-        url: `/api/rss/merged/${feed.id}`, // Public merged feed URL
-        icon: null,
-        description: feed.description || `${sources.length} feeds merged`,
-        siteId: feed.siteId,
-        isMerged: true, // Flag to identify merged feeds
-        createdAt: feed.createdAt,
-        updatedAt: feed.updatedAt,
-      };
-    });
-
-    // Combine and return both types
-    const allFeeds = [...rssFeeds, ...transformedMerged];
-
-    return NextResponse.json(allFeeds);
+    return NextResponse.json(feedsWithMergedFlag);
   } catch (error) {
     console.error("Error fetching rss feed:", error);
     return NextResponse.json(
@@ -53,3 +35,4 @@ export async function GET(
     );
   }
 }
+
