@@ -2,13 +2,14 @@
 
 import { useFetch } from "@/hooks/useFetch"
 import { Rss as RSS } from "@prisma/client"
-import { Plus, RssIcon } from "lucide-react"
+import { Plus, RssIcon, Merge } from "lucide-react"
 import { useSite } from "../Contexts/site-id-context"
 import PageWrapper from "../PageWrapper"
 import { Button } from "../ui/button"
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog"
 import { MyFeedTable } from "./MyFeedTable"
 import CreateNewFeed from "./CreateButtonPage"
+import Link from "next/link"
 
 const MyFeed = () => {
     const { siteId } = useSite()
@@ -19,7 +20,7 @@ const MyFeed = () => {
 
     return (
         <PageWrapper
-            action={<CreateRSS siteId={siteId} />}
+            action={<FeedActions siteId={siteId} />}
             title="My RSS Feeds"
             description="Manage your RSS feed subscriptions"
         >
@@ -38,6 +39,30 @@ const MyFeed = () => {
 }
 
 export default MyFeed
+
+const FeedActions = ({ siteId }: { siteId: string }) => {
+    return (
+        <div className="flex gap-2">
+            <Button variant="outline" className="gap-2" asChild>
+                <Link href={`/dashboard/${siteId}/projects/website/rss/merge`}>
+                    <Merge className="h-4 w-4" />
+                    Merge Feeds
+                </Link>
+            </Button>
+            <Dialog>
+                <DialogTrigger asChild>
+                    <Button className="cursor-pointer gap-2" variant="default">
+                        <Plus className="h-4 w-4" />
+                        Add RSS Feed
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className="!max-w-7xl">
+                    <CreateNewFeed siteId={siteId} />
+                </DialogContent>
+            </Dialog>
+        </div>
+    )
+}
 
 const CreateRSS = ({ siteId }: { siteId: string }) => {
     return (
@@ -68,8 +93,16 @@ const NoFeed = ({ siteId }: { siteId: string }) => (
         </div>
         <h3 className="text-xl font-semibold mb-2">No RSS Feeds Yet</h3>
         <p className="text-muted-foreground text-center max-w-sm mb-6">
-            Start by adding your first RSS feed to automatically import content from your favorite sources.
+            Start by adding your first RSS feed or merge multiple feeds into one.
         </p>
-        <CreateRSS siteId={siteId} />
+        <div className="flex gap-3">
+            <Button variant="outline" className="gap-2" asChild>
+                <Link href={`/dashboard/${siteId}/projects/website/rss/merge`}>
+                    <Merge className="h-4 w-4" />
+                    Merge Feeds
+                </Link>
+            </Button>
+            <CreateRSS siteId={siteId} />
+        </div>
     </div>
 )

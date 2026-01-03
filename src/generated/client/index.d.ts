@@ -94,6 +94,11 @@ export type RssItem = $Result.DefaultSelection<Prisma.$RssItemPayload>
  */
 export type CustomFeedTemplate = $Result.DefaultSelection<Prisma.$CustomFeedTemplatePayload>
 /**
+ * Model MergedFeed
+ * 
+ */
+export type MergedFeed = $Result.DefaultSelection<Prisma.$MergedFeedPayload>
+/**
  * Model Theme
  * 
  */
@@ -410,6 +415,16 @@ export class PrismaClient<
     * ```
     */
   get customFeedTemplate(): Prisma.CustomFeedTemplateDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.mergedFeed`: Exposes CRUD operations for the **MergedFeed** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MergedFeeds
+    * const mergedFeeds = await prisma.mergedFeed.findMany()
+    * ```
+    */
+  get mergedFeed(): Prisma.MergedFeedDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.theme`: Exposes CRUD operations for the **Theme** model.
@@ -897,6 +912,7 @@ export namespace Prisma {
     Rss: 'Rss',
     RssItem: 'RssItem',
     CustomFeedTemplate: 'CustomFeedTemplate',
+    MergedFeed: 'MergedFeed',
     Theme: 'Theme',
     ThemeBlock: 'ThemeBlock',
     SiteTheme: 'SiteTheme'
@@ -918,7 +934,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "account" | "session" | "verificationToken" | "category" | "site" | "snippet" | "features" | "subscription" | "billingHistory" | "analyticsEvent" | "article" | "page" | "rss" | "rssItem" | "customFeedTemplate" | "theme" | "themeBlock" | "siteTheme"
+      modelProps: "user" | "account" | "session" | "verificationToken" | "category" | "site" | "snippet" | "features" | "subscription" | "billingHistory" | "analyticsEvent" | "article" | "page" | "rss" | "rssItem" | "customFeedTemplate" | "mergedFeed" | "theme" | "themeBlock" | "siteTheme"
       txIsolationLevel: never
     }
     model: {
@@ -2106,6 +2122,80 @@ export namespace Prisma {
           }
         }
       }
+      MergedFeed: {
+        payload: Prisma.$MergedFeedPayload<ExtArgs>
+        fields: Prisma.MergedFeedFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MergedFeedFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergedFeedPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MergedFeedFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergedFeedPayload>
+          }
+          findFirst: {
+            args: Prisma.MergedFeedFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergedFeedPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MergedFeedFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergedFeedPayload>
+          }
+          findMany: {
+            args: Prisma.MergedFeedFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergedFeedPayload>[]
+          }
+          create: {
+            args: Prisma.MergedFeedCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergedFeedPayload>
+          }
+          createMany: {
+            args: Prisma.MergedFeedCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.MergedFeedDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergedFeedPayload>
+          }
+          update: {
+            args: Prisma.MergedFeedUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergedFeedPayload>
+          }
+          deleteMany: {
+            args: Prisma.MergedFeedDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MergedFeedUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.MergedFeedUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergedFeedPayload>
+          }
+          aggregate: {
+            args: Prisma.MergedFeedAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMergedFeed>
+          }
+          groupBy: {
+            args: Prisma.MergedFeedGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MergedFeedGroupByOutputType>[]
+          }
+          findRaw: {
+            args: Prisma.MergedFeedFindRawArgs<ExtArgs>
+            result: JsonObject
+          }
+          aggregateRaw: {
+            args: Prisma.MergedFeedAggregateRawArgs<ExtArgs>
+            result: JsonObject
+          }
+          count: {
+            args: Prisma.MergedFeedCountArgs<ExtArgs>
+            result: $Utils.Optional<MergedFeedCountAggregateOutputType> | number
+          }
+        }
+      }
       Theme: {
         payload: Prisma.$ThemePayload<ExtArgs>
         fields: Prisma.ThemeFieldRefs
@@ -2423,6 +2513,7 @@ export namespace Prisma {
     rss?: RssOmit
     rssItem?: RssItemOmit
     customFeedTemplate?: CustomFeedTemplateOmit
+    mergedFeed?: MergedFeedOmit
     theme?: ThemeOmit
     themeBlock?: ThemeBlockOmit
     siteTheme?: SiteThemeOmit
@@ -2630,6 +2721,7 @@ export namespace Prisma {
     installedThemes: number
     snippets: number
     customFeedTemplates: number
+    mergedFeeds: number
   }
 
   export type SiteCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2641,6 +2733,7 @@ export namespace Prisma {
     installedThemes?: boolean | SiteCountOutputTypeCountInstalledThemesArgs
     snippets?: boolean | SiteCountOutputTypeCountSnippetsArgs
     customFeedTemplates?: boolean | SiteCountOutputTypeCountCustomFeedTemplatesArgs
+    mergedFeeds?: boolean | SiteCountOutputTypeCountMergedFeedsArgs
   }
 
   // Custom InputTypes
@@ -2708,6 +2801,13 @@ export namespace Prisma {
    */
   export type SiteCountOutputTypeCountCustomFeedTemplatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: CustomFeedTemplateWhereInput
+  }
+
+  /**
+   * SiteCountOutputType without action
+   */
+  export type SiteCountOutputTypeCountMergedFeedsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MergedFeedWhereInput
   }
 
 
@@ -8514,6 +8614,7 @@ export namespace Prisma {
     installedThemes?: boolean | Site$installedThemesArgs<ExtArgs>
     snippets?: boolean | Site$snippetsArgs<ExtArgs>
     customFeedTemplates?: boolean | Site$customFeedTemplatesArgs<ExtArgs>
+    mergedFeeds?: boolean | Site$mergedFeedsArgs<ExtArgs>
     _count?: boolean | SiteCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["site"]>
 
@@ -8557,6 +8658,7 @@ export namespace Prisma {
     installedThemes?: boolean | Site$installedThemesArgs<ExtArgs>
     snippets?: boolean | Site$snippetsArgs<ExtArgs>
     customFeedTemplates?: boolean | Site$customFeedTemplatesArgs<ExtArgs>
+    mergedFeeds?: boolean | Site$mergedFeedsArgs<ExtArgs>
     _count?: boolean | SiteCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -8574,6 +8676,7 @@ export namespace Prisma {
       installedThemes: Prisma.$SiteThemePayload<ExtArgs>[]
       snippets: Prisma.$SnippetPayload<ExtArgs>[]
       customFeedTemplates: Prisma.$CustomFeedTemplatePayload<ExtArgs>[]
+      mergedFeeds: Prisma.$MergedFeedPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -8972,6 +9075,7 @@ export namespace Prisma {
     installedThemes<T extends Site$installedThemesArgs<ExtArgs> = {}>(args?: Subset<T, Site$installedThemesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteThemePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     snippets<T extends Site$snippetsArgs<ExtArgs> = {}>(args?: Subset<T, Site$snippetsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SnippetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     customFeedTemplates<T extends Site$customFeedTemplatesArgs<ExtArgs> = {}>(args?: Subset<T, Site$customFeedTemplatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CustomFeedTemplatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    mergedFeeds<T extends Site$mergedFeedsArgs<ExtArgs> = {}>(args?: Subset<T, Site$mergedFeedsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergedFeedPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9639,6 +9743,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: CustomFeedTemplateScalarFieldEnum | CustomFeedTemplateScalarFieldEnum[]
+  }
+
+  /**
+   * Site.mergedFeeds
+   */
+  export type Site$mergedFeedsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergedFeed
+     */
+    select?: MergedFeedSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergedFeed
+     */
+    omit?: MergedFeedOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergedFeedInclude<ExtArgs> | null
+    where?: MergedFeedWhereInput
+    orderBy?: MergedFeedOrderByWithRelationInput | MergedFeedOrderByWithRelationInput[]
+    cursor?: MergedFeedWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MergedFeedScalarFieldEnum | MergedFeedScalarFieldEnum[]
   }
 
   /**
@@ -20465,6 +20593,1055 @@ export namespace Prisma {
 
 
   /**
+   * Model MergedFeed
+   */
+
+  export type AggregateMergedFeed = {
+    _count: MergedFeedCountAggregateOutputType | null
+    _avg: MergedFeedAvgAggregateOutputType | null
+    _sum: MergedFeedSumAggregateOutputType | null
+    _min: MergedFeedMinAggregateOutputType | null
+    _max: MergedFeedMaxAggregateOutputType | null
+  }
+
+  export type MergedFeedAvgAggregateOutputType = {
+    maxItems: number | null
+  }
+
+  export type MergedFeedSumAggregateOutputType = {
+    maxItems: number | null
+  }
+
+  export type MergedFeedMinAggregateOutputType = {
+    id: string | null
+    siteId: string | null
+    name: string | null
+    description: string | null
+    maxItems: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MergedFeedMaxAggregateOutputType = {
+    id: string | null
+    siteId: string | null
+    name: string | null
+    description: string | null
+    maxItems: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MergedFeedCountAggregateOutputType = {
+    id: number
+    siteId: number
+    name: number
+    description: number
+    sources: number
+    filters: number
+    maxItems: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type MergedFeedAvgAggregateInputType = {
+    maxItems?: true
+  }
+
+  export type MergedFeedSumAggregateInputType = {
+    maxItems?: true
+  }
+
+  export type MergedFeedMinAggregateInputType = {
+    id?: true
+    siteId?: true
+    name?: true
+    description?: true
+    maxItems?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MergedFeedMaxAggregateInputType = {
+    id?: true
+    siteId?: true
+    name?: true
+    description?: true
+    maxItems?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MergedFeedCountAggregateInputType = {
+    id?: true
+    siteId?: true
+    name?: true
+    description?: true
+    sources?: true
+    filters?: true
+    maxItems?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type MergedFeedAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MergedFeed to aggregate.
+     */
+    where?: MergedFeedWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MergedFeeds to fetch.
+     */
+    orderBy?: MergedFeedOrderByWithRelationInput | MergedFeedOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MergedFeedWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MergedFeeds from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MergedFeeds.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MergedFeeds
+    **/
+    _count?: true | MergedFeedCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: MergedFeedAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: MergedFeedSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MergedFeedMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MergedFeedMaxAggregateInputType
+  }
+
+  export type GetMergedFeedAggregateType<T extends MergedFeedAggregateArgs> = {
+        [P in keyof T & keyof AggregateMergedFeed]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMergedFeed[P]>
+      : GetScalarType<T[P], AggregateMergedFeed[P]>
+  }
+
+
+
+
+  export type MergedFeedGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MergedFeedWhereInput
+    orderBy?: MergedFeedOrderByWithAggregationInput | MergedFeedOrderByWithAggregationInput[]
+    by: MergedFeedScalarFieldEnum[] | MergedFeedScalarFieldEnum
+    having?: MergedFeedScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MergedFeedCountAggregateInputType | true
+    _avg?: MergedFeedAvgAggregateInputType
+    _sum?: MergedFeedSumAggregateInputType
+    _min?: MergedFeedMinAggregateInputType
+    _max?: MergedFeedMaxAggregateInputType
+  }
+
+  export type MergedFeedGroupByOutputType = {
+    id: string
+    siteId: string
+    name: string
+    description: string | null
+    sources: JsonValue
+    filters: JsonValue | null
+    maxItems: number
+    createdAt: Date
+    updatedAt: Date
+    _count: MergedFeedCountAggregateOutputType | null
+    _avg: MergedFeedAvgAggregateOutputType | null
+    _sum: MergedFeedSumAggregateOutputType | null
+    _min: MergedFeedMinAggregateOutputType | null
+    _max: MergedFeedMaxAggregateOutputType | null
+  }
+
+  type GetMergedFeedGroupByPayload<T extends MergedFeedGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MergedFeedGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MergedFeedGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MergedFeedGroupByOutputType[P]>
+            : GetScalarType<T[P], MergedFeedGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MergedFeedSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    siteId?: boolean
+    name?: boolean
+    description?: boolean
+    sources?: boolean
+    filters?: boolean
+    maxItems?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["mergedFeed"]>
+
+
+
+  export type MergedFeedSelectScalar = {
+    id?: boolean
+    siteId?: boolean
+    name?: boolean
+    description?: boolean
+    sources?: boolean
+    filters?: boolean
+    maxItems?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type MergedFeedOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "siteId" | "name" | "description" | "sources" | "filters" | "maxItems" | "createdAt" | "updatedAt", ExtArgs["result"]["mergedFeed"]>
+  export type MergedFeedInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }
+
+  export type $MergedFeedPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MergedFeed"
+    objects: {
+      site: Prisma.$SitePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      siteId: string
+      name: string
+      description: string | null
+      sources: Prisma.JsonValue
+      filters: Prisma.JsonValue | null
+      maxItems: number
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["mergedFeed"]>
+    composites: {}
+  }
+
+  type MergedFeedGetPayload<S extends boolean | null | undefined | MergedFeedDefaultArgs> = $Result.GetResult<Prisma.$MergedFeedPayload, S>
+
+  type MergedFeedCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MergedFeedFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MergedFeedCountAggregateInputType | true
+    }
+
+  export interface MergedFeedDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MergedFeed'], meta: { name: 'MergedFeed' } }
+    /**
+     * Find zero or one MergedFeed that matches the filter.
+     * @param {MergedFeedFindUniqueArgs} args - Arguments to find a MergedFeed
+     * @example
+     * // Get one MergedFeed
+     * const mergedFeed = await prisma.mergedFeed.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MergedFeedFindUniqueArgs>(args: SelectSubset<T, MergedFeedFindUniqueArgs<ExtArgs>>): Prisma__MergedFeedClient<$Result.GetResult<Prisma.$MergedFeedPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one MergedFeed that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MergedFeedFindUniqueOrThrowArgs} args - Arguments to find a MergedFeed
+     * @example
+     * // Get one MergedFeed
+     * const mergedFeed = await prisma.mergedFeed.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MergedFeedFindUniqueOrThrowArgs>(args: SelectSubset<T, MergedFeedFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MergedFeedClient<$Result.GetResult<Prisma.$MergedFeedPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MergedFeed that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergedFeedFindFirstArgs} args - Arguments to find a MergedFeed
+     * @example
+     * // Get one MergedFeed
+     * const mergedFeed = await prisma.mergedFeed.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MergedFeedFindFirstArgs>(args?: SelectSubset<T, MergedFeedFindFirstArgs<ExtArgs>>): Prisma__MergedFeedClient<$Result.GetResult<Prisma.$MergedFeedPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MergedFeed that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergedFeedFindFirstOrThrowArgs} args - Arguments to find a MergedFeed
+     * @example
+     * // Get one MergedFeed
+     * const mergedFeed = await prisma.mergedFeed.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MergedFeedFindFirstOrThrowArgs>(args?: SelectSubset<T, MergedFeedFindFirstOrThrowArgs<ExtArgs>>): Prisma__MergedFeedClient<$Result.GetResult<Prisma.$MergedFeedPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MergedFeeds that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergedFeedFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MergedFeeds
+     * const mergedFeeds = await prisma.mergedFeed.findMany()
+     * 
+     * // Get first 10 MergedFeeds
+     * const mergedFeeds = await prisma.mergedFeed.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const mergedFeedWithIdOnly = await prisma.mergedFeed.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MergedFeedFindManyArgs>(args?: SelectSubset<T, MergedFeedFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergedFeedPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a MergedFeed.
+     * @param {MergedFeedCreateArgs} args - Arguments to create a MergedFeed.
+     * @example
+     * // Create one MergedFeed
+     * const MergedFeed = await prisma.mergedFeed.create({
+     *   data: {
+     *     // ... data to create a MergedFeed
+     *   }
+     * })
+     * 
+     */
+    create<T extends MergedFeedCreateArgs>(args: SelectSubset<T, MergedFeedCreateArgs<ExtArgs>>): Prisma__MergedFeedClient<$Result.GetResult<Prisma.$MergedFeedPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many MergedFeeds.
+     * @param {MergedFeedCreateManyArgs} args - Arguments to create many MergedFeeds.
+     * @example
+     * // Create many MergedFeeds
+     * const mergedFeed = await prisma.mergedFeed.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MergedFeedCreateManyArgs>(args?: SelectSubset<T, MergedFeedCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a MergedFeed.
+     * @param {MergedFeedDeleteArgs} args - Arguments to delete one MergedFeed.
+     * @example
+     * // Delete one MergedFeed
+     * const MergedFeed = await prisma.mergedFeed.delete({
+     *   where: {
+     *     // ... filter to delete one MergedFeed
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MergedFeedDeleteArgs>(args: SelectSubset<T, MergedFeedDeleteArgs<ExtArgs>>): Prisma__MergedFeedClient<$Result.GetResult<Prisma.$MergedFeedPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one MergedFeed.
+     * @param {MergedFeedUpdateArgs} args - Arguments to update one MergedFeed.
+     * @example
+     * // Update one MergedFeed
+     * const mergedFeed = await prisma.mergedFeed.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MergedFeedUpdateArgs>(args: SelectSubset<T, MergedFeedUpdateArgs<ExtArgs>>): Prisma__MergedFeedClient<$Result.GetResult<Prisma.$MergedFeedPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more MergedFeeds.
+     * @param {MergedFeedDeleteManyArgs} args - Arguments to filter MergedFeeds to delete.
+     * @example
+     * // Delete a few MergedFeeds
+     * const { count } = await prisma.mergedFeed.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MergedFeedDeleteManyArgs>(args?: SelectSubset<T, MergedFeedDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MergedFeeds.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergedFeedUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MergedFeeds
+     * const mergedFeed = await prisma.mergedFeed.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MergedFeedUpdateManyArgs>(args: SelectSubset<T, MergedFeedUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one MergedFeed.
+     * @param {MergedFeedUpsertArgs} args - Arguments to update or create a MergedFeed.
+     * @example
+     * // Update or create a MergedFeed
+     * const mergedFeed = await prisma.mergedFeed.upsert({
+     *   create: {
+     *     // ... data to create a MergedFeed
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MergedFeed we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MergedFeedUpsertArgs>(args: SelectSubset<T, MergedFeedUpsertArgs<ExtArgs>>): Prisma__MergedFeedClient<$Result.GetResult<Prisma.$MergedFeedPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MergedFeeds that matches the filter.
+     * @param {MergedFeedFindRawArgs} args - Select which filters you would like to apply.
+     * @example
+     * const mergedFeed = await prisma.mergedFeed.findRaw({
+     *   filter: { age: { $gt: 25 } }
+     * })
+     */
+    findRaw(args?: MergedFeedFindRawArgs): Prisma.PrismaPromise<JsonObject>
+
+    /**
+     * Perform aggregation operations on a MergedFeed.
+     * @param {MergedFeedAggregateRawArgs} args - Select which aggregations you would like to apply.
+     * @example
+     * const mergedFeed = await prisma.mergedFeed.aggregateRaw({
+     *   pipeline: [
+     *     { $match: { status: "registered" } },
+     *     { $group: { _id: "$country", total: { $sum: 1 } } }
+     *   ]
+     * })
+     */
+    aggregateRaw(args?: MergedFeedAggregateRawArgs): Prisma.PrismaPromise<JsonObject>
+
+
+    /**
+     * Count the number of MergedFeeds.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergedFeedCountArgs} args - Arguments to filter MergedFeeds to count.
+     * @example
+     * // Count the number of MergedFeeds
+     * const count = await prisma.mergedFeed.count({
+     *   where: {
+     *     // ... the filter for the MergedFeeds we want to count
+     *   }
+     * })
+    **/
+    count<T extends MergedFeedCountArgs>(
+      args?: Subset<T, MergedFeedCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MergedFeedCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MergedFeed.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergedFeedAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MergedFeedAggregateArgs>(args: Subset<T, MergedFeedAggregateArgs>): Prisma.PrismaPromise<GetMergedFeedAggregateType<T>>
+
+    /**
+     * Group by MergedFeed.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergedFeedGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MergedFeedGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MergedFeedGroupByArgs['orderBy'] }
+        : { orderBy?: MergedFeedGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MergedFeedGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMergedFeedGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MergedFeed model
+   */
+  readonly fields: MergedFeedFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MergedFeed.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MergedFeedClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    site<T extends SiteDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SiteDefaultArgs<ExtArgs>>): Prisma__SiteClient<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MergedFeed model
+   */
+  interface MergedFeedFieldRefs {
+    readonly id: FieldRef<"MergedFeed", 'String'>
+    readonly siteId: FieldRef<"MergedFeed", 'String'>
+    readonly name: FieldRef<"MergedFeed", 'String'>
+    readonly description: FieldRef<"MergedFeed", 'String'>
+    readonly sources: FieldRef<"MergedFeed", 'Json'>
+    readonly filters: FieldRef<"MergedFeed", 'Json'>
+    readonly maxItems: FieldRef<"MergedFeed", 'Int'>
+    readonly createdAt: FieldRef<"MergedFeed", 'DateTime'>
+    readonly updatedAt: FieldRef<"MergedFeed", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MergedFeed findUnique
+   */
+  export type MergedFeedFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergedFeed
+     */
+    select?: MergedFeedSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergedFeed
+     */
+    omit?: MergedFeedOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergedFeedInclude<ExtArgs> | null
+    /**
+     * Filter, which MergedFeed to fetch.
+     */
+    where: MergedFeedWhereUniqueInput
+  }
+
+  /**
+   * MergedFeed findUniqueOrThrow
+   */
+  export type MergedFeedFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergedFeed
+     */
+    select?: MergedFeedSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergedFeed
+     */
+    omit?: MergedFeedOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergedFeedInclude<ExtArgs> | null
+    /**
+     * Filter, which MergedFeed to fetch.
+     */
+    where: MergedFeedWhereUniqueInput
+  }
+
+  /**
+   * MergedFeed findFirst
+   */
+  export type MergedFeedFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergedFeed
+     */
+    select?: MergedFeedSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergedFeed
+     */
+    omit?: MergedFeedOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergedFeedInclude<ExtArgs> | null
+    /**
+     * Filter, which MergedFeed to fetch.
+     */
+    where?: MergedFeedWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MergedFeeds to fetch.
+     */
+    orderBy?: MergedFeedOrderByWithRelationInput | MergedFeedOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MergedFeeds.
+     */
+    cursor?: MergedFeedWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MergedFeeds from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MergedFeeds.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MergedFeeds.
+     */
+    distinct?: MergedFeedScalarFieldEnum | MergedFeedScalarFieldEnum[]
+  }
+
+  /**
+   * MergedFeed findFirstOrThrow
+   */
+  export type MergedFeedFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergedFeed
+     */
+    select?: MergedFeedSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergedFeed
+     */
+    omit?: MergedFeedOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergedFeedInclude<ExtArgs> | null
+    /**
+     * Filter, which MergedFeed to fetch.
+     */
+    where?: MergedFeedWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MergedFeeds to fetch.
+     */
+    orderBy?: MergedFeedOrderByWithRelationInput | MergedFeedOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MergedFeeds.
+     */
+    cursor?: MergedFeedWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MergedFeeds from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MergedFeeds.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MergedFeeds.
+     */
+    distinct?: MergedFeedScalarFieldEnum | MergedFeedScalarFieldEnum[]
+  }
+
+  /**
+   * MergedFeed findMany
+   */
+  export type MergedFeedFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergedFeed
+     */
+    select?: MergedFeedSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergedFeed
+     */
+    omit?: MergedFeedOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergedFeedInclude<ExtArgs> | null
+    /**
+     * Filter, which MergedFeeds to fetch.
+     */
+    where?: MergedFeedWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MergedFeeds to fetch.
+     */
+    orderBy?: MergedFeedOrderByWithRelationInput | MergedFeedOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MergedFeeds.
+     */
+    cursor?: MergedFeedWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MergedFeeds from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MergedFeeds.
+     */
+    skip?: number
+    distinct?: MergedFeedScalarFieldEnum | MergedFeedScalarFieldEnum[]
+  }
+
+  /**
+   * MergedFeed create
+   */
+  export type MergedFeedCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergedFeed
+     */
+    select?: MergedFeedSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergedFeed
+     */
+    omit?: MergedFeedOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergedFeedInclude<ExtArgs> | null
+    /**
+     * The data needed to create a MergedFeed.
+     */
+    data: XOR<MergedFeedCreateInput, MergedFeedUncheckedCreateInput>
+  }
+
+  /**
+   * MergedFeed createMany
+   */
+  export type MergedFeedCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MergedFeeds.
+     */
+    data: MergedFeedCreateManyInput | MergedFeedCreateManyInput[]
+  }
+
+  /**
+   * MergedFeed update
+   */
+  export type MergedFeedUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergedFeed
+     */
+    select?: MergedFeedSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergedFeed
+     */
+    omit?: MergedFeedOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergedFeedInclude<ExtArgs> | null
+    /**
+     * The data needed to update a MergedFeed.
+     */
+    data: XOR<MergedFeedUpdateInput, MergedFeedUncheckedUpdateInput>
+    /**
+     * Choose, which MergedFeed to update.
+     */
+    where: MergedFeedWhereUniqueInput
+  }
+
+  /**
+   * MergedFeed updateMany
+   */
+  export type MergedFeedUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MergedFeeds.
+     */
+    data: XOR<MergedFeedUpdateManyMutationInput, MergedFeedUncheckedUpdateManyInput>
+    /**
+     * Filter which MergedFeeds to update
+     */
+    where?: MergedFeedWhereInput
+    /**
+     * Limit how many MergedFeeds to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MergedFeed upsert
+   */
+  export type MergedFeedUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergedFeed
+     */
+    select?: MergedFeedSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergedFeed
+     */
+    omit?: MergedFeedOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergedFeedInclude<ExtArgs> | null
+    /**
+     * The filter to search for the MergedFeed to update in case it exists.
+     */
+    where: MergedFeedWhereUniqueInput
+    /**
+     * In case the MergedFeed found by the `where` argument doesn't exist, create a new MergedFeed with this data.
+     */
+    create: XOR<MergedFeedCreateInput, MergedFeedUncheckedCreateInput>
+    /**
+     * In case the MergedFeed was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MergedFeedUpdateInput, MergedFeedUncheckedUpdateInput>
+  }
+
+  /**
+   * MergedFeed delete
+   */
+  export type MergedFeedDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergedFeed
+     */
+    select?: MergedFeedSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergedFeed
+     */
+    omit?: MergedFeedOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergedFeedInclude<ExtArgs> | null
+    /**
+     * Filter which MergedFeed to delete.
+     */
+    where: MergedFeedWhereUniqueInput
+  }
+
+  /**
+   * MergedFeed deleteMany
+   */
+  export type MergedFeedDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MergedFeeds to delete
+     */
+    where?: MergedFeedWhereInput
+    /**
+     * Limit how many MergedFeeds to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * MergedFeed findRaw
+   */
+  export type MergedFeedFindRawArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The query predicate filter. If unspecified, then all documents in the collection will match the predicate. ${@link https://docs.mongodb.com/manual/reference/operator/query MongoDB Docs}.
+     */
+    filter?: InputJsonValue
+    /**
+     * Additional options to pass to the `find` command ${@link https://docs.mongodb.com/manual/reference/command/find/#command-fields MongoDB Docs}.
+     */
+    options?: InputJsonValue
+  }
+
+  /**
+   * MergedFeed aggregateRaw
+   */
+  export type MergedFeedAggregateRawArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * An array of aggregation stages to process and transform the document stream via the aggregation pipeline. ${@link https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline MongoDB Docs}.
+     */
+    pipeline?: InputJsonValue[]
+    /**
+     * Additional options to pass to the `aggregate` command ${@link https://docs.mongodb.com/manual/reference/command/aggregate/#command-fields MongoDB Docs}.
+     */
+    options?: InputJsonValue
+  }
+
+  /**
+   * MergedFeed without action
+   */
+  export type MergedFeedDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergedFeed
+     */
+    select?: MergedFeedSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergedFeed
+     */
+    omit?: MergedFeedOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergedFeedInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model Theme
    */
 
@@ -23784,6 +24961,21 @@ export namespace Prisma {
   export type CustomFeedTemplateScalarFieldEnum = (typeof CustomFeedTemplateScalarFieldEnum)[keyof typeof CustomFeedTemplateScalarFieldEnum]
 
 
+  export const MergedFeedScalarFieldEnum: {
+    id: 'id',
+    siteId: 'siteId',
+    name: 'name',
+    description: 'description',
+    sources: 'sources',
+    filters: 'filters',
+    maxItems: 'maxItems',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type MergedFeedScalarFieldEnum = (typeof MergedFeedScalarFieldEnum)[keyof typeof MergedFeedScalarFieldEnum]
+
+
   export const ThemeScalarFieldEnum: {
     id: 'id',
     name: 'name',
@@ -24393,6 +25585,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeListRelationFilter
     snippets?: SnippetListRelationFilter
     customFeedTemplates?: CustomFeedTemplateListRelationFilter
+    mergedFeeds?: MergedFeedListRelationFilter
   }
 
   export type SiteOrderByWithRelationInput = {
@@ -24429,6 +25622,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeOrderByRelationAggregateInput
     snippets?: SnippetOrderByRelationAggregateInput
     customFeedTemplates?: CustomFeedTemplateOrderByRelationAggregateInput
+    mergedFeeds?: MergedFeedOrderByRelationAggregateInput
   }
 
   export type SiteWhereUniqueInput = Prisma.AtLeast<{
@@ -24468,6 +25662,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeListRelationFilter
     snippets?: SnippetListRelationFilter
     customFeedTemplates?: CustomFeedTemplateListRelationFilter
+    mergedFeeds?: MergedFeedListRelationFilter
   }, "id" | "subdomain" | "url">
 
   export type SiteOrderByWithAggregationInput = {
@@ -25428,6 +26623,83 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"CustomFeedTemplate"> | Date | string
   }
 
+  export type MergedFeedWhereInput = {
+    AND?: MergedFeedWhereInput | MergedFeedWhereInput[]
+    OR?: MergedFeedWhereInput[]
+    NOT?: MergedFeedWhereInput | MergedFeedWhereInput[]
+    id?: StringFilter<"MergedFeed"> | string
+    siteId?: StringFilter<"MergedFeed"> | string
+    name?: StringFilter<"MergedFeed"> | string
+    description?: StringNullableFilter<"MergedFeed"> | string | null
+    sources?: JsonFilter<"MergedFeed">
+    filters?: JsonNullableFilter<"MergedFeed">
+    maxItems?: IntFilter<"MergedFeed"> | number
+    createdAt?: DateTimeFilter<"MergedFeed"> | Date | string
+    updatedAt?: DateTimeFilter<"MergedFeed"> | Date | string
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+  }
+
+  export type MergedFeedOrderByWithRelationInput = {
+    id?: SortOrder
+    siteId?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    sources?: SortOrder
+    filters?: SortOrder
+    maxItems?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    site?: SiteOrderByWithRelationInput
+  }
+
+  export type MergedFeedWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: MergedFeedWhereInput | MergedFeedWhereInput[]
+    OR?: MergedFeedWhereInput[]
+    NOT?: MergedFeedWhereInput | MergedFeedWhereInput[]
+    siteId?: StringFilter<"MergedFeed"> | string
+    name?: StringFilter<"MergedFeed"> | string
+    description?: StringNullableFilter<"MergedFeed"> | string | null
+    sources?: JsonFilter<"MergedFeed">
+    filters?: JsonNullableFilter<"MergedFeed">
+    maxItems?: IntFilter<"MergedFeed"> | number
+    createdAt?: DateTimeFilter<"MergedFeed"> | Date | string
+    updatedAt?: DateTimeFilter<"MergedFeed"> | Date | string
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+  }, "id">
+
+  export type MergedFeedOrderByWithAggregationInput = {
+    id?: SortOrder
+    siteId?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    sources?: SortOrder
+    filters?: SortOrder
+    maxItems?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: MergedFeedCountOrderByAggregateInput
+    _avg?: MergedFeedAvgOrderByAggregateInput
+    _max?: MergedFeedMaxOrderByAggregateInput
+    _min?: MergedFeedMinOrderByAggregateInput
+    _sum?: MergedFeedSumOrderByAggregateInput
+  }
+
+  export type MergedFeedScalarWhereWithAggregatesInput = {
+    AND?: MergedFeedScalarWhereWithAggregatesInput | MergedFeedScalarWhereWithAggregatesInput[]
+    OR?: MergedFeedScalarWhereWithAggregatesInput[]
+    NOT?: MergedFeedScalarWhereWithAggregatesInput | MergedFeedScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"MergedFeed"> | string
+    siteId?: StringWithAggregatesFilter<"MergedFeed"> | string
+    name?: StringWithAggregatesFilter<"MergedFeed"> | string
+    description?: StringNullableWithAggregatesFilter<"MergedFeed"> | string | null
+    sources?: JsonWithAggregatesFilter<"MergedFeed">
+    filters?: JsonNullableWithAggregatesFilter<"MergedFeed">
+    maxItems?: IntWithAggregatesFilter<"MergedFeed"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"MergedFeed"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"MergedFeed"> | Date | string
+  }
+
   export type ThemeWhereInput = {
     AND?: ThemeWhereInput | ThemeWhereInput[]
     OR?: ThemeWhereInput[]
@@ -26043,6 +27315,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
     snippets?: SnippetCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateInput = {
@@ -26076,6 +27349,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
     snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUpdateInput = {
@@ -26108,6 +27382,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateInput = {
@@ -26140,6 +27415,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteCreateManyInput = {
@@ -27184,6 +28460,85 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type MergedFeedCreateInput = {
+    id?: string
+    name: string
+    description?: string | null
+    sources: InputJsonValue
+    filters?: InputJsonValue | null
+    maxItems?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    site: SiteCreateNestedOneWithoutMergedFeedsInput
+  }
+
+  export type MergedFeedUncheckedCreateInput = {
+    id?: string
+    siteId: string
+    name: string
+    description?: string | null
+    sources: InputJsonValue
+    filters?: InputJsonValue | null
+    maxItems?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MergedFeedUpdateInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    sources?: InputJsonValue | InputJsonValue
+    filters?: InputJsonValue | InputJsonValue | null
+    maxItems?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    site?: SiteUpdateOneRequiredWithoutMergedFeedsNestedInput
+  }
+
+  export type MergedFeedUncheckedUpdateInput = {
+    siteId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    sources?: InputJsonValue | InputJsonValue
+    filters?: InputJsonValue | InputJsonValue | null
+    maxItems?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergedFeedCreateManyInput = {
+    id?: string
+    siteId: string
+    name: string
+    description?: string | null
+    sources: InputJsonValue
+    filters?: InputJsonValue | null
+    maxItems?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MergedFeedUpdateManyMutationInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    sources?: InputJsonValue | InputJsonValue
+    filters?: InputJsonValue | InputJsonValue | null
+    maxItems?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergedFeedUncheckedUpdateManyInput = {
+    siteId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    sources?: InputJsonValue | InputJsonValue
+    filters?: InputJsonValue | InputJsonValue | null
+    maxItems?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type ThemeCreateInput = {
     id?: string
     name: string
@@ -27889,6 +29244,12 @@ export namespace Prisma {
     none?: CustomFeedTemplateWhereInput
   }
 
+  export type MergedFeedListRelationFilter = {
+    every?: MergedFeedWhereInput
+    some?: MergedFeedWhereInput
+    none?: MergedFeedWhereInput
+  }
+
   export type AnalyticsEventOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -27902,6 +29263,10 @@ export namespace Prisma {
   }
 
   export type CustomFeedTemplateOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type MergedFeedOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -28635,6 +30000,46 @@ export namespace Prisma {
     maxItems?: SortOrder
   }
 
+  export type MergedFeedCountOrderByAggregateInput = {
+    id?: SortOrder
+    siteId?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    sources?: SortOrder
+    filters?: SortOrder
+    maxItems?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MergedFeedAvgOrderByAggregateInput = {
+    maxItems?: SortOrder
+  }
+
+  export type MergedFeedMaxOrderByAggregateInput = {
+    id?: SortOrder
+    siteId?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    maxItems?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MergedFeedMinOrderByAggregateInput = {
+    id?: SortOrder
+    siteId?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    maxItems?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MergedFeedSumOrderByAggregateInput = {
+    maxItems?: SortOrder
+  }
+
   export type ThemeBlockListRelationFilter = {
     every?: ThemeBlockWhereInput
     some?: ThemeBlockWhereInput
@@ -29242,6 +30647,13 @@ export namespace Prisma {
     connect?: CustomFeedTemplateWhereUniqueInput | CustomFeedTemplateWhereUniqueInput[]
   }
 
+  export type MergedFeedCreateNestedManyWithoutSiteInput = {
+    create?: XOR<MergedFeedCreateWithoutSiteInput, MergedFeedUncheckedCreateWithoutSiteInput> | MergedFeedCreateWithoutSiteInput[] | MergedFeedUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: MergedFeedCreateOrConnectWithoutSiteInput | MergedFeedCreateOrConnectWithoutSiteInput[]
+    createMany?: MergedFeedCreateManySiteInputEnvelope
+    connect?: MergedFeedWhereUniqueInput | MergedFeedWhereUniqueInput[]
+  }
+
   export type CategoryUncheckedCreateNestedManyWithoutSiteInput = {
     create?: XOR<CategoryCreateWithoutSiteInput, CategoryUncheckedCreateWithoutSiteInput> | CategoryCreateWithoutSiteInput[] | CategoryUncheckedCreateWithoutSiteInput[]
     connectOrCreate?: CategoryCreateOrConnectWithoutSiteInput | CategoryCreateOrConnectWithoutSiteInput[]
@@ -29296,6 +30708,13 @@ export namespace Prisma {
     connectOrCreate?: CustomFeedTemplateCreateOrConnectWithoutSiteInput | CustomFeedTemplateCreateOrConnectWithoutSiteInput[]
     createMany?: CustomFeedTemplateCreateManySiteInputEnvelope
     connect?: CustomFeedTemplateWhereUniqueInput | CustomFeedTemplateWhereUniqueInput[]
+  }
+
+  export type MergedFeedUncheckedCreateNestedManyWithoutSiteInput = {
+    create?: XOR<MergedFeedCreateWithoutSiteInput, MergedFeedUncheckedCreateWithoutSiteInput> | MergedFeedCreateWithoutSiteInput[] | MergedFeedUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: MergedFeedCreateOrConnectWithoutSiteInput | MergedFeedCreateOrConnectWithoutSiteInput[]
+    createMany?: MergedFeedCreateManySiteInputEnvelope
+    connect?: MergedFeedWhereUniqueInput | MergedFeedWhereUniqueInput[]
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -29448,6 +30867,20 @@ export namespace Prisma {
     deleteMany?: CustomFeedTemplateScalarWhereInput | CustomFeedTemplateScalarWhereInput[]
   }
 
+  export type MergedFeedUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<MergedFeedCreateWithoutSiteInput, MergedFeedUncheckedCreateWithoutSiteInput> | MergedFeedCreateWithoutSiteInput[] | MergedFeedUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: MergedFeedCreateOrConnectWithoutSiteInput | MergedFeedCreateOrConnectWithoutSiteInput[]
+    upsert?: MergedFeedUpsertWithWhereUniqueWithoutSiteInput | MergedFeedUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: MergedFeedCreateManySiteInputEnvelope
+    set?: MergedFeedWhereUniqueInput | MergedFeedWhereUniqueInput[]
+    disconnect?: MergedFeedWhereUniqueInput | MergedFeedWhereUniqueInput[]
+    delete?: MergedFeedWhereUniqueInput | MergedFeedWhereUniqueInput[]
+    connect?: MergedFeedWhereUniqueInput | MergedFeedWhereUniqueInput[]
+    update?: MergedFeedUpdateWithWhereUniqueWithoutSiteInput | MergedFeedUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: MergedFeedUpdateManyWithWhereWithoutSiteInput | MergedFeedUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: MergedFeedScalarWhereInput | MergedFeedScalarWhereInput[]
+  }
+
   export type CategoryUncheckedUpdateManyWithoutSiteNestedInput = {
     create?: XOR<CategoryCreateWithoutSiteInput, CategoryUncheckedCreateWithoutSiteInput> | CategoryCreateWithoutSiteInput[] | CategoryUncheckedCreateWithoutSiteInput[]
     connectOrCreate?: CategoryCreateOrConnectWithoutSiteInput | CategoryCreateOrConnectWithoutSiteInput[]
@@ -29558,6 +30991,20 @@ export namespace Prisma {
     update?: CustomFeedTemplateUpdateWithWhereUniqueWithoutSiteInput | CustomFeedTemplateUpdateWithWhereUniqueWithoutSiteInput[]
     updateMany?: CustomFeedTemplateUpdateManyWithWhereWithoutSiteInput | CustomFeedTemplateUpdateManyWithWhereWithoutSiteInput[]
     deleteMany?: CustomFeedTemplateScalarWhereInput | CustomFeedTemplateScalarWhereInput[]
+  }
+
+  export type MergedFeedUncheckedUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<MergedFeedCreateWithoutSiteInput, MergedFeedUncheckedCreateWithoutSiteInput> | MergedFeedCreateWithoutSiteInput[] | MergedFeedUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: MergedFeedCreateOrConnectWithoutSiteInput | MergedFeedCreateOrConnectWithoutSiteInput[]
+    upsert?: MergedFeedUpsertWithWhereUniqueWithoutSiteInput | MergedFeedUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: MergedFeedCreateManySiteInputEnvelope
+    set?: MergedFeedWhereUniqueInput | MergedFeedWhereUniqueInput[]
+    disconnect?: MergedFeedWhereUniqueInput | MergedFeedWhereUniqueInput[]
+    delete?: MergedFeedWhereUniqueInput | MergedFeedWhereUniqueInput[]
+    connect?: MergedFeedWhereUniqueInput | MergedFeedWhereUniqueInput[]
+    update?: MergedFeedUpdateWithWhereUniqueWithoutSiteInput | MergedFeedUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: MergedFeedUpdateManyWithWhereWithoutSiteInput | MergedFeedUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: MergedFeedScalarWhereInput | MergedFeedScalarWhereInput[]
   }
 
   export type SiteCreateNestedOneWithoutSnippetsInput = {
@@ -29945,6 +31392,20 @@ export namespace Prisma {
     upsert?: SiteUpsertWithoutCustomFeedTemplatesInput
     connect?: SiteWhereUniqueInput
     update?: XOR<XOR<SiteUpdateToOneWithWhereWithoutCustomFeedTemplatesInput, SiteUpdateWithoutCustomFeedTemplatesInput>, SiteUncheckedUpdateWithoutCustomFeedTemplatesInput>
+  }
+
+  export type SiteCreateNestedOneWithoutMergedFeedsInput = {
+    create?: XOR<SiteCreateWithoutMergedFeedsInput, SiteUncheckedCreateWithoutMergedFeedsInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutMergedFeedsInput
+    connect?: SiteWhereUniqueInput
+  }
+
+  export type SiteUpdateOneRequiredWithoutMergedFeedsNestedInput = {
+    create?: XOR<SiteCreateWithoutMergedFeedsInput, SiteUncheckedCreateWithoutMergedFeedsInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutMergedFeedsInput
+    upsert?: SiteUpsertWithoutMergedFeedsInput
+    connect?: SiteWhereUniqueInput
+    update?: XOR<XOR<SiteUpdateToOneWithWhereWithoutMergedFeedsInput, SiteUpdateWithoutMergedFeedsInput>, SiteUncheckedUpdateWithoutMergedFeedsInput>
   }
 
   export type ThemeBlockCreateNestedManyWithoutThemeInput = {
@@ -30476,6 +31937,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
     snippets?: SnippetCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutUserInput = {
@@ -30508,6 +31970,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
     snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutUserInput = {
@@ -31132,6 +32595,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
     snippets?: SnippetCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutCategoryInput = {
@@ -31164,6 +32628,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
     snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutCategoryInput = {
@@ -31289,6 +32754,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutCategoryInput = {
@@ -31320,6 +32786,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutCategoryInput = {
@@ -31792,6 +33259,37 @@ export namespace Prisma {
     data: CustomFeedTemplateCreateManySiteInput | CustomFeedTemplateCreateManySiteInput[]
   }
 
+  export type MergedFeedCreateWithoutSiteInput = {
+    id?: string
+    name: string
+    description?: string | null
+    sources: InputJsonValue
+    filters?: InputJsonValue | null
+    maxItems?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MergedFeedUncheckedCreateWithoutSiteInput = {
+    id?: string
+    name: string
+    description?: string | null
+    sources: InputJsonValue
+    filters?: InputJsonValue | null
+    maxItems?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MergedFeedCreateOrConnectWithoutSiteInput = {
+    where: MergedFeedWhereUniqueInput
+    create: XOR<MergedFeedCreateWithoutSiteInput, MergedFeedUncheckedCreateWithoutSiteInput>
+  }
+
+  export type MergedFeedCreateManySiteInputEnvelope = {
+    data: MergedFeedCreateManySiteInput | MergedFeedCreateManySiteInput[]
+  }
+
   export type UserUpsertWithoutSiteInput = {
     update: XOR<UserUpdateWithoutSiteInput, UserUncheckedUpdateWithoutSiteInput>
     create: XOR<UserCreateWithoutSiteInput, UserUncheckedCreateWithoutSiteInput>
@@ -32097,6 +33595,37 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"CustomFeedTemplate"> | Date | string
   }
 
+  export type MergedFeedUpsertWithWhereUniqueWithoutSiteInput = {
+    where: MergedFeedWhereUniqueInput
+    update: XOR<MergedFeedUpdateWithoutSiteInput, MergedFeedUncheckedUpdateWithoutSiteInput>
+    create: XOR<MergedFeedCreateWithoutSiteInput, MergedFeedUncheckedCreateWithoutSiteInput>
+  }
+
+  export type MergedFeedUpdateWithWhereUniqueWithoutSiteInput = {
+    where: MergedFeedWhereUniqueInput
+    data: XOR<MergedFeedUpdateWithoutSiteInput, MergedFeedUncheckedUpdateWithoutSiteInput>
+  }
+
+  export type MergedFeedUpdateManyWithWhereWithoutSiteInput = {
+    where: MergedFeedScalarWhereInput
+    data: XOR<MergedFeedUpdateManyMutationInput, MergedFeedUncheckedUpdateManyWithoutSiteInput>
+  }
+
+  export type MergedFeedScalarWhereInput = {
+    AND?: MergedFeedScalarWhereInput | MergedFeedScalarWhereInput[]
+    OR?: MergedFeedScalarWhereInput[]
+    NOT?: MergedFeedScalarWhereInput | MergedFeedScalarWhereInput[]
+    id?: StringFilter<"MergedFeed"> | string
+    siteId?: StringFilter<"MergedFeed"> | string
+    name?: StringFilter<"MergedFeed"> | string
+    description?: StringNullableFilter<"MergedFeed"> | string | null
+    sources?: JsonFilter<"MergedFeed">
+    filters?: JsonNullableFilter<"MergedFeed">
+    maxItems?: IntFilter<"MergedFeed"> | number
+    createdAt?: DateTimeFilter<"MergedFeed"> | Date | string
+    updatedAt?: DateTimeFilter<"MergedFeed"> | Date | string
+  }
+
   export type SiteCreateWithoutSnippetsInput = {
     id?: string
     subdomain: string
@@ -32127,6 +33656,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutSnippetsInput = {
@@ -32159,6 +33689,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutSnippetsInput = {
@@ -32206,6 +33737,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutSnippetsInput = {
@@ -32237,6 +33769,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteCreateWithoutFeaturesInput = {
@@ -32269,6 +33802,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
     snippets?: SnippetCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutFeaturesInput = {
@@ -32301,6 +33835,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
     snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutFeaturesInput = {
@@ -32401,6 +33936,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
     snippets?: SnippetCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutSubscriptionInput = {
@@ -32433,6 +33969,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
     snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutSubscriptionInput = {
@@ -32662,6 +34199,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
     snippets?: SnippetCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutAnalyticsEventInput = {
@@ -32694,6 +34232,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
     snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutAnalyticsEventInput = {
@@ -32741,6 +34280,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutAnalyticsEventInput = {
@@ -32772,6 +34312,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteCreateWithoutArticleInput = {
@@ -32804,6 +34345,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
     snippets?: SnippetCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutArticleInput = {
@@ -32836,6 +34378,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
     snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutArticleInput = {
@@ -32926,6 +34469,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutArticleInput = {
@@ -32957,6 +34501,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutArticleInput = {
@@ -33036,6 +34581,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
     snippets?: SnippetCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutPageInput = {
@@ -33068,6 +34614,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
     snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutPageInput = {
@@ -33158,6 +34705,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutPageInput = {
@@ -33189,6 +34737,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutPageInput = {
@@ -33268,6 +34817,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
     snippets?: SnippetCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutRSSInput = {
@@ -33300,6 +34850,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
     snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutRSSInput = {
@@ -33419,6 +34970,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutRSSInput = {
@@ -33450,6 +35002,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type RssItemUpsertWithWhereUniqueWithoutRssInput = {
@@ -33620,6 +35173,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
     snippets?: SnippetCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutCustomFeedTemplatesInput = {
@@ -33652,6 +35206,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
     snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutCustomFeedTemplatesInput = {
@@ -33699,6 +35254,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutCustomFeedTemplatesInput = {
@@ -33730,6 +35286,153 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
+  }
+
+  export type SiteCreateWithoutMergedFeedsInput = {
+    id?: string
+    subdomain: string
+    url: string
+    views?: number
+    limitViews?: number
+    title: string
+    description?: string | null
+    logo?: string | null
+    theme?: InputJsonValue | null
+    status?: string
+    defaultThemePreference?: string
+    template_schema?: InputJsonValue | null
+    settings?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    home_Id?: string | null
+    privacy_policy_id?: string | null
+    cookies_id?: string | null
+    terms_id?: string | null
+    user?: UserCreateNestedOneWithoutSiteInput
+    features?: FeaturesCreateNestedOneWithoutSiteInput
+    subscription?: SubscriptionCreateNestedOneWithoutSiteInput
+    category?: CategoryCreateNestedManyWithoutSiteInput
+    Article?: ArticleCreateNestedManyWithoutSiteInput
+    Page?: PageCreateNestedManyWithoutSiteInput
+    RSS?: RssCreateNestedManyWithoutSiteInput
+    AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
+    snippets?: SnippetCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteUncheckedCreateWithoutMergedFeedsInput = {
+    id?: string
+    subdomain: string
+    url: string
+    views?: number
+    limitViews?: number
+    title: string
+    description?: string | null
+    logo?: string | null
+    theme?: InputJsonValue | null
+    status?: string
+    defaultThemePreference?: string
+    template_schema?: InputJsonValue | null
+    settings?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    home_Id?: string | null
+    privacy_policy_id?: string | null
+    cookies_id?: string | null
+    terms_id?: string | null
+    userId?: string | null
+    featuresId?: string | null
+    subscriptionId?: string | null
+    category?: CategoryUncheckedCreateNestedManyWithoutSiteInput
+    Article?: ArticleUncheckedCreateNestedManyWithoutSiteInput
+    Page?: PageUncheckedCreateNestedManyWithoutSiteInput
+    RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
+    AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
+    snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteCreateOrConnectWithoutMergedFeedsInput = {
+    where: SiteWhereUniqueInput
+    create: XOR<SiteCreateWithoutMergedFeedsInput, SiteUncheckedCreateWithoutMergedFeedsInput>
+  }
+
+  export type SiteUpsertWithoutMergedFeedsInput = {
+    update: XOR<SiteUpdateWithoutMergedFeedsInput, SiteUncheckedUpdateWithoutMergedFeedsInput>
+    create: XOR<SiteCreateWithoutMergedFeedsInput, SiteUncheckedCreateWithoutMergedFeedsInput>
+    where?: SiteWhereInput
+  }
+
+  export type SiteUpdateToOneWithWhereWithoutMergedFeedsInput = {
+    where?: SiteWhereInput
+    data: XOR<SiteUpdateWithoutMergedFeedsInput, SiteUncheckedUpdateWithoutMergedFeedsInput>
+  }
+
+  export type SiteUpdateWithoutMergedFeedsInput = {
+    subdomain?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    views?: IntFieldUpdateOperationsInput | number
+    limitViews?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    theme?: InputJsonValue | InputJsonValue | null
+    status?: StringFieldUpdateOperationsInput | string
+    defaultThemePreference?: StringFieldUpdateOperationsInput | string
+    template_schema?: InputJsonValue | InputJsonValue | null
+    settings?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_Id?: NullableStringFieldUpdateOperationsInput | string | null
+    privacy_policy_id?: NullableStringFieldUpdateOperationsInput | string | null
+    cookies_id?: NullableStringFieldUpdateOperationsInput | string | null
+    terms_id?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneWithoutSiteNestedInput
+    features?: FeaturesUpdateOneWithoutSiteNestedInput
+    subscription?: SubscriptionUpdateOneWithoutSiteNestedInput
+    category?: CategoryUpdateManyWithoutSiteNestedInput
+    Article?: ArticleUpdateManyWithoutSiteNestedInput
+    Page?: PageUpdateManyWithoutSiteNestedInput
+    RSS?: RssUpdateManyWithoutSiteNestedInput
+    AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
+  }
+
+  export type SiteUncheckedUpdateWithoutMergedFeedsInput = {
+    subdomain?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    views?: IntFieldUpdateOperationsInput | number
+    limitViews?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    theme?: InputJsonValue | InputJsonValue | null
+    status?: StringFieldUpdateOperationsInput | string
+    defaultThemePreference?: StringFieldUpdateOperationsInput | string
+    template_schema?: InputJsonValue | InputJsonValue | null
+    settings?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_Id?: NullableStringFieldUpdateOperationsInput | string | null
+    privacy_policy_id?: NullableStringFieldUpdateOperationsInput | string | null
+    cookies_id?: NullableStringFieldUpdateOperationsInput | string | null
+    terms_id?: NullableStringFieldUpdateOperationsInput | string | null
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    featuresId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: CategoryUncheckedUpdateManyWithoutSiteNestedInput
+    Article?: ArticleUncheckedUpdateManyWithoutSiteNestedInput
+    Page?: PageUncheckedUpdateManyWithoutSiteNestedInput
+    RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
+    AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type ThemeBlockCreateWithoutThemeInput = {
@@ -33912,6 +35615,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
     snippets?: SnippetCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutInstalledThemesInput = {
@@ -33944,6 +35648,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
     snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutInstalledThemesInput = {
@@ -34022,6 +35727,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutInstalledThemesInput = {
@@ -34053,6 +35759,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type ThemeUpsertWithoutInstalledInInput = {
@@ -34276,6 +35983,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutUserInput = {
@@ -34307,6 +36015,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateManyWithoutUserInput = {
@@ -34656,6 +36365,17 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type MergedFeedCreateManySiteInput = {
+    id?: string
+    name: string
+    description?: string | null
+    sources: InputJsonValue
+    filters?: InputJsonValue | null
+    maxItems?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type CategoryUpdateWithoutSiteInput = {
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
@@ -34954,6 +36674,36 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type MergedFeedUpdateWithoutSiteInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    sources?: InputJsonValue | InputJsonValue
+    filters?: InputJsonValue | InputJsonValue | null
+    maxItems?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergedFeedUncheckedUpdateWithoutSiteInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    sources?: InputJsonValue | InputJsonValue
+    filters?: InputJsonValue | InputJsonValue | null
+    maxItems?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergedFeedUncheckedUpdateManyWithoutSiteInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    sources?: InputJsonValue | InputJsonValue
+    filters?: InputJsonValue | InputJsonValue | null
+    maxItems?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type SiteCreateManyFeaturesInput = {
     id?: string
     subdomain: string
@@ -35007,6 +36757,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutFeaturesInput = {
@@ -35038,6 +36789,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateManyWithoutFeaturesInput = {
@@ -35126,6 +36878,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutSubscriptionInput = {
@@ -35157,6 +36910,7 @@ export namespace Prisma {
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateManyWithoutSubscriptionInput = {

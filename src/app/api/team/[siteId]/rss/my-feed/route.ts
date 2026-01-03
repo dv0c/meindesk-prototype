@@ -14,18 +14,37 @@ export async function GET(
       return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
-    const rss = await db.rss.findMany({
+    // Fetch regular RSS feeds
+    const rssFeeds = await db.rss.findMany({
       where: { siteId },
-      include: {
-        site: true,
-      },
+      include: { site: true },
     });
 
-    if (!rss || rss.length === 0) {
-      return NextResponse.json([]);
-    }
+    // Fetch merged feeds
+    const mergedFeeds = await db.mergedFeed.findMany({
+      where: { siteId },
+    });
 
-    return NextResponse.json(rss);
+    // Transform merged feeds to match the Feed interface
+    const transformedMerged = mergedFeeds.map((feed) => {
+      const sources = feed.sources as { type: string; value: string }[];
+      return {
+        id: feed.id,
+        title: feed.name,
+        url: `/api/rss/merged/${feed.id}`, // Public merged feed URL
+        icon: null,
+        description: feed.description || `${sources.length} feeds merged`,
+        siteId: feed.siteId,
+        isMerged: true, // Flag to identify merged feeds
+        createdAt: feed.createdAt,
+        updatedAt: feed.updatedAt,
+      };
+    });
+
+    // Combine and return both types
+    const allFeeds = [...rssFeeds, ...transformedMerged];
+
+    return NextResponse.json(allFeeds);
   } catch (error) {
     console.error("Error fetching rss feed:", error);
     return NextResponse.json(

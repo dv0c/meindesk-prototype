@@ -339,6 +339,18 @@ exports.Prisma.CustomFeedTemplateScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.MergedFeedScalarFieldEnum = {
+  id: 'id',
+  siteId: 'siteId',
+  name: 'name',
+  description: 'description',
+  sources: 'sources',
+  filters: 'filters',
+  maxItems: 'maxItems',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.ThemeScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -415,6 +427,7 @@ exports.Prisma.ModelName = {
   Rss: 'Rss',
   RssItem: 'RssItem',
   CustomFeedTemplate: 'CustomFeedTemplate',
+  MergedFeed: 'MergedFeed',
   Theme: 'Theme',
   ThemeBlock: 'ThemeBlock',
   SiteTheme: 'SiteTheme'

@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowRight, Rss, Search, Trash2 } from "lucide-react"
+import { ArrowRight, Merge, Rss, Search, Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table"
 import { Skeleton } from "../ui/skeleton"
@@ -15,6 +15,7 @@ interface Feed {
     url: string | null
     icon: string | null
     description: string | null
+    isMerged?: boolean
 }
 
 interface MyFeedTableProps {
@@ -206,6 +207,8 @@ export function MyFeedTable({ feeds, loading, siteId, onDelete }: MyFeedTablePro
                                                             alt={feed.title || "Feed"}
                                                             className="object-cover w-full h-full"
                                                         />
+                                                    ) : feed.isMerged ? (
+                                                        <Merge className="h-5 w-5 text-purple-500" />
                                                     ) : (
                                                         <Rss className="h-5 w-5 text-muted-foreground" />
                                                     )}
