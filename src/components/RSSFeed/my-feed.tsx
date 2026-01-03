@@ -2,14 +2,13 @@
 
 import { useFetch } from "@/hooks/useFetch"
 import { Rss as RSS } from "@prisma/client"
-import { Plus, RssIcon, Merge } from "lucide-react"
+import { Plus, RssIcon } from "lucide-react"
 import { useSite } from "../Contexts/site-id-context"
 import PageWrapper from "../PageWrapper"
 import { Button } from "../ui/button"
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog"
 import { MyFeedTable } from "./MyFeedTable"
 import CreateNewFeed from "./CreateButtonPage"
-import Link from "next/link"
 
 const MyFeed = () => {
     const { siteId } = useSite()
@@ -20,7 +19,7 @@ const MyFeed = () => {
 
     return (
         <PageWrapper
-            action={<FeedActions siteId={siteId} />}
+            action={<AddFeedButton siteId={siteId} />}
             title="My RSS Feeds"
             description="Manage your RSS feed subscriptions"
         >
@@ -40,46 +39,22 @@ const MyFeed = () => {
 
 export default MyFeed
 
-const FeedActions = ({ siteId }: { siteId: string }) => {
-    return (
-        <div className="flex gap-2">
-            <Button variant="outline" className="gap-2" asChild>
-                <Link href={`/dashboard/${siteId}/projects/website/rss/merge`}>
-                    <Merge className="h-4 w-4" />
-                    Merge Feeds
-                </Link>
-            </Button>
-            <Dialog>
-                <DialogTrigger asChild>
-                    <Button className="cursor-pointer gap-2" variant="default">
-                        <Plus className="h-4 w-4" />
-                        Add RSS Feed
-                    </Button>
-                </DialogTrigger>
-                <DialogContent className="!max-w-7xl">
-                    <CreateNewFeed siteId={siteId} />
-                </DialogContent>
-            </Dialog>
-        </div>
-    )
-}
-
-const CreateRSS = ({ siteId }: { siteId: string }) => {
+// Single unified button component
+const AddFeedButton = ({ siteId, variant = "default" }: { siteId: string; variant?: "default" | "outline" }) => {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button className="cursor-pointer gap-2" variant="default">
+                <Button className="gap-2" variant={variant}>
                     <Plus className="h-4 w-4" />
-                    Add RSS Feed
+                    New Feed
                 </Button>
             </DialogTrigger>
-            <DialogContent className="!max-w-7xl">
+            <DialogContent className="max-w-4xl! p-5 gap-0">
                 <CreateNewFeed siteId={siteId} />
             </DialogContent>
         </Dialog>
     )
 }
-
 
 const NoFeed = ({ siteId }: { siteId: string }) => (
     <div className="flex flex-col items-center justify-center py-16 px-4">
@@ -93,16 +68,8 @@ const NoFeed = ({ siteId }: { siteId: string }) => (
         </div>
         <h3 className="text-xl font-semibold mb-2">No RSS Feeds Yet</h3>
         <p className="text-muted-foreground text-center max-w-sm mb-6">
-            Start by adding your first RSS feed or merge multiple feeds into one.
+            Add an RSS feed, merge multiple sources, or build a custom scraper.
         </p>
-        <div className="flex gap-3">
-            <Button variant="outline" className="gap-2" asChild>
-                <Link href={`/dashboard/${siteId}/projects/website/rss/merge`}>
-                    <Merge className="h-4 w-4" />
-                    Merge Feeds
-                </Link>
-            </Button>
-            <CreateRSS siteId={siteId} />
-        </div>
+        <AddFeedButton siteId={siteId} />
     </div>
 )

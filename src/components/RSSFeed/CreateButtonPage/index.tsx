@@ -3,440 +3,261 @@
 import { useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Search, Rss, Youtube, Globe, Newspaper, RssIcon } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import {
+    Search, Rss, Globe, Merge, Code2, ArrowRight,
+    Sparkles, Link2, Check, ArrowLeft, RssIcon
+} from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useFetch } from "@/hooks/useFetch"
+import { DialogClose } from "@/components/ui/dialog"
+
+// Popular RSS feeds
+const POPULAR_FEEDS = [
+    { id: "skai", title: "ΣΚΑΪ Ειδήσεις", url: "https://www.skai.gr/rss.xml" },
+    { id: "iefimerida", title: "iefimerida.gr", url: "https://www.iefimerida.gr/rss.xml" },
+    { id: "protothema", title: "Πρώτο Θέμα", url: "https://www.protothema.gr/rss/" },
+    { id: "in_gr", title: "in.gr", url: "https://www.in.gr/feed/" },
+    { id: "naftemporiki", title: "Ναυτεμπορική", url: "https://www.naftemporiki.gr/feed/" },
+    { id: "cnn_greece", title: "CNN Greece", url: "https://www.cnn.gr/eidhseis?format=feed&type=rss" },
+    { id: "tanea", title: "Τα Νέα", url: "https://www.tanea.gr/feed/" },
+    { id: "zougla", title: "Zougla.gr", url: "https://www.zougla.gr/feed" },
+    { id: "newsit", title: "Newsit.gr", url: "https://www.newsit.gr/feed/" },
+    { id: "enikos", title: "Enikos.gr", url: "https://www.enikos.gr/feed/" },
+    { id: "newsbeast", title: "Newsbeast.gr", url: "https://www.newsbeast.gr/feed" },
+    { id: "ethnos", title: "Έθνος", url: "https://www.ethnos.gr/rss.xml" },
+]
+
+type Mode = "select" | "url" | "merge" | "builder"
 
 export default function CreateNewFeed({ siteId }: { siteId: string }) {
     const router = useRouter()
-    const [activeTab, setActiveTab] = useState("websites")
-    const [mode, setMode] = useState<"generator" | "builder">("generator")
-    const [searchQuery, setSearchQuery] = useState("")
+    const [mode, setMode] = useState<Mode>("select")
     const [url, setUrl] = useState("")
-    const [selectedFilter, setSelectedFilter] = useState<string | null>(null)
-
-    const { data, error, loading } = useFetch(`/api/team/${siteId}/rss/feeds`)
-    const feeds = Array.isArray(data) ? data : []
-
-    // --- Hardcoded feeds ---
-    const hardcodedFeeds = [
-        {
-            id: "skai",
-            title: "ΣΚΑΪ Ειδήσεις",
-            url: "https://www.skai.gr/rss.xml",
-            icon: "",
-        },
-        {
-            id: "iefimerida",
-            title: "iefimerida.gr",
-            url: "https://www.iefimerida.gr/rss.xml",
-            icon: "https://www.iefimerida.gr/favicon.ico",
-        },
-        {
-            id: "protothema",
-            title: "Πρώτο Θέμα",
-            url: "https://www.protothema.gr/rss/",
-            icon: "https://www.protothema.gr/favicon.ico",
-        },
-        {
-            id: "in_gr",
-            title: "in.gr",
-            url: "https://www.in.gr/feed/",
-            icon: "https://www.in.gr/favicon.ico",
-        },
-        {
-            id: "naftemporiki",
-            title: "Ναυτεμπορική",
-            url: "https://www.naftemporiki.gr/feed/",
-            icon: "https://www.naftemporiki.gr/favicon.ico",
-        },
-        {
-            id: "kathimerini",
-            title: "Καθημερινή",
-            url: "https://www.kathimerini.gr",
-            icon: "https://www.kathimerini.gr/favicon.ico",
-        },
-        {
-            id: "cnn_greece",
-            title: "CNN Greece",
-            url: "https://www.cnn.gr/eidhseis?format=feed&type=rss",
-            icon: "https://www.cnn.gr/favicon.ico",
-        },
-        {
-            id: "tanea",
-            title: "Τα Νέα",
-            url: "https://www.tanea.gr/feed/",
-            icon: "https://www.tanea.gr/favicon.ico",
-        },
-        {
-            id: "news247",
-            title: "News247",
-            url: "https://www.news247.gr/",
-            icon: "",
-        },
-        {
-            id: "zougla",
-            title: "Zougla.gr",
-            url: "https://www.zougla.gr/feed",
-            icon: "",
-        },
-        {
-            id: "newsbomb",
-            title: "Newsbomb.gr",
-            url: "https://www.newsbomb.gr/oles-oi-eidhseis?format=feed&type=rss",
-            icon: "https://www.newsbomb.gr/favicon.ico",
-        },
-        {
-            id: "documentonews",
-            title: "Documento News",
-            url: "https://www.documentonews.gr/feed/",
-            icon: "",
-        },
-        {
-            id: "newsit",
-            title: "Newsit.gr",
-            url: "https://www.newsit.gr/feed/",
-            icon: "https://www.newsit.gr/favicon.ico",
-        },
-        {
-            id: "tvxs",
-            title: "TVXS.gr",
-            url: "https://tvxs.gr/feed",
-            icon: "",
-        },
-        {
-            id: "enikos",
-            title: "Enikos.gr",
-            url: "https://www.enikos.gr/feed/",
-            icon: "",
-        },
-        {
-            id: "newsbeast",
-            title: "Newsbeast.gr",
-            url: "https://www.newsbeast.gr/feed",
-            icon: "https://www.newsbeast.gr/favicon.ico",
-        },
-        {
-            id: "capital",
-            title: "Capital.gr Οικονομία",
-            url: "https://www.capital.gr/api/tags/all",
-            icon: "https://www.capital.gr/favicon.ico",
-        },
-        {
-            id: "sport24",
-            title: "Sport24",
-            url: "https://www.sport24.gr/",
-            icon: "",
-        },
-        {
-            id: "caranddrivergr",
-            title: "Car and Driver Greece",
-            url: "https://www.caranddriver.gr/arxiki/rss/",
-            icon: "https://www.caranddriver.gr/favicon.ico",
-        },
-        {
-            id: "insomnia",
-            title: "Insomnia.gr Τεχνολογία",
-            url: "https://www.insomnia.gr",
-            icon: "https://www.insomnia.gr/favicon.ico",
-        },
-        {
-            id: "unboxholics",
-            title: "Unboxholics",
-            url: "https://unboxholics.com/",
-            icon: "https://unboxholics.com/favicon.ico",
-        },
-        {
-            id: "ethnos",
-            title: "Έθνος",
-            url: "https://www.ethnos.gr/rss.xml",
-            icon: "https://www.ethnos.gr/favicon.ico",
-        },
-        {
-            id: "newsauto",
-            title: "NewsAuto.gr",
-            url: "https://www.newsauto.gr/feed/",
-            icon: "",
-        },
-        {
-            id: "mononews",
-            title: "Mononews.gr",
-            url: "https://www.mononews.gr/feed",
-            icon: "https://www.mononews.gr/favicon.ico",
-        },
-        {
-            id: "ot",
-            title: "OT.gr Οικονομικός Ταχυδρόμος",
-            url: "https://www.ot.gr/feed/",
-            icon: "https://www.ot.gr/favicon.ico",
-        },
-        {
-            id: "athensvoice",
-            title: "Athens Voice",
-            url: "https://www.athensvoice.gr/rss/echobox/",
-            icon: "https://www.athensvoice.gr/favicon.ico",
-        },
-        {
-            id: "lifo",
-            title: "LiFO.gr",
-            url: "https://www.lifo.gr/",
-            icon: "https://www.lifo.gr/favicon.ico",
-        },
-        {
-            id: "readergr",
-            title: "Reader.gr",
-            url: "https://www.reader.gr/rss.xml",
-            icon: "",
-        },
-    ];
-
-
-    const allFeeds = useMemo(() => {
-        const combined = [...hardcodedFeeds, ...(Array.isArray(feeds) ? feeds : [])]
-
-        const uniqueMap = new Map()
-        for (const feed of combined) {
-            const key = (feed.url || feed.title || "").trim().toLowerCase()
-            if (!uniqueMap.has(key)) uniqueMap.set(key, feed)
-        }
-
-        return Array.from(uniqueMap.values())
-    }, [feeds])
-
-    const filterPresets = [
-        {
-            id: "youtube",
-            label: "YouTube",
-            icon: <Youtube className="w-4 h-4 text-red-500" />,
-            match: (feed: any) =>
-                feed.url?.includes("youtube.com") || feed.title?.toLowerCase().includes("youtube"),
-            template: "https://youtube.com/@",
-            validate: (value: string) => /^https:\/\/(www\.)?youtube\.com\/@[\w-]+$/.test(value.trim()),
-        },
-        {
-            id: "news",
-            label: "News",
-            icon: <Newspaper className="w-4 h-4 text-blue-500" />,
-            match: (feed: any) =>
-                feed.title?.toLowerCase().includes("news") || feed.url?.includes("news"),
-            template: "https://",
-            validate: (value: string) => /^https?:\/\/[\w.-]+\.[a-z]{2,}/.test(value.trim()),
-        },
-        {
-            id: "general",
-            label: "General",
-            icon: <Globe className="w-4 h-4 text-green-500" />,
-            match: () => true,
-            template: "https://",
-            validate: (value: string) => /^https?:\/\/[\w.-]+\.[a-z]{2,}/.test(value.trim()),
-        },
-    ]
-
-    const handlePresetSelect = (presetId: string) => {
-        const preset = filterPresets.find(p => p.id === presetId)
-        if (!preset) return
-        setSelectedFilter(presetId)
-        setUrl(preset.template)
-    }
+    const [searchQuery, setSearchQuery] = useState("")
 
     const filteredFeeds = useMemo(() => {
-        if (!allFeeds.length) return []
-        const query = searchQuery.toLowerCase()
-
-        let filtered = allFeeds.filter(feed =>
-            feed?.title?.toLowerCase().includes(query)
+        if (!searchQuery) return POPULAR_FEEDS
+        return POPULAR_FEEDS.filter(f =>
+            f.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            f.url.toLowerCase().includes(searchQuery.toLowerCase())
         )
-
-        if (selectedFilter) {
-            const preset = filterPresets.find(p => p.id === selectedFilter)
-            if (preset) filtered = filtered.filter(preset.match)
-        }
-
-        return filtered
-    }, [allFeeds, searchQuery, selectedFilter])
+    }, [searchQuery])
 
     const handleGenerate = () => {
         if (!url.trim()) return
-        router.push(
-            `/dashboard/${siteId}/projects/website/rss/feed/${encodeURIComponent(url)}`
-        )
+        router.push(`/dashboard/${siteId}/projects/website/rss/feed/${encodeURIComponent(url)}`)
     }
 
-    const isUrlValid = useMemo(() => {
+    const isValidUrl = useMemo(() => {
         if (!url.trim()) return false
-        const preset = filterPresets.find(p => p.id === selectedFilter)
-        if (preset && preset.validate) return preset.validate(url)
         return /^https?:\/\/[\w.-]+\.[a-z]{2,}/.test(url.trim())
-    }, [url, selectedFilter])
+    }, [url])
+
+    // Option cards for the main selection screen
+    const OPTIONS = [
+        {
+            id: "url",
+            icon: Link2,
+            title: "Add RSS Feed",
+            description: "Enter a URL or choose from popular feeds",
+            color: "from-blue-500 to-cyan-500",
+            badge: "Most Popular",
+        },
+        {
+            id: "merge",
+            icon: Merge,
+            title: "Merge Feeds",
+            description: "Combine multiple feeds with filters",
+            color: "from-purple-500 to-pink-500",
+            badge: "Pro Feature",
+        },
+        {
+            id: "builder",
+            icon: Code2,
+            title: "Visual Scraper",
+            description: "Build custom feed from any website",
+            color: "from-orange-500 to-red-500",
+            badge: "Advanced",
+        },
+    ]
 
     return (
-        <div className="bg-background min-h-[80vh]">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-                {/* Mode Toggle */}
-                <div className="flex flex-wrap justify-center gap-3 mb-10">
-                    <Button
-                        onClick={() => setMode("generator")}
-                        className={`gap-2 px-6 py-2 h-auto text-sm sm:text-base ${mode === "generator"
-                            ? "bg-blue-500 hover:bg-blue-600 text-white"
-                            : "bg-muted hover:bg-muted/80 text-muted-foreground"
-                            }`}
-                    >
-                        <Rss className="w-4 h-4" /> RSS Generator
-                    </Button>
-                </div>
-
-                {/* URL Input */}
-                <div className="flex flex-col sm:flex-row gap-3 mb-10">
-                    <Input
-                        type="text"
-                        placeholder="Enter website URL"
-                        value={url}
-                        onChange={(e) => setUrl(e.target.value)}
-                        className="flex-1 min-w-0"
-                    />
-                    <Button
-                        onClick={handleGenerate}
-                        disabled={!isUrlValid}
-                        className={`px-8 whitespace-nowrap ${isUrlValid
-                            ? "bg-orange-500 hover:bg-orange-600 text-white"
-                            : "bg-muted text-muted-foreground cursor-not-allowed"
-                            }`}
-                    >
-                        Generate
-                    </Button>
-                </div>
-
-                {/* Category Tabs */}
-                <div className="mb-8">
-                    <Tabs value={activeTab} onValueChange={setActiveTab}>
-                        <TabsList className="bg-transparent border-b border-border w-full overflow-x-auto">
-                            <TabsTrigger
-                                value="websites"
-                                className={`gap-2 px-4 py-2 border-b-2 rounded-none text-sm sm:text-base ${activeTab === "websites"
-                                    ? "border-blue-500 text-blue-500"
-                                    : "border-transparent text-muted-foreground"
-                                    }`}
-                            >
-                                📁 Websites
-                            </TabsTrigger>
-                            <TabsTrigger disabled value="topics" className="gap-2 px-4 py-2 border-b-2 rounded-none text-sm sm:text-base border-transparent text-muted-foreground">
-                                🏷️ Topics
-                            </TabsTrigger>
-                            <TabsTrigger disabled value="newsletters" className="gap-2 px-4 py-2 border-b-2 rounded-none text-sm sm:text-base border-transparent text-muted-foreground">
-                                📬 Newsletters
-                            </TabsTrigger>
-                        </TabsList>
-                    </Tabs>
-                </div>
-
-                {/* Feed List */}
-                {loading ? (
-                    <p className="text-muted-foreground text-center">Loading feeds...</p>
-                ) : error ? (
-                    <p className="text-red-500 text-center">Failed to load feeds: {error}</p>
-                ) : allFeeds.length === 0 ? (
-                    <p className="text-muted-foreground text-center">
-                        No feeds found for this site.
-                    </p>
+        <div className="min-h-[60vh] max-w-4xl">
+            {/* Header */}
+            <div className="text-center mb-8 pt-4">
+                {mode === "select" ? (
+                    <>
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 mb-4">
+                            <Rss className="w-8 h-8 text-primary" />
+                        </div>
+                        <h2 className="text-2xl font-bold mb-2">Add New Feed</h2>
+                        <p className="text-muted-foreground">Choose how you want to add your RSS feed</p>
+                    </>
                 ) : (
-                    <div>
-                        {/* Header section */}
-                        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4 border-b border-border pb-4">
-                            <div>
-                                <h2 className="text-lg font-semibold text-foreground">
-                                    Select which RSS feed you’d like to create
-                                </h2>
-                                <p className="text-sm text-muted-foreground">
-                                    Choose from available sources or search to find a specific feed.
-                                </p>
-                            </div>
+                    <div className="flex items-center gap-3">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setMode("select")}
+                            className="h-9 w-9"
+                        >
+                            <ArrowLeft className="h-4 w-4" />
+                        </Button>
+                        <div className="text-left">
+                            <h2 className="text-xl font-semibold">
+                                {mode === "url" && "Add RSS Feed"}
+                                {mode === "merge" && "Merge Feeds"}
+                                {mode === "builder" && "Visual Scraper"}
+                            </h2>
+                            <p className="text-sm text-muted-foreground">
+                                {mode === "url" && "Enter a feed URL or pick from popular sources"}
+                                {mode === "merge" && "Combine multiple RSS feeds into one"}
+                                {mode === "builder" && "Create a custom feed from any website"}
+                            </p>
+                        </div>
+                    </div>
+                )}
+            </div>
 
-                            <div className="relative w-full md:w-64">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            {/* Mode Selection */}
+            {mode === "select" && (
+                <div className="grid gap-4 md:grid-cols-3 px-4 pb-4">
+                    {OPTIONS.map((option) => (
+                        <Card
+                            key={option.id}
+                            className="relative overflow-hidden cursor-pointer group transition-all duration-300 hover:shadow-xl hover:shadow-primary/10 hover:border-primary/30 hover:-translate-y-1"
+                            onClick={() => {
+                                if (option.id === "builder") {
+                                    router.push(`/dashboard/${siteId}/projects/website/rss/builder`)
+                                } else if (option.id === "merge") {
+                                    router.push(`/dashboard/${siteId}/projects/website/rss/merge`)
+                                } else {
+                                    setMode(option.id as Mode)
+                                }
+                            }}
+                        >
+                            {/* Gradient Background */}
+                            <div className={`absolute inset-0 bg-gradient-to-br ${option.color} opacity-0 group-hover:opacity-5 transition-opacity`} />
+
+                            <CardContent className="p-6">
+                                <div className="flex items-start justify-between mb-4">
+                                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${option.color} flex items-center justify-center shadow-lg`}>
+                                        <option.icon className="w-6 h-6 text-white" />
+                                    </div>
+                                    <Badge variant="secondary" className="text-[10px] font-normal">
+                                        {option.badge}
+                                    </Badge>
+                                </div>
+
+                                <h3 className="font-semibold text-lg mb-1 group-hover:text-primary transition-colors">
+                                    {option.title}
+                                </h3>
+                                <p className="text-sm text-muted-foreground mb-4">
+                                    {option.description}
+                                </p>
+
+                                <div className="flex items-center text-sm text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <span>Get started</span>
+                                    <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            )}
+
+            {/* URL Mode */}
+            {mode === "url" && (
+                <div className="px-4 pb-4 space-y-6">
+                    {/* URL Input */}
+                    <div className="space-y-3">
+                        <div className="flex gap-2">
+                            <div className="relative flex-1">
+                                <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                 <Input
-                                    type="text"
-                                    placeholder="Search feeds..."
+                                    placeholder="https://example.com/feed.xml"
+                                    value={url}
+                                    onChange={(e) => setUrl(e.target.value)}
+                                    onKeyDown={(e) => e.key === "Enter" && isValidUrl && handleGenerate()}
+                                    className="pl-10 h-12 text-base"
+                                />
+                            </div>
+                            <DialogClose asChild>
+                                <Button
+                                    onClick={handleGenerate}
+                                    disabled={!isValidUrl}
+                                    className="h-12 px-6 bg-gradient-to-r from-primary to-primary/80"
+                                >
+                                    <Sparkles className="h-4 w-4 mr-2" />
+                                    Generate
+                                </Button>
+                            </DialogClose>
+                        </div>
+
+                        {url && !isValidUrl && (
+                            <p className="text-xs text-destructive">Please enter a valid URL starting with http:// or https://</p>
+                        )}
+                    </div>
+
+                    {/* Popular Feeds */}
+                    <div>
+                        <div className="flex items-center justify-between mb-3">
+                            <h3 className="text-sm font-medium text-muted-foreground">Popular Feeds</h3>
+                            <div className="relative w-48">
+                                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                                <Input
+                                    placeholder="Search..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="pl-9 bg-muted"
+                                    className="h-8 pl-8 text-xs"
                                 />
                             </div>
                         </div>
 
-                        {/* Preset Filter Buttons */}
-                        <div className="flex flex-wrap gap-2 mb-8">
-                            {filterPresets.map((preset) => (
-                                <Button
-                                    key={preset.id}
-                                    variant={selectedFilter === preset.id ? "default" : "outline"}
-                                    className={`gap-2 px-4 py-2 text-sm transition ${selectedFilter === preset.id
-                                        ? "bg-blue-500 text-white hover:bg-blue-600"
-                                        : "text-muted-foreground hover:text-foreground"
-                                        }`}
-                                    onClick={() => handlePresetSelect(preset.id)}
-                                >
-                                    {preset.icon}
-                                    {preset.label}
-                                </Button>
-                            ))}
-                            {selectedFilter && (
-                                <Button
-                                    variant="ghost"
-                                    className="text-xs text-muted-foreground hover:text-foreground"
-                                    onClick={() => setSelectedFilter(null)}
-                                >
-                                    Clear filter
-                                </Button>
-                            )}
-                        </div>
-
-                        {/* Feed Grid */}
-                        {filteredFeeds.length === 0 ? (
-                            <p className="text-muted-foreground text-center">
-                                No feeds match your search or selected filter.
-                            </p>
-                        ) : (
-                            <div className="grid max-h-[300px] overflow-auto gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                                {filteredFeeds.map((feed) => (
-                                    <Button
-                                        key={feed.id}
-                                        onClick={() => setUrl(feed.url)}
-                                        variant="outline"
-                                        className="flex flex-col items-start justify-start p-5 gap-3 h-full text-left hover:bg-muted/50 transition"
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            {feed.icon ? (
-                                                <img
-                                                    src={feed.icon}
-                                                    alt="feed icon"
-                                                    className="w-8 h-8 object-cover rounded"
-                                                />
-                                            ) : <RssIcon />}
-                                            <h3 className="font-medium text-foreground line-clamp-1">
-                                                {feed.title || "Untitled Feed"}
-                                            </h3>
-                                        </div>
-                                        <p
-                                            className="text-xs text-muted-foreground break-all line-clamp-1 max-w-full"
-                                            title={decodeURIComponent(feed.url)}
+                        <ScrollArea className="h-[240px] rounded-lg border p-2">
+                            <div className="grid gap-2 sm:grid-cols-2">
+                                {filteredFeeds.map((feed) => {
+                                    const isSelected = url === feed.url
+                                    return (
+                                        <button
+                                            key={feed.id}
+                                            onClick={() => setUrl(feed.url)}
+                                            className={`
+                                                flex items-center gap-3 p-3 rounded-lg text-left transition-all
+                                                ${isSelected
+                                                    ? 'bg-primary/10 border-primary ring-1 ring-primary/20'
+                                                    : 'hover:bg-muted border-transparent'
+                                                }
+                                                border
+                                            `}
                                         >
-                                            {decodeURIComponent(feed.url) || "Untitled Feed"}
-                                        </p>
-                                        {hardcodedFeeds.some(h => h.id === feed.id) ? (
-                                            <span className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded">
-                                                Built-in
-                                            </span>
-                                        ) : <span className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded">
-                                            External Source
-                                        </span>}
-                                    </Button>
-                                ))}
+                                            <div className={`
+                                                w-8 h-8 rounded-lg flex items-center justify-center shrink-0
+                                                ${isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted'}
+                                            `}>
+                                                {isSelected ? (
+                                                    <Check className="h-4 w-4" />
+                                                ) : (
+                                                    <RssIcon className="h-4 w-4 text-muted-foreground" />
+                                                )}
+                                            </div>
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-sm font-medium truncate">{feed.title}</p>
+                                                <p className="text-[10px] text-muted-foreground truncate">
+                                                    {new URL(feed.url).hostname}
+                                                </p>
+                                            </div>
+                                        </button>
+                                    )
+                                })}
                             </div>
-                        )}
+                        </ScrollArea>
                     </div>
-                )}
-            </div>
+                </div>
+            )}
         </div>
     )
 }
