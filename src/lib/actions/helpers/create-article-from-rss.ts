@@ -1,7 +1,34 @@
 "use server";
 import { db } from "@/lib/db";
 import generateSlug from "@/lib/generateSlug";
-import DOMPurify from "isomorphic-dompurify";
+import * as cheerio from "cheerio";
+
+// Simple HTML sanitizer using cheerio (avoids jsdom ESM issues in production)
+function sanitizeHtml(html: string): string {
+    const $ = cheerio.load(html);
+
+    // Remove script, style, and other dangerous elements
+    $("script, style, iframe, object, embed, form, input, textarea, button, noscript").remove();
+
+    // Remove event handlers and dangerous attributes from all elements
+    $("*").each((_, el) => {
+        const attribs = (el as cheerio.Element).attribs || {};
+        for (const attr of Object.keys(attribs)) {
+            if (attr.startsWith("on") || attr === "style" && attribs[attr].includes("javascript:")) {
+                $(el).removeAttr(attr);
+            }
+        }
+        // Remove javascript: hrefs
+        if (attribs.href && attribs.href.toLowerCase().startsWith("javascript:")) {
+            $(el).removeAttr("href");
+        }
+        if (attribs.src && attribs.src.toLowerCase().startsWith("javascript:")) {
+            $(el).removeAttr("src");
+        }
+    });
+
+    return $.html();
+}
 
 interface RssItemData {
     id: string;
@@ -47,13 +74,7 @@ export async function createArticleFromRss({
 
     // Sanitize HTML content to prevent XSS
     const sanitizedHtml = rssItem.content || rssItem.description || "";
-    const cleanHtml = DOMPurify.sanitize(sanitizedHtml, {
-        ALLOWED_TAGS: [
-            "p", "br", "strong", "em", "u", "h1", "h2", "h3", "h4", "h5", "h6",
-            "ul", "ol", "li", "a", "img", "blockquote", "code", "pre",
-        ],
-        ALLOWED_ATTR: ["href", "src", "alt", "target", "rel"],
-    });
+    const cleanHtml = sanitizeHtml(sanitizedHtml);
 
     // Build attribution content for Lexical editor
     const siteName = rssItem.site_name || "Unknown Source";
