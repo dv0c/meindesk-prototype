@@ -23,6 +23,10 @@ export async function createSite(formData: FormData) {
   }
 
   try {
+    const pages = JSON.parse(formData.get("pages")?.toString() || "[]");
+    const siteType = formData.get("type")?.toString() || "blog";
+    const themeId = formData.get("theme")?.toString() || "core";
+
     const site = await db.site.create({
       data: {
         title,
@@ -31,11 +35,15 @@ export async function createSite(formData: FormData) {
         logo,
         subdomain,
         template_schema: null,
-        userId: session.user.id, // link site to logged-in user
+        userId: session.user.id,
+        settings: {
+          type: siteType,
+          themeId: themeId
+        }
       },
     });
 
-    // Create the Home page and link it to the site
+    // Create the Home page (Always required)
     const homePage = await db.page.create({
       data: {
         title: "Home",
@@ -52,15 +60,12 @@ export async function createSite(formData: FormData) {
       data: { home_Id: homePage.id },
     });
 
-    // Create other resources in parallel
-    await Promise.all([
+    // Prepare promises for other resources
+    const promises: Promise<any>[] = [
+      // Subscription
       db.subscription.create({
         data: {
-          Site: {
-            connect: {
-              id: site.id,
-            },
-          },
+          Site: { connect: { id: site.id } },
           userId: session.user.id,
           price: 20,
           billing_cycle: "monthly",
@@ -70,46 +75,91 @@ export async function createSite(formData: FormData) {
         },
       }),
 
+      // Features
       db.features.create({
         data: {
-          Site: {
-            connect: {
-              id: site.id,
-            },
-          },
+          Site: { connect: { id: site.id } },
         },
       }),
-
-      db.page.create({
-        data: {
-          title: "Article",
-          slug: "article",
-          status: "PUBLISHED",
-          siteId: site.id,
-          locked: true
-        },
-      }),
-
-      db.page.create({
-        data: {
-          title: "Articles",
-          slug: "articles",
-          status: "PUBLISHED",
-          siteId: site.id,
-          locked: true
-        },
-      }),
-
 
       // Install default "Core" theme
       db.siteTheme.create({
         data: {
           siteId: site.id,
-          themeId: "000000000000000000000001",
+          themeId: "000000000000000000000001", // Default core theme ID
         },
       }),
+    ];
 
-    ]);
+    // Create selected pages
+    if (pages.includes("article")) {
+      promises.push(
+        db.page.create({
+          data: {
+            title: "Article",
+            slug: "article",
+            status: "PUBLISHED",
+            siteId: site.id,
+            locked: true
+          },
+        })
+      );
+    }
+
+    if (pages.includes("articles")) {
+      promises.push(
+        db.page.create({
+          data: {
+            title: "Articles",
+            slug: "articles",
+            status: "PUBLISHED",
+            siteId: site.id,
+            locked: true
+          },
+        })
+      );
+    }
+
+    if (pages.includes("about")) {
+      promises.push(
+        db.page.create({
+          data: {
+            title: "About Us",
+            slug: "about",
+            status: "PUBLISHED",
+            siteId: site.id,
+          },
+        })
+      );
+    }
+
+    if (pages.includes("contact")) {
+      promises.push(
+        db.page.create({
+          data: {
+            title: "Contact",
+            slug: "contact",
+            status: "PUBLISHED",
+            siteId: site.id,
+          },
+        })
+      );
+    }
+
+    if (pages.includes("portfolio")) {
+      promises.push(
+        db.page.create({
+          data: {
+            title: "Portfolio",
+            slug: "portfolio",
+            status: "PUBLISHED",
+            siteId: site.id,
+          },
+        })
+      );
+    }
+
+    await Promise.all(promises);
 
     return site;
   } catch (err: any) {
