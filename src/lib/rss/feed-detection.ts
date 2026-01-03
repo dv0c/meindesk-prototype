@@ -14,25 +14,56 @@ export async function detectRealFeed(
   maxItems = 20 // <-- limit number of items
 ) {
   // Preserve the base URL (original site URL) for metadata purposes
-  const baseUrl = target.replace(/\/(feed|rss|rss\.xml|atom\.xml)(\/)?$/, "");
+  const baseUrl = target.replace(/\/(feed|rss|rss\.xml|atom\.xml|index\.xml)\/?$/, "");
   const res = await safeFetch(target);
-  if (!res || !res.ok) return null;
+  if (!res || !res.ok) {
+    console.error(`[RSS Scraper]: Failed to fetch target page: ${target}`);
+    return null;
+  }
   const html = await res.text();
   const $ = cheerio.load(html);
 
   // --- Collect possible feed URLs ---
   const candidates = new Set<string>();
+
+  // 1. Standard RSS/Atom autodiscovery links (most reliable)
+  $('link[rel="alternate"]').each((_, el) => {
+    const href = $(el).attr("href");
+    const type = $(el).attr("type") || "";
+    if (!href) return;
+    // Check for RSS or Atom feed types
+    if (
+      type.includes("application/rss+xml") ||
+      type.includes("application/atom+xml") ||
+      type.includes("application/feed+json") ||
+      type.includes("text/xml") ||
+      type.includes("application/xml")
+    ) {
+      try {
+        candidates.add(new URL(href, baseUrl).href);
+        console.error(`[RSS Scraper]: Found autodiscovery link: ${href}`);
+      } catch { }
+    }
+  });
+
+  // 2. Links and anchors that reference feeds
   $("link, a").each((_, el) => {
     const href = $(el).attr("href");
     const type = $(el).attr("type") || "";
+    const rel = $(el).attr("rel") || "";
     const text = ($(el).text() || "").toLowerCase();
     if (!href) return;
     if (
       href.toLowerCase().includes("rss") ||
-      href.toLowerCase().includes("feed") ||
-      text.includes("rss feed") ||
+      href.toLowerCase().includes("/feed") ||
+      href.toLowerCase().includes("atom") ||
+      href.toLowerCase().endsWith(".xml") ||
+      text.includes("rss") ||
+      text.includes("feed") ||
       type.includes("rss") ||
-      type.includes("atom")
+      type.includes("atom") ||
+      type.includes("xml") ||
+      rel.includes("alternate")
     ) {
       try {
         candidates.add(new URL(href, baseUrl).href);
@@ -40,19 +71,48 @@ export async function detectRealFeed(
     }
   });
 
-  // --- Common guesses for feed URLs ---
+  // --- Common guesses for feed URLs (expanded list) ---
   const path = new URL(target).pathname;
   const guesses = [
+    // Standard paths
     "feed",
+    "feed/",
     "rss",
+    "rss/",
     "rss.xml",
+    "feed.xml",
     "atom.xml",
+    "index.xml",
+    // WordPress patterns
+    "feed/rss",
+    "feed/rss2",
+    "feed/atom",
+    "?feed=rss",
+    "?feed=rss2",
+    "?feed=atom",
+    // Blogger/Blogspot
     "feeds/posts/default",
+    "feeds/posts/default?alt=rss",
+    // Substack/Ghost
+    "rss/",
+    // Medium
+    "feed/",
+    // Generic
     `${path}?format=rss`,
     "?format=rss",
-  ].map((p) => new URL(p, baseUrl).href);
+    ".rss",
+  ].map((p) => {
+    try {
+      return new URL(p, baseUrl).href;
+    } catch {
+      return null;
+    }
+  }).filter((url): url is string => url !== null);
 
-  const allCandidates = [...candidates, ...guesses];
+  // Deduplicate and prioritize autodiscovery links
+  const allCandidates = [...candidates, ...guesses.filter(g => !candidates.has(g))];
+
+  console.error(`[RSS Scraper]: Checking ${allCandidates.length} candidate URLs for ${target}`);
 
   // --- Try each candidate feed ---
   for (const feedUrl of allCandidates) {
