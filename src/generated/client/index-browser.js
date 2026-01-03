@@ -320,6 +320,25 @@ exports.Prisma.RssItemScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.CustomFeedTemplateScalarFieldEnum = {
+  id: 'id',
+  siteId: 'siteId',
+  name: 'name',
+  targetUrl: 'targetUrl',
+  containerSelector: 'containerSelector',
+  titleSelector: 'titleSelector',
+  linkSelector: 'linkSelector',
+  thumbnailSelector: 'thumbnailSelector',
+  descriptionSelector: 'descriptionSelector',
+  dateSelector: 'dateSelector',
+  authorSelector: 'authorSelector',
+  linkAttribute: 'linkAttribute',
+  thumbnailAttribute: 'thumbnailAttribute',
+  maxItems: 'maxItems',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.ThemeScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -395,6 +414,7 @@ exports.Prisma.ModelName = {
   Page: 'Page',
   Rss: 'Rss',
   RssItem: 'RssItem',
+  CustomFeedTemplate: 'CustomFeedTemplate',
   Theme: 'Theme',
   ThemeBlock: 'ThemeBlock',
   SiteTheme: 'SiteTheme'

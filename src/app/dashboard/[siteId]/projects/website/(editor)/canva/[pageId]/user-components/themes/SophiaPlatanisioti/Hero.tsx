@@ -33,10 +33,10 @@ const HeroBase = React.forwardRef<HTMLDivElement, HeroProps>(({
     return (
         <div
             ref={ref}
-            className={cn("w-full transition-colors", props.className)}
+            className={cn("w-full p-5 transition-colors", props.className)}
             style={style}
         >
-            <div className="max-w-[52.5rem] mx-auto">
+            <div className="max-w-210 mx-auto">
                 <div className="text-[18px] space-y-5 text-muted-foreground">
                     {thumbnail && (
                         <EditableImage

@@ -147,13 +147,14 @@ model Site {
   subscriptionId String?       @db.ObjectId
 
   // --- Embedded/Referenced Content ---
-  category        Category[]
-  Article         Article[]
-  Page            Page[]
-  RSS             Rss[]
-  AnalyticsEvent  AnalyticsEvent[]
-  installedThemes SiteTheme[]
-  snippets        Snippet[]
+  category            Category[]
+  Article             Article[]
+  Page                Page[]
+  RSS                 Rss[]
+  AnalyticsEvent      AnalyticsEvent[]
+  installedThemes     SiteTheme[]
+  snippets            Snippet[]
+  customFeedTemplates CustomFeedTemplate[]
 
   // Optional: Add a custom index for performance on frequently queried fields
   @@index([userId])
@@ -348,6 +349,38 @@ model RssItem {
   createdAt   DateTime  @default(now())
 
   rss Rss @relation(fields: [rssId], references: [id], onDelete: Cascade)
+}
+
+// --- Custom Feed Template for Visual RSS Builder ---
+// Stores user-defined CSS selectors for scraping any website
+
+model CustomFeedTemplate {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  siteId String @db.ObjectId
+
+  name      String
+  targetUrl String // Base URL to scrape (e.g., "https://example.com/blog")
+
+  // CSS Selectors for scraping
+  containerSelector   String // Selector for each article container
+  titleSelector       String? // Selector for title (relative to container)
+  linkSelector        String? // Selector for link (relative to container)
+  thumbnailSelector   String? // Selector for thumbnail image
+  descriptionSelector String? // Selector for description/excerpt
+  dateSelector        String? // Selector for publish date
+  authorSelector      String? // Selector for author name
+
+  // Scraping options
+  linkAttribute      String @default("href") // Attribute to extract from linkSelector
+  thumbnailAttribute String @default("src") // Attribute to extract from thumbnailSelector
+  maxItems           Int    @default(20) // Max items to scrape per run
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@index([siteId])
 }
 
 // --- Theme Store Models ---

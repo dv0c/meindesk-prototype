@@ -89,6 +89,11 @@ export type Rss = $Result.DefaultSelection<Prisma.$RssPayload>
  */
 export type RssItem = $Result.DefaultSelection<Prisma.$RssItemPayload>
 /**
+ * Model CustomFeedTemplate
+ * 
+ */
+export type CustomFeedTemplate = $Result.DefaultSelection<Prisma.$CustomFeedTemplatePayload>
+/**
  * Model Theme
  * 
  */
@@ -395,6 +400,16 @@ export class PrismaClient<
     * ```
     */
   get rssItem(): Prisma.RssItemDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.customFeedTemplate`: Exposes CRUD operations for the **CustomFeedTemplate** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more CustomFeedTemplates
+    * const customFeedTemplates = await prisma.customFeedTemplate.findMany()
+    * ```
+    */
+  get customFeedTemplate(): Prisma.CustomFeedTemplateDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.theme`: Exposes CRUD operations for the **Theme** model.
@@ -881,6 +896,7 @@ export namespace Prisma {
     Page: 'Page',
     Rss: 'Rss',
     RssItem: 'RssItem',
+    CustomFeedTemplate: 'CustomFeedTemplate',
     Theme: 'Theme',
     ThemeBlock: 'ThemeBlock',
     SiteTheme: 'SiteTheme'
@@ -902,7 +918,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "account" | "session" | "verificationToken" | "category" | "site" | "snippet" | "features" | "subscription" | "billingHistory" | "analyticsEvent" | "article" | "page" | "rss" | "rssItem" | "theme" | "themeBlock" | "siteTheme"
+      modelProps: "user" | "account" | "session" | "verificationToken" | "category" | "site" | "snippet" | "features" | "subscription" | "billingHistory" | "analyticsEvent" | "article" | "page" | "rss" | "rssItem" | "customFeedTemplate" | "theme" | "themeBlock" | "siteTheme"
       txIsolationLevel: never
     }
     model: {
@@ -2016,6 +2032,80 @@ export namespace Prisma {
           }
         }
       }
+      CustomFeedTemplate: {
+        payload: Prisma.$CustomFeedTemplatePayload<ExtArgs>
+        fields: Prisma.CustomFeedTemplateFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.CustomFeedTemplateFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CustomFeedTemplatePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.CustomFeedTemplateFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CustomFeedTemplatePayload>
+          }
+          findFirst: {
+            args: Prisma.CustomFeedTemplateFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CustomFeedTemplatePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.CustomFeedTemplateFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CustomFeedTemplatePayload>
+          }
+          findMany: {
+            args: Prisma.CustomFeedTemplateFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CustomFeedTemplatePayload>[]
+          }
+          create: {
+            args: Prisma.CustomFeedTemplateCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CustomFeedTemplatePayload>
+          }
+          createMany: {
+            args: Prisma.CustomFeedTemplateCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.CustomFeedTemplateDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CustomFeedTemplatePayload>
+          }
+          update: {
+            args: Prisma.CustomFeedTemplateUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CustomFeedTemplatePayload>
+          }
+          deleteMany: {
+            args: Prisma.CustomFeedTemplateDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.CustomFeedTemplateUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.CustomFeedTemplateUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CustomFeedTemplatePayload>
+          }
+          aggregate: {
+            args: Prisma.CustomFeedTemplateAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateCustomFeedTemplate>
+          }
+          groupBy: {
+            args: Prisma.CustomFeedTemplateGroupByArgs<ExtArgs>
+            result: $Utils.Optional<CustomFeedTemplateGroupByOutputType>[]
+          }
+          findRaw: {
+            args: Prisma.CustomFeedTemplateFindRawArgs<ExtArgs>
+            result: JsonObject
+          }
+          aggregateRaw: {
+            args: Prisma.CustomFeedTemplateAggregateRawArgs<ExtArgs>
+            result: JsonObject
+          }
+          count: {
+            args: Prisma.CustomFeedTemplateCountArgs<ExtArgs>
+            result: $Utils.Optional<CustomFeedTemplateCountAggregateOutputType> | number
+          }
+        }
+      }
       Theme: {
         payload: Prisma.$ThemePayload<ExtArgs>
         fields: Prisma.ThemeFieldRefs
@@ -2332,6 +2422,7 @@ export namespace Prisma {
     page?: PageOmit
     rss?: RssOmit
     rssItem?: RssItemOmit
+    customFeedTemplate?: CustomFeedTemplateOmit
     theme?: ThemeOmit
     themeBlock?: ThemeBlockOmit
     siteTheme?: SiteThemeOmit
@@ -2538,6 +2629,7 @@ export namespace Prisma {
     AnalyticsEvent: number
     installedThemes: number
     snippets: number
+    customFeedTemplates: number
   }
 
   export type SiteCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2548,6 +2640,7 @@ export namespace Prisma {
     AnalyticsEvent?: boolean | SiteCountOutputTypeCountAnalyticsEventArgs
     installedThemes?: boolean | SiteCountOutputTypeCountInstalledThemesArgs
     snippets?: boolean | SiteCountOutputTypeCountSnippetsArgs
+    customFeedTemplates?: boolean | SiteCountOutputTypeCountCustomFeedTemplatesArgs
   }
 
   // Custom InputTypes
@@ -2608,6 +2701,13 @@ export namespace Prisma {
    */
   export type SiteCountOutputTypeCountSnippetsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: SnippetWhereInput
+  }
+
+  /**
+   * SiteCountOutputType without action
+   */
+  export type SiteCountOutputTypeCountCustomFeedTemplatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CustomFeedTemplateWhereInput
   }
 
 
@@ -8413,6 +8513,7 @@ export namespace Prisma {
     AnalyticsEvent?: boolean | Site$AnalyticsEventArgs<ExtArgs>
     installedThemes?: boolean | Site$installedThemesArgs<ExtArgs>
     snippets?: boolean | Site$snippetsArgs<ExtArgs>
+    customFeedTemplates?: boolean | Site$customFeedTemplatesArgs<ExtArgs>
     _count?: boolean | SiteCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["site"]>
 
@@ -8455,6 +8556,7 @@ export namespace Prisma {
     AnalyticsEvent?: boolean | Site$AnalyticsEventArgs<ExtArgs>
     installedThemes?: boolean | Site$installedThemesArgs<ExtArgs>
     snippets?: boolean | Site$snippetsArgs<ExtArgs>
+    customFeedTemplates?: boolean | Site$customFeedTemplatesArgs<ExtArgs>
     _count?: boolean | SiteCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -8471,6 +8573,7 @@ export namespace Prisma {
       AnalyticsEvent: Prisma.$AnalyticsEventPayload<ExtArgs>[]
       installedThemes: Prisma.$SiteThemePayload<ExtArgs>[]
       snippets: Prisma.$SnippetPayload<ExtArgs>[]
+      customFeedTemplates: Prisma.$CustomFeedTemplatePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -8868,6 +8971,7 @@ export namespace Prisma {
     AnalyticsEvent<T extends Site$AnalyticsEventArgs<ExtArgs> = {}>(args?: Subset<T, Site$AnalyticsEventArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AnalyticsEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     installedThemes<T extends Site$installedThemesArgs<ExtArgs> = {}>(args?: Subset<T, Site$installedThemesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteThemePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     snippets<T extends Site$snippetsArgs<ExtArgs> = {}>(args?: Subset<T, Site$snippetsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SnippetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    customFeedTemplates<T extends Site$customFeedTemplatesArgs<ExtArgs> = {}>(args?: Subset<T, Site$customFeedTemplatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CustomFeedTemplatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9511,6 +9615,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: SnippetScalarFieldEnum | SnippetScalarFieldEnum[]
+  }
+
+  /**
+   * Site.customFeedTemplates
+   */
+  export type Site$customFeedTemplatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CustomFeedTemplate
+     */
+    select?: CustomFeedTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CustomFeedTemplate
+     */
+    omit?: CustomFeedTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CustomFeedTemplateInclude<ExtArgs> | null
+    where?: CustomFeedTemplateWhereInput
+    orderBy?: CustomFeedTemplateOrderByWithRelationInput | CustomFeedTemplateOrderByWithRelationInput[]
+    cursor?: CustomFeedTemplateWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: CustomFeedTemplateScalarFieldEnum | CustomFeedTemplateScalarFieldEnum[]
   }
 
   /**
@@ -19203,6 +19331,1140 @@ export namespace Prisma {
 
 
   /**
+   * Model CustomFeedTemplate
+   */
+
+  export type AggregateCustomFeedTemplate = {
+    _count: CustomFeedTemplateCountAggregateOutputType | null
+    _avg: CustomFeedTemplateAvgAggregateOutputType | null
+    _sum: CustomFeedTemplateSumAggregateOutputType | null
+    _min: CustomFeedTemplateMinAggregateOutputType | null
+    _max: CustomFeedTemplateMaxAggregateOutputType | null
+  }
+
+  export type CustomFeedTemplateAvgAggregateOutputType = {
+    maxItems: number | null
+  }
+
+  export type CustomFeedTemplateSumAggregateOutputType = {
+    maxItems: number | null
+  }
+
+  export type CustomFeedTemplateMinAggregateOutputType = {
+    id: string | null
+    siteId: string | null
+    name: string | null
+    targetUrl: string | null
+    containerSelector: string | null
+    titleSelector: string | null
+    linkSelector: string | null
+    thumbnailSelector: string | null
+    descriptionSelector: string | null
+    dateSelector: string | null
+    authorSelector: string | null
+    linkAttribute: string | null
+    thumbnailAttribute: string | null
+    maxItems: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type CustomFeedTemplateMaxAggregateOutputType = {
+    id: string | null
+    siteId: string | null
+    name: string | null
+    targetUrl: string | null
+    containerSelector: string | null
+    titleSelector: string | null
+    linkSelector: string | null
+    thumbnailSelector: string | null
+    descriptionSelector: string | null
+    dateSelector: string | null
+    authorSelector: string | null
+    linkAttribute: string | null
+    thumbnailAttribute: string | null
+    maxItems: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type CustomFeedTemplateCountAggregateOutputType = {
+    id: number
+    siteId: number
+    name: number
+    targetUrl: number
+    containerSelector: number
+    titleSelector: number
+    linkSelector: number
+    thumbnailSelector: number
+    descriptionSelector: number
+    dateSelector: number
+    authorSelector: number
+    linkAttribute: number
+    thumbnailAttribute: number
+    maxItems: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type CustomFeedTemplateAvgAggregateInputType = {
+    maxItems?: true
+  }
+
+  export type CustomFeedTemplateSumAggregateInputType = {
+    maxItems?: true
+  }
+
+  export type CustomFeedTemplateMinAggregateInputType = {
+    id?: true
+    siteId?: true
+    name?: true
+    targetUrl?: true
+    containerSelector?: true
+    titleSelector?: true
+    linkSelector?: true
+    thumbnailSelector?: true
+    descriptionSelector?: true
+    dateSelector?: true
+    authorSelector?: true
+    linkAttribute?: true
+    thumbnailAttribute?: true
+    maxItems?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type CustomFeedTemplateMaxAggregateInputType = {
+    id?: true
+    siteId?: true
+    name?: true
+    targetUrl?: true
+    containerSelector?: true
+    titleSelector?: true
+    linkSelector?: true
+    thumbnailSelector?: true
+    descriptionSelector?: true
+    dateSelector?: true
+    authorSelector?: true
+    linkAttribute?: true
+    thumbnailAttribute?: true
+    maxItems?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type CustomFeedTemplateCountAggregateInputType = {
+    id?: true
+    siteId?: true
+    name?: true
+    targetUrl?: true
+    containerSelector?: true
+    titleSelector?: true
+    linkSelector?: true
+    thumbnailSelector?: true
+    descriptionSelector?: true
+    dateSelector?: true
+    authorSelector?: true
+    linkAttribute?: true
+    thumbnailAttribute?: true
+    maxItems?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type CustomFeedTemplateAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CustomFeedTemplate to aggregate.
+     */
+    where?: CustomFeedTemplateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CustomFeedTemplates to fetch.
+     */
+    orderBy?: CustomFeedTemplateOrderByWithRelationInput | CustomFeedTemplateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: CustomFeedTemplateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CustomFeedTemplates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CustomFeedTemplates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned CustomFeedTemplates
+    **/
+    _count?: true | CustomFeedTemplateCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: CustomFeedTemplateAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: CustomFeedTemplateSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: CustomFeedTemplateMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: CustomFeedTemplateMaxAggregateInputType
+  }
+
+  export type GetCustomFeedTemplateAggregateType<T extends CustomFeedTemplateAggregateArgs> = {
+        [P in keyof T & keyof AggregateCustomFeedTemplate]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateCustomFeedTemplate[P]>
+      : GetScalarType<T[P], AggregateCustomFeedTemplate[P]>
+  }
+
+
+
+
+  export type CustomFeedTemplateGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CustomFeedTemplateWhereInput
+    orderBy?: CustomFeedTemplateOrderByWithAggregationInput | CustomFeedTemplateOrderByWithAggregationInput[]
+    by: CustomFeedTemplateScalarFieldEnum[] | CustomFeedTemplateScalarFieldEnum
+    having?: CustomFeedTemplateScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: CustomFeedTemplateCountAggregateInputType | true
+    _avg?: CustomFeedTemplateAvgAggregateInputType
+    _sum?: CustomFeedTemplateSumAggregateInputType
+    _min?: CustomFeedTemplateMinAggregateInputType
+    _max?: CustomFeedTemplateMaxAggregateInputType
+  }
+
+  export type CustomFeedTemplateGroupByOutputType = {
+    id: string
+    siteId: string
+    name: string
+    targetUrl: string
+    containerSelector: string
+    titleSelector: string | null
+    linkSelector: string | null
+    thumbnailSelector: string | null
+    descriptionSelector: string | null
+    dateSelector: string | null
+    authorSelector: string | null
+    linkAttribute: string
+    thumbnailAttribute: string
+    maxItems: number
+    createdAt: Date
+    updatedAt: Date
+    _count: CustomFeedTemplateCountAggregateOutputType | null
+    _avg: CustomFeedTemplateAvgAggregateOutputType | null
+    _sum: CustomFeedTemplateSumAggregateOutputType | null
+    _min: CustomFeedTemplateMinAggregateOutputType | null
+    _max: CustomFeedTemplateMaxAggregateOutputType | null
+  }
+
+  type GetCustomFeedTemplateGroupByPayload<T extends CustomFeedTemplateGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<CustomFeedTemplateGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof CustomFeedTemplateGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], CustomFeedTemplateGroupByOutputType[P]>
+            : GetScalarType<T[P], CustomFeedTemplateGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type CustomFeedTemplateSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    siteId?: boolean
+    name?: boolean
+    targetUrl?: boolean
+    containerSelector?: boolean
+    titleSelector?: boolean
+    linkSelector?: boolean
+    thumbnailSelector?: boolean
+    descriptionSelector?: boolean
+    dateSelector?: boolean
+    authorSelector?: boolean
+    linkAttribute?: boolean
+    thumbnailAttribute?: boolean
+    maxItems?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["customFeedTemplate"]>
+
+
+
+  export type CustomFeedTemplateSelectScalar = {
+    id?: boolean
+    siteId?: boolean
+    name?: boolean
+    targetUrl?: boolean
+    containerSelector?: boolean
+    titleSelector?: boolean
+    linkSelector?: boolean
+    thumbnailSelector?: boolean
+    descriptionSelector?: boolean
+    dateSelector?: boolean
+    authorSelector?: boolean
+    linkAttribute?: boolean
+    thumbnailAttribute?: boolean
+    maxItems?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type CustomFeedTemplateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "siteId" | "name" | "targetUrl" | "containerSelector" | "titleSelector" | "linkSelector" | "thumbnailSelector" | "descriptionSelector" | "dateSelector" | "authorSelector" | "linkAttribute" | "thumbnailAttribute" | "maxItems" | "createdAt" | "updatedAt", ExtArgs["result"]["customFeedTemplate"]>
+  export type CustomFeedTemplateInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }
+
+  export type $CustomFeedTemplatePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "CustomFeedTemplate"
+    objects: {
+      site: Prisma.$SitePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      siteId: string
+      name: string
+      targetUrl: string
+      containerSelector: string
+      titleSelector: string | null
+      linkSelector: string | null
+      thumbnailSelector: string | null
+      descriptionSelector: string | null
+      dateSelector: string | null
+      authorSelector: string | null
+      linkAttribute: string
+      thumbnailAttribute: string
+      maxItems: number
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["customFeedTemplate"]>
+    composites: {}
+  }
+
+  type CustomFeedTemplateGetPayload<S extends boolean | null | undefined | CustomFeedTemplateDefaultArgs> = $Result.GetResult<Prisma.$CustomFeedTemplatePayload, S>
+
+  type CustomFeedTemplateCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<CustomFeedTemplateFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: CustomFeedTemplateCountAggregateInputType | true
+    }
+
+  export interface CustomFeedTemplateDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['CustomFeedTemplate'], meta: { name: 'CustomFeedTemplate' } }
+    /**
+     * Find zero or one CustomFeedTemplate that matches the filter.
+     * @param {CustomFeedTemplateFindUniqueArgs} args - Arguments to find a CustomFeedTemplate
+     * @example
+     * // Get one CustomFeedTemplate
+     * const customFeedTemplate = await prisma.customFeedTemplate.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends CustomFeedTemplateFindUniqueArgs>(args: SelectSubset<T, CustomFeedTemplateFindUniqueArgs<ExtArgs>>): Prisma__CustomFeedTemplateClient<$Result.GetResult<Prisma.$CustomFeedTemplatePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one CustomFeedTemplate that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {CustomFeedTemplateFindUniqueOrThrowArgs} args - Arguments to find a CustomFeedTemplate
+     * @example
+     * // Get one CustomFeedTemplate
+     * const customFeedTemplate = await prisma.customFeedTemplate.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends CustomFeedTemplateFindUniqueOrThrowArgs>(args: SelectSubset<T, CustomFeedTemplateFindUniqueOrThrowArgs<ExtArgs>>): Prisma__CustomFeedTemplateClient<$Result.GetResult<Prisma.$CustomFeedTemplatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CustomFeedTemplate that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CustomFeedTemplateFindFirstArgs} args - Arguments to find a CustomFeedTemplate
+     * @example
+     * // Get one CustomFeedTemplate
+     * const customFeedTemplate = await prisma.customFeedTemplate.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends CustomFeedTemplateFindFirstArgs>(args?: SelectSubset<T, CustomFeedTemplateFindFirstArgs<ExtArgs>>): Prisma__CustomFeedTemplateClient<$Result.GetResult<Prisma.$CustomFeedTemplatePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CustomFeedTemplate that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CustomFeedTemplateFindFirstOrThrowArgs} args - Arguments to find a CustomFeedTemplate
+     * @example
+     * // Get one CustomFeedTemplate
+     * const customFeedTemplate = await prisma.customFeedTemplate.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends CustomFeedTemplateFindFirstOrThrowArgs>(args?: SelectSubset<T, CustomFeedTemplateFindFirstOrThrowArgs<ExtArgs>>): Prisma__CustomFeedTemplateClient<$Result.GetResult<Prisma.$CustomFeedTemplatePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more CustomFeedTemplates that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CustomFeedTemplateFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all CustomFeedTemplates
+     * const customFeedTemplates = await prisma.customFeedTemplate.findMany()
+     * 
+     * // Get first 10 CustomFeedTemplates
+     * const customFeedTemplates = await prisma.customFeedTemplate.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const customFeedTemplateWithIdOnly = await prisma.customFeedTemplate.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends CustomFeedTemplateFindManyArgs>(args?: SelectSubset<T, CustomFeedTemplateFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CustomFeedTemplatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a CustomFeedTemplate.
+     * @param {CustomFeedTemplateCreateArgs} args - Arguments to create a CustomFeedTemplate.
+     * @example
+     * // Create one CustomFeedTemplate
+     * const CustomFeedTemplate = await prisma.customFeedTemplate.create({
+     *   data: {
+     *     // ... data to create a CustomFeedTemplate
+     *   }
+     * })
+     * 
+     */
+    create<T extends CustomFeedTemplateCreateArgs>(args: SelectSubset<T, CustomFeedTemplateCreateArgs<ExtArgs>>): Prisma__CustomFeedTemplateClient<$Result.GetResult<Prisma.$CustomFeedTemplatePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many CustomFeedTemplates.
+     * @param {CustomFeedTemplateCreateManyArgs} args - Arguments to create many CustomFeedTemplates.
+     * @example
+     * // Create many CustomFeedTemplates
+     * const customFeedTemplate = await prisma.customFeedTemplate.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends CustomFeedTemplateCreateManyArgs>(args?: SelectSubset<T, CustomFeedTemplateCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a CustomFeedTemplate.
+     * @param {CustomFeedTemplateDeleteArgs} args - Arguments to delete one CustomFeedTemplate.
+     * @example
+     * // Delete one CustomFeedTemplate
+     * const CustomFeedTemplate = await prisma.customFeedTemplate.delete({
+     *   where: {
+     *     // ... filter to delete one CustomFeedTemplate
+     *   }
+     * })
+     * 
+     */
+    delete<T extends CustomFeedTemplateDeleteArgs>(args: SelectSubset<T, CustomFeedTemplateDeleteArgs<ExtArgs>>): Prisma__CustomFeedTemplateClient<$Result.GetResult<Prisma.$CustomFeedTemplatePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one CustomFeedTemplate.
+     * @param {CustomFeedTemplateUpdateArgs} args - Arguments to update one CustomFeedTemplate.
+     * @example
+     * // Update one CustomFeedTemplate
+     * const customFeedTemplate = await prisma.customFeedTemplate.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends CustomFeedTemplateUpdateArgs>(args: SelectSubset<T, CustomFeedTemplateUpdateArgs<ExtArgs>>): Prisma__CustomFeedTemplateClient<$Result.GetResult<Prisma.$CustomFeedTemplatePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more CustomFeedTemplates.
+     * @param {CustomFeedTemplateDeleteManyArgs} args - Arguments to filter CustomFeedTemplates to delete.
+     * @example
+     * // Delete a few CustomFeedTemplates
+     * const { count } = await prisma.customFeedTemplate.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends CustomFeedTemplateDeleteManyArgs>(args?: SelectSubset<T, CustomFeedTemplateDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CustomFeedTemplates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CustomFeedTemplateUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many CustomFeedTemplates
+     * const customFeedTemplate = await prisma.customFeedTemplate.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends CustomFeedTemplateUpdateManyArgs>(args: SelectSubset<T, CustomFeedTemplateUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one CustomFeedTemplate.
+     * @param {CustomFeedTemplateUpsertArgs} args - Arguments to update or create a CustomFeedTemplate.
+     * @example
+     * // Update or create a CustomFeedTemplate
+     * const customFeedTemplate = await prisma.customFeedTemplate.upsert({
+     *   create: {
+     *     // ... data to create a CustomFeedTemplate
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the CustomFeedTemplate we want to update
+     *   }
+     * })
+     */
+    upsert<T extends CustomFeedTemplateUpsertArgs>(args: SelectSubset<T, CustomFeedTemplateUpsertArgs<ExtArgs>>): Prisma__CustomFeedTemplateClient<$Result.GetResult<Prisma.$CustomFeedTemplatePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more CustomFeedTemplates that matches the filter.
+     * @param {CustomFeedTemplateFindRawArgs} args - Select which filters you would like to apply.
+     * @example
+     * const customFeedTemplate = await prisma.customFeedTemplate.findRaw({
+     *   filter: { age: { $gt: 25 } }
+     * })
+     */
+    findRaw(args?: CustomFeedTemplateFindRawArgs): Prisma.PrismaPromise<JsonObject>
+
+    /**
+     * Perform aggregation operations on a CustomFeedTemplate.
+     * @param {CustomFeedTemplateAggregateRawArgs} args - Select which aggregations you would like to apply.
+     * @example
+     * const customFeedTemplate = await prisma.customFeedTemplate.aggregateRaw({
+     *   pipeline: [
+     *     { $match: { status: "registered" } },
+     *     { $group: { _id: "$country", total: { $sum: 1 } } }
+     *   ]
+     * })
+     */
+    aggregateRaw(args?: CustomFeedTemplateAggregateRawArgs): Prisma.PrismaPromise<JsonObject>
+
+
+    /**
+     * Count the number of CustomFeedTemplates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CustomFeedTemplateCountArgs} args - Arguments to filter CustomFeedTemplates to count.
+     * @example
+     * // Count the number of CustomFeedTemplates
+     * const count = await prisma.customFeedTemplate.count({
+     *   where: {
+     *     // ... the filter for the CustomFeedTemplates we want to count
+     *   }
+     * })
+    **/
+    count<T extends CustomFeedTemplateCountArgs>(
+      args?: Subset<T, CustomFeedTemplateCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], CustomFeedTemplateCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a CustomFeedTemplate.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CustomFeedTemplateAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends CustomFeedTemplateAggregateArgs>(args: Subset<T, CustomFeedTemplateAggregateArgs>): Prisma.PrismaPromise<GetCustomFeedTemplateAggregateType<T>>
+
+    /**
+     * Group by CustomFeedTemplate.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CustomFeedTemplateGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CustomFeedTemplateGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CustomFeedTemplateGroupByArgs['orderBy'] }
+        : { orderBy?: CustomFeedTemplateGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CustomFeedTemplateGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCustomFeedTemplateGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the CustomFeedTemplate model
+   */
+  readonly fields: CustomFeedTemplateFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for CustomFeedTemplate.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__CustomFeedTemplateClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    site<T extends SiteDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SiteDefaultArgs<ExtArgs>>): Prisma__SiteClient<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the CustomFeedTemplate model
+   */
+  interface CustomFeedTemplateFieldRefs {
+    readonly id: FieldRef<"CustomFeedTemplate", 'String'>
+    readonly siteId: FieldRef<"CustomFeedTemplate", 'String'>
+    readonly name: FieldRef<"CustomFeedTemplate", 'String'>
+    readonly targetUrl: FieldRef<"CustomFeedTemplate", 'String'>
+    readonly containerSelector: FieldRef<"CustomFeedTemplate", 'String'>
+    readonly titleSelector: FieldRef<"CustomFeedTemplate", 'String'>
+    readonly linkSelector: FieldRef<"CustomFeedTemplate", 'String'>
+    readonly thumbnailSelector: FieldRef<"CustomFeedTemplate", 'String'>
+    readonly descriptionSelector: FieldRef<"CustomFeedTemplate", 'String'>
+    readonly dateSelector: FieldRef<"CustomFeedTemplate", 'String'>
+    readonly authorSelector: FieldRef<"CustomFeedTemplate", 'String'>
+    readonly linkAttribute: FieldRef<"CustomFeedTemplate", 'String'>
+    readonly thumbnailAttribute: FieldRef<"CustomFeedTemplate", 'String'>
+    readonly maxItems: FieldRef<"CustomFeedTemplate", 'Int'>
+    readonly createdAt: FieldRef<"CustomFeedTemplate", 'DateTime'>
+    readonly updatedAt: FieldRef<"CustomFeedTemplate", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * CustomFeedTemplate findUnique
+   */
+  export type CustomFeedTemplateFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CustomFeedTemplate
+     */
+    select?: CustomFeedTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CustomFeedTemplate
+     */
+    omit?: CustomFeedTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CustomFeedTemplateInclude<ExtArgs> | null
+    /**
+     * Filter, which CustomFeedTemplate to fetch.
+     */
+    where: CustomFeedTemplateWhereUniqueInput
+  }
+
+  /**
+   * CustomFeedTemplate findUniqueOrThrow
+   */
+  export type CustomFeedTemplateFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CustomFeedTemplate
+     */
+    select?: CustomFeedTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CustomFeedTemplate
+     */
+    omit?: CustomFeedTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CustomFeedTemplateInclude<ExtArgs> | null
+    /**
+     * Filter, which CustomFeedTemplate to fetch.
+     */
+    where: CustomFeedTemplateWhereUniqueInput
+  }
+
+  /**
+   * CustomFeedTemplate findFirst
+   */
+  export type CustomFeedTemplateFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CustomFeedTemplate
+     */
+    select?: CustomFeedTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CustomFeedTemplate
+     */
+    omit?: CustomFeedTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CustomFeedTemplateInclude<ExtArgs> | null
+    /**
+     * Filter, which CustomFeedTemplate to fetch.
+     */
+    where?: CustomFeedTemplateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CustomFeedTemplates to fetch.
+     */
+    orderBy?: CustomFeedTemplateOrderByWithRelationInput | CustomFeedTemplateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CustomFeedTemplates.
+     */
+    cursor?: CustomFeedTemplateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CustomFeedTemplates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CustomFeedTemplates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CustomFeedTemplates.
+     */
+    distinct?: CustomFeedTemplateScalarFieldEnum | CustomFeedTemplateScalarFieldEnum[]
+  }
+
+  /**
+   * CustomFeedTemplate findFirstOrThrow
+   */
+  export type CustomFeedTemplateFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CustomFeedTemplate
+     */
+    select?: CustomFeedTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CustomFeedTemplate
+     */
+    omit?: CustomFeedTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CustomFeedTemplateInclude<ExtArgs> | null
+    /**
+     * Filter, which CustomFeedTemplate to fetch.
+     */
+    where?: CustomFeedTemplateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CustomFeedTemplates to fetch.
+     */
+    orderBy?: CustomFeedTemplateOrderByWithRelationInput | CustomFeedTemplateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CustomFeedTemplates.
+     */
+    cursor?: CustomFeedTemplateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CustomFeedTemplates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CustomFeedTemplates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CustomFeedTemplates.
+     */
+    distinct?: CustomFeedTemplateScalarFieldEnum | CustomFeedTemplateScalarFieldEnum[]
+  }
+
+  /**
+   * CustomFeedTemplate findMany
+   */
+  export type CustomFeedTemplateFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CustomFeedTemplate
+     */
+    select?: CustomFeedTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CustomFeedTemplate
+     */
+    omit?: CustomFeedTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CustomFeedTemplateInclude<ExtArgs> | null
+    /**
+     * Filter, which CustomFeedTemplates to fetch.
+     */
+    where?: CustomFeedTemplateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CustomFeedTemplates to fetch.
+     */
+    orderBy?: CustomFeedTemplateOrderByWithRelationInput | CustomFeedTemplateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing CustomFeedTemplates.
+     */
+    cursor?: CustomFeedTemplateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CustomFeedTemplates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CustomFeedTemplates.
+     */
+    skip?: number
+    distinct?: CustomFeedTemplateScalarFieldEnum | CustomFeedTemplateScalarFieldEnum[]
+  }
+
+  /**
+   * CustomFeedTemplate create
+   */
+  export type CustomFeedTemplateCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CustomFeedTemplate
+     */
+    select?: CustomFeedTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CustomFeedTemplate
+     */
+    omit?: CustomFeedTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CustomFeedTemplateInclude<ExtArgs> | null
+    /**
+     * The data needed to create a CustomFeedTemplate.
+     */
+    data: XOR<CustomFeedTemplateCreateInput, CustomFeedTemplateUncheckedCreateInput>
+  }
+
+  /**
+   * CustomFeedTemplate createMany
+   */
+  export type CustomFeedTemplateCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many CustomFeedTemplates.
+     */
+    data: CustomFeedTemplateCreateManyInput | CustomFeedTemplateCreateManyInput[]
+  }
+
+  /**
+   * CustomFeedTemplate update
+   */
+  export type CustomFeedTemplateUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CustomFeedTemplate
+     */
+    select?: CustomFeedTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CustomFeedTemplate
+     */
+    omit?: CustomFeedTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CustomFeedTemplateInclude<ExtArgs> | null
+    /**
+     * The data needed to update a CustomFeedTemplate.
+     */
+    data: XOR<CustomFeedTemplateUpdateInput, CustomFeedTemplateUncheckedUpdateInput>
+    /**
+     * Choose, which CustomFeedTemplate to update.
+     */
+    where: CustomFeedTemplateWhereUniqueInput
+  }
+
+  /**
+   * CustomFeedTemplate updateMany
+   */
+  export type CustomFeedTemplateUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update CustomFeedTemplates.
+     */
+    data: XOR<CustomFeedTemplateUpdateManyMutationInput, CustomFeedTemplateUncheckedUpdateManyInput>
+    /**
+     * Filter which CustomFeedTemplates to update
+     */
+    where?: CustomFeedTemplateWhereInput
+    /**
+     * Limit how many CustomFeedTemplates to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * CustomFeedTemplate upsert
+   */
+  export type CustomFeedTemplateUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CustomFeedTemplate
+     */
+    select?: CustomFeedTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CustomFeedTemplate
+     */
+    omit?: CustomFeedTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CustomFeedTemplateInclude<ExtArgs> | null
+    /**
+     * The filter to search for the CustomFeedTemplate to update in case it exists.
+     */
+    where: CustomFeedTemplateWhereUniqueInput
+    /**
+     * In case the CustomFeedTemplate found by the `where` argument doesn't exist, create a new CustomFeedTemplate with this data.
+     */
+    create: XOR<CustomFeedTemplateCreateInput, CustomFeedTemplateUncheckedCreateInput>
+    /**
+     * In case the CustomFeedTemplate was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<CustomFeedTemplateUpdateInput, CustomFeedTemplateUncheckedUpdateInput>
+  }
+
+  /**
+   * CustomFeedTemplate delete
+   */
+  export type CustomFeedTemplateDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CustomFeedTemplate
+     */
+    select?: CustomFeedTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CustomFeedTemplate
+     */
+    omit?: CustomFeedTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CustomFeedTemplateInclude<ExtArgs> | null
+    /**
+     * Filter which CustomFeedTemplate to delete.
+     */
+    where: CustomFeedTemplateWhereUniqueInput
+  }
+
+  /**
+   * CustomFeedTemplate deleteMany
+   */
+  export type CustomFeedTemplateDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CustomFeedTemplates to delete
+     */
+    where?: CustomFeedTemplateWhereInput
+    /**
+     * Limit how many CustomFeedTemplates to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * CustomFeedTemplate findRaw
+   */
+  export type CustomFeedTemplateFindRawArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The query predicate filter. If unspecified, then all documents in the collection will match the predicate. ${@link https://docs.mongodb.com/manual/reference/operator/query MongoDB Docs}.
+     */
+    filter?: InputJsonValue
+    /**
+     * Additional options to pass to the `find` command ${@link https://docs.mongodb.com/manual/reference/command/find/#command-fields MongoDB Docs}.
+     */
+    options?: InputJsonValue
+  }
+
+  /**
+   * CustomFeedTemplate aggregateRaw
+   */
+  export type CustomFeedTemplateAggregateRawArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * An array of aggregation stages to process and transform the document stream via the aggregation pipeline. ${@link https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline MongoDB Docs}.
+     */
+    pipeline?: InputJsonValue[]
+    /**
+     * Additional options to pass to the `aggregate` command ${@link https://docs.mongodb.com/manual/reference/command/aggregate/#command-fields MongoDB Docs}.
+     */
+    options?: InputJsonValue
+  }
+
+  /**
+   * CustomFeedTemplate without action
+   */
+  export type CustomFeedTemplateDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CustomFeedTemplate
+     */
+    select?: CustomFeedTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CustomFeedTemplate
+     */
+    omit?: CustomFeedTemplateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CustomFeedTemplateInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model Theme
    */
 
@@ -22500,6 +23762,28 @@ export namespace Prisma {
   export type RssItemScalarFieldEnum = (typeof RssItemScalarFieldEnum)[keyof typeof RssItemScalarFieldEnum]
 
 
+  export const CustomFeedTemplateScalarFieldEnum: {
+    id: 'id',
+    siteId: 'siteId',
+    name: 'name',
+    targetUrl: 'targetUrl',
+    containerSelector: 'containerSelector',
+    titleSelector: 'titleSelector',
+    linkSelector: 'linkSelector',
+    thumbnailSelector: 'thumbnailSelector',
+    descriptionSelector: 'descriptionSelector',
+    dateSelector: 'dateSelector',
+    authorSelector: 'authorSelector',
+    linkAttribute: 'linkAttribute',
+    thumbnailAttribute: 'thumbnailAttribute',
+    maxItems: 'maxItems',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type CustomFeedTemplateScalarFieldEnum = (typeof CustomFeedTemplateScalarFieldEnum)[keyof typeof CustomFeedTemplateScalarFieldEnum]
+
+
   export const ThemeScalarFieldEnum: {
     id: 'id',
     name: 'name',
@@ -23108,6 +24392,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventListRelationFilter
     installedThemes?: SiteThemeListRelationFilter
     snippets?: SnippetListRelationFilter
+    customFeedTemplates?: CustomFeedTemplateListRelationFilter
   }
 
   export type SiteOrderByWithRelationInput = {
@@ -23143,6 +24428,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventOrderByRelationAggregateInput
     installedThemes?: SiteThemeOrderByRelationAggregateInput
     snippets?: SnippetOrderByRelationAggregateInput
+    customFeedTemplates?: CustomFeedTemplateOrderByRelationAggregateInput
   }
 
   export type SiteWhereUniqueInput = Prisma.AtLeast<{
@@ -23181,6 +24467,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventListRelationFilter
     installedThemes?: SiteThemeListRelationFilter
     snippets?: SnippetListRelationFilter
+    customFeedTemplates?: CustomFeedTemplateListRelationFilter
   }, "id" | "subdomain" | "url">
 
   export type SiteOrderByWithAggregationInput = {
@@ -24029,6 +25316,118 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"RssItem"> | Date | string
   }
 
+  export type CustomFeedTemplateWhereInput = {
+    AND?: CustomFeedTemplateWhereInput | CustomFeedTemplateWhereInput[]
+    OR?: CustomFeedTemplateWhereInput[]
+    NOT?: CustomFeedTemplateWhereInput | CustomFeedTemplateWhereInput[]
+    id?: StringFilter<"CustomFeedTemplate"> | string
+    siteId?: StringFilter<"CustomFeedTemplate"> | string
+    name?: StringFilter<"CustomFeedTemplate"> | string
+    targetUrl?: StringFilter<"CustomFeedTemplate"> | string
+    containerSelector?: StringFilter<"CustomFeedTemplate"> | string
+    titleSelector?: StringNullableFilter<"CustomFeedTemplate"> | string | null
+    linkSelector?: StringNullableFilter<"CustomFeedTemplate"> | string | null
+    thumbnailSelector?: StringNullableFilter<"CustomFeedTemplate"> | string | null
+    descriptionSelector?: StringNullableFilter<"CustomFeedTemplate"> | string | null
+    dateSelector?: StringNullableFilter<"CustomFeedTemplate"> | string | null
+    authorSelector?: StringNullableFilter<"CustomFeedTemplate"> | string | null
+    linkAttribute?: StringFilter<"CustomFeedTemplate"> | string
+    thumbnailAttribute?: StringFilter<"CustomFeedTemplate"> | string
+    maxItems?: IntFilter<"CustomFeedTemplate"> | number
+    createdAt?: DateTimeFilter<"CustomFeedTemplate"> | Date | string
+    updatedAt?: DateTimeFilter<"CustomFeedTemplate"> | Date | string
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+  }
+
+  export type CustomFeedTemplateOrderByWithRelationInput = {
+    id?: SortOrder
+    siteId?: SortOrder
+    name?: SortOrder
+    targetUrl?: SortOrder
+    containerSelector?: SortOrder
+    titleSelector?: SortOrder
+    linkSelector?: SortOrder
+    thumbnailSelector?: SortOrder
+    descriptionSelector?: SortOrder
+    dateSelector?: SortOrder
+    authorSelector?: SortOrder
+    linkAttribute?: SortOrder
+    thumbnailAttribute?: SortOrder
+    maxItems?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    site?: SiteOrderByWithRelationInput
+  }
+
+  export type CustomFeedTemplateWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: CustomFeedTemplateWhereInput | CustomFeedTemplateWhereInput[]
+    OR?: CustomFeedTemplateWhereInput[]
+    NOT?: CustomFeedTemplateWhereInput | CustomFeedTemplateWhereInput[]
+    siteId?: StringFilter<"CustomFeedTemplate"> | string
+    name?: StringFilter<"CustomFeedTemplate"> | string
+    targetUrl?: StringFilter<"CustomFeedTemplate"> | string
+    containerSelector?: StringFilter<"CustomFeedTemplate"> | string
+    titleSelector?: StringNullableFilter<"CustomFeedTemplate"> | string | null
+    linkSelector?: StringNullableFilter<"CustomFeedTemplate"> | string | null
+    thumbnailSelector?: StringNullableFilter<"CustomFeedTemplate"> | string | null
+    descriptionSelector?: StringNullableFilter<"CustomFeedTemplate"> | string | null
+    dateSelector?: StringNullableFilter<"CustomFeedTemplate"> | string | null
+    authorSelector?: StringNullableFilter<"CustomFeedTemplate"> | string | null
+    linkAttribute?: StringFilter<"CustomFeedTemplate"> | string
+    thumbnailAttribute?: StringFilter<"CustomFeedTemplate"> | string
+    maxItems?: IntFilter<"CustomFeedTemplate"> | number
+    createdAt?: DateTimeFilter<"CustomFeedTemplate"> | Date | string
+    updatedAt?: DateTimeFilter<"CustomFeedTemplate"> | Date | string
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+  }, "id">
+
+  export type CustomFeedTemplateOrderByWithAggregationInput = {
+    id?: SortOrder
+    siteId?: SortOrder
+    name?: SortOrder
+    targetUrl?: SortOrder
+    containerSelector?: SortOrder
+    titleSelector?: SortOrder
+    linkSelector?: SortOrder
+    thumbnailSelector?: SortOrder
+    descriptionSelector?: SortOrder
+    dateSelector?: SortOrder
+    authorSelector?: SortOrder
+    linkAttribute?: SortOrder
+    thumbnailAttribute?: SortOrder
+    maxItems?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: CustomFeedTemplateCountOrderByAggregateInput
+    _avg?: CustomFeedTemplateAvgOrderByAggregateInput
+    _max?: CustomFeedTemplateMaxOrderByAggregateInput
+    _min?: CustomFeedTemplateMinOrderByAggregateInput
+    _sum?: CustomFeedTemplateSumOrderByAggregateInput
+  }
+
+  export type CustomFeedTemplateScalarWhereWithAggregatesInput = {
+    AND?: CustomFeedTemplateScalarWhereWithAggregatesInput | CustomFeedTemplateScalarWhereWithAggregatesInput[]
+    OR?: CustomFeedTemplateScalarWhereWithAggregatesInput[]
+    NOT?: CustomFeedTemplateScalarWhereWithAggregatesInput | CustomFeedTemplateScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"CustomFeedTemplate"> | string
+    siteId?: StringWithAggregatesFilter<"CustomFeedTemplate"> | string
+    name?: StringWithAggregatesFilter<"CustomFeedTemplate"> | string
+    targetUrl?: StringWithAggregatesFilter<"CustomFeedTemplate"> | string
+    containerSelector?: StringWithAggregatesFilter<"CustomFeedTemplate"> | string
+    titleSelector?: StringNullableWithAggregatesFilter<"CustomFeedTemplate"> | string | null
+    linkSelector?: StringNullableWithAggregatesFilter<"CustomFeedTemplate"> | string | null
+    thumbnailSelector?: StringNullableWithAggregatesFilter<"CustomFeedTemplate"> | string | null
+    descriptionSelector?: StringNullableWithAggregatesFilter<"CustomFeedTemplate"> | string | null
+    dateSelector?: StringNullableWithAggregatesFilter<"CustomFeedTemplate"> | string | null
+    authorSelector?: StringNullableWithAggregatesFilter<"CustomFeedTemplate"> | string | null
+    linkAttribute?: StringWithAggregatesFilter<"CustomFeedTemplate"> | string
+    thumbnailAttribute?: StringWithAggregatesFilter<"CustomFeedTemplate"> | string
+    maxItems?: IntWithAggregatesFilter<"CustomFeedTemplate"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"CustomFeedTemplate"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"CustomFeedTemplate"> | Date | string
+  }
+
   export type ThemeWhereInput = {
     AND?: ThemeWhereInput | ThemeWhereInput[]
     OR?: ThemeWhereInput[]
@@ -24643,6 +26042,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
     snippets?: SnippetCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateInput = {
@@ -24675,6 +26075,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
     snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUpdateInput = {
@@ -24706,6 +26107,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateInput = {
@@ -24737,6 +26139,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteCreateManyInput = {
@@ -25653,6 +27056,134 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type CustomFeedTemplateCreateInput = {
+    id?: string
+    name: string
+    targetUrl: string
+    containerSelector: string
+    titleSelector?: string | null
+    linkSelector?: string | null
+    thumbnailSelector?: string | null
+    descriptionSelector?: string | null
+    dateSelector?: string | null
+    authorSelector?: string | null
+    linkAttribute?: string
+    thumbnailAttribute?: string
+    maxItems?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    site: SiteCreateNestedOneWithoutCustomFeedTemplatesInput
+  }
+
+  export type CustomFeedTemplateUncheckedCreateInput = {
+    id?: string
+    siteId: string
+    name: string
+    targetUrl: string
+    containerSelector: string
+    titleSelector?: string | null
+    linkSelector?: string | null
+    thumbnailSelector?: string | null
+    descriptionSelector?: string | null
+    dateSelector?: string | null
+    authorSelector?: string | null
+    linkAttribute?: string
+    thumbnailAttribute?: string
+    maxItems?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CustomFeedTemplateUpdateInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    targetUrl?: StringFieldUpdateOperationsInput | string
+    containerSelector?: StringFieldUpdateOperationsInput | string
+    titleSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    linkSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    thumbnailSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    descriptionSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    dateSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    authorSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    linkAttribute?: StringFieldUpdateOperationsInput | string
+    thumbnailAttribute?: StringFieldUpdateOperationsInput | string
+    maxItems?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    site?: SiteUpdateOneRequiredWithoutCustomFeedTemplatesNestedInput
+  }
+
+  export type CustomFeedTemplateUncheckedUpdateInput = {
+    siteId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    targetUrl?: StringFieldUpdateOperationsInput | string
+    containerSelector?: StringFieldUpdateOperationsInput | string
+    titleSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    linkSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    thumbnailSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    descriptionSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    dateSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    authorSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    linkAttribute?: StringFieldUpdateOperationsInput | string
+    thumbnailAttribute?: StringFieldUpdateOperationsInput | string
+    maxItems?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CustomFeedTemplateCreateManyInput = {
+    id?: string
+    siteId: string
+    name: string
+    targetUrl: string
+    containerSelector: string
+    titleSelector?: string | null
+    linkSelector?: string | null
+    thumbnailSelector?: string | null
+    descriptionSelector?: string | null
+    dateSelector?: string | null
+    authorSelector?: string | null
+    linkAttribute?: string
+    thumbnailAttribute?: string
+    maxItems?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CustomFeedTemplateUpdateManyMutationInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    targetUrl?: StringFieldUpdateOperationsInput | string
+    containerSelector?: StringFieldUpdateOperationsInput | string
+    titleSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    linkSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    thumbnailSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    descriptionSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    dateSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    authorSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    linkAttribute?: StringFieldUpdateOperationsInput | string
+    thumbnailAttribute?: StringFieldUpdateOperationsInput | string
+    maxItems?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CustomFeedTemplateUncheckedUpdateManyInput = {
+    siteId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    targetUrl?: StringFieldUpdateOperationsInput | string
+    containerSelector?: StringFieldUpdateOperationsInput | string
+    titleSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    linkSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    thumbnailSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    descriptionSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    dateSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    authorSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    linkAttribute?: StringFieldUpdateOperationsInput | string
+    thumbnailAttribute?: StringFieldUpdateOperationsInput | string
+    maxItems?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type ThemeCreateInput = {
     id?: string
     name: string
@@ -26352,6 +27883,12 @@ export namespace Prisma {
     none?: SnippetWhereInput
   }
 
+  export type CustomFeedTemplateListRelationFilter = {
+    every?: CustomFeedTemplateWhereInput
+    some?: CustomFeedTemplateWhereInput
+    none?: CustomFeedTemplateWhereInput
+  }
+
   export type AnalyticsEventOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -26361,6 +27898,10 @@ export namespace Prisma {
   }
 
   export type SnippetOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type CustomFeedTemplateOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -27029,6 +28570,71 @@ export namespace Prisma {
     createdAt?: SortOrder
   }
 
+  export type CustomFeedTemplateCountOrderByAggregateInput = {
+    id?: SortOrder
+    siteId?: SortOrder
+    name?: SortOrder
+    targetUrl?: SortOrder
+    containerSelector?: SortOrder
+    titleSelector?: SortOrder
+    linkSelector?: SortOrder
+    thumbnailSelector?: SortOrder
+    descriptionSelector?: SortOrder
+    dateSelector?: SortOrder
+    authorSelector?: SortOrder
+    linkAttribute?: SortOrder
+    thumbnailAttribute?: SortOrder
+    maxItems?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CustomFeedTemplateAvgOrderByAggregateInput = {
+    maxItems?: SortOrder
+  }
+
+  export type CustomFeedTemplateMaxOrderByAggregateInput = {
+    id?: SortOrder
+    siteId?: SortOrder
+    name?: SortOrder
+    targetUrl?: SortOrder
+    containerSelector?: SortOrder
+    titleSelector?: SortOrder
+    linkSelector?: SortOrder
+    thumbnailSelector?: SortOrder
+    descriptionSelector?: SortOrder
+    dateSelector?: SortOrder
+    authorSelector?: SortOrder
+    linkAttribute?: SortOrder
+    thumbnailAttribute?: SortOrder
+    maxItems?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CustomFeedTemplateMinOrderByAggregateInput = {
+    id?: SortOrder
+    siteId?: SortOrder
+    name?: SortOrder
+    targetUrl?: SortOrder
+    containerSelector?: SortOrder
+    titleSelector?: SortOrder
+    linkSelector?: SortOrder
+    thumbnailSelector?: SortOrder
+    descriptionSelector?: SortOrder
+    dateSelector?: SortOrder
+    authorSelector?: SortOrder
+    linkAttribute?: SortOrder
+    thumbnailAttribute?: SortOrder
+    maxItems?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CustomFeedTemplateSumOrderByAggregateInput = {
+    maxItems?: SortOrder
+  }
+
   export type ThemeBlockListRelationFilter = {
     every?: ThemeBlockWhereInput
     some?: ThemeBlockWhereInput
@@ -27629,6 +29235,13 @@ export namespace Prisma {
     connect?: SnippetWhereUniqueInput | SnippetWhereUniqueInput[]
   }
 
+  export type CustomFeedTemplateCreateNestedManyWithoutSiteInput = {
+    create?: XOR<CustomFeedTemplateCreateWithoutSiteInput, CustomFeedTemplateUncheckedCreateWithoutSiteInput> | CustomFeedTemplateCreateWithoutSiteInput[] | CustomFeedTemplateUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: CustomFeedTemplateCreateOrConnectWithoutSiteInput | CustomFeedTemplateCreateOrConnectWithoutSiteInput[]
+    createMany?: CustomFeedTemplateCreateManySiteInputEnvelope
+    connect?: CustomFeedTemplateWhereUniqueInput | CustomFeedTemplateWhereUniqueInput[]
+  }
+
   export type CategoryUncheckedCreateNestedManyWithoutSiteInput = {
     create?: XOR<CategoryCreateWithoutSiteInput, CategoryUncheckedCreateWithoutSiteInput> | CategoryCreateWithoutSiteInput[] | CategoryUncheckedCreateWithoutSiteInput[]
     connectOrCreate?: CategoryCreateOrConnectWithoutSiteInput | CategoryCreateOrConnectWithoutSiteInput[]
@@ -27676,6 +29289,13 @@ export namespace Prisma {
     connectOrCreate?: SnippetCreateOrConnectWithoutSiteInput | SnippetCreateOrConnectWithoutSiteInput[]
     createMany?: SnippetCreateManySiteInputEnvelope
     connect?: SnippetWhereUniqueInput | SnippetWhereUniqueInput[]
+  }
+
+  export type CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput = {
+    create?: XOR<CustomFeedTemplateCreateWithoutSiteInput, CustomFeedTemplateUncheckedCreateWithoutSiteInput> | CustomFeedTemplateCreateWithoutSiteInput[] | CustomFeedTemplateUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: CustomFeedTemplateCreateOrConnectWithoutSiteInput | CustomFeedTemplateCreateOrConnectWithoutSiteInput[]
+    createMany?: CustomFeedTemplateCreateManySiteInputEnvelope
+    connect?: CustomFeedTemplateWhereUniqueInput | CustomFeedTemplateWhereUniqueInput[]
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -27814,6 +29434,20 @@ export namespace Prisma {
     deleteMany?: SnippetScalarWhereInput | SnippetScalarWhereInput[]
   }
 
+  export type CustomFeedTemplateUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<CustomFeedTemplateCreateWithoutSiteInput, CustomFeedTemplateUncheckedCreateWithoutSiteInput> | CustomFeedTemplateCreateWithoutSiteInput[] | CustomFeedTemplateUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: CustomFeedTemplateCreateOrConnectWithoutSiteInput | CustomFeedTemplateCreateOrConnectWithoutSiteInput[]
+    upsert?: CustomFeedTemplateUpsertWithWhereUniqueWithoutSiteInput | CustomFeedTemplateUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: CustomFeedTemplateCreateManySiteInputEnvelope
+    set?: CustomFeedTemplateWhereUniqueInput | CustomFeedTemplateWhereUniqueInput[]
+    disconnect?: CustomFeedTemplateWhereUniqueInput | CustomFeedTemplateWhereUniqueInput[]
+    delete?: CustomFeedTemplateWhereUniqueInput | CustomFeedTemplateWhereUniqueInput[]
+    connect?: CustomFeedTemplateWhereUniqueInput | CustomFeedTemplateWhereUniqueInput[]
+    update?: CustomFeedTemplateUpdateWithWhereUniqueWithoutSiteInput | CustomFeedTemplateUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: CustomFeedTemplateUpdateManyWithWhereWithoutSiteInput | CustomFeedTemplateUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: CustomFeedTemplateScalarWhereInput | CustomFeedTemplateScalarWhereInput[]
+  }
+
   export type CategoryUncheckedUpdateManyWithoutSiteNestedInput = {
     create?: XOR<CategoryCreateWithoutSiteInput, CategoryUncheckedCreateWithoutSiteInput> | CategoryCreateWithoutSiteInput[] | CategoryUncheckedCreateWithoutSiteInput[]
     connectOrCreate?: CategoryCreateOrConnectWithoutSiteInput | CategoryCreateOrConnectWithoutSiteInput[]
@@ -27910,6 +29544,20 @@ export namespace Prisma {
     update?: SnippetUpdateWithWhereUniqueWithoutSiteInput | SnippetUpdateWithWhereUniqueWithoutSiteInput[]
     updateMany?: SnippetUpdateManyWithWhereWithoutSiteInput | SnippetUpdateManyWithWhereWithoutSiteInput[]
     deleteMany?: SnippetScalarWhereInput | SnippetScalarWhereInput[]
+  }
+
+  export type CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<CustomFeedTemplateCreateWithoutSiteInput, CustomFeedTemplateUncheckedCreateWithoutSiteInput> | CustomFeedTemplateCreateWithoutSiteInput[] | CustomFeedTemplateUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: CustomFeedTemplateCreateOrConnectWithoutSiteInput | CustomFeedTemplateCreateOrConnectWithoutSiteInput[]
+    upsert?: CustomFeedTemplateUpsertWithWhereUniqueWithoutSiteInput | CustomFeedTemplateUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: CustomFeedTemplateCreateManySiteInputEnvelope
+    set?: CustomFeedTemplateWhereUniqueInput | CustomFeedTemplateWhereUniqueInput[]
+    disconnect?: CustomFeedTemplateWhereUniqueInput | CustomFeedTemplateWhereUniqueInput[]
+    delete?: CustomFeedTemplateWhereUniqueInput | CustomFeedTemplateWhereUniqueInput[]
+    connect?: CustomFeedTemplateWhereUniqueInput | CustomFeedTemplateWhereUniqueInput[]
+    update?: CustomFeedTemplateUpdateWithWhereUniqueWithoutSiteInput | CustomFeedTemplateUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: CustomFeedTemplateUpdateManyWithWhereWithoutSiteInput | CustomFeedTemplateUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: CustomFeedTemplateScalarWhereInput | CustomFeedTemplateScalarWhereInput[]
   }
 
   export type SiteCreateNestedOneWithoutSnippetsInput = {
@@ -28283,6 +29931,20 @@ export namespace Prisma {
     upsert?: RssUpsertWithoutRssItemsInput
     connect?: RssWhereUniqueInput
     update?: XOR<XOR<RssUpdateToOneWithWhereWithoutRssItemsInput, RssUpdateWithoutRssItemsInput>, RssUncheckedUpdateWithoutRssItemsInput>
+  }
+
+  export type SiteCreateNestedOneWithoutCustomFeedTemplatesInput = {
+    create?: XOR<SiteCreateWithoutCustomFeedTemplatesInput, SiteUncheckedCreateWithoutCustomFeedTemplatesInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutCustomFeedTemplatesInput
+    connect?: SiteWhereUniqueInput
+  }
+
+  export type SiteUpdateOneRequiredWithoutCustomFeedTemplatesNestedInput = {
+    create?: XOR<SiteCreateWithoutCustomFeedTemplatesInput, SiteUncheckedCreateWithoutCustomFeedTemplatesInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutCustomFeedTemplatesInput
+    upsert?: SiteUpsertWithoutCustomFeedTemplatesInput
+    connect?: SiteWhereUniqueInput
+    update?: XOR<XOR<SiteUpdateToOneWithWhereWithoutCustomFeedTemplatesInput, SiteUpdateWithoutCustomFeedTemplatesInput>, SiteUncheckedUpdateWithoutCustomFeedTemplatesInput>
   }
 
   export type ThemeBlockCreateNestedManyWithoutThemeInput = {
@@ -28813,6 +30475,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
     snippets?: SnippetCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutUserInput = {
@@ -28844,6 +30507,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
     snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutUserInput = {
@@ -29467,6 +31131,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
     snippets?: SnippetCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutCategoryInput = {
@@ -29498,6 +31163,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
     snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutCategoryInput = {
@@ -29622,6 +31288,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutCategoryInput = {
@@ -29652,6 +31319,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutCategoryInput = {
@@ -30079,6 +31747,51 @@ export namespace Prisma {
     data: SnippetCreateManySiteInput | SnippetCreateManySiteInput[]
   }
 
+  export type CustomFeedTemplateCreateWithoutSiteInput = {
+    id?: string
+    name: string
+    targetUrl: string
+    containerSelector: string
+    titleSelector?: string | null
+    linkSelector?: string | null
+    thumbnailSelector?: string | null
+    descriptionSelector?: string | null
+    dateSelector?: string | null
+    authorSelector?: string | null
+    linkAttribute?: string
+    thumbnailAttribute?: string
+    maxItems?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CustomFeedTemplateUncheckedCreateWithoutSiteInput = {
+    id?: string
+    name: string
+    targetUrl: string
+    containerSelector: string
+    titleSelector?: string | null
+    linkSelector?: string | null
+    thumbnailSelector?: string | null
+    descriptionSelector?: string | null
+    dateSelector?: string | null
+    authorSelector?: string | null
+    linkAttribute?: string
+    thumbnailAttribute?: string
+    maxItems?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CustomFeedTemplateCreateOrConnectWithoutSiteInput = {
+    where: CustomFeedTemplateWhereUniqueInput
+    create: XOR<CustomFeedTemplateCreateWithoutSiteInput, CustomFeedTemplateUncheckedCreateWithoutSiteInput>
+  }
+
+  export type CustomFeedTemplateCreateManySiteInputEnvelope = {
+    data: CustomFeedTemplateCreateManySiteInput | CustomFeedTemplateCreateManySiteInput[]
+  }
+
   export type UserUpsertWithoutSiteInput = {
     update: XOR<UserUpdateWithoutSiteInput, UserUncheckedUpdateWithoutSiteInput>
     create: XOR<UserCreateWithoutSiteInput, UserUncheckedCreateWithoutSiteInput>
@@ -30346,6 +32059,44 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Snippet"> | Date | string
   }
 
+  export type CustomFeedTemplateUpsertWithWhereUniqueWithoutSiteInput = {
+    where: CustomFeedTemplateWhereUniqueInput
+    update: XOR<CustomFeedTemplateUpdateWithoutSiteInput, CustomFeedTemplateUncheckedUpdateWithoutSiteInput>
+    create: XOR<CustomFeedTemplateCreateWithoutSiteInput, CustomFeedTemplateUncheckedCreateWithoutSiteInput>
+  }
+
+  export type CustomFeedTemplateUpdateWithWhereUniqueWithoutSiteInput = {
+    where: CustomFeedTemplateWhereUniqueInput
+    data: XOR<CustomFeedTemplateUpdateWithoutSiteInput, CustomFeedTemplateUncheckedUpdateWithoutSiteInput>
+  }
+
+  export type CustomFeedTemplateUpdateManyWithWhereWithoutSiteInput = {
+    where: CustomFeedTemplateScalarWhereInput
+    data: XOR<CustomFeedTemplateUpdateManyMutationInput, CustomFeedTemplateUncheckedUpdateManyWithoutSiteInput>
+  }
+
+  export type CustomFeedTemplateScalarWhereInput = {
+    AND?: CustomFeedTemplateScalarWhereInput | CustomFeedTemplateScalarWhereInput[]
+    OR?: CustomFeedTemplateScalarWhereInput[]
+    NOT?: CustomFeedTemplateScalarWhereInput | CustomFeedTemplateScalarWhereInput[]
+    id?: StringFilter<"CustomFeedTemplate"> | string
+    siteId?: StringFilter<"CustomFeedTemplate"> | string
+    name?: StringFilter<"CustomFeedTemplate"> | string
+    targetUrl?: StringFilter<"CustomFeedTemplate"> | string
+    containerSelector?: StringFilter<"CustomFeedTemplate"> | string
+    titleSelector?: StringNullableFilter<"CustomFeedTemplate"> | string | null
+    linkSelector?: StringNullableFilter<"CustomFeedTemplate"> | string | null
+    thumbnailSelector?: StringNullableFilter<"CustomFeedTemplate"> | string | null
+    descriptionSelector?: StringNullableFilter<"CustomFeedTemplate"> | string | null
+    dateSelector?: StringNullableFilter<"CustomFeedTemplate"> | string | null
+    authorSelector?: StringNullableFilter<"CustomFeedTemplate"> | string | null
+    linkAttribute?: StringFilter<"CustomFeedTemplate"> | string
+    thumbnailAttribute?: StringFilter<"CustomFeedTemplate"> | string
+    maxItems?: IntFilter<"CustomFeedTemplate"> | number
+    createdAt?: DateTimeFilter<"CustomFeedTemplate"> | Date | string
+    updatedAt?: DateTimeFilter<"CustomFeedTemplate"> | Date | string
+  }
+
   export type SiteCreateWithoutSnippetsInput = {
     id?: string
     subdomain: string
@@ -30375,6 +32126,7 @@ export namespace Prisma {
     RSS?: RssCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutSnippetsInput = {
@@ -30406,6 +32158,7 @@ export namespace Prisma {
     RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutSnippetsInput = {
@@ -30452,6 +32205,7 @@ export namespace Prisma {
     RSS?: RssUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutSnippetsInput = {
@@ -30482,6 +32236,7 @@ export namespace Prisma {
     RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteCreateWithoutFeaturesInput = {
@@ -30513,6 +32268,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
     snippets?: SnippetCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutFeaturesInput = {
@@ -30544,6 +32300,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
     snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutFeaturesInput = {
@@ -30643,6 +32400,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
     snippets?: SnippetCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutSubscriptionInput = {
@@ -30674,6 +32432,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
     snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutSubscriptionInput = {
@@ -30902,6 +32661,7 @@ export namespace Prisma {
     RSS?: RssCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
     snippets?: SnippetCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutAnalyticsEventInput = {
@@ -30933,6 +32693,7 @@ export namespace Prisma {
     RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
     snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutAnalyticsEventInput = {
@@ -30979,6 +32740,7 @@ export namespace Prisma {
     RSS?: RssUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutAnalyticsEventInput = {
@@ -31009,6 +32771,7 @@ export namespace Prisma {
     RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteCreateWithoutArticleInput = {
@@ -31040,6 +32803,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
     snippets?: SnippetCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutArticleInput = {
@@ -31071,6 +32835,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
     snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutArticleInput = {
@@ -31160,6 +32925,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutArticleInput = {
@@ -31190,6 +32956,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutArticleInput = {
@@ -31268,6 +33035,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
     snippets?: SnippetCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutPageInput = {
@@ -31299,6 +33067,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
     snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutPageInput = {
@@ -31388,6 +33157,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutPageInput = {
@@ -31418,6 +33188,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutPageInput = {
@@ -31496,6 +33267,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
     snippets?: SnippetCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutRSSInput = {
@@ -31527,6 +33299,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
     installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
     snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutRSSInput = {
@@ -31645,6 +33418,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutRSSInput = {
@@ -31675,6 +33449,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type RssItemUpsertWithWhereUniqueWithoutRssInput = {
@@ -31813,6 +33588,148 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     autoImport?: BoolFieldUpdateOperationsInput | boolean
     categoryId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type SiteCreateWithoutCustomFeedTemplatesInput = {
+    id?: string
+    subdomain: string
+    url: string
+    views?: number
+    limitViews?: number
+    title: string
+    description?: string | null
+    logo?: string | null
+    theme?: InputJsonValue | null
+    status?: string
+    defaultThemePreference?: string
+    template_schema?: InputJsonValue | null
+    settings?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    home_Id?: string | null
+    privacy_policy_id?: string | null
+    cookies_id?: string | null
+    terms_id?: string | null
+    user?: UserCreateNestedOneWithoutSiteInput
+    features?: FeaturesCreateNestedOneWithoutSiteInput
+    subscription?: SubscriptionCreateNestedOneWithoutSiteInput
+    category?: CategoryCreateNestedManyWithoutSiteInput
+    Article?: ArticleCreateNestedManyWithoutSiteInput
+    Page?: PageCreateNestedManyWithoutSiteInput
+    RSS?: RssCreateNestedManyWithoutSiteInput
+    AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
+    snippets?: SnippetCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteUncheckedCreateWithoutCustomFeedTemplatesInput = {
+    id?: string
+    subdomain: string
+    url: string
+    views?: number
+    limitViews?: number
+    title: string
+    description?: string | null
+    logo?: string | null
+    theme?: InputJsonValue | null
+    status?: string
+    defaultThemePreference?: string
+    template_schema?: InputJsonValue | null
+    settings?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    home_Id?: string | null
+    privacy_policy_id?: string | null
+    cookies_id?: string | null
+    terms_id?: string | null
+    userId?: string | null
+    featuresId?: string | null
+    subscriptionId?: string | null
+    category?: CategoryUncheckedCreateNestedManyWithoutSiteInput
+    Article?: ArticleUncheckedCreateNestedManyWithoutSiteInput
+    Page?: PageUncheckedCreateNestedManyWithoutSiteInput
+    RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
+    AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
+    snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteCreateOrConnectWithoutCustomFeedTemplatesInput = {
+    where: SiteWhereUniqueInput
+    create: XOR<SiteCreateWithoutCustomFeedTemplatesInput, SiteUncheckedCreateWithoutCustomFeedTemplatesInput>
+  }
+
+  export type SiteUpsertWithoutCustomFeedTemplatesInput = {
+    update: XOR<SiteUpdateWithoutCustomFeedTemplatesInput, SiteUncheckedUpdateWithoutCustomFeedTemplatesInput>
+    create: XOR<SiteCreateWithoutCustomFeedTemplatesInput, SiteUncheckedCreateWithoutCustomFeedTemplatesInput>
+    where?: SiteWhereInput
+  }
+
+  export type SiteUpdateToOneWithWhereWithoutCustomFeedTemplatesInput = {
+    where?: SiteWhereInput
+    data: XOR<SiteUpdateWithoutCustomFeedTemplatesInput, SiteUncheckedUpdateWithoutCustomFeedTemplatesInput>
+  }
+
+  export type SiteUpdateWithoutCustomFeedTemplatesInput = {
+    subdomain?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    views?: IntFieldUpdateOperationsInput | number
+    limitViews?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    theme?: InputJsonValue | InputJsonValue | null
+    status?: StringFieldUpdateOperationsInput | string
+    defaultThemePreference?: StringFieldUpdateOperationsInput | string
+    template_schema?: InputJsonValue | InputJsonValue | null
+    settings?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_Id?: NullableStringFieldUpdateOperationsInput | string | null
+    privacy_policy_id?: NullableStringFieldUpdateOperationsInput | string | null
+    cookies_id?: NullableStringFieldUpdateOperationsInput | string | null
+    terms_id?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneWithoutSiteNestedInput
+    features?: FeaturesUpdateOneWithoutSiteNestedInput
+    subscription?: SubscriptionUpdateOneWithoutSiteNestedInput
+    category?: CategoryUpdateManyWithoutSiteNestedInput
+    Article?: ArticleUpdateManyWithoutSiteNestedInput
+    Page?: PageUpdateManyWithoutSiteNestedInput
+    RSS?: RssUpdateManyWithoutSiteNestedInput
+    AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUpdateManyWithoutSiteNestedInput
+  }
+
+  export type SiteUncheckedUpdateWithoutCustomFeedTemplatesInput = {
+    subdomain?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    views?: IntFieldUpdateOperationsInput | number
+    limitViews?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    theme?: InputJsonValue | InputJsonValue | null
+    status?: StringFieldUpdateOperationsInput | string
+    defaultThemePreference?: StringFieldUpdateOperationsInput | string
+    template_schema?: InputJsonValue | InputJsonValue | null
+    settings?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_Id?: NullableStringFieldUpdateOperationsInput | string | null
+    privacy_policy_id?: NullableStringFieldUpdateOperationsInput | string | null
+    cookies_id?: NullableStringFieldUpdateOperationsInput | string | null
+    terms_id?: NullableStringFieldUpdateOperationsInput | string | null
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    featuresId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: CategoryUncheckedUpdateManyWithoutSiteNestedInput
+    Article?: ArticleUncheckedUpdateManyWithoutSiteNestedInput
+    Page?: PageUncheckedUpdateManyWithoutSiteNestedInput
+    RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
+    AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type ThemeBlockCreateWithoutThemeInput = {
@@ -31994,6 +33911,7 @@ export namespace Prisma {
     RSS?: RssCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
     snippets?: SnippetCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutInstalledThemesInput = {
@@ -32025,6 +33943,7 @@ export namespace Prisma {
     RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
     AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
     snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutInstalledThemesInput = {
@@ -32102,6 +34021,7 @@ export namespace Prisma {
     RSS?: RssUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutInstalledThemesInput = {
@@ -32132,6 +34052,7 @@ export namespace Prisma {
     RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type ThemeUpsertWithoutInstalledInInput = {
@@ -32354,6 +34275,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutUserInput = {
@@ -32384,6 +34306,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateManyWithoutUserInput = {
@@ -32715,6 +34638,24 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type CustomFeedTemplateCreateManySiteInput = {
+    id?: string
+    name: string
+    targetUrl: string
+    containerSelector: string
+    titleSelector?: string | null
+    linkSelector?: string | null
+    thumbnailSelector?: string | null
+    descriptionSelector?: string | null
+    dateSelector?: string | null
+    authorSelector?: string | null
+    linkAttribute?: string
+    thumbnailAttribute?: string
+    maxItems?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type CategoryUpdateWithoutSiteInput = {
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
@@ -32962,6 +34903,57 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type CustomFeedTemplateUpdateWithoutSiteInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    targetUrl?: StringFieldUpdateOperationsInput | string
+    containerSelector?: StringFieldUpdateOperationsInput | string
+    titleSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    linkSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    thumbnailSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    descriptionSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    dateSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    authorSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    linkAttribute?: StringFieldUpdateOperationsInput | string
+    thumbnailAttribute?: StringFieldUpdateOperationsInput | string
+    maxItems?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CustomFeedTemplateUncheckedUpdateWithoutSiteInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    targetUrl?: StringFieldUpdateOperationsInput | string
+    containerSelector?: StringFieldUpdateOperationsInput | string
+    titleSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    linkSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    thumbnailSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    descriptionSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    dateSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    authorSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    linkAttribute?: StringFieldUpdateOperationsInput | string
+    thumbnailAttribute?: StringFieldUpdateOperationsInput | string
+    maxItems?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CustomFeedTemplateUncheckedUpdateManyWithoutSiteInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    targetUrl?: StringFieldUpdateOperationsInput | string
+    containerSelector?: StringFieldUpdateOperationsInput | string
+    titleSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    linkSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    thumbnailSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    descriptionSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    dateSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    authorSelector?: NullableStringFieldUpdateOperationsInput | string | null
+    linkAttribute?: StringFieldUpdateOperationsInput | string
+    thumbnailAttribute?: StringFieldUpdateOperationsInput | string
+    maxItems?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type SiteCreateManyFeaturesInput = {
     id?: string
     subdomain: string
@@ -33014,6 +35006,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutFeaturesInput = {
@@ -33044,6 +35037,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateManyWithoutFeaturesInput = {
@@ -33131,6 +35125,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutSubscriptionInput = {
@@ -33161,6 +35156,7 @@ export namespace Prisma {
     AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
     installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
     snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateManyWithoutSubscriptionInput = {

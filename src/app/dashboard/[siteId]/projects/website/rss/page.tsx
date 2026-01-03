@@ -1,0 +1,258 @@
+'use client'
+
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Skeleton } from "@/components/ui/skeleton"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+import { Plus, Rss, ExternalLink, Calendar, Trash2, Globe, FileText, MoreHorizontal, Pencil } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import Link from "next/link"
+import { use, useEffect, useState } from "react"
+import { toast } from "sonner"
+
+interface FeedTemplate {
+    id: string
+    name: string
+    targetUrl: string
+    containerSelector: string
+    titleSelector: string | null
+    linkSelector: string | null
+    thumbnailSelector: string | null
+    descriptionSelector: string | null
+    dateSelector: string | null
+    authorSelector: string | null
+    createdAt: string
+    updatedAt: string
+}
+
+const RSSPage = ({ params }: { params: Promise<{ siteId: string }> }) => {
+    const { siteId } = use(params)
+
+    const [templates, setTemplates] = useState<FeedTemplate[]>([])
+    const [loading, setLoading] = useState(true)
+    const [deleting, setDeleting] = useState<string | null>(null)
+
+    // Fetch templates
+    useEffect(() => {
+        const fetchTemplates = async () => {
+            try {
+                const response = await fetch(`/api/team/${siteId}/rss/templates`)
+                if (!response.ok) throw new Error("Failed to fetch templates")
+                const data = await response.json()
+                setTemplates(data)
+            } catch (err: any) {
+                toast.error("Failed to load templates")
+                console.error(err)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchTemplates()
+    }, [siteId])
+
+    // Delete template
+    const deleteTemplate = async (templateId: string) => {
+        setDeleting(templateId)
+        try {
+            const response = await fetch(`/api/team/${siteId}/rss/templates/${templateId}`, {
+                method: "DELETE"
+            })
+            if (!response.ok) throw new Error("Failed to delete template")
+
+            setTemplates(prev => prev.filter(t => t.id !== templateId))
+            toast.success("Template deleted")
+        } catch (err: any) {
+            toast.error("Failed to delete template")
+        } finally {
+            setDeleting(null)
+        }
+    }
+
+    // Count selectors configured for a template
+    const countSelectors = (template: FeedTemplate) => {
+        const selectors = [
+            template.containerSelector,
+            template.titleSelector,
+            template.linkSelector,
+            template.thumbnailSelector,
+            template.descriptionSelector,
+            template.dateSelector,
+            template.authorSelector
+        ]
+        return selectors.filter(Boolean).length
+    }
+
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        })
+    }
+
+    const getHostname = (url: string) => {
+        try {
+            return new URL(url).hostname
+        } catch {
+            return url
+        }
+    }
+
+    return (
+        <div className="h-full flex flex-col">
+            {/* Header */}
+            <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                <div className="px-6 py-4">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h1 className="text-xl font-semibold flex items-center gap-2">
+                                <Rss className="h-5 w-5 text-orange-500" />
+                                RSS Feeds
+                            </h1>
+                            <p className="text-sm text-muted-foreground mt-0.5">
+                                Create custom RSS feeds from any website
+                            </p>
+                        </div>
+                        <Button asChild>
+                            <Link href={`/dashboard/${siteId}/projects/website/rss/builder`}>
+                                <Plus className="h-4 w-4 mr-2" />
+                                New Feed
+                            </Link>
+                        </Button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Content */}
+            <ScrollArea className="flex-1">
+                <div className="p-6">
+                    {loading ? (
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            {[...Array(3)].map((_, i) => (
+                                <Card key={i}>
+                                    <CardHeader className="pb-3">
+                                        <Skeleton className="h-5 w-32" />
+                                        <Skeleton className="h-3 w-48 mt-1" />
+                                    </CardHeader>
+                                    <CardContent>
+                                        <Skeleton className="h-4 w-full" />
+                                        <Skeleton className="h-4 w-24 mt-2" />
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    ) : templates.length === 0 ? (
+                        <div className="text-center py-16">
+                            <div className="w-16 h-16 rounded-2xl bg-orange-500/10 flex items-center justify-center mx-auto mb-4">
+                                <Rss className="h-8 w-8 text-orange-500" />
+                            </div>
+                            <h3 className="text-lg font-medium mb-1">No feed templates yet</h3>
+                            <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
+                                Create your first custom RSS feed by selecting elements from any website
+                            </p>
+                            <Button asChild>
+                                <Link href={`/dashboard/${siteId}/projects/website/rss/builder`}>
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Create Feed Template
+                                </Link>
+                            </Button>
+                        </div>
+                    ) : (
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            {templates.map((template) => (
+                                <Card key={template.id} className="group hover:border-primary/30 transition-colors">
+                                    <CardHeader className="pb-3">
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex-1 min-w-0">
+                                                <CardTitle className="text-base truncate">
+                                                    {template.name}
+                                                </CardTitle>
+                                                <CardDescription className="flex items-center gap-1 mt-1">
+                                                    <Globe className="h-3 w-3" />
+                                                    <span className="truncate">{getHostname(template.targetUrl)}</span>
+                                                </CardDescription>
+                                            </div>
+
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    >
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem asChild>
+                                                        <a href={template.targetUrl} target="_blank" rel="noopener noreferrer">
+                                                            <ExternalLink className="h-4 w-4 mr-2" />
+                                                            View Source
+                                                        </a>
+                                                    </DropdownMenuItem>
+                                                    <AlertDialog>
+                                                        <AlertDialogTrigger asChild>
+                                                            <DropdownMenuItem
+                                                                className="text-destructive focus:text-destructive"
+                                                                onSelect={(e) => e.preventDefault()}
+                                                            >
+                                                                <Trash2 className="h-4 w-4 mr-2" />
+                                                                Delete
+                                                            </DropdownMenuItem>
+                                                        </AlertDialogTrigger>
+                                                        <AlertDialogContent>
+                                                            <AlertDialogHeader>
+                                                                <AlertDialogTitle>Delete Template</AlertDialogTitle>
+                                                                <AlertDialogDescription>
+                                                                    Are you sure you want to delete "{template.name}"? This action cannot be undone.
+                                                                </AlertDialogDescription>
+                                                            </AlertDialogHeader>
+                                                            <AlertDialogFooter>
+                                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                                <AlertDialogAction
+                                                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                                                    onClick={() => deleteTemplate(template.id)}
+                                                                    disabled={deleting === template.id}
+                                                                >
+                                                                    {deleting === template.id ? "Deleting..." : "Delete"}
+                                                                </AlertDialogAction>
+                                                            </AlertDialogFooter>
+                                                        </AlertDialogContent>
+                                                    </AlertDialog>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                            <div className="flex items-center gap-1">
+                                                <FileText className="h-3 w-3" />
+                                                <span>{countSelectors(template)} selectors</span>
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                <Calendar className="h-3 w-3" />
+                                                <span>{formatDate(template.createdAt)}</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-3 pt-3 border-t flex items-center gap-2">
+                                            <Badge variant="outline" className="text-[10px] h-5 bg-orange-500/10 text-orange-600 border-orange-500/30">
+                                                <Rss className="h-2.5 w-2.5 mr-1" />
+                                                RSS
+                                            </Badge>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </ScrollArea>
+        </div>
+    )
+}
+
+export default RSSPage
