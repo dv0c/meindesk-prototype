@@ -31,8 +31,8 @@ const SITE_TYPES = [
 
 const DEFAULT_PAGES = [
   { id: "home", label: "Home", required: true },
-  { id: "articles", label: "Articles", required: false },
-  { id: "article", label: "Article Details", required: false },
+  { id: "articles", label: "Articles", required: true },
+  { id: "article", label: "Single Article", required: true },
   { id: "about", label: "About", required: false },
   { id: "contact", label: "Contact", required: false },
   { id: "portfolio", label: "Portfolio", required: false },
@@ -67,7 +67,7 @@ export function SetupForm({ className, ...props }: React.ComponentProps<"div">) 
   }
 
   const togglePage = (pageId: string) => {
-    if (pageId === "home") return
+    if (pageId === "home" || pageId === "articles" || pageId === "article") return
     setSelectedPages(prev =>
       prev.includes(pageId)
         ? prev.filter(p => p !== pageId)
@@ -109,13 +109,16 @@ export function SetupForm({ className, ...props }: React.ComponentProps<"div">) 
       <AnimatedNoise opacity={0.05} />
 
       {/* Header */}
-      <header className="h-20 px-8 flex items-center justify-between border-b border-foreground/10 relative z-10">
+      <header className="h-16 md:h-20 px-4 md:px-8 flex items-center justify-between border-b border-foreground/10 relative z-10 shrink-0">
         <div className="flex items-center gap-4">
           <div className="w-8 h-8 border border-foreground/20 flex items-center justify-center bg-foreground/5">
             <div className="w-2 h-2 bg-foreground/50" />
           </div>
-          <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/60">
+          <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/60 hidden sm:inline-block">
             Initial Setup Sequence
+          </span>
+          <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/60 sm:hidden">
+            Setup
           </span>
         </div>
 
@@ -130,8 +133,8 @@ export function SetupForm({ className, ...props }: React.ComponentProps<"div">) 
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto relative z-10">
-        <div className="max-w-5xl mx-auto px-6 py-12 flex flex-col items-center">
+      <main className="flex-1 overflow-y-auto relative z-10 px-4 py-8 md:px-6 md:py-12">
+        <div className="max-w-5xl mx-auto flex flex-col items-center">
 
           <AnimatePresence mode="wait">
             {/* Step 1: Category Selection */}
@@ -143,20 +146,20 @@ export function SetupForm({ className, ...props }: React.ComponentProps<"div">) 
                 exit={{ opacity: 0, y: -10 }}
                 className="w-full"
               >
-                <h1 className="font-[var(--font-bebas)] text-4xl md:text-6xl text-center mb-4 tracking-wide text-foreground/80">
+                <h1 className="font-[var(--font-bebas)] text-3xl md:text-4xl lg:text-6xl text-center mb-4 tracking-wide text-foreground/80">
                   SELECT TARGET PROTOCOL
                 </h1>
-                <p className="text-center font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground mb-16">
+                <p className="text-center font-mono text-[10px] md:text-xs uppercase tracking-[0.2em] text-muted-foreground mb-8 md:mb-16">
                                     // Define primary operational parameters
                 </p>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-4xl mx-auto">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 w-full max-w-4xl mx-auto">
                   {SITE_TYPES.map((type) => (
                     <button
                       key={type.id}
                       onClick={() => setSiteType(type.id)}
                       className={cn(
-                        "group relative h-40 flex flex-col items-center justify-center gap-4 border transition-all duration-300",
+                        "group relative h-32 md:h-40 flex flex-col items-center justify-center gap-4 border transition-all duration-300",
                         siteType === type.id
                           ? "border-foreground bg-foreground/5"
                           : "border-foreground/20 hover:border-foreground/50 hover:bg-foreground/[0.02]"
@@ -168,12 +171,12 @@ export function SetupForm({ className, ...props }: React.ComponentProps<"div">) 
                       <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-foreground/20 transition-all group-hover:w-4 group-hover:h-4 group-hover:border-foreground/40" />
                       <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-foreground/20 transition-all group-hover:w-4 group-hover:h-4 group-hover:border-foreground/40" />
 
-                      <type.icon className="w-8 h-8 stroke-1 text-foreground/70 group-hover:text-foreground transition-colors" />
+                      <type.icon className="w-6 h-6 md:w-8 md:h-8 stroke-1 text-foreground/70 group-hover:text-foreground transition-colors" />
                       <div className="text-center">
-                        <div className="font-mono text-sm uppercase tracking-widest mb-1 group-hover:text-foreground transition-colors">
+                        <div className="font-mono text-xs md:text-sm uppercase tracking-widest mb-1 group-hover:text-foreground transition-colors">
                           <ScrambleTextOnHover text={type.title} duration={0.3} />
                         </div>
-                        <div className="text-[10px] text-muted-foreground uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="text-[9px] md:text-[10px] text-muted-foreground uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity">
                           {type.desc}
                         </div>
                       </div>
@@ -192,14 +195,14 @@ export function SetupForm({ className, ...props }: React.ComponentProps<"div">) 
                 exit={{ opacity: 0, y: -10 }}
                 className="w-full flex flex-col items-center"
               >
-                <h1 className="font-[var(--font-bebas)] text-4xl md:text-6xl text-center mb-4 tracking-wide text-foreground/80">
+                <h1 className="font-[var(--font-bebas)] text-3xl md:text-4xl lg:text-6xl text-center mb-4 tracking-wide text-foreground/80">
                   IDENTITY CONFIGURATION
                 </h1>
-                <p className="text-center font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground mb-16">
+                <p className="text-center font-mono text-[10px] md:text-xs uppercase tracking-[0.2em] text-muted-foreground mb-8 md:mb-16">
                                     // Assign unique identifiers
                 </p>
 
-                <div className="w-full max-w-lg space-y-12">
+                <div className="w-full max-w-lg space-y-8 md:space-y-12">
                   <div className="space-y-4">
                     <Label className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Title Designation</Label>
                     <div className="relative group">
@@ -207,7 +210,7 @@ export function SetupForm({ className, ...props }: React.ComponentProps<"div">) 
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         placeholder="ENTER SITE TITLE"
-                        className="h-14 bg-transparent border-0 border-b border-foreground/20 rounded-none px-0 text-2xl font-mono placeholder:text-foreground/20 focus-visible:ring-0 focus-visible:border-foreground transition-all"
+                        className="h-14 bg-transparent border-0 border-b border-foreground/20 rounded-none px-0 text-xl md:text-2xl font-mono placeholder:text-foreground/20 focus-visible:ring-0 focus-visible:border-foreground transition-all"
                       />
                       <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-foreground transition-all duration-300 group-focus-within:w-full" />
                     </div>
@@ -215,15 +218,17 @@ export function SetupForm({ className, ...props }: React.ComponentProps<"div">) 
 
                   <div className="space-y-4">
                     <Label className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Network Address</Label>
-                    <div className="flex items-end gap-2 font-mono text-xl border-b border-foreground/20 pb-4 relative group">
-                      <span className="text-muted-foreground">https://</span>
-                      <input
-                        value={subdomain}
-                        onChange={(e) => setSubdomain(e.target.value.replace(/[^a-zA-Z0-9-]/g, ''))}
-                        placeholder="subdomain"
-                        className="flex-1 bg-transparent border-none outline-none placeholder:text-foreground/20 uppercase"
-                      />
-                      <span className="text-muted-foreground">{BASE_DOMAIN}</span>
+                    <div className="flex flex-col md:flex-row md:items-end gap-2 font-mono text-lg md:text-xl border-b border-foreground/20 pb-4 relative group">
+                      <div className="flex items-end gap-1 w-full">
+                        <span className="text-muted-foreground text-sm md:text-lg">https://</span>
+                        <input
+                          value={subdomain}
+                          onChange={(e) => setSubdomain(e.target.value.replace(/[^a-zA-Z0-9-]/g, ''))}
+                          placeholder="subdomain"
+                          className="flex-1 bg-transparent border-none outline-none placeholder:text-foreground/20 uppercase text-base md:text-xl min-w-0"
+                        />
+                      </div>
+                      <span className="text-muted-foreground text-xs md:text-lg text-right md:text-left">{BASE_DOMAIN}</span>
                       <div className="absolute bottom-[-1px] left-0 w-0 h-[1px] bg-foreground transition-all duration-300 group-focus-within:w-full" />
                     </div>
                     {subdomain && (
@@ -256,10 +261,10 @@ export function SetupForm({ className, ...props }: React.ComponentProps<"div">) 
                 exit={{ opacity: 0, y: -10 }}
                 className="w-full flex flex-col items-center"
               >
-                <h1 className="font-[var(--font-bebas)] text-4xl md:text-6xl text-center mb-4 tracking-wide text-foreground/80">
+                <h1 className="font-[var(--font-bebas)] text-3xl md:text-4xl lg:text-6xl text-center mb-4 tracking-wide text-foreground/80">
                   SYSTEM MODULES
                 </h1>
-                <p className="text-center font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground mb-16">
+                <p className="text-center font-mono text-[10px] md:text-xs uppercase tracking-[0.2em] text-muted-foreground mb-8 md:mb-16">
                                     // Initialize required components
                 </p>
 
@@ -269,11 +274,11 @@ export function SetupForm({ className, ...props }: React.ComponentProps<"div">) 
                       key={page.id}
                       onClick={() => togglePage(page.id)}
                       className={cn(
-                        "relative p-6 bg-background cursor-pointer group transition-colors hover:bg-foreground/[0.02]",
+                        "relative p-4 md:p-6 bg-background cursor-pointer group transition-colors hover:bg-foreground/[0.02]",
                       )}
                     >
                       <div className="flex items-start justify-between mb-2">
-                        <div className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground group-hover:text-foreground transition-colors">
+                        <div className="font-mono text-[10px] md:text-xs uppercase tracking-[0.2em] text-muted-foreground group-hover:text-foreground transition-colors">
                           Module_0{DEFAULT_PAGES.indexOf(page) + 1}
                         </div>
                         <div className={cn(
@@ -281,7 +286,7 @@ export function SetupForm({ className, ...props }: React.ComponentProps<"div">) 
                           selectedPages.includes(page.id) ? "bg-foreground" : "bg-transparent"
                         )} />
                       </div>
-                      <div className="font-[var(--font-bebas)] text-2xl tracking-wide">
+                      <div className="font-[var(--font-bebas)] text-xl md:text-2xl tracking-wide">
                         {page.label}
                       </div>
                       {page.required && (
@@ -304,10 +309,10 @@ export function SetupForm({ className, ...props }: React.ComponentProps<"div">) 
                 exit={{ opacity: 0, y: -10 }}
                 className="w-full flex flex-col items-center"
               >
-                <h1 className="font-[var(--font-bebas)] text-4xl md:text-6xl text-center mb-4 tracking-wide text-foreground/80">
+                <h1 className="font-[var(--font-bebas)] text-3xl md:text-4xl lg:text-6xl text-center mb-4 tracking-wide text-foreground/80">
                   VISUAL MATRIX
                 </h1>
-                <p className="text-center font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground mb-16">
+                <p className="text-center font-mono text-[10px] md:text-xs uppercase tracking-[0.2em] text-muted-foreground mb-8 md:mb-16">
                                     // Select interface paradigm
                 </p>
 
@@ -362,14 +367,14 @@ export function SetupForm({ className, ...props }: React.ComponentProps<"div">) 
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-foreground/10 bg-background/80 backdrop-blur-sm relative z-10">
-        <div className="px-8 h-20 flex items-center justify-between">
+      <footer className="border-t border-foreground/10 bg-background/80 backdrop-blur-sm relative z-10 shrink-0">
+        <div className="px-4 md:px-8 h-16 md:h-20 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-              Step 0{step} / 0{totalSteps}
+              <span className="hidden sm:inline">Step</span> 0{step} / 0{totalSteps}
             </div>
             {/* Industrial Steps Visualization */}
-            <div className="flex gap-1">
+            <div className="hidden sm:flex gap-1">
               {Array.from({ length: totalSteps }).map((_, i) => (
                 <div
                   key={i}
@@ -399,7 +404,7 @@ export function SetupForm({ className, ...props }: React.ComponentProps<"div">) 
             <button
               onClick={step === totalSteps ? handleSubmit : () => setStep(s => Math.min(totalSteps, s + 1))}
               disabled={!canProceed() || loading}
-              className="group relative px-6 py-3 bg-foreground text-background font-mono text-xs uppercase tracking-widest hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="group relative px-4 md:px-6 py-3 bg-foreground text-background font-mono text-xs uppercase tracking-widest hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               <span className="relative z-10 flex items-center gap-2">
                 <ScrambleTextOnHover
