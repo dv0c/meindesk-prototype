@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useTransition } from "react"
 import { getAdminSentNotifications, sendNotification } from "@/lib/actions/notification-actions"
-import { searchUsers } from "@/lib/actions/user-actions" // I need to verify if this exists or I need to create it
+import { searchUsers } from "@/lib/actions/user-actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -23,23 +23,24 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { toast } from "sonner"
-import { Loader2, Mail, Plus, Send, Search, BellRing, Info, AlertTriangle, AlertCircle, CheckCircle } from "lucide-react"
-import { AnimatePresence, motion } from "framer-motion"
+import { Loader2, Mail, Plus, Send, Search, BellRing, Info, AlertTriangle, AlertCircle, CheckCircle, Trash2, Archive, ArchiveX, MoreVertical, Reply, Forward } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent } from "@/components/ui/card"
-import { formatDistanceToNow } from "date-fns"
+import { formatDistanceToNow, format } from "date-fns"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Separator } from "@/components/ui/separator"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { cn } from "@/lib/utils"
 
 export default function AdminNotificationsPage() {
-    const [activeTab, setActiveTab] = useState("sent")
     const [sentNotifications, setSentNotifications] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [isComposeOpen, setIsComposeOpen] = useState(false)
+    const [selectedMailId, setSelectedMailId] = useState<string | null>(null)
     const [isPending, startTransition] = useTransition()
 
     // Compose State
-    const [searchQuery, setSearchQuery] = useState("")
-    const [searchResults, setSearchResults] = useState<any[]>([])
     const [selectedUser, setSelectedUser] = useState<any>(null)
     const [title, setTitle] = useState("")
     const [message, setMessage] = useState("")
@@ -55,22 +56,12 @@ export default function AdminNotificationsPage() {
         const res = await getAdminSentNotifications()
         if (res.notifications) {
             setSentNotifications(res.notifications)
+            if (res.notifications.length > 0 && !selectedMailId) {
+                setSelectedMailId(res.notifications[0].id)
+            }
         }
         setLoading(false)
     }
-
-    // Debounced User Search would be better, but simple effect for now
-    useEffect(() => {
-        if (searchQuery.length > 2) {
-            const timer = setTimeout(async () => {
-                // I need to implement searchUsers first! 
-                // For now, I'll mock or assuming I'll fix it next step.
-                // Assuming `searchUsers(query)` exists.
-                // If not, I will create it.
-            }, 500)
-            return () => clearTimeout(timer)
-        }
-    }, [searchQuery])
 
     const handleSend = async () => {
         if (!selectedUser || !title || !message) {
@@ -102,88 +93,187 @@ export default function AdminNotificationsPage() {
         setSelectedUser(null)
         setTitle("")
         setMessage("")
-        setSearchResults([])
-        setSearchQuery("")
     }
 
+    const selectedMail = sentNotifications.find(n => n.id === selectedMailId)
+
     return (
-        <div className="flex h-[calc(100vh-80px)] overflow-hidden bg-background">
-            {/* Sidebar */}
-            <div className="w-64 border-r bg-muted/10 flex flex-col p-4 gap-2">
+        <div className="flex h-[calc(100vh-80px)] overflow-hidden bg-background rounded-lg border shadow-sm mx-4 mb-4">
+            {/* Left Sidebar (Nav) */}
+            <div className="w-[250px] border-r bg-muted/10 flex flex-col p-3 gap-2 hidden md:flex">
                 <Button
                     onClick={() => setIsComposeOpen(true)}
-                    className="w-full justify-start gap-2 mb-4"
+                    className="w-full justify-start gap-2 mb-2"
                     size="lg"
                 >
-                    <Plus className="w-4 h-4" /> Compose
+                    <Plus className="w-4 h-4" /> New Message
                 </Button>
 
                 <div className="space-y-1">
-                    <Button
-                        variant={activeTab === 'sent' ? 'secondary' : 'ghost'}
-                        className="w-full justify-start"
-                        onClick={() => setActiveTab('sent')}
-                    >
-                        <Send className="w-4 h-4 mr-2" /> Sent Messages
+                    <Button variant="secondary" className="w-full justify-start font-medium">
+                        <Send className="w-4 h-4 mr-2" /> Sent
+                        <span className="ml-auto text-xs text-muted-foreground">{sentNotifications.length}</span>
                     </Button>
-                    {/* Future: System Alerts, etc */}
+                    <Button variant="ghost" className="w-full justify-start font-normal text-muted-foreground">
+                        <Archive className="w-4 h-4 mr-2" /> Archived
+                    </Button>
+                    <Button variant="ghost" className="w-full justify-start font-normal text-muted-foreground">
+                        <Trash2 className="w-4 h-4 mr-2" /> Trash
+                    </Button>
                 </div>
             </div>
 
-            {/* Main Content */}
-            <div className="flex-1 flex flex-col overflow-hidden">
-                <div className="p-4 border-b flex justify-between items-center">
-                    <h2 className="text-xl font-semibold">
-                        {activeTab === 'sent' ? 'Sent Notifications' : 'Inbox'}
-                    </h2>
-                    <Button variant="ghost" size="icon" onClick={loadNotifications}>
-                        <Loader2 className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                    </Button>
+            {/* Middle: Mail List */}
+            <div className="flex-1 md:max-w-[350px] border-r flex flex-col min-w-0">
+                <div className="p-4 border-b">
+                    <div className="relative">
+                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input placeholder="Search messages..." className="pl-8" />
+                    </div>
                 </div>
-
-                <div className="flex-1 overflow-y-auto p-4 space-y-2">
+                <ScrollArea className="flex-1">
                     {loading ? (
-                        <div className="flex justify-center p-10"><Loader2 className="animate-spin text-muted-foreground" /></div>
-                    ) : sentNotifications.length === 0 ? (
-                        <div className="text-center text-muted-foreground p-10">No notifications found</div>
+                        <div className="p-8 flex justify-center"><Loader2 className="animate-spin text-muted-foreground" /></div>
                     ) : (
-                        sentNotifications.map(n => (
-                            <Card key={n.id} className="hover:bg-muted/50 transition-colors">
-                                <CardContent className="p-4 flex gap-4 items-start">
-                                    <div className={`p-2 rounded-full ${getTypeColor(n.type)}`}>
-                                        {getTypeIcon(n.type)}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex justify-between items-start">
-                                            <h4 className="font-semibold truncate">{n.title}</h4>
-                                            <span className="text-xs text-muted-foreground whitespace-nowrap ml-2">
-                                                {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
-                                            </span>
-                                        </div>
-                                        <p className="text-sm text-foreground/80 line-clamp-2 my-1">{n.message}</p>
-                                        <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-                                            <div className="flex items-center gap-1">
-                                                <Avatar className="w-4 h-4">
-                                                    <AvatarImage src={n.user?.image} />
-                                                    <AvatarFallback>{n.user?.name?.[0]}</AvatarFallback>
-                                                </Avatar>
-                                                To: {n.user?.name || n.user?.email || "Unknown User"}
+                        <div className="flex flex-col gap-1 p-2">
+                            {sentNotifications.map((item) => (
+                                <button
+                                    key={item.id}
+                                    className={cn(
+                                        "flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent",
+                                        selectedMailId === item.id && "bg-accent"
+                                    )}
+                                    onClick={() => setSelectedMailId(item.id)}
+                                >
+                                    <div className="flex w-full flex-col gap-1">
+                                        <div className="flex items-center">
+                                            <div className="flex items-center gap-2">
+                                                <div className="font-semibold">{item.user?.name || "Unknown"}</div>
+                                                {!item.read && (
+                                                    <span className="flex h-2 w-2 rounded-full bg-blue-600" />
+                                                )}
                                             </div>
-                                            {n.read ? (
-                                                <Badge variant="outline" className="text-green-600 border-green-200 bg-green-50">Read</Badge>
-                                            ) : (
-                                                <Badge variant="outline">Unread</Badge>
-                                            )}
+                                            <div className={cn(
+                                                "ml-auto text-xs",
+                                                selectedMailId === item.id ? "text-foreground" : "text-muted-foreground"
+                                            )}>
+                                                {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
+                                            </div>
                                         </div>
+                                        <div className="text-xs font-medium">{item.title}</div>
                                     </div>
-                                </CardContent>
-                            </Card>
-                        ))
+                                    <div className="line-clamp-2 text-xs text-muted-foreground w-full">
+                                        {item.message.substring(0, 300)}
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Badge variant={getBadgeVariant(item.type)} className="text-[10px] px-1 py-0 h-5">
+                                            {item.type}
+                                        </Badge>
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
                     )}
-                </div>
+                </ScrollArea>
             </div>
 
-            {/* Compose Modal */}
+            {/* Right: Reading Pane */}
+            <div className="flex-1 flex flex-col min-w-0 bg-background/50">
+                {selectedMail ? (
+                    <div className="flex flex-col h-full">
+                        {/* Toolbar */}
+                        <div className="flex items-center p-2 border-b gap-2">
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button variant="ghost" size="icon" disabled>
+                                            <Archive className="h-4 w-4" />
+                                            <span className="sr-only">Archive</span>
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>Archive</TooltipContent>
+                                </Tooltip>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button variant="ghost" size="icon" disabled>
+                                            <Trash2 className="h-4 w-4" />
+                                            <span className="sr-only">Move to trash</span>
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>Move to trash</TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                            <div className="ml-auto flex items-center gap-2">
+                                <Separator orientation="vertical" className="mx-1 h-6" />
+                                <Avatar className="h-8 w-8">
+                                    <AvatarImage src={selectedMail.sender?.image} />
+                                    <AvatarFallback>{selectedMail.sender?.name?.[0] || "A"}</AvatarFallback>
+                                </Avatar>
+                            </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1 flex flex-col overflow-y-auto">
+                            <div className="p-8 border-b">
+                                <div className="flex items-start justify-between">
+                                    <div className="grid gap-1">
+                                        <h1 className="font-semibold text-xl">{selectedMail.title}</h1>
+                                        <div className="flex items-center gap-2 text-sm">
+                                            <span className="font-medium text-muted-foreground">To:</span>
+                                            <span>{selectedMail.user?.name} &lt;{selectedMail.user?.email}&gt;</span>
+                                        </div>
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">
+                                        {format(new Date(selectedMail.createdAt), "PPpp")}
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="p-8 text-sm leading-relaxed whitespace-pre-wrap">
+                                {selectedMail.message}
+                            </div>
+                            {selectedMail.link && (
+                                <div className="p-8 pt-0">
+                                    <div className="p-4 rounded-md bg-muted/20 border flex items-center gap-3">
+                                        <div className="bg-background p-2 rounded-md border shadow-sm">
+                                            <Info className="w-5 h-5 text-blue-500" />
+                                        </div>
+                                        <div className="flex-1 space-y-1">
+                                            <p className="text-sm font-medium">Attached Link</p>
+                                            <a href={selectedMail.link} target="_blank" rel="noreferrer" className="text-xs text-blue-500 hover:underline break-all">
+                                                {selectedMail.link}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Footer / Reply Area Placeholder */}
+                        <div className="p-4 border-t bg-muted/5">
+                            <form>
+                                <div className="grid gap-4">
+                                    <Textarea className="p-4 min-h-[100px]" placeholder={`Reply to ${selectedMail.user?.name}... (Simulated)`} disabled />
+                                    <div className="flex items-center justify-between">
+                                        <Label htmlFor="mute" className="flex items-center gap-2 text-xs font-normal">
+
+                                        </Label>
+                                        <Button size="sm" className="ml-auto" disabled>
+                                            Send
+                                        </Button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="p-8 text-center text-muted-foreground m-auto">
+                        <Mail className="w-12 h-12 mx-auto mb-4 text-muted-foreground/20" />
+                        <h3 className="text-lg font-medium">No message selected</h3>
+                        <p className="text-sm">Select a message from the list to view details.</p>
+                    </div>
+                )}
+            </div>
+
             <UserSearchDialog
                 open={isComposeOpen}
                 onOpenChange={setIsComposeOpen}
@@ -204,6 +294,15 @@ export default function AdminNotificationsPage() {
     )
 }
 
+function getBadgeVariant(type: string): any {
+    switch (type) {
+        case "WARNING": return "destructive"
+        case "ERROR": return "destructive"
+        case "SUCCESS": return "default" // or a custom success variant if strictly typed
+        default: return "secondary"
+    }
+}
+
 function UserSearchDialog({
     open, onOpenChange, selectedUser, setSelectedUser,
     title, setTitle, message, setMessage, type, setType, link, setLink,
@@ -220,8 +319,6 @@ function UserSearchDialog({
         }
     }, [open])
 
-    // Mock Search Implementation for V1 until action exists
-    // I really should implement the action fast.
     const handleSearch = async (val: string) => {
         setQuery(val)
         if (val.length < 2) return
@@ -347,48 +444,5 @@ function UserSearchDialog({
                 </div>
             </DialogContent>
         </Dialog>
-    )
-}
-
-function getTypeColor(type: string) {
-    switch (type) {
-        case "WARNING": return "bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400"
-        case "ERROR": return "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400"
-        case "SUCCESS": return "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400"
-        case "PROMO": return "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400"
-        default: return "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
-    }
-}
-
-function getTypeIcon(type: string) {
-    switch (type) {
-        case "WARNING": return <AlertTriangle className="w-5 h-5" />
-        case "ERROR": return <AlertCircle className="w-5 h-5" />
-        case "SUCCESS": return <CheckCircle className="w-5 h-5" />
-        case "PROMO": return <SparklesIcon className="w-5 h-5" />
-        default: return <Info className="w-5 h-5" />
-    }
-}
-
-function SparklesIcon(props: any) {
-    return (
-        <svg
-            {...props}
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        >
-            <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .962L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
-            <path d="M20 3v4" />
-            <path d="M22 5h-4" />
-            <path d="M4 17v2" />
-            <path d="M5 18H3" />
-        </svg>
     )
 }
