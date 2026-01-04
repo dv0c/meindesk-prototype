@@ -1,0 +1,138 @@
+{
+  "name": "PrismaClientValidationError",
+  "clientVersion": "6.19.0"
+}
+
+Invalid `prisma.page.create()` invocation in
+C:\Users\tasos\Documents\Projects\meindesk-prototype\scripts\seed-demo.ts:218:23
+
+  215 }
+  216 
+  217 // 1. Authors List Page (/authors)
+→ 218 await prisma.page.create({
+        data: {
+          siteId: "695a974c885921fe0b920ea5",
+          title: "Authors Directory",
+          slug: "authors",
+          status: "PUBLISHED",
+          layout: {
+            ROOT: {
+              type: {
+                resolvedName: "Container"
+              },
+              isCanvas: true,
+              props: {
+                width: "100%",
+                height: "100vh",
+                className: "bg-background text-foreground min-h-screen p-8"
+              },
+              displayName: "App",
+              custom: {
+                displayName: "App"
+              },
+              hidden: false,
+              nodes: [
+                "heading-node",
+                "list-node"
+              ],
+              linkedNodes: {}
+            },
+            heading-node: {
+              type: {
+                resolvedName: "Text"
+              },
+              props: {
+                text: "Featured Authors",
+                tagName: "h1",
+                className: "text-4xl font-bold mb-8 font-[var(--font-bebas)]"
+              },
+              parent: "ROOT"
+            },
+            list-node: {
+              type: {
+                resolvedName: "CollectionList"
+              },
+              props: {
+                collectionId: "695a974c885921fe0b920ea6",
+                layoutType: "cards",
+                itemsPerPage: 9,
+                className: "gap-6"
+              },
+              parent: "ROOT"
+            },
+      +     set: Json[]
+          }
+        }
+      })
+
+Argument `set` is missing.
+PrismaClientValidationError: 
+Invalid `prisma.page.create()` invocation in
+C:\Users\tasos\Documents\Projects\meindesk-prototype\scripts\seed-demo.ts:218:23
+
+  215 }
+  216 
+  217 // 1. Authors List Page (/authors)
+→ 218 await prisma.page.create({
+        data: {
+          siteId: "695a974c885921fe0b920ea5",
+          title: "Authors Directory",
+          slug: "authors",
+          status: "PUBLISHED",
+          layout: {
+            ROOT: {
+              type: {
+                resolvedName: "Container"
+              },
+              isCanvas: true,
+              props: {
+                width: "100%",
+                height: "100vh",
+                className: "bg-background text-foreground min-h-screen p-8"
+              },
+              displayName: "App",
+              custom: {
+                displayName: "App"
+              },
+              hidden: false,
+              nodes: [
+                "heading-node",
+                "list-node"
+              ],
+              linkedNodes: {}
+            },
+            heading-node: {
+              type: {
+                resolvedName: "Text"
+              },
+              props: {
+                text: "Featured Authors",
+                tagName: "h1",
+                className: "text-4xl font-bold mb-8 font-[var(--font-bebas)]"
+              },
+              parent: "ROOT"
+            },
+            list-node: {
+              type: {
+                resolvedName: "CollectionList"
+              },
+              props: {
+                collectionId: "695a974c885921fe0b920ea6",
+                layoutType: "cards",
+                itemsPerPage: 9,
+                className: "gap-6"
+              },
+              parent: "ROOT"
+            },
+      +     set: Json[]
+          }
+        }
+      })
+
+Argument `set` is missing.
+    at Nn (C:\Users\tasos\Documents\Projects\meindesk-prototype\src\generated\client\runtime\library.js:33:1363)
+    at ei.handleRequestError (C:\Users\tasos\Documents\Projects\meindesk-prototype\src\generated\client\runtime\library.js:125:6911)
+    at ei.handleAndLogRequestError (C:\Users\tasos\Documents\Projects\meindesk-prototype\src\generated\client\runtime\library.js:125:6593)
+    at ei.request (C:\Users\tasos\Documents\Projects\meindesk-prototype\src\generated\client\runtime\library.js:125:6300)
+    at async a (C:\Users\tasos\Documents\Projects\meindesk-prototype\src\generated\client\runtime\library.js:134:9551)
+    at async main (C:\Users\tasos\Documents\Projects\meindesk-prototype\scripts\seed-demo.ts:218:5)

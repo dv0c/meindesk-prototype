@@ -22,6 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { toast } from "sonner"
 
 import { useTeam } from "@/hooks/useTeam"
@@ -42,6 +43,7 @@ export function PagesTable() {
   const team = useTeam().team
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("ALL")
+  const [activeTab, setActiveTab] = useState("pages")
   const [currentPage, setCurrentPage] = useState(1)
   const { pages, getPages, deletePage, loading } = usePages()
 
@@ -55,13 +57,21 @@ export function PagesTable() {
   const filteredPages = useMemo(() => {
     if (!pages) return []
     return pages.filter((page: any) => {
+      // Search Filter
       const matchesSearch =
         page.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         page.slug?.toLowerCase().includes(searchQuery.toLowerCase())
+
+      // Status Filter
       const matchesStatus = statusFilter === "ALL" || page.status === statusFilter
-      return matchesSearch && matchesStatus
+
+      // Tab Filter (Pages vs Templates)
+      const isTemplate = page.meta?.isTemplate || page.slug?.endsWith("-template")
+      const matchesTab = activeTab === "templates" ? isTemplate : !isTemplate
+
+      return matchesSearch && matchesStatus && matchesTab
     })
-  }, [pages, searchQuery, statusFilter])
+  }, [pages, searchQuery, statusFilter, activeTab])
 
   const totalPages = Math.ceil(filteredPages.length / ITEMS_PER_PAGE)
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
@@ -178,8 +188,16 @@ export function PagesTable() {
               <SelectItem value="DRAFT">Draft</SelectItem>
               <SelectItem value="ARCHIVED">Archived</SelectItem>
             </SelectContent>
+
           </Select>
         </div>
+
+        <Tabs defaultValue="pages" onValueChange={setActiveTab} className="w-full">
+          <TabsList>
+            <TabsTrigger value="pages">Pages</TabsTrigger>
+            <TabsTrigger value="templates">Templates</TabsTrigger>
+          </TabsList>
+        </Tabs>
 
         <div className="rounded-lg border border-border bg-card overflow-hidden">
           <Table>

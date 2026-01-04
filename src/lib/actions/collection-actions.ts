@@ -46,7 +46,130 @@ export async function createCollection(data: z.infer<typeof CreateCollectionSche
             }
         })
 
+        // -- AUTOMATED PAGE CREATION --
+        // Automatically create List Page and Detail Template Page to improve UX
+
+        const listPageSlug = slug
+        const detailPageSlug = `${slug}-template`
+
+        // check if pages exist
+        const listPageExists = await db.page.findFirst({ where: { siteId, slug: listPageSlug } })
+        const detailPageExists = await db.page.findFirst({ where: { siteId, slug: detailPageSlug } })
+
+        const userId = session.user.id
+
+        // 1. Create List Page (if not exists)
+        if (!listPageExists) {
+            const listLayout = {
+                "ROOT": {
+                    "type": { "resolvedName": "Container" },
+                    "isCanvas": true,
+                    "props": {
+                        "background": "bg-background",
+                        "padding": "p-8",
+                        "width": "100%",
+                        "height": "min-h-screen",
+                        "flexDirection": "column",
+                        "alignItems": "flex-start",
+                        "justifyContent": "flex-start",
+                        "gap": 0
+                    },
+                    "displayName": "App",
+                    "custom": { "displayName": "App" },
+                    "hidden": false,
+                    "nodes": ["list-node"],
+                    "linkedNodes": {}
+                },
+                "list-node": {
+                    "type": { "resolvedName": "CollectionList" },
+                    "isCanvas": false,
+                    "props": {
+                        "collectionId": collection.id,
+                        "layout": "grid",
+                        "columns": 3,
+                        "limit": 12,
+                        "showImage": true,
+                        "linkToDetail": true
+                    },
+                    "displayName": "Collection List",
+                    "custom": { "displayName": "Collection List" },
+                    "parent": "ROOT",
+                    "hidden": false,
+                    "nodes": [],
+                    "linkedNodes": {}
+                }
+            }
+
+            await db.page.create({
+                data: {
+                    title: name,
+                    slug: listPageSlug,
+                    siteId,
+                    userId,
+                    status: "PUBLISHED", // Auto-publish for immediate feedback? Or DRAFT? Let's go DRAFT to be safe.
+                    layout: [listLayout] as any,
+                }
+            })
+        }
+
+        // 2. Create Detail Template Page (if not exists)
+        if (!detailPageExists) {
+            const detailLayout = {
+                "ROOT": {
+                    "type": { "resolvedName": "Container" },
+                    "isCanvas": true,
+                    "props": {
+                        "background": "bg-background",
+                        "padding": "p-0",
+                        "width": "100%",
+                        "height": "min-h-screen",
+                        "flexDirection": "column",
+                        "alignItems": "flex-start",
+                        "justifyContent": "flex-start",
+                        "gap": 0
+                    },
+                    "displayName": "App",
+                    "custom": { "displayName": "App" },
+                    "hidden": false,
+                    "nodes": ["detail-node"],
+                    "linkedNodes": {}
+                },
+                "detail-node": {
+                    "type": { "resolvedName": "CollectionItem" },
+                    "isCanvas": false,
+                    "props": {
+                        "collectionId": collection.id,
+                        "useSlugFromUrl": true,
+                        "layout": "hero",
+                        "showImage": true,
+                        "showAllFields": true
+                    },
+                    "displayName": "Collection Item",
+                    "custom": { "displayName": "Collection Item" },
+                    "parent": "ROOT",
+                    "hidden": false,
+                    "nodes": [],
+                    "linkedNodes": {}
+                }
+            }
+
+            await db.page.create({
+                data: {
+                    title: `${name} Detail`,
+                    slug: detailPageSlug,
+                    siteId,
+                    userId,
+                    status: "PUBLISHED",
+                    layout: [detailLayout] as any,
+                    meta: { isTemplate: true }
+                }
+            })
+        }
+
         revalidatePath(`/dashboard/${siteId}/collections`)
+        // Also revalidate pages list so users see them immediately
+        revalidatePath(`/dashboard/${siteId}/projects/website`)
+
         return { success: true, collection }
     } catch (error: any) {
         console.error("Create Collection Error:", error)

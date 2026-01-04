@@ -23,6 +23,7 @@ import {
     User,
     Calendar,
     Tag,
+    Database,
 } from 'lucide-react'
 
 // Import all components
@@ -59,6 +60,8 @@ import {
     FooterInfo,
 } from './themes/Meindesk'
 import { MeindeskContainer } from './themes/Meindesk/MeindeskContainer'
+import { CollectionList, CollectionItem, CollectionField, RelatedItems, CollectionContainer } from './collections'
+import { Link2 } from 'lucide-react'
 
 /**
  * Component metadata interface
@@ -299,6 +302,44 @@ export const componentRegistry: ComponentRegistration[] = [
         category: 'Meindesk Theme',
         description: 'Multi-column footer with links',
         icon: <Navigation className="h-5 w-5" />,
+    },
+
+    // Collection Components - Dynamic content from user collections
+    {
+        name: 'CollectionList',
+        component: CollectionList,
+        category: 'Collections',
+        description: 'Display items from any collection',
+        icon: <Database className="h-5 w-5" />,
+    },
+    {
+        name: 'CollectionItem',
+        component: CollectionItem,
+        category: 'Collections',
+        description: 'Display a single collection item',
+        icon: <FileText className="h-5 w-5" />,
+    },
+    {
+        name: 'CollectionField',
+        component: CollectionField,
+        category: 'Collections',
+        description: 'Display a single field value',
+        icon: <Type className="h-5 w-5" />,
+    },
+    {
+        name: 'RelatedItems',
+        component: RelatedItems,
+        category: 'Collections',
+        description: 'Show items that reference current item',
+        icon: <Link2 className="h-5 w-5" />,
+    },
+    {
+        name: 'CollectionContainer',
+        component: CollectionContainer,
+        category: 'Collections',
+        description: 'Data Wrapper for Fields',
+        icon: <Box className="h-5 w-5" />,
+        isContainer: true,
     },
 
 ]

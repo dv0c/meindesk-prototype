@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
-import { Plus, Trash2, GripVertical, CheckCircle2, Link as LinkIcon, Database } from "lucide-react"
+import { Plus, Trash2, GripVertical, CheckCircle2, Link as LinkIcon, Database, FileText, User, ShoppingBag, Calendar, Book, Box } from "lucide-react"
 import { motion, AnimatePresence, Reorder, useDragControls } from "framer-motion"
 import { cn } from "@/lib/utils"
 // Import Setup components
@@ -45,22 +45,123 @@ interface CollectionWizardProps {
     backCheckPath?: string // Where to go back on step 0
 }
 
+const PRESETS = [
+    {
+        id: "blank",
+        title: "Blank Protocol",
+        icon: Database,
+        desc: "Custom Structure",
+        fields: []
+    },
+    {
+        id: "authors",
+        title: "Authors",
+        icon: User,
+        desc: "Bio & Identity",
+        fields: [
+            { name: "name", label: "Full Name", type: "text", required: true },
+            { name: "bio", label: "Biography", type: "richtext", required: false },
+            { name: "photo", label: "Headshot", type: "image", required: false }
+        ]
+    },
+    {
+        id: "books",
+        title: "Books",
+        icon: Book,
+        desc: "Literature DB",
+        fields: [
+            { name: "title", label: "Book Title", type: "text", required: true },
+            { name: "author", label: "Author", type: "text", required: true },
+            { name: "cover", label: "Cover Art", type: "image", required: false },
+            { name: "summary", label: "Summary", type: "richtext", required: false },
+            { name: "isbn", label: "ISBN", type: "text", required: false }
+        ]
+    },
+    {
+        id: "blog",
+        title: "Articles",
+        icon: FileText,
+        desc: "Editorial Content",
+        fields: [
+            { name: "title", label: "Post Title", type: "text", required: true },
+            { name: "content", label: "Content", type: "richtext", required: true },
+            { name: "cover", label: "Cover Image", type: "image", required: false },
+            { name: "published_at", label: "Publish Date", type: "date", required: true },
+            { name: "tags", label: "Tags", type: "text", required: false }
+        ]
+    },
+    {
+        id: "products",
+        title: "Products",
+        icon: ShoppingBag,
+        desc: "Commerce Items",
+        fields: [
+            { name: "name", label: "Product Name", type: "text", required: true },
+            { name: "price", label: "Price", type: "number", required: true },
+            { name: "description", label: "Description", type: "richtext", required: false },
+            { name: "image", label: "Product Image", type: "image", required: true },
+            { name: "in_stock", label: "In Stock", type: "boolean", required: true }
+        ]
+    },
+    {
+        id: "events",
+        title: "Events",
+        icon: Calendar,
+        desc: "Timeline Data",
+        fields: [
+            { name: "title", label: "Event Title", type: "text", required: true },
+            { name: "date", label: "Event Date", type: "date", required: true },
+            { name: "location", label: "Location", type: "text", required: false },
+            { name: "description", label: "Details", type: "richtext", required: false }
+        ]
+    }
+]
+
 export function CollectionWizard({ onComplete, existingCollections = [], mode = 'create', initialData, onDelete, backCheckPath }: CollectionWizardProps) {
     const router = useRouter()
     const params = useParams()
-    const [step, setStep] = useState(mode === 'edit' ? 2 : 1) // In edit mode start at schema
+
+    // Step management: 0 = Preset Selection (Create only), 1 = Identity, 2 = Schema, 3 = Review
+    const [step, setStep] = useState(mode === 'edit' ? 2 : 0)
     const totalSteps = 3
+    const [selectedPreset, setSelectedPreset] = useState("blank")
 
     // Form Data
     const [name, setName] = useState(initialData?.name || "")
     const [description, setDescription] = useState(initialData?.description || "")
+    const [createPages, setCreatePages] = useState(true)
 
-    // Initialize fields. If edit mode, map existing fields to include an internal ID
+    // Initialize fields
     const [fields, setFields] = useState<FieldDefinition[]>(
         initialData?.fields ?
             initialData.fields.map((f: any) => ({ ...f, id: Math.random().toString(), options: Array.isArray(f.options) ? f.options.join(', ') : f.options })) :
-            [{ id: "1", name: "title", label: "Title", type: "text", required: true }]
+            [{ id: "1", name: "title", label: "Title", type: "text", required: true }] // Default for blank
     )
+
+    // Apply preset
+    const applyPreset = (presetId: string) => {
+        setSelectedPreset(presetId)
+        const preset = PRESETS.find(p => p.id === presetId)
+        if (preset) {
+            // If not blank, pre-fill name if empty
+            if (presetId !== 'blank') {
+                if (!name) setName(preset.title)
+                if (!description) setDescription(preset.desc)
+
+                // Map preset fields
+                const newFields: FieldDefinition[] = preset.fields.map(f => ({
+                    ...f,
+                    id: crypto.randomUUID(),
+                    type: f.type as FieldType,
+                    required: f.required
+                }))
+                setFields(newFields)
+            } else {
+                // Reset to default for blank
+                setFields([{ id: crypto.randomUUID(), name: "title", label: "Title", type: "text", required: true }])
+            }
+        }
+    }
 
     // Field Logic
     const addField = () => {
@@ -96,6 +197,7 @@ export function CollectionWizard({ onComplete, existingCollections = [], mode = 
     }
 
     const canProceed = () => {
+        if (step === 0) return !!selectedPreset
         if (step === 1) return !!name.trim()
         if (step === 2) return fields.every(f => f.name && f.label)
         return true
@@ -109,10 +211,11 @@ export function CollectionWizard({ onComplete, existingCollections = [], mode = 
                 label: f.label,
                 type: f.type,
                 required: f.required,
-                options: f.type === 'select' && f.options ? f.options.split(',').map(s => s.trim()) : undefined,
+                options: f.type === 'select' && f.options ? f.options.split(',').map(s => s.trim()).filter(Boolean) : undefined,
                 relatedCollectionId: f.type === 'relation' ? f.relatedCollectionId : undefined,
                 relationType: f.type === 'relation' ? f.relationType : undefined
-            }))
+            })),
+            createPages // Pass this flag to the action
         })
     }
 
@@ -148,6 +251,56 @@ export function CollectionWizard({ onComplete, existingCollections = [], mode = 
             <main className="flex-1 overflow-y-auto relative z-10 px-4 py-8 md:px-6 md:py-12">
                 <div className="max-w-4xl mx-auto flex flex-col items-center">
                     <AnimatePresence mode="wait">
+
+                        {/* Step 0: Archetype Selection (Create Mode Only) */}
+                        {step === 0 && mode === 'create' && (
+                            <motion.div
+                                key="step0"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                className="w-full"
+                            >
+                                <h1 className="font-[var(--font-bebas)] text-3xl md:text-5xl text-center mb-4 tracking-wide text-foreground/80">
+                                    SELECT DATA ARCHETYPE
+                                </h1>
+                                <p className="text-center font-mono text-[10px] md:text-xs uppercase tracking-[0.2em] text-muted-foreground mb-8 md:mb-16">
+                                    // Initialize structure from template
+                                </p>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 w-full">
+                                    {PRESETS.map((preset) => (
+                                        <button
+                                            key={preset.id}
+                                            onClick={() => applyPreset(preset.id)}
+                                            className={cn(
+                                                "group relative h-32 md:h-40 flex flex-col items-center justify-center gap-4 border transition-all duration-300",
+                                                selectedPreset === preset.id
+                                                    ? "border-foreground bg-foreground/5"
+                                                    : "border-foreground/20 hover:border-foreground/50 hover:bg-foreground/[0.02]"
+                                            )}
+                                        >
+                                            {/* Corner Markers */}
+                                            <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-foreground/20 transition-all group-hover:w-4 group-hover:h-4 group-hover:border-foreground/40" />
+                                            <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-foreground/20 transition-all group-hover:w-4 group-hover:h-4 group-hover:border-foreground/40" />
+                                            <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-foreground/20 transition-all group-hover:w-4 group-hover:h-4 group-hover:border-foreground/40" />
+                                            <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-foreground/20 transition-all group-hover:w-4 group-hover:h-4 group-hover:border-foreground/40" />
+
+                                            <preset.icon className="w-6 h-6 md:w-8 md:h-8 stroke-1 text-foreground/70 group-hover:text-foreground transition-colors" />
+                                            <div className="text-center">
+                                                <div className="font-mono text-xs md:text-sm uppercase tracking-widest mb-1 group-hover:text-foreground transition-colors">
+                                                    <ScrambleTextOnHover text={preset.title} duration={0.3} />
+                                                </div>
+                                                <div className="text-[9px] md:text-[10px] text-muted-foreground uppercase tracking-wide opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    {preset.desc}
+                                                </div>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            </motion.div>
+                        )}
+
 
                         {/* Step 1: Identity */}
                         {step === 1 && (
@@ -281,6 +434,16 @@ export function CollectionWizard({ onComplete, existingCollections = [], mode = 
                                         ))}
                                     </div>
 
+                                    <div className="flex items-center justify-between p-3 border border-foreground/10 bg-foreground/5">
+                                        <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                                            Auto-Generate Pages
+                                        </div>
+                                        <Switch
+                                            checked={createPages}
+                                            onCheckedChange={setCreatePages}
+                                        />
+                                    </div>
+
                                     <div className="flex items-center gap-2 text-green-500/80 text-xs font-mono border p-2 border-green-500/20 bg-green-500/5">
                                         <CheckCircle2 className="w-4 h-4" />
                                         <span>CONFIGURATION VALID. READY FOR DEPLOYMENT.</span>
@@ -302,12 +465,12 @@ export function CollectionWizard({ onComplete, existingCollections = [], mode = 
                         </div>
                         {/* Industrial Steps Visualization */}
                         <div className="hidden sm:flex gap-1">
-                            {Array.from({ length: totalSteps }).map((_, i) => (
+                            {Array.from({ length: totalSteps + 1 }).map((_, i) => (
                                 <div
                                     key={i}
                                     className={cn(
                                         "w-8 h-1 transition-all duration-300",
-                                        i + 1 <= step ? "bg-foreground" : "bg-foreground/10"
+                                        i <= step ? "bg-foreground" : "bg-foreground/10"
                                     )}
                                 />
                             ))}
@@ -326,11 +489,11 @@ export function CollectionWizard({ onComplete, existingCollections = [], mode = 
 
                         <Button
                             variant="ghost"
-                            onClick={() => setStep(s => Math.max(1, s - 1))}
-                            disabled={step === 1}
+                            onClick={() => setStep(s => Math.max(mode === 'create' ? 0 : 1, s - 1))}
+                            disabled={step === (mode === 'create' ? 0 : 1)}
                             className={cn(
                                 "font-mono text-xs uppercase tracking-widest hover:bg-transparent hover:text-foreground/60 rounded-none px-4",
-                                step === 1 && "invisible"
+                                step === (mode === 'create' ? 0 : 1) && "invisible"
                             )}
                         >
                             <span className="mr-2 text-xs">{"<"}</span>
@@ -395,7 +558,7 @@ function DragItemContent({ field, updateField, handleLabelChange, availableColle
                         <SelectTrigger className="h-8 bg-background/50 border-foreground/10 text-xs">
                             <SelectValue />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="z-[60]">
                             <SelectItem value="text">Text</SelectItem>
                             <SelectItem value="richtext">Rich Text</SelectItem>
                             <SelectItem value="number">Number</SelectItem>
@@ -449,7 +612,7 @@ function DragItemContent({ field, updateField, handleLabelChange, availableColle
                                     <SelectTrigger className="h-8 bg-background/50 border-foreground/10 text-xs">
                                         <SelectValue placeholder="Select collection..." />
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent className="z-[60]">
                                         {availableCollections.map(c => (
                                             <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                                         ))}
@@ -459,17 +622,56 @@ function DragItemContent({ field, updateField, handleLabelChange, availableColle
                         </div>
                     </div>
                 )}
+
+                {/* Dropdown Options (List Style) */}
+                {field.type === 'select' && (
+                    <div className="md:col-span-12 space-y-3 pt-2">
+                        <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Options</Label>
+                        <div className="space-y-2">
+                            {(field.options !== undefined ? field.options.split(',').map(s => s.trim()) : []).map((opt, idx) => (
+                                <div key={idx} className="flex items-center gap-2 group/opt">
+                                    <div className="flex-1 relative">
+                                        <Input
+                                            value={opt}
+                                            onChange={(e) => {
+                                                const currentOpts = field.options !== undefined ? field.options.split(',').map(s => s.trim()) : []
+                                                currentOpts[idx] = e.target.value
+                                                updateField(field.id, { options: currentOpts.join(', ') })
+                                            }}
+                                            className="h-9 bg-background/50 border-foreground/10 text-xs font-mono"
+                                            placeholder={`Option ${idx + 1}`}
+                                        />
+                                    </div>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => {
+                                            const currentOpts = field.options !== undefined ? field.options.split(',').map(s => s.trim()) : []
+                                            const newOpts = currentOpts.filter((_, i) => i !== idx).join(', ')
+                                            updateField(field.id, { options: newOpts })
+                                        }}
+                                        className="h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                </div>
+                            ))}
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                    const currentOpts = field.options !== undefined ? field.options.split(',').map(s => s.trim()) : []
+                                    const newOpts = [...currentOpts, ""].join(', ')
+                                    updateField(field.id, { options: newOpts })
+                                }}
+                                className="w-full border-dashed border-foreground/20 hover:border-foreground/40 hover:bg-foreground/5 h-9 text-xs uppercase tracking-widest text-muted-foreground"
+                            >
+                                <Plus className="w-3 h-3 mr-2" /> Add Option
+                            </Button>
+                        </div>
+                    </div>
+                )}
             </div>
-            {field.type === 'select' && (
-                <div className="w-full mt-2 pl-8">
-                    <Input
-                        placeholder="Option 1, Option 2, Option 3"
-                        value={field.options || ""}
-                        onChange={e => updateField(field.id, { options: e.target.value })}
-                        className="bg-background/50 border-foreground/10 h-8 text-xs font-mono"
-                    />
-                </div>
-            )}
         </div>
     )
 }

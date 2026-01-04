@@ -36,7 +36,7 @@ import { CSS } from "@dnd-kit/utilities"
 export interface PropConfig {
     label: string
     description?: string
-    type?: 'text' | 'number' | 'textarea' | 'color' | 'select' | 'checkbox' | 'media' | 'slider' | 'array' | 'richtext'
+    type?: 'text' | 'number' | 'textarea' | 'color' | 'select' | 'checkbox' | 'media' | 'slider' | 'array' | 'richtext' | 'collection-select' | 'collection-field-select'
     placeholder?: string
     options?: { label: string; value: string | number }[]
     min?: number
@@ -105,11 +105,12 @@ export function generateSettings<P extends Record<string, any>>(
     defaultProps?: Partial<P>
 ) {
     const GeneratedSettings = () => {
-        const { actions, selectedId, nodeProps } = useEditor((state) => {
+        const { actions, selectedId, nodeProps, nodes } = useEditor((state) => {
             const [currentId] = state.events.selected
             return {
                 selectedId: currentId,
                 nodeProps: currentId ? state.nodes[currentId].data.props : null,
+                nodes: state.nodes, // Expose nodes for traversal
                 actions: state.actions
             }
         })
@@ -126,6 +127,27 @@ export function generateSettings<P extends Record<string, any>>(
         const siteId = params?.siteId as string
         const [isDialogOpen, setIsDialogOpen] = useState(false)
         const [currentMediaProp, setCurrentMediaProp] = useState<string>('')
+        const [collections, setCollections] = useState<{ id: string; name: string; fields: any }[]>([])
+        const [collectionsLoading, setCollectionsLoading] = useState(false)
+
+        // Load collections for collection-select fields
+        React.useEffect(() => {
+            const hasCollectionSelect = Object.values(config).some(c =>
+                typeof c === 'object' && (c.type === 'collection-select' || c.type === 'collection-field-select')
+            )
+            if (hasCollectionSelect && siteId && collections.length === 0) {
+                setCollectionsLoading(true)
+                fetch(`/api/dashboard/${siteId}/collections`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.collections) {
+                            setCollections(data.collections)
+                        }
+                    })
+                    .catch(console.error)
+                    .finally(() => setCollectionsLoading(false))
+            }
+        }, [siteId])
 
         const handleMediaSelect = (items: MediaItem[]) => {
             if (items.length > 0 && currentMediaProp) {
@@ -158,6 +180,33 @@ export function generateSettings<P extends Record<string, any>>(
                 defaultCollapsed: normalized.defaultCollapsed
             })
         })
+
+        // Helper to find parent with collectionId
+        const findParentCollectionId = (nodeId: string): string | undefined => {
+            let currentId = nodeId
+            // Limit depth to avoid infinite loops (though strictly explicit parent refs prevent loops)
+            let depth = 0
+            while (currentId && currentId !== 'ROOT' && depth < 50) {
+                const node = nodes[currentId]
+                if (!node) {
+                    break
+                }
+
+                // Check if this node has a collectionId prop
+                // Note: CollectionItem passing dynamic ID via helper might be an issue if we need raw UUID
+                // But usually collectionId prop is what we want
+                if (node.data.props.collectionId && typeof node.data.props.collectionId === 'string' && node.data.props.collectionId.length > 10) {
+                    return node.data.props.collectionId
+                }
+
+                if (!node.data.parent) {
+                    break
+                }
+                currentId = node.data.parent
+                depth++
+            }
+            return undefined
+        }
 
         // Helper to render a single prop control
         const renderPropControl = (propName: string, propConfig: PropConfig | string) => {
@@ -338,6 +387,89 @@ export function generateSettings<P extends Record<string, any>>(
                 )
             }
 
+            // Collection select dropdown
+            if (normalized.type === 'collection-select') {
+                return (
+                    <PropertyRow key={propName} label={normalized.label} description={normalized.description}>
+                        <PropertySelect
+                            value={value || ''}
+                            onChange={(v) => setProp((p: P) => {
+                                p[propName] = v
+                            })}
+                            options={
+                                collectionsLoading
+                                    ? [{ label: 'Loading...', value: '' }]
+                                    : collections.length > 0
+                                        ? [{ label: 'Select a collection...', value: '' }, ...collections.map(c => ({ label: c.name, value: c.id }))]
+                                        : [{ label: 'No collections found', value: '' }]
+                            }
+                        />
+                    </PropertyRow>
+                )
+            }
+
+            // Field Select that auto-detects parent collection
+            if (normalized.type === 'collection-field-select') {
+                // 1. Traverse up to find parent with collectionId
+                const parentCollectionId = findParentCollectionId(selectedId)
+
+                // 2. Find collection fields
+                let fieldOptions: { label: string; value: string }[] = []
+                let placeholderText = "Select found collection..."
+
+                if (!parentCollectionId) {
+                    placeholderText = "No parent collection found"
+                } else if (!collectionsLoading) {
+                    const collection = collections.find(c => c.id === parentCollectionId)
+                    if (collection && collection.fields) {
+                        try {
+                            // Fields might be string (if prisma Json type is returned as string?) or object
+                            // Based on API response for Json, it should be object if parsed correctly by prisma client
+                            // But usually prisma returns Json object as object.
+                            // If `fields` was created with JSON.stringify, it might be a string containing JSON.
+                            // Let's handle both.
+                            let fields = collection.fields
+                            if (typeof fields === 'string') {
+                                fields = JSON.parse(fields)
+                            }
+
+                            if (Array.isArray(fields)) {
+                                fieldOptions = fields.map((f: any) => ({
+                                    label: f.label || f.name,
+                                    value: f.name
+                                }))
+                            }
+                        } catch (e) {
+                            console.error("Error parsing collection fields:", e)
+                        }
+                    } else {
+                        // Maybe collection not loaded or not found
+                        placeholderText = "Collection not found"
+                    }
+                } else {
+                    placeholderText = "Loading collections..."
+                }
+
+                // Always add 'No Field' option? Or allow empty
+
+                return (
+                    <PropertyRow key={propName} label={normalized.label} description={normalized.description || "Auto-detected from parent collection"}>
+                        <PropertySelect
+                            value={value || ''}
+                            onChange={(v) => setProp((p: P) => {
+                                p[propName] = v
+                            })}
+                            options={
+                                fieldOptions.length > 0
+                                    ? [{ label: 'Select a field...', value: '' }, ...fieldOptions]
+                                    : [{ label: placeholderText, value: '' }]
+                            }
+                            disabled={fieldOptions.length === 0}
+                        />
+                    </PropertyRow>
+                )
+            }
+
             return null
         }
 
@@ -351,7 +483,7 @@ export function generateSettings<P extends Record<string, any>>(
                             .map(({ propName, propConfig }) => {
                                 const normalized = normalizeConfig(propName, propConfig, defaultProps?.[propName])
                                 const value = props[propName]
-                                if (value && normalized.type !== 'media' && normalized.type !== 'array') {
+                                if (value && normalized.type !== 'media' && normalized.type !== 'array' && normalized.type !== 'collection-select' && normalized.type !== 'collection-field-select') {
                                     if (typeof value === 'string' && value.length > 15) {
                                         return `${value.substring(0, 15)}...`
                                     }
