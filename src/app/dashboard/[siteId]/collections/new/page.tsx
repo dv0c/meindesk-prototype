@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { createCollection, getCollections } from "@/lib/actions/collection-actions"
-import { SetupForm } from "@/components/setup-form"
+import { CollectionWizard } from "@/components/collection-wizard"
 import { toast } from "sonner"
 import { AnimatedNoise } from "@/app/(home)/components/animated-noise"
 import { Loader2 } from "lucide-react"
@@ -49,10 +49,11 @@ export default function CreateCollectionPage() {
     )
 
     return (
-        <SetupForm
+        <CollectionWizard
             onComplete={handleCreate}
             existingCollections={existingCollections}
             mode="create"
         />
     )
 }
+

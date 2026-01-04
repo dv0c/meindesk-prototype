@@ -105,7 +105,7 @@ export async function updateItem(id: string, data: any, status?: string) {
     }
 }
 
-export async function deleteItem(id: string) {
+export async function deleteItem(id: string, relationAction?: 'CASCADE' | 'SET_NULL') {
     const session = await getAuthSession()
     if (!session) return { error: "Unauthorized" }
 
@@ -118,13 +118,133 @@ export async function deleteItem(id: string) {
 
         if (!item) return { error: "Item not found" }
 
+        // Handle incoming references if action specified
+        if (relationAction) {
+            const references = await findIncomingReferences(id, item.collection.siteId)
+
+            if (references.length > 0) {
+                if (relationAction === 'CASCADE') {
+                    // Delete all items that reference this one
+                    for (const ref of references) {
+                        await db.collectionItem.delete({ where: { id: ref.itemId } })
+                    }
+                } else if (relationAction === 'SET_NULL') {
+                    // Set the relation field to null in all referencing items
+                    for (const ref of references) {
+                        const refItem = await db.collectionItem.findUnique({ where: { id: ref.itemId } })
+                        if (refItem) {
+                            const updatedData = { ...refItem.data as any }
+                            const fieldValue = updatedData[ref.fieldName]
+
+                            if (Array.isArray(fieldValue)) {
+                                // Remove this ID from the array
+                                updatedData[ref.fieldName] = fieldValue.filter((v: string) => v !== id)
+                            } else {
+                                // Set to null
+                                updatedData[ref.fieldName] = null
+                            }
+
+                            await db.collectionItem.update({
+                                where: { id: ref.itemId },
+                                data: { data: updatedData }
+                            })
+                        }
+                    }
+                }
+            }
+        }
+
         await db.collectionItem.delete({ where: { id } })
 
         revalidatePath(`/dashboard/${item.collection.siteId}/collections/${item.collectionId}`)
         return { success: true }
     } catch (error) {
+        console.error("Delete item error:", error)
         return { error: "Failed to delete item" }
     }
+}
+
+// Check for items that reference this item through relation fields
+export async function checkIncomingReferences(itemId: string) {
+    const session = await getAuthSession()
+    if (!session) return { error: "Unauthorized" }
+
+    try {
+        const item = await db.collectionItem.findUnique({
+            where: { id: itemId },
+            include: { collection: true }
+        })
+
+        if (!item) return { error: "Item not found" }
+
+        const references = await findIncomingReferences(itemId, item.collection.siteId)
+        return { references }
+    } catch (error) {
+        console.error("Check references error:", error)
+        return { error: "Failed to check references" }
+    }
+}
+
+// Internal helper to find all items that reference the given itemId
+async function findIncomingReferences(itemId: string, siteId: string) {
+    // Get all collections in this site
+    const collections = await db.collection.findMany({
+        where: { siteId },
+        select: { id: true, name: true, fields: true }
+    })
+
+    const references: Array<{
+        itemId: string
+        itemName: string
+        collectionId: string
+        collectionName: string
+        fieldName: string
+        fieldLabel: string
+    }> = []
+
+    // For each collection, check if it has relation fields
+    for (const col of collections) {
+        const fields = col.fields as any[]
+        const relationFields = fields?.filter((f: any) => f.type === 'relation') || []
+
+        if (relationFields.length === 0) continue
+
+        // Get all items in this collection
+        const items = await db.collectionItem.findMany({
+            where: { collectionId: col.id },
+            select: { id: true, data: true, slug: true }
+        })
+
+        // Check each item's relation fields
+        for (const item of items) {
+            const data = item.data as any
+            for (const field of relationFields) {
+                const value = data[field.name]
+                if (!value) continue
+
+                // Check if this field references our target item
+                const hasReference = Array.isArray(value)
+                    ? value.includes(itemId)
+                    : value === itemId
+
+                if (hasReference) {
+                    // Get a display name for the referencing item
+                    const itemName = data.title || data.name || item.slug
+
+                    references.push({
+                        itemId: item.id,
+                        itemName,
+                        collectionId: col.id,
+                        collectionName: col.name,
+                        fieldName: field.name,
+                        fieldLabel: field.label
+                    })
+                }
+            }
+        }
+    }
+
+    return references
 }
 
 export async function getItems(collectionId: string) {

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { getItems, deleteItem, getResolvedNames } from "@/lib/actions/item-actions"
+import { getItems, deleteItem, getResolvedNames, checkIncomingReferences } from "@/lib/actions/item-actions"
 import { getCollection } from "@/lib/actions/collection-actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,6 +14,7 @@ import { toast } from "sonner"
 import { formatDistanceToNow } from "date-fns"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
+import { DeleteRelationDialog, type Reference, type RelationAction } from "@/components/DeleteRelationDialog"
 
 // Import Setup components
 import { AnimatedNoise } from "@/app/(home)/components/animated-noise"
@@ -26,6 +27,12 @@ export default function CollectionItemsPage() {
     const [items, setItems] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [resolvedNames, setResolvedNames] = useState<Record<string, string>>({})
+
+    // Delete relation dialog state
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+    const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null)
+    const [deleteReferences, setDeleteReferences] = useState<Reference[]>([])
+    const [deleteLoading, setDeleteLoading] = useState(false)
 
     useEffect(() => {
         const loadData = async () => {
@@ -72,14 +79,61 @@ export default function CollectionItemsPage() {
     }, [])
 
     const handleDelete = async (id: string) => {
-        if (confirm("Delete this item?")) {
-            const res = await deleteItem(id)
-            if (res.success) {
-                toast.success("Item Deleted")
-                setItems(items.filter(i => i.id !== id))
-            } else {
-                toast.error("Failed to delete")
+        // First, check for incoming references
+        const item = items.find(i => i.id === id)
+        const itemName = item?.data?.title || item?.data?.name || item?.slug || 'this item'
+
+        const refRes = await checkIncomingReferences(id)
+
+        if (refRes.references && refRes.references.length > 0) {
+            // Has references - show dialog
+            setDeleteTarget({ id, name: itemName })
+            setDeleteReferences(refRes.references)
+            setDeleteDialogOpen(true)
+        } else {
+            // No references - simple delete with confirmation
+            if (confirm(`Delete "${itemName}"?`)) {
+                const res = await deleteItem(id)
+                if (res.success) {
+                    toast.success("Item Deleted")
+                    setItems(items.filter(i => i.id !== id))
+                } else {
+                    toast.error("Failed to delete")
+                }
             }
+        }
+    }
+
+    const handleRelationDeleteConfirm = async (action: RelationAction) => {
+        if (!deleteTarget || action === 'CANCEL') {
+            setDeleteDialogOpen(false)
+            return
+        }
+
+        setDeleteLoading(true)
+        try {
+            const res = await deleteItem(deleteTarget.id, action)
+            if (res.success) {
+                toast.success(
+                    action === 'CASCADE'
+                        ? `Deleted ${deleteTarget.name} and ${deleteReferences.length} related item(s)`
+                        : `Deleted ${deleteTarget.name} and unlinked ${deleteReferences.length} reference(s)`
+                )
+                // Reload items to reflect changes
+                const itemsRes = await getItems(params.collectionId as string)
+                if (itemsRes.items) {
+                    setItems(itemsRes.items)
+                }
+            } else {
+                toast.error(res.error || "Failed to delete")
+            }
+        } catch (error) {
+            toast.error("An error occurred")
+        } finally {
+            setDeleteLoading(false)
+            setDeleteDialogOpen(false)
+            setDeleteTarget(null)
+            setDeleteReferences([])
         }
     }
 
@@ -246,6 +300,16 @@ export default function CollectionItemsPage() {
                     </div>
                 </div>
             </main>
+
+            {/* Delete Relation Dialog */}
+            <DeleteRelationDialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                itemName={deleteTarget?.name || ''}
+                references={deleteReferences}
+                onConfirm={handleRelationDeleteConfirm}
+                loading={deleteLoading}
+            />
         </div>
     )
 }

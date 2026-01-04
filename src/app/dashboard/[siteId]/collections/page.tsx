@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { getCollections, deleteCollection } from "@/lib/actions/collection-actions"
+import { getCollections, deleteCollection, checkCollectionReferences } from "@/lib/actions/collection-actions"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Plus, ArrowLeft, Search, Edit, Trash2, MoreHorizontal, Terminal, Database, Loader2, Folder } from "lucide-react"
@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { formatDistanceToNow } from "date-fns"
 import { cn } from "@/lib/utils"
+import { DeleteCollectionDialog, type CollectionReference, type CollectionRelationAction } from "@/components/DeleteCollectionDialog"
 
 // Import Setup components
 import { AnimatedNoise } from "@/app/(home)/components/animated-noise"
@@ -21,6 +22,12 @@ export default function CollectionsPage() {
     const router = useRouter()
     const [collections, setCollections] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
+
+    // Delete dialog state
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+    const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null)
+    const [deleteReferences, setDeleteReferences] = useState<CollectionReference[]>([])
+    const [deleteLoading, setDeleteLoading] = useState(false)
 
     useEffect(() => {
         loadCollections()
@@ -37,15 +44,55 @@ export default function CollectionsPage() {
         setLoading(false)
     }
 
-    const handleDelete = async (id: string) => {
-        if (confirm("Are you sure? This will delete all items in this collection.")) {
-            const res = await deleteCollection(id, params.siteId as string)
+    const handleDelete = async (id: string, name: string) => {
+        // Check for collection references
+        const refRes = await checkCollectionReferences(id)
+
+        if (refRes.references && refRes.references.length > 0) {
+            // Has references - show dialog
+            setDeleteTarget({ id, name })
+            setDeleteReferences(refRes.references)
+            setDeleteDialogOpen(true)
+        } else {
+            // No references - simple delete with confirmation
+            if (confirm(`Delete "${name}"? This will delete all items in this collection.`)) {
+                const res = await deleteCollection(id, params.siteId as string)
+                if (res.success) {
+                    toast.success("Collection deleted")
+                    loadCollections()
+                } else {
+                    toast.error(res.error || "Failed to delete")
+                }
+            }
+        }
+    }
+
+    const handleRelationDeleteConfirm = async (action: CollectionRelationAction) => {
+        if (!deleteTarget || action === 'CANCEL') {
+            setDeleteDialogOpen(false)
+            return
+        }
+
+        setDeleteLoading(true)
+        try {
+            const res = await deleteCollection(deleteTarget.id, params.siteId as string, action)
             if (res.success) {
-                toast.success("Collection deleted")
+                toast.success(
+                    action === 'CASCADE'
+                        ? `Deleted ${deleteTarget.name} and all referencing collections`
+                        : `Deleted ${deleteTarget.name} and removed relation fields`
+                )
                 loadCollections()
             } else {
-                toast.error(res.error)
+                toast.error(res.error || "Failed to delete")
             }
+        } catch (error) {
+            toast.error("An error occurred")
+        } finally {
+            setDeleteLoading(false)
+            setDeleteDialogOpen(false)
+            setDeleteTarget(null)
+            setDeleteReferences([])
         }
     }
 
@@ -174,7 +221,7 @@ export default function CollectionsPage() {
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem
                                                             className="text-destructive font-mono text-xs uppercase focus:bg-destructive/10 focus:text-destructive cursor-pointer"
-                                                            onClick={(e) => { e.stopPropagation(); handleDelete(collection.id) }}
+                                                            onClick={(e) => { e.stopPropagation(); handleDelete(collection.id, collection.name) }}
                                                         >
                                                             <Trash2 className="mr-2 h-3 w-3" /> Delete System
                                                         </DropdownMenuItem>
@@ -189,6 +236,16 @@ export default function CollectionsPage() {
                     </div>
                 </div>
             </main>
+
+            {/* Delete Collection Dialog */}
+            <DeleteCollectionDialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                collectionName={deleteTarget?.name || ''}
+                references={deleteReferences}
+                onConfirm={handleRelationDeleteConfirm}
+                loading={deleteLoading}
+            />
         </div>
     )
 }
