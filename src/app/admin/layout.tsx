@@ -34,6 +34,7 @@ export default async function AdminLayout({
                     <h1 className="text-xl font-bold">Meindesk Admin</h1>
                     <nav className="flex items-center gap-4 text-sm font-medium">
                         <Link href="/admin/themes" className="hover:text-primary">Themes</Link>
+                        <Link href="/admin/notifications" className="hover:text-primary">Notifications</Link>
                         {/* Add other admin links here */}
                     </nav>
                 </div>

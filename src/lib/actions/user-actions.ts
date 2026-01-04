@@ -44,3 +44,27 @@ export async function deleteAccount() {
         return { success: false, error: "Failed to delete account" }
     }
 }
+
+// Admin only search
+export async function searchUsers(query: string) {
+    const session = await getServerSession(authOptions)
+    if (!session || session.user.role !== "ADMIN") return []
+
+    if (!query || query.length < 2) return []
+
+    try {
+        const users = await db.user.findMany({
+            where: {
+                OR: [
+                    { name: { contains: query, mode: "insensitive" } },
+                    { email: { contains: query, mode: "insensitive" } }
+                ]
+            },
+            take: 10,
+            select: { id: true, name: true, email: true, image: true }
+        })
+        return users
+    } catch (error) {
+        return []
+    }
+}

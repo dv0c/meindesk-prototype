@@ -377,6 +377,20 @@ exports.Prisma.SiteThemeScalarFieldEnum = {
   installedAt: 'installedAt'
 };
 
+exports.Prisma.NotificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  siteId: 'siteId',
+  title: 'title',
+  message: 'message',
+  link: 'link',
+  imageUrl: 'imageUrl',
+  type: 'type',
+  read: 'read',
+  createdAt: 'createdAt',
+  senderId: 'senderId'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -410,6 +424,15 @@ exports.PageStatus = exports.$Enums.PageStatus = {
   ARCHIVED: 'ARCHIVED'
 };
 
+exports.NotificationType = exports.$Enums.NotificationType = {
+  INFO: 'INFO',
+  WARNING: 'WARNING',
+  SUCCESS: 'SUCCESS',
+  ERROR: 'ERROR',
+  PROMO: 'PROMO',
+  SYSTEM: 'SYSTEM'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   Account: 'Account',
@@ -430,7 +453,8 @@ exports.Prisma.ModelName = {
   MergedFeed: 'MergedFeed',
   Theme: 'Theme',
   ThemeBlock: 'ThemeBlock',
-  SiteTheme: 'SiteTheme'
+  SiteTheme: 'SiteTheme',
+  Notification: 'Notification'
 };
 
 /**

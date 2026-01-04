@@ -45,7 +45,7 @@ export async function GET(
     })
 
     if (!articles.length) {
-      return NextResponse.json({ error: "No articles found" }, { status: 404 })
+      return NextResponse.json([])
     }
 
     return NextResponse.json(articles)

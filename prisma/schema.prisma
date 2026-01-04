@@ -20,23 +20,25 @@ enum Role {
 }
 
 model User {
-  id             String         @id @default(auto()) @map("_id") @db.ObjectId
-  name           String
-  username       String?
-  image          String?
-  email          String         @unique
-  emailVerified  DateTime?
-  hashedPassword String?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  role           Role           @default(USER)
-  sessions       Session[]
-  accounts       Account[]
-  Site           Site[]
-  Category       Category[]
-  Subscription   Subscription[]
-  Article        Article[]
-  Page           Page[]
+  id                String         @id @default(auto()) @map("_id") @db.ObjectId
+  name              String
+  username          String?
+  image             String?
+  email             String         @unique
+  emailVerified     DateTime?
+  hashedPassword    String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  role              Role           @default(USER)
+  sessions          Session[]
+  accounts          Account[]
+  Site              Site[]
+  Category          Category[]
+  Subscription      Subscription[]
+  Article           Article[]
+  Page              Page[]
+  Notification      Notification[] // Received
+  sentNotifications Notification[] @relation("Sender") // Sent
 
   @@index([email, id])
 }
@@ -156,6 +158,7 @@ model Site {
   snippets            Snippet[]
   customFeedTemplates CustomFeedTemplate[]
   mergedFeeds         MergedFeed[]
+  Notification        Notification[]
 
   // Optional: Add a custom index for performance on frequently queried fields
   @@index([userId])
@@ -454,4 +457,35 @@ model SiteTheme {
   theme Theme @relation(fields: [themeId], references: [id], onDelete: Cascade)
 
   @@unique([siteId, themeId])
+}
+
+model Notification {
+  id     String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId String  @db.ObjectId
+  siteId String? @db.ObjectId
+
+  title    String
+  message  String
+  link     String?
+  imageUrl String?
+
+  type NotificationType @default(INFO)
+  read Boolean          @default(false)
+
+  createdAt DateTime @default(now())
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  site Site? @relation(fields: [siteId], references: [id])
+
+  sender   User?   @relation("Sender", fields: [senderId], references: [id])
+  senderId String? @db.ObjectId
+}
+
+enum NotificationType {
+  INFO
+  WARNING
+  SUCCESS
+  ERROR
+  PROMO
+  SYSTEM
 }

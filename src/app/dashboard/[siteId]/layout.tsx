@@ -1,5 +1,7 @@
 "use client"
 
+import { NotificationBell } from "@/components/notifications/notification-bell"
+
 import { ThemeTogglerButton } from "@/components/animate-ui/components/buttons/theme-toggler"
 import { AppSidebar, ToggleSidebar } from "@/components/app-sidebar"
 import { SiteProvider } from "@/components/Contexts/site-id-context"
@@ -27,15 +29,15 @@ const Layout: FC<LayoutProps> = ({ children }) => {
                 <SidebarInset>
                     <div className={cn(hideHeader ? "" : "rounded-2xl relative h-full shadow m-2 border")}>
                         {!hideHeader && (
-                            <header className="flex dark:bg-neutral-900 mb-5 rounded-t-2xl h-16 shrink-0 items-center gap-2">
-                                <div className="flex items-center gap-2 px-4">
+                            <header className="flex dark:bg-neutral-900 mb-5 rounded-t-2xl h-16 shrink-0 items-center justify-between px-4 gap-2">
+                                <div className="flex items-center gap-2">
                                     <ToggleSidebar />
                                     <Separator
                                         orientation="vertical"
                                         className="mr-2 data-[orientation=vertical]:h-4"
                                     />
                                     <Breadcrumb>
-                                        <BreadcrumbList className="w-full">
+                                        <BreadcrumbList>
                                             <BreadcrumbItem className="hidden md:block">
                                                 <BreadcrumbLink href="#">
                                                     Your Project
@@ -45,11 +47,12 @@ const Layout: FC<LayoutProps> = ({ children }) => {
                                             <BreadcrumbItem>
                                                 <BreadcrumbPage>Website</BreadcrumbPage>
                                             </BreadcrumbItem>
-                                            <BreadcrumbItem className="flex-1">
-                                                <ThemeTogglerButton />
-                                            </BreadcrumbItem>
                                         </BreadcrumbList>
                                     </Breadcrumb>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <NotificationBell />
+                                    <ThemeTogglerButton />
                                 </div>
                             </header>
                         )}

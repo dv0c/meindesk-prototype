@@ -1,6 +1,7 @@
 "use server";
 import { db } from "@/lib/db";
 import { getAuthSession } from "@/lib/auth";
+import { triggerNotification } from "@/lib/actions/notification-actions";
 export async function createSite(formData: FormData) {
   // Get current logged-in user
   const session = await getAuthSession();
@@ -160,6 +161,16 @@ export async function createSite(formData: FormData) {
     }
 
     await Promise.all(promises);
+
+    // Trigger Notification
+    await triggerNotification({
+      userId: session.user.id,
+      title: "Site Created Successfully",
+      message: `Your new site "${site.title}" has been deployed. Start editing now!`,
+      type: "SUCCESS",
+      siteId: site.id,
+      link: `/dashboard/${site.id}`
+    })
 
     return site;
   } catch (err: any) {
