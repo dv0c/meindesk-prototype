@@ -56,6 +56,10 @@ const sizeStyles = {
     lg: { padding: "16px 32px", fontSize: 18 },
 }
 
+// Add imports
+import { useCollectionItem } from "./collections/CollectionItemContext"
+import { resolveCollectionTemplate } from "@/lib/collection-utils"
+
 export const Button = ({
     text = "Button",
     variant = "primary",
@@ -78,33 +82,36 @@ export const Button = ({
         id: state.id,
     }))
 
-    const { actions: editorActions } = useEditor()
-
-    // Get design settings from context - called unconditionally
-    const { settings: designSettings } = useDesign()
+    const { actions: editorActions, enabled } = useEditor((state) => ({
+        enabled: state.options.enabled
+    }))
 
     const [isEditing, setIsEditing] = useState(false)
     const contentRef = useRef<HTMLButtonElement>(null)
+    const collectionContext = useCollectionItem()
+
+    // Resolve properties
+    const resolvedText = resolveCollectionTemplate(text, collectionContext?.data)
+    const resolvedUrl = resolveCollectionTemplate(url, collectionContext?.data)
+
+    const { settings: designSettings } = useDesign()
 
     const variantStyle = variantStyles[variant]
     const sizeStyle = sizeStyles[size]
 
     // Determine if button should use outline style based on variant AND design setting
-    // If design button style is "outline", primary buttons render as outline
-    const designButtonStyle = designSettings.buttonStyle || "filled"
+    const designButtonStyle = designSettings?.buttonStyle || "filled"
     const isOutline = variant === "outline" || (variant === "primary" && designButtonStyle === "outline")
     const isGhost = variant === "ghost" || (variant === "primary" && designButtonStyle === "ghost")
     const isFilled = !isOutline && !isGhost
 
     // Use CSS variables from design context with fallbacks
     const style: React.CSSProperties = {
-        // For primary variant, use design primary color. For outline, transparent bg
         backgroundColor: backgroundColor || (
             isOutline || isGhost
                 ? "transparent"
                 : "var(--design-primary, #000000)"
         ),
-        // Text color: white for filled primary, design primary for outline
         color: textColor || (
             isOutline
                 ? "var(--design-primary, #000000)"
@@ -112,7 +119,6 @@ export const Button = ({
                     ? "#ffffff"
                     : variantStyle.text
         ),
-        // Border: use design primary for outline variant
         borderColor: isOutline ? "var(--design-primary, #000000)" : variantStyle.border,
         borderWidth: isOutline ? 2 : 0,
         borderStyle: "solid",
@@ -121,7 +127,7 @@ export const Button = ({
         fontSize: sizeStyle.fontSize,
         fontWeight: 500,
         fontFamily: "var(--design-font-base, inherit)",
-        cursor: isEditing ? "text" : "pointer",
+        cursor: selected ? "text" : "pointer",
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
@@ -129,6 +135,8 @@ export const Button = ({
         transition: "all 0.2s ease",
         outline: isEditing ? "none" : undefined,
     }
+
+    const displayText = (isEditing) ? text : resolvedText
 
     // Single click to edit when already selected
     const handleClick = useCallback((e: React.MouseEvent) => {
@@ -146,8 +154,8 @@ export const Button = ({
         if (contentRef.current) {
             const newText = contentRef.current.innerText.trim()
             if (newText) {
-                setProp((props: ButtonProps) => {
-                    props.text = newText
+                setProp((p: ButtonProps) => {
+                    p.text = newText
                 })
             }
         }
@@ -176,19 +184,23 @@ export const Button = ({
     useEffect(() => {
         if (isEditing && contentRef.current) {
             contentRef.current.focus()
-            const range = document.createRange()
-            range.selectNodeContents(contentRef.current)
-            const selection = window.getSelection()
-            selection?.removeAllRanges()
-            selection?.addRange(range)
+            setTimeout(() => {
+                if (contentRef.current) {
+                    const range = document.createRange()
+                    range.selectNodeContents(contentRef.current)
+                    const selection = window.getSelection()
+                    selection?.removeAllRanges()
+                    selection?.addRange(range)
+                }
+            }, 0)
         }
     }, [isEditing])
 
     return (
         <button
-            ref={(ref) => {
+            ref={(ref: any) => {
+                connect(drag(ref))
                 contentRef.current = ref
-                if (ref) connect(drag(ref))
             }}
             className={className}
             style={style}
@@ -198,7 +210,7 @@ export const Button = ({
             contentEditable={isEditing}
             suppressContentEditableWarning
         >
-            {text}
+            {displayText}
         </button>
     )
 }
@@ -237,6 +249,9 @@ export const ButtonSettings = () => {
                         onChange={(v) => setProp((props: ButtonProps) => (props.text = v))}
                     />
                 </PropertyRow>
+                <div className="px-4 pb-2 text-xs text-muted-foreground">
+                    Tip: Use <code>{`{field_name}`}</code> for dynamic text or URL.
+                </div>
                 <PropertyRow label="URL">
                     <PropertyInput
                         type="url"

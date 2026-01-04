@@ -2,13 +2,14 @@
 
 import { useNode, useEditor } from "@craftjs/core"
 import { useState, useRef, useEffect, useCallback } from "react"
+import { useCollectionItem } from "./collections/CollectionItemContext"
+import { resolveCollectionTemplate } from "@/lib/collection-utils"
 import {
     PropertySection,
     PropertyRow,
     PropertySlider,
     PropertyColor,
     PropertySelect,
-    PropertyButtonGroup,
 } from "../components/PropertySection"
 
 interface TextProps {
@@ -67,9 +68,16 @@ export const Text = ({
     }))
 
     const { actions: editorActions } = useEditor()
+    const collectionContext = useCollectionItem()
 
     const [isEditing, setIsEditing] = useState(false)
     const contentRef = useRef<HTMLParagraphElement>(null)
+
+    // Resolve variables in text if we are in a collection context
+    // Only resolve when NOT editing, so the user sees the raw template when typing
+    const displayText = (isEditing)
+        ? text
+        : resolveCollectionTemplate(text, collectionContext?.data)
 
     const style: React.CSSProperties = {
         width: "100%",
@@ -94,11 +102,11 @@ export const Text = ({
         borderStyle: borderWidth ? "solid" : undefined,
         boxShadow,
         outline: isEditing ? "none" : undefined,
-        cursor: isEditing ? "text" : "pointer",
+        cursor: selected ? "text" : "pointer",
         whiteSpace: isEditing ? "pre-wrap" : undefined,
     }
 
-    // Single click to edit when already selected
+    // Logic for editing state
     const handleClick = useCallback((e: React.MouseEvent) => {
         e.stopPropagation()
         if (selected) {
@@ -129,13 +137,7 @@ export const Text = ({
         }
     }, [text])
 
-    // When deselected, exit edit mode
-    useEffect(() => {
-        if (!selected && isEditing) {
-            setIsEditing(false)
-        }
-    }, [selected, isEditing])
-
+    // Handle focus effect for editing
     useEffect(() => {
         if (isEditing && contentRef.current) {
             contentRef.current.focus()
@@ -148,12 +150,16 @@ export const Text = ({
         }
     }, [isEditing])
 
+    // Sync editing state
+    useEffect(() => {
+        if (!selected && isEditing) {
+            setIsEditing(false)
+        }
+    }, [selected, isEditing])
+
     return (
         <p
-            ref={(ref) => {
-                contentRef.current = ref
-                if (ref) connect(drag(ref))
-            }}
+            ref={(ref: any) => connect(drag(ref))}
             className={className}
             style={style}
             contentEditable={isEditing}
@@ -161,117 +167,21 @@ export const Text = ({
             onClick={handleClick}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
+            ref={(ref: any) => {
+                connect(drag(ref))
+                contentRef.current = ref
+            }}
         >
-            {text}
+            {displayText}
         </p>
     )
 }
 
+
 // Settings component for Text
-export const TextSettings = () => {
-    const {
-        actions: { setProp },
-        text,
-        fontSize,
-        fontWeight,
-        color,
-        textAlign,
-        lineHeight,
-        marginTop,
-        marginBottom,
-    } = useNode((node) => ({
-        text: node.data.props.text,
-        fontSize: node.data.props.fontSize,
-        fontWeight: node.data.props.fontWeight,
-        color: node.data.props.color,
-        textAlign: node.data.props.textAlign,
-        lineHeight: node.data.props.lineHeight,
-        marginTop: node.data.props.marginTop,
-        marginBottom: node.data.props.marginBottom,
-    }))
-
-    const fontWeightLabel = {
-        "300": "Light",
-        "400": "Regular",
-        "500": "Medium",
-        "600": "Semibold",
-        "700": "Bold",
-    }[fontWeight || "400"] || "Regular"
-
-    const typographySummary = `${fontSize}px, ${fontWeightLabel}, ${textAlign}`
-
-
-    return (
-        <div>
-            <PropertySection title="Content">
-                <PropertyRow label="Text">
-                    <textarea
-                        value={text || ""}
-                        onChange={(e) => setProp((props: TextProps) => (props.text = e.target.value))}
-                        className="w-full min-h-[80px] px-3 py-2 text-sm border rounded-md resize-y bg-background"
-                        rows={3}
-                    />
-                </PropertyRow>
-            </PropertySection>
-
-            <PropertySection title="Typography" summary={typographySummary}>
-                <PropertyRow label="Font Size">
-                    <PropertySlider
-                        value={fontSize || 16}
-                        onChange={(v) => setProp((props: TextProps) => (props.fontSize = v))}
-                        min={10}
-                        max={72}
-                    />
-                </PropertyRow>
-                <PropertyRow label="Font Weight">
-                    <PropertySelect
-                        value={fontWeight || "400"}
-                        onChange={(v) => setProp((props: TextProps) => (props.fontWeight = v))}
-                        options={[
-                            { label: "Light", value: "300" },
-                            { label: "Regular", value: "400" },
-                            { label: "Medium", value: "500" },
-                            { label: "Semibold", value: "600" },
-                            { label: "Bold", value: "700" },
-                        ]}
-                    />
-                </PropertyRow>
-                <PropertyRow label="Line Height">
-                    <PropertySlider
-                        value={Math.round((lineHeight || 1.6) * 10)}
-                        onChange={(v) => setProp((props: TextProps) => (props.lineHeight = v / 10))}
-                        min={10}
-                        max={30}
-                        unit=""
-                    />
-                </PropertyRow>
-                <PropertyRow label="Text Align">
-                    <PropertyButtonGroup
-                        value={textAlign || "left"}
-                        onChange={(v) => setProp((props: TextProps) => (props.textAlign = v as TextProps["textAlign"]))}
-                        options={[
-                            { label: "Left", value: "left" },
-                            { label: "Center", value: "center" },
-                            { label: "Right", value: "right" },
-                            { label: "Justify", value: "justify" },
-                        ]}
-                    />
-                </PropertyRow>
-            </PropertySection>
-
-            <PropertySection title="Appearance">
-                <PropertyRow label="Color">
-                    <PropertyColor
-                        value={color || "#374151"}
-                        onChange={(v) => setProp((props: TextProps) => (props.color = v))}
-                    />
-                </PropertyRow>
-            </PropertySection>
-
-
-        </div>
-    )
-}
+// Import from external file
+import { TextSettings } from "./TextSettings"
+export { TextSettings }
 
 Text.craft = {
     displayName: "Text",

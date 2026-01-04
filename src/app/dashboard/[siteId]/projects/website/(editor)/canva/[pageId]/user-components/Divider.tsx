@@ -28,10 +28,7 @@ export const Divider = ({
 }: DividerProps) => {
     const {
         connectors: { connect, drag },
-        selected,
-    } = useNode((state) => ({
-        selected: state.events.selected,
-    }))
+    } = useNode()
 
     const dividerStyle: React.CSSProperties = {
         width: "100%",
@@ -44,9 +41,7 @@ export const Divider = ({
 
     return (
         <hr
-            ref={(ref) => {
-                if (ref) connect(drag(ref))
-            }}
+            ref={(ref: any) => connect(drag(ref))}
             className={className}
             style={dividerStyle}
         />

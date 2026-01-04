@@ -32,14 +32,15 @@ export const Grid = ({
 }: GridProps) => {
     const {
         connectors: { connect, drag },
-        selected,
-    } = useNode((state) => ({
-        selected: state.events.selected,
-    }))
+    } = useNode()
 
     const { enabled } = useEditor((state) => ({
         enabled: state.options.enabled,
     }))
+
+    // Check if grid is empty
+    const isEmpty = !children || (Array.isArray(children) && children.length === 0) ||
+        (React.Children.count(children) === 0)
 
     const style: React.CSSProperties = {
         display: "grid",
@@ -54,15 +55,9 @@ export const Grid = ({
         width: "100%",
     }
 
-    // Check if grid is empty
-    const isEmpty = !children || (Array.isArray(children) && children.length === 0) ||
-        (React.Children.count(children) === 0)
-
     return (
         <div
-            ref={(ref) => {
-                if (ref) connect(drag(ref))
-            }}
+            ref={(ref: any) => connect(drag(ref))}
             className={className}
             style={style}
         >

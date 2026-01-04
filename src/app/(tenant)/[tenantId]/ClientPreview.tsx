@@ -7,8 +7,6 @@ import { PageData } from "@/lib/types"
 import { DesignSystemStyles } from "@/components/DesignSystemStyles"
 import { DesignSettings } from "@/lib/design-system"
 
-import { ArticleProvider } from "@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/user-components/article"
-
 interface ClientPreviewProps {
   tenantId: string
   page: PageData
@@ -23,16 +21,6 @@ function ClientPreview({ tenantId, page }: ClientPreviewProps) {
   }, [tenantId])
 
   // CraftJS stores layout as [craftState] where craftState is the serialized editor state
-  // The craftState is a flat object with stringified JSON
-  // We need to pass the serialized string to the Frame json prop, or deserialized object?
-  // <Frame json={...}> accepts the serialized JSON string.
-
-  // page.layout is Json[] from Prisma. 
-  // In page.tsx (editor), we save implementation:
-  // layout: [JSON.parse(json)] where json is query.serialize() which returns a string.
-  // So page.layout[0] is an Object (the deserialized state).
-
-  // CraftJS Frame `json` prop expects a string.
   const craftStateObj = page.layout?.[0]
   const craftStateJson = craftStateObj ? JSON.stringify(craftStateObj) : null
 
@@ -53,16 +41,8 @@ function ClientPreview({ tenantId, page }: ClientPreviewProps) {
   return (
     <main>
       <DesignSystemStyles settings={designSettings} />
-      <Editor
-        enabled={false} // Read-only mode
-        resolver={resolverWithFallback}
-      >
-        <ArticleProvider>
-          <Frame json={craftStateJson}>
-            {/* Frame content is hydrated from json, children here are ignored/replaced */}
-            <div />
-          </Frame>
-        </ArticleProvider>
+      <Editor enabled={false} resolver={resolverWithFallback}>
+        <Frame json={craftStateJson} />
       </Editor>
     </main>
   )

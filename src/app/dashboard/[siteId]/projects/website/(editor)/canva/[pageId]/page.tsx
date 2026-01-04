@@ -329,7 +329,6 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                                     width: getCanvasWidth(),
                                     minHeight: "100%",
                                     backgroundColor: "var(--design-background, #ffffff)",
-                                    containerType: "inline-size",
                                     ...Object.fromEntries(
                                         getCssVariables()
                                             .split(';')

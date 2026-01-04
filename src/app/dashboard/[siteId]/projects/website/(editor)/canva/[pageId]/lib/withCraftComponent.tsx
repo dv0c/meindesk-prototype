@@ -180,6 +180,8 @@ interface EditableTextProps {
     style?: React.CSSProperties
     /** Children to render (usually not needed, value is rendered) */
     children?: React.ReactNode
+    /** Optional resolved value to display when not editing */
+    renderValue?: string
 }
 
 /**
@@ -196,6 +198,7 @@ export function EditableText({
     className,
     style,
     children,
+    renderValue,
 }: EditableTextProps) {
     const {
         selected,
@@ -255,11 +258,21 @@ export function EditableText({
     useEffect(() => {
         if (isEditing && contentRef.current) {
             contentRef.current.focus()
-            const range = document.createRange()
-            range.selectNodeContents(contentRef.current)
-            const selection = window.getSelection()
-            selection?.removeAllRanges()
-            selection?.addRange(range)
+
+            // If checking switching from resolved to raw, we need to ensure content is raw
+            // React render cycle handles the DOM update via children below, 
+            // BUT contentEditable might need help if the DOM node was just updated
+
+            // Small timeout safely ensures DOM is updated with 'value' before we select
+            setTimeout(() => {
+                if (contentRef.current) {
+                    const range = document.createRange()
+                    range.selectNodeContents(contentRef.current)
+                    const selection = window.getSelection()
+                    selection?.removeAllRanges()
+                    selection?.addRange(range)
+                }
+            }, 0)
         }
     }, [isEditing])
 
@@ -268,6 +281,11 @@ export function EditableText({
         outline: isEditing ? "none" : undefined,
         cursor: enabled ? (isEditing ? "text" : "pointer") : undefined,
     }
+
+    // Display logic: 
+    // If editing: show raw value (template)
+    // If not editing: show renderValue (resolved) if available, else value
+    const content = isEditing ? value : (renderValue ?? value)
 
     return (
         <Tag
@@ -280,7 +298,7 @@ export function EditableText({
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
         >
-            {children ?? value}
+            {children ?? content}
         </Tag>
     )
 }

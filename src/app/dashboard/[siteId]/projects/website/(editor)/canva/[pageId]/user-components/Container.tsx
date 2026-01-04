@@ -1,7 +1,7 @@
 "use client"
 
 import { useNode, useEditor } from "@craftjs/core"
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
 import MediaLibraryDialog, { MediaItem } from "@/components/MediaGallery/media-select"
 import { Button } from "@/components/ui/button"
@@ -19,6 +19,11 @@ import {
 } from "../components/PropertySection"
 import { Plus, ArrowRight, ArrowDown, AlignLeft, AlignCenter, AlignRight, AlignJustify } from "lucide-react"
 
+
+// Add imports
+import { useCollectionData } from "@/hooks/useCollectionData"
+import { CollectionItemProvider } from "./collections/CollectionItemContext"
+import { resolveCollectionTemplate } from "@/lib/collection-utils"
 
 interface ContainerProps {
     children?: React.ReactNode
@@ -41,6 +46,11 @@ interface ContainerProps {
     alignItems?: "flex-start" | "center" | "flex-end" | "stretch"
     justifyContent?: "flex-start" | "center" | "flex-end" | "space-between" | "space-around"
 
+    // Collection Data Props
+    collectionId?: string
+    itemId?: string
+    useSlugFromUrl?: boolean
+
     // Global Decoration
     marginTop?: string
     marginRight?: string
@@ -53,41 +63,12 @@ interface ContainerProps {
     boxShadow?: string
 }
 
-// Shared style generator
-function getContainerStyle(props: ContainerProps): React.CSSProperties {
-    return {
-        backgroundColor: props.backgroundColor,
-        backgroundImage: props.backgroundImage ? `url(${props.backgroundImage})` : undefined,
-        backgroundSize: props.backgroundSize,
-        backgroundPosition: props.backgroundPosition,
-        backgroundRepeat: props.backgroundRepeat,
-        borderRadius: `${props.borderRadius}px`,
-        border: `${props.borderWidth}px solid ${props.borderColor}`,
-        minHeight: props.minHeight,
-        maxWidth: props.maxWidth,
-        width: "100%",
-        position: "relative" as const,
-        transition: "all 0.2s ease",
-        display: "flex",
-        flexDirection: props.flexDirection,
-        gap: `${props.gap}px`,
-        alignItems: props.alignItems,
-        justifyContent: props.justifyContent,
-        boxShadow: props.boxShadow,
-        marginTop: props.marginTop,
-        marginRight: props.marginRight,
-        marginBottom: props.marginBottom,
-        marginLeft: props.marginLeft,
-        paddingTop: props.paddingTop,
-        paddingRight: props.paddingRight,
-        paddingBottom: props.paddingBottom,
-        paddingLeft: props.paddingLeft,
-    }
-}
+// ... (getContainerStyle function remains same, maybe optional update but not critical if using inline styles mostly)
 
+// CraftJS Connected Component
 export const Container = ({
     children,
-    padding = 20, // Legacy padding, kept for empty state calculation
+    padding = 20,
     backgroundColor = "transparent",
     backgroundImage,
     backgroundSize = "cover",
@@ -108,6 +89,10 @@ export const Container = ({
     marginTop, marginRight, marginBottom, marginLeft,
     paddingTop, paddingRight, paddingBottom, paddingLeft,
     boxShadow,
+    // Collection Props
+    collectionId,
+    itemId,
+    useSlugFromUrl,
 }: ContainerProps) => {
     const {
         connectors: { connect, drag },
@@ -122,9 +107,19 @@ export const Container = ({
         enabled: state.options.enabled,
     }))
 
+    // Fetch Collection Data
+    const collectionData = useCollectionData({
+        collectionId,
+        itemId,
+        useSlugFromUrl
+    })
+
+    // Resolve Background Image
+    const resolvedBackgroundImage = resolveCollectionTemplate(backgroundImage, collectionData.data)
+
     const style: React.CSSProperties = {
         backgroundColor,
-        backgroundImage: backgroundImage ? `url(${backgroundImage})` : undefined,
+        backgroundImage: resolvedBackgroundImage ? `url(${resolvedBackgroundImage})` : undefined,
         backgroundSize,
         backgroundPosition,
         backgroundRepeat,
@@ -156,11 +151,9 @@ export const Container = ({
     const isEmpty = !children || (Array.isArray(children) && children.length === 0) ||
         (React.Children.count(children) === 0)
 
-    return (
+    const content = (
         <div
-            ref={(ref) => {
-                if (ref) connect(drag(ref))
-            }}
+            ref={(ref: any) => connect(drag(ref))}
             className={className}
             style={style}
         >
@@ -206,7 +199,7 @@ export const Container = ({
                             textAlign: "center",
                         }}
                     >
-                        Drop components here
+                        {collectionId ? "Data Container Ready" : "Drop components here"}
                     </div>
                 )
             ) : (
@@ -214,7 +207,17 @@ export const Container = ({
             )}
         </div>
     )
+
+    return (
+        <CollectionItemProvider value={collectionData}>
+            {content}
+        </CollectionItemProvider>
+    )
 }
+
+// Custom Settings Component
+// Add imports
+import { getCollections } from "@/lib/actions/collection-actions"
 
 // Settings component for Container with sections
 export const ContainerSettings = () => {
@@ -239,6 +242,10 @@ export const ContainerSettings = () => {
         marginTop, marginRight, marginBottom, marginLeft,
         paddingTop, paddingRight, paddingBottom, paddingLeft,
         boxShadow,
+        // Collection Props
+        collectionId,
+        itemId,
+        useSlugFromUrl,
     } = useNode((node) => ({
         backgroundColor: node.data.props.backgroundColor,
         backgroundImage: node.data.props.backgroundImage,
@@ -265,11 +272,31 @@ export const ContainerSettings = () => {
         paddingBottom: node.data.props.paddingBottom,
         paddingLeft: node.data.props.paddingLeft,
         boxShadow: node.data.props.boxShadow,
+        // Collection Props
+        collectionId: node.data.props.collectionId,
+        itemId: node.data.props.itemId,
+        useSlugFromUrl: node.data.props.useSlugFromUrl,
     }))
 
     const params = useParams()
     const siteId = params.siteId as string
     const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [collections, setCollections] = useState<{ label: string, value: string }[]>([])
+
+    // Fetch collections on mount
+    useEffect(() => {
+        if (!siteId) return
+        const fetchCollections = async () => {
+            const res = await getCollections(siteId)
+            if (res.collections) {
+                setCollections(res.collections.map(c => ({
+                    label: c.name,
+                    value: c.id
+                })))
+            }
+        }
+        fetchCollections()
+    }, [siteId])
 
     const handleMediaSelect = (items: MediaItem[]) => {
         if (items.length > 0) {
@@ -298,9 +325,31 @@ export const ContainerSettings = () => {
 
     return (
         <div>
+            {/* Collection Data Match Section */}
+            <PropertySection title="Data Source" summary={collectionId ? "Connected" : "None"}>
+                <div className="px-4 pb-2 text-xs text-muted-foreground">
+                    Bind this container to a collection to provide dynamic data to its children.
+                </div>
 
+                <PropertyRow label="Collection">
+                    <PropertySelect
+                        value={collectionId || ""}
+                        onChange={(v) => setProp((props: ContainerProps) => (props.collectionId = v))}
+                        options={[
+                            { label: "None", value: "" },
+                            ...collections
+                        ]}
+                    />
+                </PropertyRow>
+                {collectionId && (
+                    <div className="text-[10px] text-muted-foreground px-4 pb-2">
+                        ID: {collectionId}
+                    </div>
+                )}
+            </PropertySection>
 
             <PropertySection title="Dimensions" summary={dimensionsSummary}>
+                {/* ... existing dimensions ... */}
                 <PropertyRow label="Max Width">
                     <PropertySliderWithUnit
                         value={maxWidthValue}
@@ -317,6 +366,7 @@ export const ContainerSettings = () => {
                 </PropertyRow>
             </PropertySection>
 
+            {/* ... other sections ... */}
             <PropertySection title="Layout" summary={`${flexDirection} ${gap}px`}>
                 <PropertyRow label="Direction">
                     <PropertySelect
@@ -361,7 +411,9 @@ export const ContainerSettings = () => {
                 </PropertyRow>
             </PropertySection>
 
+            {/* ... decoration ... */}
             <PropertySection title="Decoration" summary={`${borderRadius ? `${borderRadius}px` : "0px"} / ${boxShadow ? "Shadow" : "None"}`} defaultOpen={false}>
+                {/* ... existing decoration inputs ... */}
                 <PropertyRow label="Background Color">
                     <PropertyColor
                         value={backgroundColor}
@@ -370,7 +422,10 @@ export const ContainerSettings = () => {
                 </PropertyRow>
                 <PropertyRow label="Background Image">
                     <div className="flex flex-col gap-2 w-full">
-                        {backgroundImage ? (
+                        <div className="text-xs text-muted-foreground mb-1">
+                            Use <code>{`{field_name}`}</code> or select image
+                        </div>
+                        {backgroundImage && !backgroundImage.startsWith('{') ? (
                             <div className="relative group w-full aspect-video bg-muted rounded-md overflow-hidden border border-border">
                                 <div
                                     className="w-full h-full"
@@ -388,7 +443,7 @@ export const ContainerSettings = () => {
                                         className="h-8 text-xs"
                                         onClick={() => setIsDialogOpen(true)}
                                     >
-                                        Change Image
+                                        Change
                                     </Button>
                                     <Button
                                         variant="destructive"
@@ -401,18 +456,26 @@ export const ContainerSettings = () => {
                                 </div>
                             </div>
                         ) : (
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="w-full flex items-center justify-center gap-2 h-20 border-dashed"
-                                onClick={() => setIsDialogOpen(true)}
-                            >
-                                <ImageIcon className="w-5 h-5 text-muted-foreground" />
-                                <span className="text-muted-foreground">Select Background Image</span>
-                            </Button>
+                            <div className="flex flex-col gap-2">
+                                <PropertyInput
+                                    value={backgroundImage || ""}
+                                    onChange={(v) => setProp((props: ContainerProps) => (props.backgroundImage = v))}
+                                    placeholder="{cover_image}"
+                                />
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="w-full flex items-center justify-center gap-2 h-10 border-dashed"
+                                    onClick={() => setIsDialogOpen(true)}
+                                >
+                                    <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                                    <span className="text-muted-foreground">Select Image</span>
+                                </Button>
+                            </div>
                         )}
                     </div>
                 </PropertyRow>
+                {/* ... rest of decoration ... */}
                 {backgroundImage && (
                     <>
                         <PropertyRow label="Image Size">
@@ -536,6 +599,11 @@ Container.craft = {
         paddingBottom: undefined,
         paddingLeft: undefined,
         boxShadow: undefined,
+
+        // Collection Props
+        collectionId: "",
+        itemId: "",
+        useSlugFromUrl: false,
     },
     rules: {
         canDrag: () => true,

@@ -29,12 +29,12 @@ export const Spacer = ({
         width: "100%",
     }
 
+    const finalClassName = `${className || ""} ${selected ? "bg-muted/20" : ""}`
+
     return (
         <div
-            ref={(ref) => {
-                if (ref) connect(drag(ref))
-            }}
-            className={`${className} ${selected ? "bg-muted/20" : ""}`}
+            ref={(ref: any) => connect(drag(ref))}
+            className={finalClassName}
             style={style}
         />
     )

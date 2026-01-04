@@ -8,6 +8,7 @@ import { useNode } from "@craftjs/core"
 import {
     withCraftComponent,
     CraftComponentProps,
+    propsToStyle,
 } from "../../lib/withCraftComponent"
 import { cn } from "@/lib/utils"
 import { CollectionItemProvider } from "./CollectionItemContext"
@@ -40,6 +41,9 @@ const CollectionContainerBase = forwardRef<HTMLDivElement, CollectionContainerPr
         const slugFromUrl = params?.slug as string
 
         const { connectors: { connect, drag } } = useNode()
+
+        // Generate styles from props
+        const style = propsToStyle({ ...props })
 
         // Fetch data logic (similar to CollectionItem but simplified)
         useEffect(() => {
@@ -118,7 +122,12 @@ const CollectionContainerBase = forwardRef<HTMLDivElement, CollectionContainerPr
         // Render states
         if (!collectionId) {
             return (
-                <div ref={ref} className={cn("p-4 border-2 border-dashed border-muted-foreground/20 rounded min-h-[100px] flex items-center justify-center bg-muted/5", className)}>
+                <div
+                    ref={ref}
+                    className={cn("p-4 border-2 border-dashed border-muted-foreground/20 rounded min-h-[100px] flex items-center justify-center bg-muted/5", className)}
+                    style={style}
+                    {...props}
+                >
                     <span className="text-muted-foreground text-sm">Select a Collection</span>
                 </div>
             )
@@ -129,6 +138,7 @@ const CollectionContainerBase = forwardRef<HTMLDivElement, CollectionContainerPr
                 <div
                     ref={ref}
                     className={cn("min-h-[50px] relative", className)}
+                    style={style}
                     {...props}
                 >
                     {/* 
@@ -157,9 +167,17 @@ export const CollectionContainer = withCraftComponent<CollectionContainerProps, 
             collectionId: "",
             itemId: "",
             useSlugFromUrl: false,
-            className: "w-full p-4"
+            className: "p-4",
+            width: "100%",
+            backgroundColor: "transparent",
+            paddingTop: 16,
+            paddingBottom: 16,
+            paddingLeft: 16,
+            paddingRight: 16,
+            borderRadius: 0,
         },
         settingsConfig: {
+            // Data settings
             collectionId: {
                 label: "Collection",
                 type: "collection-select",
@@ -177,11 +195,23 @@ export const CollectionContainer = withCraftComponent<CollectionContainerProps, 
                 section: "Data Match",
                 description: "Match item based on page URL slug"
             },
-            // Add style props here if we want standard spacing/colors via settings
-            // But withCraftComponent auto-generates some if we don't specify? 
-            // Actually generatedSettings uses the config passed here. 
-            // We can add standard visual props:
+
+            // Size
+            width: { label: "Width", type: "text", section: "Size", placeholder: "100%, 500px" },
+            height: { label: "Height", type: "text", section: "Size", placeholder: "auto, 400px" },
+            minHeight: { label: "Min Height", type: "text", section: "Size" },
+
+            // Appearance
             backgroundColor: { label: "Background", type: "color", section: "Styles" },
+            borderRadius: { label: "Radius", type: "slider", section: "Styles", min: 0, max: 50 },
+            borderWidth: { label: "Border Width", type: "slider", section: "Styles", min: 0, max: 20 },
+            borderColor: { label: "Border Color", type: "color", section: "Styles" },
+
+            // Spacing
+            marginTop: { label: "Margin Top", type: "number", section: "Spacing" },
+            marginBottom: { label: "Margin Bottom", type: "number", section: "Spacing" },
+            marginLeft: { label: "Margin Left", type: "number", section: "Spacing" },
+            marginRight: { label: "Margin Right", type: "number", section: "Spacing" },
             paddingTop: { label: "Padding Top", type: "number", section: "Spacing" },
             paddingBottom: { label: "Padding Bottom", type: "number", section: "Spacing" },
             paddingLeft: { label: "Padding Left", type: "number", section: "Spacing" },
