@@ -159,6 +159,7 @@ model Site {
   customFeedTemplates CustomFeedTemplate[]
   mergedFeeds         MergedFeed[]
   Notification        Notification[]
+  collections         Collection[]
 
   // Optional: Add a custom index for performance on frequently queried fields
   @@index([userId])
@@ -488,4 +489,50 @@ enum NotificationType {
   ERROR
   PROMO
   SYSTEM
+}
+
+// --- Dynamic Content System ---
+
+model Collection {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  siteId      String  @db.ObjectId
+  name        String
+  slug        String
+  description String?
+
+  // Field Definitions: Array of { name: string, type: "text" | "number" | "image" | "boolean" | "date" | "richtext", label: string, required: boolean }
+  fields Json
+
+  items CollectionItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@unique([siteId, slug])
+}
+
+model CollectionItem {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  collectionId String @db.ObjectId
+
+  // Dynamic Data: Key-Value pairs matching the Collection fields
+  data Json
+
+  slug   String // For public routing
+  status ItemStatus @default(DRAFT)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@unique([collectionId, slug])
+}
+
+enum ItemStatus {
+  PUBLISHED
+  DRAFT
+  ARCHIVED
 }

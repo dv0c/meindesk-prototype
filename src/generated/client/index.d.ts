@@ -118,6 +118,16 @@ export type SiteTheme = $Result.DefaultSelection<Prisma.$SiteThemePayload>
  * 
  */
 export type Notification = $Result.DefaultSelection<Prisma.$NotificationPayload>
+/**
+ * Model Collection
+ * 
+ */
+export type Collection = $Result.DefaultSelection<Prisma.$CollectionPayload>
+/**
+ * Model CollectionItem
+ * 
+ */
+export type CollectionItem = $Result.DefaultSelection<Prisma.$CollectionItemPayload>
 
 /**
  * Enums
@@ -170,6 +180,15 @@ export const NotificationType: {
 
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
 
+
+export const ItemStatus: {
+  PUBLISHED: 'PUBLISHED',
+  DRAFT: 'DRAFT',
+  ARCHIVED: 'ARCHIVED'
+};
+
+export type ItemStatus = (typeof ItemStatus)[keyof typeof ItemStatus]
+
 }
 
 export type Role = $Enums.Role
@@ -191,6 +210,10 @@ export const ArticleSourceType: typeof $Enums.ArticleSourceType
 export type NotificationType = $Enums.NotificationType
 
 export const NotificationType: typeof $Enums.NotificationType
+
+export type ItemStatus = $Enums.ItemStatus
+
+export const ItemStatus: typeof $Enums.ItemStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -486,6 +509,26 @@ export class PrismaClient<
     * ```
     */
   get notification(): Prisma.NotificationDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.collection`: Exposes CRUD operations for the **Collection** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Collections
+    * const collections = await prisma.collection.findMany()
+    * ```
+    */
+  get collection(): Prisma.CollectionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.collectionItem`: Exposes CRUD operations for the **CollectionItem** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more CollectionItems
+    * const collectionItems = await prisma.collectionItem.findMany()
+    * ```
+    */
+  get collectionItem(): Prisma.CollectionItemDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -947,7 +990,9 @@ export namespace Prisma {
     Theme: 'Theme',
     ThemeBlock: 'ThemeBlock',
     SiteTheme: 'SiteTheme',
-    Notification: 'Notification'
+    Notification: 'Notification',
+    Collection: 'Collection',
+    CollectionItem: 'CollectionItem'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -966,7 +1011,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "account" | "session" | "verificationToken" | "category" | "site" | "snippet" | "features" | "subscription" | "billingHistory" | "analyticsEvent" | "article" | "page" | "rss" | "rssItem" | "customFeedTemplate" | "mergedFeed" | "theme" | "themeBlock" | "siteTheme" | "notification"
+      modelProps: "user" | "account" | "session" | "verificationToken" | "category" | "site" | "snippet" | "features" | "subscription" | "billingHistory" | "analyticsEvent" | "article" | "page" | "rss" | "rssItem" | "customFeedTemplate" | "mergedFeed" | "theme" | "themeBlock" | "siteTheme" | "notification" | "collection" | "collectionItem"
       txIsolationLevel: never
     }
     model: {
@@ -2524,6 +2569,154 @@ export namespace Prisma {
           }
         }
       }
+      Collection: {
+        payload: Prisma.$CollectionPayload<ExtArgs>
+        fields: Prisma.CollectionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.CollectionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CollectionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.CollectionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CollectionPayload>
+          }
+          findFirst: {
+            args: Prisma.CollectionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CollectionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.CollectionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CollectionPayload>
+          }
+          findMany: {
+            args: Prisma.CollectionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CollectionPayload>[]
+          }
+          create: {
+            args: Prisma.CollectionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CollectionPayload>
+          }
+          createMany: {
+            args: Prisma.CollectionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.CollectionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CollectionPayload>
+          }
+          update: {
+            args: Prisma.CollectionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CollectionPayload>
+          }
+          deleteMany: {
+            args: Prisma.CollectionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.CollectionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.CollectionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CollectionPayload>
+          }
+          aggregate: {
+            args: Prisma.CollectionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateCollection>
+          }
+          groupBy: {
+            args: Prisma.CollectionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<CollectionGroupByOutputType>[]
+          }
+          findRaw: {
+            args: Prisma.CollectionFindRawArgs<ExtArgs>
+            result: JsonObject
+          }
+          aggregateRaw: {
+            args: Prisma.CollectionAggregateRawArgs<ExtArgs>
+            result: JsonObject
+          }
+          count: {
+            args: Prisma.CollectionCountArgs<ExtArgs>
+            result: $Utils.Optional<CollectionCountAggregateOutputType> | number
+          }
+        }
+      }
+      CollectionItem: {
+        payload: Prisma.$CollectionItemPayload<ExtArgs>
+        fields: Prisma.CollectionItemFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.CollectionItemFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CollectionItemPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.CollectionItemFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CollectionItemPayload>
+          }
+          findFirst: {
+            args: Prisma.CollectionItemFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CollectionItemPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.CollectionItemFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CollectionItemPayload>
+          }
+          findMany: {
+            args: Prisma.CollectionItemFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CollectionItemPayload>[]
+          }
+          create: {
+            args: Prisma.CollectionItemCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CollectionItemPayload>
+          }
+          createMany: {
+            args: Prisma.CollectionItemCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.CollectionItemDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CollectionItemPayload>
+          }
+          update: {
+            args: Prisma.CollectionItemUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CollectionItemPayload>
+          }
+          deleteMany: {
+            args: Prisma.CollectionItemDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.CollectionItemUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.CollectionItemUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CollectionItemPayload>
+          }
+          aggregate: {
+            args: Prisma.CollectionItemAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateCollectionItem>
+          }
+          groupBy: {
+            args: Prisma.CollectionItemGroupByArgs<ExtArgs>
+            result: $Utils.Optional<CollectionItemGroupByOutputType>[]
+          }
+          findRaw: {
+            args: Prisma.CollectionItemFindRawArgs<ExtArgs>
+            result: JsonObject
+          }
+          aggregateRaw: {
+            args: Prisma.CollectionItemAggregateRawArgs<ExtArgs>
+            result: JsonObject
+          }
+          count: {
+            args: Prisma.CollectionItemCountArgs<ExtArgs>
+            result: $Utils.Optional<CollectionItemCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2624,6 +2817,8 @@ export namespace Prisma {
     themeBlock?: ThemeBlockOmit
     siteTheme?: SiteThemeOmit
     notification?: NotificationOmit
+    collection?: CollectionOmit
+    collectionItem?: CollectionItemOmit
   }
 
   /* Types for Logging */
@@ -2848,6 +3043,7 @@ export namespace Prisma {
     customFeedTemplates: number
     mergedFeeds: number
     Notification: number
+    collections: number
   }
 
   export type SiteCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2861,6 +3057,7 @@ export namespace Prisma {
     customFeedTemplates?: boolean | SiteCountOutputTypeCountCustomFeedTemplatesArgs
     mergedFeeds?: boolean | SiteCountOutputTypeCountMergedFeedsArgs
     Notification?: boolean | SiteCountOutputTypeCountNotificationArgs
+    collections?: boolean | SiteCountOutputTypeCountCollectionsArgs
   }
 
   // Custom InputTypes
@@ -2942,6 +3139,13 @@ export namespace Prisma {
    */
   export type SiteCountOutputTypeCountNotificationArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: NotificationWhereInput
+  }
+
+  /**
+   * SiteCountOutputType without action
+   */
+  export type SiteCountOutputTypeCountCollectionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CollectionWhereInput
   }
 
 
@@ -3084,6 +3288,37 @@ export namespace Prisma {
    */
   export type ThemeCountOutputTypeCountInstalledInArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: SiteThemeWhereInput
+  }
+
+
+  /**
+   * Count Type CollectionCountOutputType
+   */
+
+  export type CollectionCountOutputType = {
+    items: number
+  }
+
+  export type CollectionCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    items?: boolean | CollectionCountOutputTypeCountItemsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * CollectionCountOutputType without action
+   */
+  export type CollectionCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CollectionCountOutputType
+     */
+    select?: CollectionCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * CollectionCountOutputType without action
+   */
+  export type CollectionCountOutputTypeCountItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CollectionItemWhereInput
   }
 
 
@@ -8806,6 +9041,7 @@ export namespace Prisma {
     customFeedTemplates?: boolean | Site$customFeedTemplatesArgs<ExtArgs>
     mergedFeeds?: boolean | Site$mergedFeedsArgs<ExtArgs>
     Notification?: boolean | Site$NotificationArgs<ExtArgs>
+    collections?: boolean | Site$collectionsArgs<ExtArgs>
     _count?: boolean | SiteCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["site"]>
 
@@ -8851,6 +9087,7 @@ export namespace Prisma {
     customFeedTemplates?: boolean | Site$customFeedTemplatesArgs<ExtArgs>
     mergedFeeds?: boolean | Site$mergedFeedsArgs<ExtArgs>
     Notification?: boolean | Site$NotificationArgs<ExtArgs>
+    collections?: boolean | Site$collectionsArgs<ExtArgs>
     _count?: boolean | SiteCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -8870,6 +9107,7 @@ export namespace Prisma {
       customFeedTemplates: Prisma.$CustomFeedTemplatePayload<ExtArgs>[]
       mergedFeeds: Prisma.$MergedFeedPayload<ExtArgs>[]
       Notification: Prisma.$NotificationPayload<ExtArgs>[]
+      collections: Prisma.$CollectionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -9270,6 +9508,7 @@ export namespace Prisma {
     customFeedTemplates<T extends Site$customFeedTemplatesArgs<ExtArgs> = {}>(args?: Subset<T, Site$customFeedTemplatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CustomFeedTemplatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     mergedFeeds<T extends Site$mergedFeedsArgs<ExtArgs> = {}>(args?: Subset<T, Site$mergedFeedsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergedFeedPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     Notification<T extends Site$NotificationArgs<ExtArgs> = {}>(args?: Subset<T, Site$NotificationArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    collections<T extends Site$collectionsArgs<ExtArgs> = {}>(args?: Subset<T, Site$collectionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CollectionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9985,6 +10224,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: NotificationScalarFieldEnum | NotificationScalarFieldEnum[]
+  }
+
+  /**
+   * Site.collections
+   */
+  export type Site$collectionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Collection
+     */
+    select?: CollectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Collection
+     */
+    omit?: CollectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CollectionInclude<ExtArgs> | null
+    where?: CollectionWhereInput
+    orderBy?: CollectionOrderByWithRelationInput | CollectionOrderByWithRelationInput[]
+    cursor?: CollectionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: CollectionScalarFieldEnum | CollectionScalarFieldEnum[]
   }
 
   /**
@@ -25994,6 +26257,2041 @@ export namespace Prisma {
 
 
   /**
+   * Model Collection
+   */
+
+  export type AggregateCollection = {
+    _count: CollectionCountAggregateOutputType | null
+    _min: CollectionMinAggregateOutputType | null
+    _max: CollectionMaxAggregateOutputType | null
+  }
+
+  export type CollectionMinAggregateOutputType = {
+    id: string | null
+    siteId: string | null
+    name: string | null
+    slug: string | null
+    description: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type CollectionMaxAggregateOutputType = {
+    id: string | null
+    siteId: string | null
+    name: string | null
+    slug: string | null
+    description: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type CollectionCountAggregateOutputType = {
+    id: number
+    siteId: number
+    name: number
+    slug: number
+    description: number
+    fields: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type CollectionMinAggregateInputType = {
+    id?: true
+    siteId?: true
+    name?: true
+    slug?: true
+    description?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type CollectionMaxAggregateInputType = {
+    id?: true
+    siteId?: true
+    name?: true
+    slug?: true
+    description?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type CollectionCountAggregateInputType = {
+    id?: true
+    siteId?: true
+    name?: true
+    slug?: true
+    description?: true
+    fields?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type CollectionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Collection to aggregate.
+     */
+    where?: CollectionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Collections to fetch.
+     */
+    orderBy?: CollectionOrderByWithRelationInput | CollectionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: CollectionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Collections from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Collections.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Collections
+    **/
+    _count?: true | CollectionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: CollectionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: CollectionMaxAggregateInputType
+  }
+
+  export type GetCollectionAggregateType<T extends CollectionAggregateArgs> = {
+        [P in keyof T & keyof AggregateCollection]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateCollection[P]>
+      : GetScalarType<T[P], AggregateCollection[P]>
+  }
+
+
+
+
+  export type CollectionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CollectionWhereInput
+    orderBy?: CollectionOrderByWithAggregationInput | CollectionOrderByWithAggregationInput[]
+    by: CollectionScalarFieldEnum[] | CollectionScalarFieldEnum
+    having?: CollectionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: CollectionCountAggregateInputType | true
+    _min?: CollectionMinAggregateInputType
+    _max?: CollectionMaxAggregateInputType
+  }
+
+  export type CollectionGroupByOutputType = {
+    id: string
+    siteId: string
+    name: string
+    slug: string
+    description: string | null
+    fields: JsonValue
+    createdAt: Date
+    updatedAt: Date
+    _count: CollectionCountAggregateOutputType | null
+    _min: CollectionMinAggregateOutputType | null
+    _max: CollectionMaxAggregateOutputType | null
+  }
+
+  type GetCollectionGroupByPayload<T extends CollectionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<CollectionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof CollectionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], CollectionGroupByOutputType[P]>
+            : GetScalarType<T[P], CollectionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type CollectionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    siteId?: boolean
+    name?: boolean
+    slug?: boolean
+    description?: boolean
+    fields?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    items?: boolean | Collection$itemsArgs<ExtArgs>
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    _count?: boolean | CollectionCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["collection"]>
+
+
+
+  export type CollectionSelectScalar = {
+    id?: boolean
+    siteId?: boolean
+    name?: boolean
+    slug?: boolean
+    description?: boolean
+    fields?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type CollectionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "siteId" | "name" | "slug" | "description" | "fields" | "createdAt" | "updatedAt", ExtArgs["result"]["collection"]>
+  export type CollectionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    items?: boolean | Collection$itemsArgs<ExtArgs>
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    _count?: boolean | CollectionCountOutputTypeDefaultArgs<ExtArgs>
+  }
+
+  export type $CollectionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Collection"
+    objects: {
+      items: Prisma.$CollectionItemPayload<ExtArgs>[]
+      site: Prisma.$SitePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      siteId: string
+      name: string
+      slug: string
+      description: string | null
+      fields: Prisma.JsonValue
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["collection"]>
+    composites: {}
+  }
+
+  type CollectionGetPayload<S extends boolean | null | undefined | CollectionDefaultArgs> = $Result.GetResult<Prisma.$CollectionPayload, S>
+
+  type CollectionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<CollectionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: CollectionCountAggregateInputType | true
+    }
+
+  export interface CollectionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Collection'], meta: { name: 'Collection' } }
+    /**
+     * Find zero or one Collection that matches the filter.
+     * @param {CollectionFindUniqueArgs} args - Arguments to find a Collection
+     * @example
+     * // Get one Collection
+     * const collection = await prisma.collection.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends CollectionFindUniqueArgs>(args: SelectSubset<T, CollectionFindUniqueArgs<ExtArgs>>): Prisma__CollectionClient<$Result.GetResult<Prisma.$CollectionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Collection that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {CollectionFindUniqueOrThrowArgs} args - Arguments to find a Collection
+     * @example
+     * // Get one Collection
+     * const collection = await prisma.collection.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends CollectionFindUniqueOrThrowArgs>(args: SelectSubset<T, CollectionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__CollectionClient<$Result.GetResult<Prisma.$CollectionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Collection that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CollectionFindFirstArgs} args - Arguments to find a Collection
+     * @example
+     * // Get one Collection
+     * const collection = await prisma.collection.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends CollectionFindFirstArgs>(args?: SelectSubset<T, CollectionFindFirstArgs<ExtArgs>>): Prisma__CollectionClient<$Result.GetResult<Prisma.$CollectionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Collection that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CollectionFindFirstOrThrowArgs} args - Arguments to find a Collection
+     * @example
+     * // Get one Collection
+     * const collection = await prisma.collection.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends CollectionFindFirstOrThrowArgs>(args?: SelectSubset<T, CollectionFindFirstOrThrowArgs<ExtArgs>>): Prisma__CollectionClient<$Result.GetResult<Prisma.$CollectionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Collections that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CollectionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Collections
+     * const collections = await prisma.collection.findMany()
+     * 
+     * // Get first 10 Collections
+     * const collections = await prisma.collection.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const collectionWithIdOnly = await prisma.collection.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends CollectionFindManyArgs>(args?: SelectSubset<T, CollectionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CollectionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Collection.
+     * @param {CollectionCreateArgs} args - Arguments to create a Collection.
+     * @example
+     * // Create one Collection
+     * const Collection = await prisma.collection.create({
+     *   data: {
+     *     // ... data to create a Collection
+     *   }
+     * })
+     * 
+     */
+    create<T extends CollectionCreateArgs>(args: SelectSubset<T, CollectionCreateArgs<ExtArgs>>): Prisma__CollectionClient<$Result.GetResult<Prisma.$CollectionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Collections.
+     * @param {CollectionCreateManyArgs} args - Arguments to create many Collections.
+     * @example
+     * // Create many Collections
+     * const collection = await prisma.collection.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends CollectionCreateManyArgs>(args?: SelectSubset<T, CollectionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a Collection.
+     * @param {CollectionDeleteArgs} args - Arguments to delete one Collection.
+     * @example
+     * // Delete one Collection
+     * const Collection = await prisma.collection.delete({
+     *   where: {
+     *     // ... filter to delete one Collection
+     *   }
+     * })
+     * 
+     */
+    delete<T extends CollectionDeleteArgs>(args: SelectSubset<T, CollectionDeleteArgs<ExtArgs>>): Prisma__CollectionClient<$Result.GetResult<Prisma.$CollectionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Collection.
+     * @param {CollectionUpdateArgs} args - Arguments to update one Collection.
+     * @example
+     * // Update one Collection
+     * const collection = await prisma.collection.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends CollectionUpdateArgs>(args: SelectSubset<T, CollectionUpdateArgs<ExtArgs>>): Prisma__CollectionClient<$Result.GetResult<Prisma.$CollectionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Collections.
+     * @param {CollectionDeleteManyArgs} args - Arguments to filter Collections to delete.
+     * @example
+     * // Delete a few Collections
+     * const { count } = await prisma.collection.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends CollectionDeleteManyArgs>(args?: SelectSubset<T, CollectionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Collections.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CollectionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Collections
+     * const collection = await prisma.collection.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends CollectionUpdateManyArgs>(args: SelectSubset<T, CollectionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Collection.
+     * @param {CollectionUpsertArgs} args - Arguments to update or create a Collection.
+     * @example
+     * // Update or create a Collection
+     * const collection = await prisma.collection.upsert({
+     *   create: {
+     *     // ... data to create a Collection
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Collection we want to update
+     *   }
+     * })
+     */
+    upsert<T extends CollectionUpsertArgs>(args: SelectSubset<T, CollectionUpsertArgs<ExtArgs>>): Prisma__CollectionClient<$Result.GetResult<Prisma.$CollectionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Collections that matches the filter.
+     * @param {CollectionFindRawArgs} args - Select which filters you would like to apply.
+     * @example
+     * const collection = await prisma.collection.findRaw({
+     *   filter: { age: { $gt: 25 } }
+     * })
+     */
+    findRaw(args?: CollectionFindRawArgs): Prisma.PrismaPromise<JsonObject>
+
+    /**
+     * Perform aggregation operations on a Collection.
+     * @param {CollectionAggregateRawArgs} args - Select which aggregations you would like to apply.
+     * @example
+     * const collection = await prisma.collection.aggregateRaw({
+     *   pipeline: [
+     *     { $match: { status: "registered" } },
+     *     { $group: { _id: "$country", total: { $sum: 1 } } }
+     *   ]
+     * })
+     */
+    aggregateRaw(args?: CollectionAggregateRawArgs): Prisma.PrismaPromise<JsonObject>
+
+
+    /**
+     * Count the number of Collections.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CollectionCountArgs} args - Arguments to filter Collections to count.
+     * @example
+     * // Count the number of Collections
+     * const count = await prisma.collection.count({
+     *   where: {
+     *     // ... the filter for the Collections we want to count
+     *   }
+     * })
+    **/
+    count<T extends CollectionCountArgs>(
+      args?: Subset<T, CollectionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], CollectionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Collection.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CollectionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends CollectionAggregateArgs>(args: Subset<T, CollectionAggregateArgs>): Prisma.PrismaPromise<GetCollectionAggregateType<T>>
+
+    /**
+     * Group by Collection.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CollectionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CollectionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CollectionGroupByArgs['orderBy'] }
+        : { orderBy?: CollectionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CollectionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCollectionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Collection model
+   */
+  readonly fields: CollectionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Collection.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__CollectionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    items<T extends Collection$itemsArgs<ExtArgs> = {}>(args?: Subset<T, Collection$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CollectionItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    site<T extends SiteDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SiteDefaultArgs<ExtArgs>>): Prisma__SiteClient<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Collection model
+   */
+  interface CollectionFieldRefs {
+    readonly id: FieldRef<"Collection", 'String'>
+    readonly siteId: FieldRef<"Collection", 'String'>
+    readonly name: FieldRef<"Collection", 'String'>
+    readonly slug: FieldRef<"Collection", 'String'>
+    readonly description: FieldRef<"Collection", 'String'>
+    readonly fields: FieldRef<"Collection", 'Json'>
+    readonly createdAt: FieldRef<"Collection", 'DateTime'>
+    readonly updatedAt: FieldRef<"Collection", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Collection findUnique
+   */
+  export type CollectionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Collection
+     */
+    select?: CollectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Collection
+     */
+    omit?: CollectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CollectionInclude<ExtArgs> | null
+    /**
+     * Filter, which Collection to fetch.
+     */
+    where: CollectionWhereUniqueInput
+  }
+
+  /**
+   * Collection findUniqueOrThrow
+   */
+  export type CollectionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Collection
+     */
+    select?: CollectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Collection
+     */
+    omit?: CollectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CollectionInclude<ExtArgs> | null
+    /**
+     * Filter, which Collection to fetch.
+     */
+    where: CollectionWhereUniqueInput
+  }
+
+  /**
+   * Collection findFirst
+   */
+  export type CollectionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Collection
+     */
+    select?: CollectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Collection
+     */
+    omit?: CollectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CollectionInclude<ExtArgs> | null
+    /**
+     * Filter, which Collection to fetch.
+     */
+    where?: CollectionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Collections to fetch.
+     */
+    orderBy?: CollectionOrderByWithRelationInput | CollectionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Collections.
+     */
+    cursor?: CollectionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Collections from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Collections.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Collections.
+     */
+    distinct?: CollectionScalarFieldEnum | CollectionScalarFieldEnum[]
+  }
+
+  /**
+   * Collection findFirstOrThrow
+   */
+  export type CollectionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Collection
+     */
+    select?: CollectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Collection
+     */
+    omit?: CollectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CollectionInclude<ExtArgs> | null
+    /**
+     * Filter, which Collection to fetch.
+     */
+    where?: CollectionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Collections to fetch.
+     */
+    orderBy?: CollectionOrderByWithRelationInput | CollectionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Collections.
+     */
+    cursor?: CollectionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Collections from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Collections.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Collections.
+     */
+    distinct?: CollectionScalarFieldEnum | CollectionScalarFieldEnum[]
+  }
+
+  /**
+   * Collection findMany
+   */
+  export type CollectionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Collection
+     */
+    select?: CollectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Collection
+     */
+    omit?: CollectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CollectionInclude<ExtArgs> | null
+    /**
+     * Filter, which Collections to fetch.
+     */
+    where?: CollectionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Collections to fetch.
+     */
+    orderBy?: CollectionOrderByWithRelationInput | CollectionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Collections.
+     */
+    cursor?: CollectionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Collections from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Collections.
+     */
+    skip?: number
+    distinct?: CollectionScalarFieldEnum | CollectionScalarFieldEnum[]
+  }
+
+  /**
+   * Collection create
+   */
+  export type CollectionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Collection
+     */
+    select?: CollectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Collection
+     */
+    omit?: CollectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CollectionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Collection.
+     */
+    data: XOR<CollectionCreateInput, CollectionUncheckedCreateInput>
+  }
+
+  /**
+   * Collection createMany
+   */
+  export type CollectionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Collections.
+     */
+    data: CollectionCreateManyInput | CollectionCreateManyInput[]
+  }
+
+  /**
+   * Collection update
+   */
+  export type CollectionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Collection
+     */
+    select?: CollectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Collection
+     */
+    omit?: CollectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CollectionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Collection.
+     */
+    data: XOR<CollectionUpdateInput, CollectionUncheckedUpdateInput>
+    /**
+     * Choose, which Collection to update.
+     */
+    where: CollectionWhereUniqueInput
+  }
+
+  /**
+   * Collection updateMany
+   */
+  export type CollectionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Collections.
+     */
+    data: XOR<CollectionUpdateManyMutationInput, CollectionUncheckedUpdateManyInput>
+    /**
+     * Filter which Collections to update
+     */
+    where?: CollectionWhereInput
+    /**
+     * Limit how many Collections to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Collection upsert
+   */
+  export type CollectionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Collection
+     */
+    select?: CollectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Collection
+     */
+    omit?: CollectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CollectionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Collection to update in case it exists.
+     */
+    where: CollectionWhereUniqueInput
+    /**
+     * In case the Collection found by the `where` argument doesn't exist, create a new Collection with this data.
+     */
+    create: XOR<CollectionCreateInput, CollectionUncheckedCreateInput>
+    /**
+     * In case the Collection was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<CollectionUpdateInput, CollectionUncheckedUpdateInput>
+  }
+
+  /**
+   * Collection delete
+   */
+  export type CollectionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Collection
+     */
+    select?: CollectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Collection
+     */
+    omit?: CollectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CollectionInclude<ExtArgs> | null
+    /**
+     * Filter which Collection to delete.
+     */
+    where: CollectionWhereUniqueInput
+  }
+
+  /**
+   * Collection deleteMany
+   */
+  export type CollectionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Collections to delete
+     */
+    where?: CollectionWhereInput
+    /**
+     * Limit how many Collections to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Collection findRaw
+   */
+  export type CollectionFindRawArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The query predicate filter. If unspecified, then all documents in the collection will match the predicate. ${@link https://docs.mongodb.com/manual/reference/operator/query MongoDB Docs}.
+     */
+    filter?: InputJsonValue
+    /**
+     * Additional options to pass to the `find` command ${@link https://docs.mongodb.com/manual/reference/command/find/#command-fields MongoDB Docs}.
+     */
+    options?: InputJsonValue
+  }
+
+  /**
+   * Collection aggregateRaw
+   */
+  export type CollectionAggregateRawArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * An array of aggregation stages to process and transform the document stream via the aggregation pipeline. ${@link https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline MongoDB Docs}.
+     */
+    pipeline?: InputJsonValue[]
+    /**
+     * Additional options to pass to the `aggregate` command ${@link https://docs.mongodb.com/manual/reference/command/aggregate/#command-fields MongoDB Docs}.
+     */
+    options?: InputJsonValue
+  }
+
+  /**
+   * Collection.items
+   */
+  export type Collection$itemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CollectionItem
+     */
+    select?: CollectionItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CollectionItem
+     */
+    omit?: CollectionItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CollectionItemInclude<ExtArgs> | null
+    where?: CollectionItemWhereInput
+    orderBy?: CollectionItemOrderByWithRelationInput | CollectionItemOrderByWithRelationInput[]
+    cursor?: CollectionItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: CollectionItemScalarFieldEnum | CollectionItemScalarFieldEnum[]
+  }
+
+  /**
+   * Collection without action
+   */
+  export type CollectionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Collection
+     */
+    select?: CollectionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Collection
+     */
+    omit?: CollectionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CollectionInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model CollectionItem
+   */
+
+  export type AggregateCollectionItem = {
+    _count: CollectionItemCountAggregateOutputType | null
+    _min: CollectionItemMinAggregateOutputType | null
+    _max: CollectionItemMaxAggregateOutputType | null
+  }
+
+  export type CollectionItemMinAggregateOutputType = {
+    id: string | null
+    collectionId: string | null
+    slug: string | null
+    status: $Enums.ItemStatus | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type CollectionItemMaxAggregateOutputType = {
+    id: string | null
+    collectionId: string | null
+    slug: string | null
+    status: $Enums.ItemStatus | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type CollectionItemCountAggregateOutputType = {
+    id: number
+    collectionId: number
+    data: number
+    slug: number
+    status: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type CollectionItemMinAggregateInputType = {
+    id?: true
+    collectionId?: true
+    slug?: true
+    status?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type CollectionItemMaxAggregateInputType = {
+    id?: true
+    collectionId?: true
+    slug?: true
+    status?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type CollectionItemCountAggregateInputType = {
+    id?: true
+    collectionId?: true
+    data?: true
+    slug?: true
+    status?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type CollectionItemAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CollectionItem to aggregate.
+     */
+    where?: CollectionItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CollectionItems to fetch.
+     */
+    orderBy?: CollectionItemOrderByWithRelationInput | CollectionItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: CollectionItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CollectionItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CollectionItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned CollectionItems
+    **/
+    _count?: true | CollectionItemCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: CollectionItemMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: CollectionItemMaxAggregateInputType
+  }
+
+  export type GetCollectionItemAggregateType<T extends CollectionItemAggregateArgs> = {
+        [P in keyof T & keyof AggregateCollectionItem]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateCollectionItem[P]>
+      : GetScalarType<T[P], AggregateCollectionItem[P]>
+  }
+
+
+
+
+  export type CollectionItemGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CollectionItemWhereInput
+    orderBy?: CollectionItemOrderByWithAggregationInput | CollectionItemOrderByWithAggregationInput[]
+    by: CollectionItemScalarFieldEnum[] | CollectionItemScalarFieldEnum
+    having?: CollectionItemScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: CollectionItemCountAggregateInputType | true
+    _min?: CollectionItemMinAggregateInputType
+    _max?: CollectionItemMaxAggregateInputType
+  }
+
+  export type CollectionItemGroupByOutputType = {
+    id: string
+    collectionId: string
+    data: JsonValue
+    slug: string
+    status: $Enums.ItemStatus
+    createdAt: Date
+    updatedAt: Date
+    _count: CollectionItemCountAggregateOutputType | null
+    _min: CollectionItemMinAggregateOutputType | null
+    _max: CollectionItemMaxAggregateOutputType | null
+  }
+
+  type GetCollectionItemGroupByPayload<T extends CollectionItemGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<CollectionItemGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof CollectionItemGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], CollectionItemGroupByOutputType[P]>
+            : GetScalarType<T[P], CollectionItemGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type CollectionItemSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    collectionId?: boolean
+    data?: boolean
+    slug?: boolean
+    status?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    collection?: boolean | CollectionDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["collectionItem"]>
+
+
+
+  export type CollectionItemSelectScalar = {
+    id?: boolean
+    collectionId?: boolean
+    data?: boolean
+    slug?: boolean
+    status?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type CollectionItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "collectionId" | "data" | "slug" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["collectionItem"]>
+  export type CollectionItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    collection?: boolean | CollectionDefaultArgs<ExtArgs>
+  }
+
+  export type $CollectionItemPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "CollectionItem"
+    objects: {
+      collection: Prisma.$CollectionPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      collectionId: string
+      data: Prisma.JsonValue
+      slug: string
+      status: $Enums.ItemStatus
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["collectionItem"]>
+    composites: {}
+  }
+
+  type CollectionItemGetPayload<S extends boolean | null | undefined | CollectionItemDefaultArgs> = $Result.GetResult<Prisma.$CollectionItemPayload, S>
+
+  type CollectionItemCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<CollectionItemFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: CollectionItemCountAggregateInputType | true
+    }
+
+  export interface CollectionItemDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['CollectionItem'], meta: { name: 'CollectionItem' } }
+    /**
+     * Find zero or one CollectionItem that matches the filter.
+     * @param {CollectionItemFindUniqueArgs} args - Arguments to find a CollectionItem
+     * @example
+     * // Get one CollectionItem
+     * const collectionItem = await prisma.collectionItem.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends CollectionItemFindUniqueArgs>(args: SelectSubset<T, CollectionItemFindUniqueArgs<ExtArgs>>): Prisma__CollectionItemClient<$Result.GetResult<Prisma.$CollectionItemPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one CollectionItem that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {CollectionItemFindUniqueOrThrowArgs} args - Arguments to find a CollectionItem
+     * @example
+     * // Get one CollectionItem
+     * const collectionItem = await prisma.collectionItem.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends CollectionItemFindUniqueOrThrowArgs>(args: SelectSubset<T, CollectionItemFindUniqueOrThrowArgs<ExtArgs>>): Prisma__CollectionItemClient<$Result.GetResult<Prisma.$CollectionItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CollectionItem that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CollectionItemFindFirstArgs} args - Arguments to find a CollectionItem
+     * @example
+     * // Get one CollectionItem
+     * const collectionItem = await prisma.collectionItem.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends CollectionItemFindFirstArgs>(args?: SelectSubset<T, CollectionItemFindFirstArgs<ExtArgs>>): Prisma__CollectionItemClient<$Result.GetResult<Prisma.$CollectionItemPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CollectionItem that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CollectionItemFindFirstOrThrowArgs} args - Arguments to find a CollectionItem
+     * @example
+     * // Get one CollectionItem
+     * const collectionItem = await prisma.collectionItem.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends CollectionItemFindFirstOrThrowArgs>(args?: SelectSubset<T, CollectionItemFindFirstOrThrowArgs<ExtArgs>>): Prisma__CollectionItemClient<$Result.GetResult<Prisma.$CollectionItemPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more CollectionItems that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CollectionItemFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all CollectionItems
+     * const collectionItems = await prisma.collectionItem.findMany()
+     * 
+     * // Get first 10 CollectionItems
+     * const collectionItems = await prisma.collectionItem.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const collectionItemWithIdOnly = await prisma.collectionItem.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends CollectionItemFindManyArgs>(args?: SelectSubset<T, CollectionItemFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CollectionItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a CollectionItem.
+     * @param {CollectionItemCreateArgs} args - Arguments to create a CollectionItem.
+     * @example
+     * // Create one CollectionItem
+     * const CollectionItem = await prisma.collectionItem.create({
+     *   data: {
+     *     // ... data to create a CollectionItem
+     *   }
+     * })
+     * 
+     */
+    create<T extends CollectionItemCreateArgs>(args: SelectSubset<T, CollectionItemCreateArgs<ExtArgs>>): Prisma__CollectionItemClient<$Result.GetResult<Prisma.$CollectionItemPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many CollectionItems.
+     * @param {CollectionItemCreateManyArgs} args - Arguments to create many CollectionItems.
+     * @example
+     * // Create many CollectionItems
+     * const collectionItem = await prisma.collectionItem.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends CollectionItemCreateManyArgs>(args?: SelectSubset<T, CollectionItemCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a CollectionItem.
+     * @param {CollectionItemDeleteArgs} args - Arguments to delete one CollectionItem.
+     * @example
+     * // Delete one CollectionItem
+     * const CollectionItem = await prisma.collectionItem.delete({
+     *   where: {
+     *     // ... filter to delete one CollectionItem
+     *   }
+     * })
+     * 
+     */
+    delete<T extends CollectionItemDeleteArgs>(args: SelectSubset<T, CollectionItemDeleteArgs<ExtArgs>>): Prisma__CollectionItemClient<$Result.GetResult<Prisma.$CollectionItemPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one CollectionItem.
+     * @param {CollectionItemUpdateArgs} args - Arguments to update one CollectionItem.
+     * @example
+     * // Update one CollectionItem
+     * const collectionItem = await prisma.collectionItem.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends CollectionItemUpdateArgs>(args: SelectSubset<T, CollectionItemUpdateArgs<ExtArgs>>): Prisma__CollectionItemClient<$Result.GetResult<Prisma.$CollectionItemPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more CollectionItems.
+     * @param {CollectionItemDeleteManyArgs} args - Arguments to filter CollectionItems to delete.
+     * @example
+     * // Delete a few CollectionItems
+     * const { count } = await prisma.collectionItem.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends CollectionItemDeleteManyArgs>(args?: SelectSubset<T, CollectionItemDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CollectionItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CollectionItemUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many CollectionItems
+     * const collectionItem = await prisma.collectionItem.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends CollectionItemUpdateManyArgs>(args: SelectSubset<T, CollectionItemUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one CollectionItem.
+     * @param {CollectionItemUpsertArgs} args - Arguments to update or create a CollectionItem.
+     * @example
+     * // Update or create a CollectionItem
+     * const collectionItem = await prisma.collectionItem.upsert({
+     *   create: {
+     *     // ... data to create a CollectionItem
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the CollectionItem we want to update
+     *   }
+     * })
+     */
+    upsert<T extends CollectionItemUpsertArgs>(args: SelectSubset<T, CollectionItemUpsertArgs<ExtArgs>>): Prisma__CollectionItemClient<$Result.GetResult<Prisma.$CollectionItemPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more CollectionItems that matches the filter.
+     * @param {CollectionItemFindRawArgs} args - Select which filters you would like to apply.
+     * @example
+     * const collectionItem = await prisma.collectionItem.findRaw({
+     *   filter: { age: { $gt: 25 } }
+     * })
+     */
+    findRaw(args?: CollectionItemFindRawArgs): Prisma.PrismaPromise<JsonObject>
+
+    /**
+     * Perform aggregation operations on a CollectionItem.
+     * @param {CollectionItemAggregateRawArgs} args - Select which aggregations you would like to apply.
+     * @example
+     * const collectionItem = await prisma.collectionItem.aggregateRaw({
+     *   pipeline: [
+     *     { $match: { status: "registered" } },
+     *     { $group: { _id: "$country", total: { $sum: 1 } } }
+     *   ]
+     * })
+     */
+    aggregateRaw(args?: CollectionItemAggregateRawArgs): Prisma.PrismaPromise<JsonObject>
+
+
+    /**
+     * Count the number of CollectionItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CollectionItemCountArgs} args - Arguments to filter CollectionItems to count.
+     * @example
+     * // Count the number of CollectionItems
+     * const count = await prisma.collectionItem.count({
+     *   where: {
+     *     // ... the filter for the CollectionItems we want to count
+     *   }
+     * })
+    **/
+    count<T extends CollectionItemCountArgs>(
+      args?: Subset<T, CollectionItemCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], CollectionItemCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a CollectionItem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CollectionItemAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends CollectionItemAggregateArgs>(args: Subset<T, CollectionItemAggregateArgs>): Prisma.PrismaPromise<GetCollectionItemAggregateType<T>>
+
+    /**
+     * Group by CollectionItem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CollectionItemGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CollectionItemGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CollectionItemGroupByArgs['orderBy'] }
+        : { orderBy?: CollectionItemGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CollectionItemGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCollectionItemGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the CollectionItem model
+   */
+  readonly fields: CollectionItemFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for CollectionItem.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__CollectionItemClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    collection<T extends CollectionDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CollectionDefaultArgs<ExtArgs>>): Prisma__CollectionClient<$Result.GetResult<Prisma.$CollectionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the CollectionItem model
+   */
+  interface CollectionItemFieldRefs {
+    readonly id: FieldRef<"CollectionItem", 'String'>
+    readonly collectionId: FieldRef<"CollectionItem", 'String'>
+    readonly data: FieldRef<"CollectionItem", 'Json'>
+    readonly slug: FieldRef<"CollectionItem", 'String'>
+    readonly status: FieldRef<"CollectionItem", 'ItemStatus'>
+    readonly createdAt: FieldRef<"CollectionItem", 'DateTime'>
+    readonly updatedAt: FieldRef<"CollectionItem", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * CollectionItem findUnique
+   */
+  export type CollectionItemFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CollectionItem
+     */
+    select?: CollectionItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CollectionItem
+     */
+    omit?: CollectionItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CollectionItemInclude<ExtArgs> | null
+    /**
+     * Filter, which CollectionItem to fetch.
+     */
+    where: CollectionItemWhereUniqueInput
+  }
+
+  /**
+   * CollectionItem findUniqueOrThrow
+   */
+  export type CollectionItemFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CollectionItem
+     */
+    select?: CollectionItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CollectionItem
+     */
+    omit?: CollectionItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CollectionItemInclude<ExtArgs> | null
+    /**
+     * Filter, which CollectionItem to fetch.
+     */
+    where: CollectionItemWhereUniqueInput
+  }
+
+  /**
+   * CollectionItem findFirst
+   */
+  export type CollectionItemFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CollectionItem
+     */
+    select?: CollectionItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CollectionItem
+     */
+    omit?: CollectionItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CollectionItemInclude<ExtArgs> | null
+    /**
+     * Filter, which CollectionItem to fetch.
+     */
+    where?: CollectionItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CollectionItems to fetch.
+     */
+    orderBy?: CollectionItemOrderByWithRelationInput | CollectionItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CollectionItems.
+     */
+    cursor?: CollectionItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CollectionItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CollectionItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CollectionItems.
+     */
+    distinct?: CollectionItemScalarFieldEnum | CollectionItemScalarFieldEnum[]
+  }
+
+  /**
+   * CollectionItem findFirstOrThrow
+   */
+  export type CollectionItemFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CollectionItem
+     */
+    select?: CollectionItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CollectionItem
+     */
+    omit?: CollectionItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CollectionItemInclude<ExtArgs> | null
+    /**
+     * Filter, which CollectionItem to fetch.
+     */
+    where?: CollectionItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CollectionItems to fetch.
+     */
+    orderBy?: CollectionItemOrderByWithRelationInput | CollectionItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CollectionItems.
+     */
+    cursor?: CollectionItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CollectionItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CollectionItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CollectionItems.
+     */
+    distinct?: CollectionItemScalarFieldEnum | CollectionItemScalarFieldEnum[]
+  }
+
+  /**
+   * CollectionItem findMany
+   */
+  export type CollectionItemFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CollectionItem
+     */
+    select?: CollectionItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CollectionItem
+     */
+    omit?: CollectionItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CollectionItemInclude<ExtArgs> | null
+    /**
+     * Filter, which CollectionItems to fetch.
+     */
+    where?: CollectionItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CollectionItems to fetch.
+     */
+    orderBy?: CollectionItemOrderByWithRelationInput | CollectionItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing CollectionItems.
+     */
+    cursor?: CollectionItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CollectionItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CollectionItems.
+     */
+    skip?: number
+    distinct?: CollectionItemScalarFieldEnum | CollectionItemScalarFieldEnum[]
+  }
+
+  /**
+   * CollectionItem create
+   */
+  export type CollectionItemCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CollectionItem
+     */
+    select?: CollectionItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CollectionItem
+     */
+    omit?: CollectionItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CollectionItemInclude<ExtArgs> | null
+    /**
+     * The data needed to create a CollectionItem.
+     */
+    data: XOR<CollectionItemCreateInput, CollectionItemUncheckedCreateInput>
+  }
+
+  /**
+   * CollectionItem createMany
+   */
+  export type CollectionItemCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many CollectionItems.
+     */
+    data: CollectionItemCreateManyInput | CollectionItemCreateManyInput[]
+  }
+
+  /**
+   * CollectionItem update
+   */
+  export type CollectionItemUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CollectionItem
+     */
+    select?: CollectionItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CollectionItem
+     */
+    omit?: CollectionItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CollectionItemInclude<ExtArgs> | null
+    /**
+     * The data needed to update a CollectionItem.
+     */
+    data: XOR<CollectionItemUpdateInput, CollectionItemUncheckedUpdateInput>
+    /**
+     * Choose, which CollectionItem to update.
+     */
+    where: CollectionItemWhereUniqueInput
+  }
+
+  /**
+   * CollectionItem updateMany
+   */
+  export type CollectionItemUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update CollectionItems.
+     */
+    data: XOR<CollectionItemUpdateManyMutationInput, CollectionItemUncheckedUpdateManyInput>
+    /**
+     * Filter which CollectionItems to update
+     */
+    where?: CollectionItemWhereInput
+    /**
+     * Limit how many CollectionItems to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * CollectionItem upsert
+   */
+  export type CollectionItemUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CollectionItem
+     */
+    select?: CollectionItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CollectionItem
+     */
+    omit?: CollectionItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CollectionItemInclude<ExtArgs> | null
+    /**
+     * The filter to search for the CollectionItem to update in case it exists.
+     */
+    where: CollectionItemWhereUniqueInput
+    /**
+     * In case the CollectionItem found by the `where` argument doesn't exist, create a new CollectionItem with this data.
+     */
+    create: XOR<CollectionItemCreateInput, CollectionItemUncheckedCreateInput>
+    /**
+     * In case the CollectionItem was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<CollectionItemUpdateInput, CollectionItemUncheckedUpdateInput>
+  }
+
+  /**
+   * CollectionItem delete
+   */
+  export type CollectionItemDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CollectionItem
+     */
+    select?: CollectionItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CollectionItem
+     */
+    omit?: CollectionItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CollectionItemInclude<ExtArgs> | null
+    /**
+     * Filter which CollectionItem to delete.
+     */
+    where: CollectionItemWhereUniqueInput
+  }
+
+  /**
+   * CollectionItem deleteMany
+   */
+  export type CollectionItemDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CollectionItems to delete
+     */
+    where?: CollectionItemWhereInput
+    /**
+     * Limit how many CollectionItems to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * CollectionItem findRaw
+   */
+  export type CollectionItemFindRawArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The query predicate filter. If unspecified, then all documents in the collection will match the predicate. ${@link https://docs.mongodb.com/manual/reference/operator/query MongoDB Docs}.
+     */
+    filter?: InputJsonValue
+    /**
+     * Additional options to pass to the `find` command ${@link https://docs.mongodb.com/manual/reference/command/find/#command-fields MongoDB Docs}.
+     */
+    options?: InputJsonValue
+  }
+
+  /**
+   * CollectionItem aggregateRaw
+   */
+  export type CollectionItemAggregateRawArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * An array of aggregation stages to process and transform the document stream via the aggregation pipeline. ${@link https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline MongoDB Docs}.
+     */
+    pipeline?: InputJsonValue[]
+    /**
+     * Additional options to pass to the `aggregate` command ${@link https://docs.mongodb.com/manual/reference/command/aggregate/#command-fields MongoDB Docs}.
+     */
+    options?: InputJsonValue
+  }
+
+  /**
+   * CollectionItem without action
+   */
+  export type CollectionItemDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CollectionItem
+     */
+    select?: CollectionItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CollectionItem
+     */
+    omit?: CollectionItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CollectionItemInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -26337,6 +28635,33 @@ export namespace Prisma {
   export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
+  export const CollectionScalarFieldEnum: {
+    id: 'id',
+    siteId: 'siteId',
+    name: 'name',
+    slug: 'slug',
+    description: 'description',
+    fields: 'fields',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type CollectionScalarFieldEnum = (typeof CollectionScalarFieldEnum)[keyof typeof CollectionScalarFieldEnum]
+
+
+  export const CollectionItemScalarFieldEnum: {
+    id: 'id',
+    collectionId: 'collectionId',
+    data: 'data',
+    slug: 'slug',
+    status: 'status',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type CollectionItemScalarFieldEnum = (typeof CollectionItemScalarFieldEnum)[keyof typeof CollectionItemScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -26502,6 +28827,20 @@ export namespace Prisma {
    * Reference to a field of type 'NotificationType[]'
    */
   export type ListEnumNotificationTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NotificationType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'ItemStatus'
+   */
+  export type EnumItemStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ItemStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'ItemStatus[]'
+   */
+  export type ListEnumItemStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ItemStatus[]'>
     
   /**
    * Deep Input Types
@@ -26933,6 +29272,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateListRelationFilter
     mergedFeeds?: MergedFeedListRelationFilter
     Notification?: NotificationListRelationFilter
+    collections?: CollectionListRelationFilter
   }
 
   export type SiteOrderByWithRelationInput = {
@@ -26971,6 +29311,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateOrderByRelationAggregateInput
     mergedFeeds?: MergedFeedOrderByRelationAggregateInput
     Notification?: NotificationOrderByRelationAggregateInput
+    collections?: CollectionOrderByRelationAggregateInput
   }
 
   export type SiteWhereUniqueInput = Prisma.AtLeast<{
@@ -27012,6 +29353,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateListRelationFilter
     mergedFeeds?: MergedFeedListRelationFilter
     Notification?: NotificationListRelationFilter
+    collections?: CollectionListRelationFilter
   }, "id" | "subdomain" | "url">
 
   export type SiteOrderByWithAggregationInput = {
@@ -28324,6 +30666,146 @@ export namespace Prisma {
     senderId?: StringNullableWithAggregatesFilter<"Notification"> | string | null
   }
 
+  export type CollectionWhereInput = {
+    AND?: CollectionWhereInput | CollectionWhereInput[]
+    OR?: CollectionWhereInput[]
+    NOT?: CollectionWhereInput | CollectionWhereInput[]
+    id?: StringFilter<"Collection"> | string
+    siteId?: StringFilter<"Collection"> | string
+    name?: StringFilter<"Collection"> | string
+    slug?: StringFilter<"Collection"> | string
+    description?: StringNullableFilter<"Collection"> | string | null
+    fields?: JsonFilter<"Collection">
+    createdAt?: DateTimeFilter<"Collection"> | Date | string
+    updatedAt?: DateTimeFilter<"Collection"> | Date | string
+    items?: CollectionItemListRelationFilter
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+  }
+
+  export type CollectionOrderByWithRelationInput = {
+    id?: SortOrder
+    siteId?: SortOrder
+    name?: SortOrder
+    slug?: SortOrder
+    description?: SortOrder
+    fields?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    items?: CollectionItemOrderByRelationAggregateInput
+    site?: SiteOrderByWithRelationInput
+  }
+
+  export type CollectionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    siteId_slug?: CollectionSiteIdSlugCompoundUniqueInput
+    AND?: CollectionWhereInput | CollectionWhereInput[]
+    OR?: CollectionWhereInput[]
+    NOT?: CollectionWhereInput | CollectionWhereInput[]
+    siteId?: StringFilter<"Collection"> | string
+    name?: StringFilter<"Collection"> | string
+    slug?: StringFilter<"Collection"> | string
+    description?: StringNullableFilter<"Collection"> | string | null
+    fields?: JsonFilter<"Collection">
+    createdAt?: DateTimeFilter<"Collection"> | Date | string
+    updatedAt?: DateTimeFilter<"Collection"> | Date | string
+    items?: CollectionItemListRelationFilter
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+  }, "id" | "siteId_slug">
+
+  export type CollectionOrderByWithAggregationInput = {
+    id?: SortOrder
+    siteId?: SortOrder
+    name?: SortOrder
+    slug?: SortOrder
+    description?: SortOrder
+    fields?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: CollectionCountOrderByAggregateInput
+    _max?: CollectionMaxOrderByAggregateInput
+    _min?: CollectionMinOrderByAggregateInput
+  }
+
+  export type CollectionScalarWhereWithAggregatesInput = {
+    AND?: CollectionScalarWhereWithAggregatesInput | CollectionScalarWhereWithAggregatesInput[]
+    OR?: CollectionScalarWhereWithAggregatesInput[]
+    NOT?: CollectionScalarWhereWithAggregatesInput | CollectionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Collection"> | string
+    siteId?: StringWithAggregatesFilter<"Collection"> | string
+    name?: StringWithAggregatesFilter<"Collection"> | string
+    slug?: StringWithAggregatesFilter<"Collection"> | string
+    description?: StringNullableWithAggregatesFilter<"Collection"> | string | null
+    fields?: JsonWithAggregatesFilter<"Collection">
+    createdAt?: DateTimeWithAggregatesFilter<"Collection"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Collection"> | Date | string
+  }
+
+  export type CollectionItemWhereInput = {
+    AND?: CollectionItemWhereInput | CollectionItemWhereInput[]
+    OR?: CollectionItemWhereInput[]
+    NOT?: CollectionItemWhereInput | CollectionItemWhereInput[]
+    id?: StringFilter<"CollectionItem"> | string
+    collectionId?: StringFilter<"CollectionItem"> | string
+    data?: JsonFilter<"CollectionItem">
+    slug?: StringFilter<"CollectionItem"> | string
+    status?: EnumItemStatusFilter<"CollectionItem"> | $Enums.ItemStatus
+    createdAt?: DateTimeFilter<"CollectionItem"> | Date | string
+    updatedAt?: DateTimeFilter<"CollectionItem"> | Date | string
+    collection?: XOR<CollectionScalarRelationFilter, CollectionWhereInput>
+  }
+
+  export type CollectionItemOrderByWithRelationInput = {
+    id?: SortOrder
+    collectionId?: SortOrder
+    data?: SortOrder
+    slug?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    collection?: CollectionOrderByWithRelationInput
+  }
+
+  export type CollectionItemWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    collectionId_slug?: CollectionItemCollectionIdSlugCompoundUniqueInput
+    AND?: CollectionItemWhereInput | CollectionItemWhereInput[]
+    OR?: CollectionItemWhereInput[]
+    NOT?: CollectionItemWhereInput | CollectionItemWhereInput[]
+    collectionId?: StringFilter<"CollectionItem"> | string
+    data?: JsonFilter<"CollectionItem">
+    slug?: StringFilter<"CollectionItem"> | string
+    status?: EnumItemStatusFilter<"CollectionItem"> | $Enums.ItemStatus
+    createdAt?: DateTimeFilter<"CollectionItem"> | Date | string
+    updatedAt?: DateTimeFilter<"CollectionItem"> | Date | string
+    collection?: XOR<CollectionScalarRelationFilter, CollectionWhereInput>
+  }, "id" | "collectionId_slug">
+
+  export type CollectionItemOrderByWithAggregationInput = {
+    id?: SortOrder
+    collectionId?: SortOrder
+    data?: SortOrder
+    slug?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: CollectionItemCountOrderByAggregateInput
+    _max?: CollectionItemMaxOrderByAggregateInput
+    _min?: CollectionItemMinOrderByAggregateInput
+  }
+
+  export type CollectionItemScalarWhereWithAggregatesInput = {
+    AND?: CollectionItemScalarWhereWithAggregatesInput | CollectionItemScalarWhereWithAggregatesInput[]
+    OR?: CollectionItemScalarWhereWithAggregatesInput[]
+    NOT?: CollectionItemScalarWhereWithAggregatesInput | CollectionItemScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"CollectionItem"> | string
+    collectionId?: StringWithAggregatesFilter<"CollectionItem"> | string
+    data?: JsonWithAggregatesFilter<"CollectionItem">
+    slug?: StringWithAggregatesFilter<"CollectionItem"> | string
+    status?: EnumItemStatusWithAggregatesFilter<"CollectionItem"> | $Enums.ItemStatus
+    createdAt?: DateTimeWithAggregatesFilter<"CollectionItem"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"CollectionItem"> | Date | string
+  }
+
   export type UserCreateInput = {
     id?: string
     name: string
@@ -28765,6 +31247,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
     Notification?: NotificationCreateNestedManyWithoutSiteInput
+    collections?: CollectionCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateInput = {
@@ -28800,6 +31283,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutSiteInput
+    collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUpdateInput = {
@@ -28834,6 +31318,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateInput = {
@@ -28868,6 +31353,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteCreateManyInput = {
@@ -30257,6 +32743,147 @@ export namespace Prisma {
     senderId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+  export type CollectionCreateInput = {
+    id?: string
+    name: string
+    slug: string
+    description?: string | null
+    fields: InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    items?: CollectionItemCreateNestedManyWithoutCollectionInput
+    site: SiteCreateNestedOneWithoutCollectionsInput
+  }
+
+  export type CollectionUncheckedCreateInput = {
+    id?: string
+    siteId: string
+    name: string
+    slug: string
+    description?: string | null
+    fields: InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    items?: CollectionItemUncheckedCreateNestedManyWithoutCollectionInput
+  }
+
+  export type CollectionUpdateInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    fields?: InputJsonValue | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    items?: CollectionItemUpdateManyWithoutCollectionNestedInput
+    site?: SiteUpdateOneRequiredWithoutCollectionsNestedInput
+  }
+
+  export type CollectionUncheckedUpdateInput = {
+    siteId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    fields?: InputJsonValue | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    items?: CollectionItemUncheckedUpdateManyWithoutCollectionNestedInput
+  }
+
+  export type CollectionCreateManyInput = {
+    id?: string
+    siteId: string
+    name: string
+    slug: string
+    description?: string | null
+    fields: InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CollectionUpdateManyMutationInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    fields?: InputJsonValue | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CollectionUncheckedUpdateManyInput = {
+    siteId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    fields?: InputJsonValue | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CollectionItemCreateInput = {
+    id?: string
+    data: InputJsonValue
+    slug: string
+    status?: $Enums.ItemStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    collection: CollectionCreateNestedOneWithoutItemsInput
+  }
+
+  export type CollectionItemUncheckedCreateInput = {
+    id?: string
+    collectionId: string
+    data: InputJsonValue
+    slug: string
+    status?: $Enums.ItemStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CollectionItemUpdateInput = {
+    data?: InputJsonValue | InputJsonValue
+    slug?: StringFieldUpdateOperationsInput | string
+    status?: EnumItemStatusFieldUpdateOperationsInput | $Enums.ItemStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    collection?: CollectionUpdateOneRequiredWithoutItemsNestedInput
+  }
+
+  export type CollectionItemUncheckedUpdateInput = {
+    collectionId?: StringFieldUpdateOperationsInput | string
+    data?: InputJsonValue | InputJsonValue
+    slug?: StringFieldUpdateOperationsInput | string
+    status?: EnumItemStatusFieldUpdateOperationsInput | $Enums.ItemStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CollectionItemCreateManyInput = {
+    id?: string
+    collectionId: string
+    data: InputJsonValue
+    slug: string
+    status?: $Enums.ItemStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CollectionItemUpdateManyMutationInput = {
+    data?: InputJsonValue | InputJsonValue
+    slug?: StringFieldUpdateOperationsInput | string
+    status?: EnumItemStatusFieldUpdateOperationsInput | $Enums.ItemStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CollectionItemUncheckedUpdateManyInput = {
+    collectionId?: StringFieldUpdateOperationsInput | string
+    data?: InputJsonValue | InputJsonValue
+    slug?: StringFieldUpdateOperationsInput | string
+    status?: EnumItemStatusFieldUpdateOperationsInput | $Enums.ItemStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -30803,6 +33430,12 @@ export namespace Prisma {
     none?: MergedFeedWhereInput
   }
 
+  export type CollectionListRelationFilter = {
+    every?: CollectionWhereInput
+    some?: CollectionWhereInput
+    none?: CollectionWhereInput
+  }
+
   export type AnalyticsEventOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -30820,6 +33453,10 @@ export namespace Prisma {
   }
 
   export type MergedFeedOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type CollectionOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -31754,6 +34391,107 @@ export namespace Prisma {
     _max?: NestedEnumNotificationTypeFilter<$PrismaModel>
   }
 
+  export type CollectionItemListRelationFilter = {
+    every?: CollectionItemWhereInput
+    some?: CollectionItemWhereInput
+    none?: CollectionItemWhereInput
+  }
+
+  export type CollectionItemOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type CollectionSiteIdSlugCompoundUniqueInput = {
+    siteId: string
+    slug: string
+  }
+
+  export type CollectionCountOrderByAggregateInput = {
+    id?: SortOrder
+    siteId?: SortOrder
+    name?: SortOrder
+    slug?: SortOrder
+    description?: SortOrder
+    fields?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CollectionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    siteId?: SortOrder
+    name?: SortOrder
+    slug?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CollectionMinOrderByAggregateInput = {
+    id?: SortOrder
+    siteId?: SortOrder
+    name?: SortOrder
+    slug?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumItemStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.ItemStatus | EnumItemStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ItemStatus[] | ListEnumItemStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ItemStatus[] | ListEnumItemStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumItemStatusFilter<$PrismaModel> | $Enums.ItemStatus
+  }
+
+  export type CollectionScalarRelationFilter = {
+    is?: CollectionWhereInput
+    isNot?: CollectionWhereInput
+  }
+
+  export type CollectionItemCollectionIdSlugCompoundUniqueInput = {
+    collectionId: string
+    slug: string
+  }
+
+  export type CollectionItemCountOrderByAggregateInput = {
+    id?: SortOrder
+    collectionId?: SortOrder
+    data?: SortOrder
+    slug?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CollectionItemMaxOrderByAggregateInput = {
+    id?: SortOrder
+    collectionId?: SortOrder
+    slug?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type CollectionItemMinOrderByAggregateInput = {
+    id?: SortOrder
+    collectionId?: SortOrder
+    slug?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumItemStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ItemStatus | EnumItemStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ItemStatus[] | ListEnumItemStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ItemStatus[] | ListEnumItemStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumItemStatusWithAggregatesFilter<$PrismaModel> | $Enums.ItemStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumItemStatusFilter<$PrismaModel>
+    _max?: NestedEnumItemStatusFilter<$PrismaModel>
+  }
+
   export type SessionCreateNestedManyWithoutUserInput = {
     create?: XOR<SessionCreateWithoutUserInput, SessionUncheckedCreateWithoutUserInput> | SessionCreateWithoutUserInput[] | SessionUncheckedCreateWithoutUserInput[]
     connectOrCreate?: SessionCreateOrConnectWithoutUserInput | SessionCreateOrConnectWithoutUserInput[]
@@ -32357,6 +35095,13 @@ export namespace Prisma {
     connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
   }
 
+  export type CollectionCreateNestedManyWithoutSiteInput = {
+    create?: XOR<CollectionCreateWithoutSiteInput, CollectionUncheckedCreateWithoutSiteInput> | CollectionCreateWithoutSiteInput[] | CollectionUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: CollectionCreateOrConnectWithoutSiteInput | CollectionCreateOrConnectWithoutSiteInput[]
+    createMany?: CollectionCreateManySiteInputEnvelope
+    connect?: CollectionWhereUniqueInput | CollectionWhereUniqueInput[]
+  }
+
   export type CategoryUncheckedCreateNestedManyWithoutSiteInput = {
     create?: XOR<CategoryCreateWithoutSiteInput, CategoryUncheckedCreateWithoutSiteInput> | CategoryCreateWithoutSiteInput[] | CategoryUncheckedCreateWithoutSiteInput[]
     connectOrCreate?: CategoryCreateOrConnectWithoutSiteInput | CategoryCreateOrConnectWithoutSiteInput[]
@@ -32425,6 +35170,13 @@ export namespace Prisma {
     connectOrCreate?: NotificationCreateOrConnectWithoutSiteInput | NotificationCreateOrConnectWithoutSiteInput[]
     createMany?: NotificationCreateManySiteInputEnvelope
     connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+  }
+
+  export type CollectionUncheckedCreateNestedManyWithoutSiteInput = {
+    create?: XOR<CollectionCreateWithoutSiteInput, CollectionUncheckedCreateWithoutSiteInput> | CollectionCreateWithoutSiteInput[] | CollectionUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: CollectionCreateOrConnectWithoutSiteInput | CollectionCreateOrConnectWithoutSiteInput[]
+    createMany?: CollectionCreateManySiteInputEnvelope
+    connect?: CollectionWhereUniqueInput | CollectionWhereUniqueInput[]
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -32605,6 +35357,20 @@ export namespace Prisma {
     deleteMany?: NotificationScalarWhereInput | NotificationScalarWhereInput[]
   }
 
+  export type CollectionUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<CollectionCreateWithoutSiteInput, CollectionUncheckedCreateWithoutSiteInput> | CollectionCreateWithoutSiteInput[] | CollectionUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: CollectionCreateOrConnectWithoutSiteInput | CollectionCreateOrConnectWithoutSiteInput[]
+    upsert?: CollectionUpsertWithWhereUniqueWithoutSiteInput | CollectionUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: CollectionCreateManySiteInputEnvelope
+    set?: CollectionWhereUniqueInput | CollectionWhereUniqueInput[]
+    disconnect?: CollectionWhereUniqueInput | CollectionWhereUniqueInput[]
+    delete?: CollectionWhereUniqueInput | CollectionWhereUniqueInput[]
+    connect?: CollectionWhereUniqueInput | CollectionWhereUniqueInput[]
+    update?: CollectionUpdateWithWhereUniqueWithoutSiteInput | CollectionUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: CollectionUpdateManyWithWhereWithoutSiteInput | CollectionUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: CollectionScalarWhereInput | CollectionScalarWhereInput[]
+  }
+
   export type CategoryUncheckedUpdateManyWithoutSiteNestedInput = {
     create?: XOR<CategoryCreateWithoutSiteInput, CategoryUncheckedCreateWithoutSiteInput> | CategoryCreateWithoutSiteInput[] | CategoryUncheckedCreateWithoutSiteInput[]
     connectOrCreate?: CategoryCreateOrConnectWithoutSiteInput | CategoryCreateOrConnectWithoutSiteInput[]
@@ -32743,6 +35509,20 @@ export namespace Prisma {
     update?: NotificationUpdateWithWhereUniqueWithoutSiteInput | NotificationUpdateWithWhereUniqueWithoutSiteInput[]
     updateMany?: NotificationUpdateManyWithWhereWithoutSiteInput | NotificationUpdateManyWithWhereWithoutSiteInput[]
     deleteMany?: NotificationScalarWhereInput | NotificationScalarWhereInput[]
+  }
+
+  export type CollectionUncheckedUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<CollectionCreateWithoutSiteInput, CollectionUncheckedCreateWithoutSiteInput> | CollectionCreateWithoutSiteInput[] | CollectionUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: CollectionCreateOrConnectWithoutSiteInput | CollectionCreateOrConnectWithoutSiteInput[]
+    upsert?: CollectionUpsertWithWhereUniqueWithoutSiteInput | CollectionUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: CollectionCreateManySiteInputEnvelope
+    set?: CollectionWhereUniqueInput | CollectionWhereUniqueInput[]
+    disconnect?: CollectionWhereUniqueInput | CollectionWhereUniqueInput[]
+    delete?: CollectionWhereUniqueInput | CollectionWhereUniqueInput[]
+    connect?: CollectionWhereUniqueInput | CollectionWhereUniqueInput[]
+    update?: CollectionUpdateWithWhereUniqueWithoutSiteInput | CollectionUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: CollectionUpdateManyWithWhereWithoutSiteInput | CollectionUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: CollectionScalarWhereInput | CollectionScalarWhereInput[]
   }
 
   export type SiteCreateNestedOneWithoutSnippetsInput = {
@@ -33322,6 +36102,80 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSentNotificationsInput, UserUpdateWithoutSentNotificationsInput>, UserUncheckedUpdateWithoutSentNotificationsInput>
   }
 
+  export type CollectionItemCreateNestedManyWithoutCollectionInput = {
+    create?: XOR<CollectionItemCreateWithoutCollectionInput, CollectionItemUncheckedCreateWithoutCollectionInput> | CollectionItemCreateWithoutCollectionInput[] | CollectionItemUncheckedCreateWithoutCollectionInput[]
+    connectOrCreate?: CollectionItemCreateOrConnectWithoutCollectionInput | CollectionItemCreateOrConnectWithoutCollectionInput[]
+    createMany?: CollectionItemCreateManyCollectionInputEnvelope
+    connect?: CollectionItemWhereUniqueInput | CollectionItemWhereUniqueInput[]
+  }
+
+  export type SiteCreateNestedOneWithoutCollectionsInput = {
+    create?: XOR<SiteCreateWithoutCollectionsInput, SiteUncheckedCreateWithoutCollectionsInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutCollectionsInput
+    connect?: SiteWhereUniqueInput
+  }
+
+  export type CollectionItemUncheckedCreateNestedManyWithoutCollectionInput = {
+    create?: XOR<CollectionItemCreateWithoutCollectionInput, CollectionItemUncheckedCreateWithoutCollectionInput> | CollectionItemCreateWithoutCollectionInput[] | CollectionItemUncheckedCreateWithoutCollectionInput[]
+    connectOrCreate?: CollectionItemCreateOrConnectWithoutCollectionInput | CollectionItemCreateOrConnectWithoutCollectionInput[]
+    createMany?: CollectionItemCreateManyCollectionInputEnvelope
+    connect?: CollectionItemWhereUniqueInput | CollectionItemWhereUniqueInput[]
+  }
+
+  export type CollectionItemUpdateManyWithoutCollectionNestedInput = {
+    create?: XOR<CollectionItemCreateWithoutCollectionInput, CollectionItemUncheckedCreateWithoutCollectionInput> | CollectionItemCreateWithoutCollectionInput[] | CollectionItemUncheckedCreateWithoutCollectionInput[]
+    connectOrCreate?: CollectionItemCreateOrConnectWithoutCollectionInput | CollectionItemCreateOrConnectWithoutCollectionInput[]
+    upsert?: CollectionItemUpsertWithWhereUniqueWithoutCollectionInput | CollectionItemUpsertWithWhereUniqueWithoutCollectionInput[]
+    createMany?: CollectionItemCreateManyCollectionInputEnvelope
+    set?: CollectionItemWhereUniqueInput | CollectionItemWhereUniqueInput[]
+    disconnect?: CollectionItemWhereUniqueInput | CollectionItemWhereUniqueInput[]
+    delete?: CollectionItemWhereUniqueInput | CollectionItemWhereUniqueInput[]
+    connect?: CollectionItemWhereUniqueInput | CollectionItemWhereUniqueInput[]
+    update?: CollectionItemUpdateWithWhereUniqueWithoutCollectionInput | CollectionItemUpdateWithWhereUniqueWithoutCollectionInput[]
+    updateMany?: CollectionItemUpdateManyWithWhereWithoutCollectionInput | CollectionItemUpdateManyWithWhereWithoutCollectionInput[]
+    deleteMany?: CollectionItemScalarWhereInput | CollectionItemScalarWhereInput[]
+  }
+
+  export type SiteUpdateOneRequiredWithoutCollectionsNestedInput = {
+    create?: XOR<SiteCreateWithoutCollectionsInput, SiteUncheckedCreateWithoutCollectionsInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutCollectionsInput
+    upsert?: SiteUpsertWithoutCollectionsInput
+    connect?: SiteWhereUniqueInput
+    update?: XOR<XOR<SiteUpdateToOneWithWhereWithoutCollectionsInput, SiteUpdateWithoutCollectionsInput>, SiteUncheckedUpdateWithoutCollectionsInput>
+  }
+
+  export type CollectionItemUncheckedUpdateManyWithoutCollectionNestedInput = {
+    create?: XOR<CollectionItemCreateWithoutCollectionInput, CollectionItemUncheckedCreateWithoutCollectionInput> | CollectionItemCreateWithoutCollectionInput[] | CollectionItemUncheckedCreateWithoutCollectionInput[]
+    connectOrCreate?: CollectionItemCreateOrConnectWithoutCollectionInput | CollectionItemCreateOrConnectWithoutCollectionInput[]
+    upsert?: CollectionItemUpsertWithWhereUniqueWithoutCollectionInput | CollectionItemUpsertWithWhereUniqueWithoutCollectionInput[]
+    createMany?: CollectionItemCreateManyCollectionInputEnvelope
+    set?: CollectionItemWhereUniqueInput | CollectionItemWhereUniqueInput[]
+    disconnect?: CollectionItemWhereUniqueInput | CollectionItemWhereUniqueInput[]
+    delete?: CollectionItemWhereUniqueInput | CollectionItemWhereUniqueInput[]
+    connect?: CollectionItemWhereUniqueInput | CollectionItemWhereUniqueInput[]
+    update?: CollectionItemUpdateWithWhereUniqueWithoutCollectionInput | CollectionItemUpdateWithWhereUniqueWithoutCollectionInput[]
+    updateMany?: CollectionItemUpdateManyWithWhereWithoutCollectionInput | CollectionItemUpdateManyWithWhereWithoutCollectionInput[]
+    deleteMany?: CollectionItemScalarWhereInput | CollectionItemScalarWhereInput[]
+  }
+
+  export type CollectionCreateNestedOneWithoutItemsInput = {
+    create?: XOR<CollectionCreateWithoutItemsInput, CollectionUncheckedCreateWithoutItemsInput>
+    connectOrCreate?: CollectionCreateOrConnectWithoutItemsInput
+    connect?: CollectionWhereUniqueInput
+  }
+
+  export type EnumItemStatusFieldUpdateOperationsInput = {
+    set?: $Enums.ItemStatus
+  }
+
+  export type CollectionUpdateOneRequiredWithoutItemsNestedInput = {
+    create?: XOR<CollectionCreateWithoutItemsInput, CollectionUncheckedCreateWithoutItemsInput>
+    connectOrCreate?: CollectionCreateOrConnectWithoutItemsInput
+    upsert?: CollectionUpsertWithoutItemsInput
+    connect?: CollectionWhereUniqueInput
+    update?: XOR<XOR<CollectionUpdateToOneWithWhereWithoutItemsInput, CollectionUpdateWithoutItemsInput>, CollectionUncheckedUpdateWithoutItemsInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -33654,6 +36508,23 @@ export namespace Prisma {
     _max?: NestedEnumNotificationTypeFilter<$PrismaModel>
   }
 
+  export type NestedEnumItemStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.ItemStatus | EnumItemStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ItemStatus[] | ListEnumItemStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ItemStatus[] | ListEnumItemStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumItemStatusFilter<$PrismaModel> | $Enums.ItemStatus
+  }
+
+  export type NestedEnumItemStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ItemStatus | EnumItemStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ItemStatus[] | ListEnumItemStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ItemStatus[] | ListEnumItemStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumItemStatusWithAggregatesFilter<$PrismaModel> | $Enums.ItemStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumItemStatusFilter<$PrismaModel>
+    _max?: NestedEnumItemStatusFilter<$PrismaModel>
+  }
+
   export type SessionCreateWithoutUserInput = {
     id?: string
     sessionToken: string
@@ -33744,6 +36615,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
     Notification?: NotificationCreateNestedManyWithoutSiteInput
+    collections?: CollectionCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutUserInput = {
@@ -33778,6 +36650,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutSiteInput
+    collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutUserInput = {
@@ -34539,6 +37412,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
     Notification?: NotificationCreateNestedManyWithoutSiteInput
+    collections?: CollectionCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutCategoryInput = {
@@ -34573,6 +37447,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutSiteInput
+    collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutCategoryInput = {
@@ -34704,6 +37579,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutCategoryInput = {
@@ -34737,6 +37613,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutCategoryInput = {
@@ -35283,6 +38160,37 @@ export namespace Prisma {
     data: NotificationCreateManySiteInput | NotificationCreateManySiteInput[]
   }
 
+  export type CollectionCreateWithoutSiteInput = {
+    id?: string
+    name: string
+    slug: string
+    description?: string | null
+    fields: InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    items?: CollectionItemCreateNestedManyWithoutCollectionInput
+  }
+
+  export type CollectionUncheckedCreateWithoutSiteInput = {
+    id?: string
+    name: string
+    slug: string
+    description?: string | null
+    fields: InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    items?: CollectionItemUncheckedCreateNestedManyWithoutCollectionInput
+  }
+
+  export type CollectionCreateOrConnectWithoutSiteInput = {
+    where: CollectionWhereUniqueInput
+    create: XOR<CollectionCreateWithoutSiteInput, CollectionUncheckedCreateWithoutSiteInput>
+  }
+
+  export type CollectionCreateManySiteInputEnvelope = {
+    data: CollectionCreateManySiteInput | CollectionCreateManySiteInput[]
+  }
+
   export type UserUpsertWithoutSiteInput = {
     update: XOR<UserUpdateWithoutSiteInput, UserUncheckedUpdateWithoutSiteInput>
     create: XOR<UserCreateWithoutSiteInput, UserUncheckedCreateWithoutSiteInput>
@@ -35639,6 +38547,36 @@ export namespace Prisma {
     data: XOR<NotificationUpdateManyMutationInput, NotificationUncheckedUpdateManyWithoutSiteInput>
   }
 
+  export type CollectionUpsertWithWhereUniqueWithoutSiteInput = {
+    where: CollectionWhereUniqueInput
+    update: XOR<CollectionUpdateWithoutSiteInput, CollectionUncheckedUpdateWithoutSiteInput>
+    create: XOR<CollectionCreateWithoutSiteInput, CollectionUncheckedCreateWithoutSiteInput>
+  }
+
+  export type CollectionUpdateWithWhereUniqueWithoutSiteInput = {
+    where: CollectionWhereUniqueInput
+    data: XOR<CollectionUpdateWithoutSiteInput, CollectionUncheckedUpdateWithoutSiteInput>
+  }
+
+  export type CollectionUpdateManyWithWhereWithoutSiteInput = {
+    where: CollectionScalarWhereInput
+    data: XOR<CollectionUpdateManyMutationInput, CollectionUncheckedUpdateManyWithoutSiteInput>
+  }
+
+  export type CollectionScalarWhereInput = {
+    AND?: CollectionScalarWhereInput | CollectionScalarWhereInput[]
+    OR?: CollectionScalarWhereInput[]
+    NOT?: CollectionScalarWhereInput | CollectionScalarWhereInput[]
+    id?: StringFilter<"Collection"> | string
+    siteId?: StringFilter<"Collection"> | string
+    name?: StringFilter<"Collection"> | string
+    slug?: StringFilter<"Collection"> | string
+    description?: StringNullableFilter<"Collection"> | string | null
+    fields?: JsonFilter<"Collection">
+    createdAt?: DateTimeFilter<"Collection"> | Date | string
+    updatedAt?: DateTimeFilter<"Collection"> | Date | string
+  }
+
   export type SiteCreateWithoutSnippetsInput = {
     id?: string
     subdomain: string
@@ -35671,6 +38609,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
     Notification?: NotificationCreateNestedManyWithoutSiteInput
+    collections?: CollectionCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutSnippetsInput = {
@@ -35705,6 +38644,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutSiteInput
+    collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutSnippetsInput = {
@@ -35754,6 +38694,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutSnippetsInput = {
@@ -35787,6 +38728,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteCreateWithoutFeaturesInput = {
@@ -35821,6 +38763,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
     Notification?: NotificationCreateNestedManyWithoutSiteInput
+    collections?: CollectionCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutFeaturesInput = {
@@ -35855,6 +38798,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutSiteInput
+    collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutFeaturesInput = {
@@ -35961,6 +38905,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
     Notification?: NotificationCreateNestedManyWithoutSiteInput
+    collections?: CollectionCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutSubscriptionInput = {
@@ -35995,6 +38940,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutSiteInput
+    collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutSubscriptionInput = {
@@ -36230,6 +39176,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
     Notification?: NotificationCreateNestedManyWithoutSiteInput
+    collections?: CollectionCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutAnalyticsEventInput = {
@@ -36264,6 +39211,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutSiteInput
+    collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutAnalyticsEventInput = {
@@ -36313,6 +39261,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutAnalyticsEventInput = {
@@ -36346,6 +39295,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteCreateWithoutArticleInput = {
@@ -36380,6 +39330,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
     Notification?: NotificationCreateNestedManyWithoutSiteInput
+    collections?: CollectionCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutArticleInput = {
@@ -36414,6 +39365,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutSiteInput
+    collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutArticleInput = {
@@ -36510,6 +39462,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutArticleInput = {
@@ -36543,6 +39496,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutArticleInput = {
@@ -36628,6 +39582,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
     Notification?: NotificationCreateNestedManyWithoutSiteInput
+    collections?: CollectionCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutPageInput = {
@@ -36662,6 +39617,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutSiteInput
+    collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutPageInput = {
@@ -36758,6 +39714,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutPageInput = {
@@ -36791,6 +39748,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutPageInput = {
@@ -36876,6 +39834,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
     Notification?: NotificationCreateNestedManyWithoutSiteInput
+    collections?: CollectionCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutRSSInput = {
@@ -36910,6 +39869,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutSiteInput
+    collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutRSSInput = {
@@ -37031,6 +39991,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutRSSInput = {
@@ -37064,6 +40025,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type RssItemUpsertWithWhereUniqueWithoutRssInput = {
@@ -37236,6 +40198,7 @@ export namespace Prisma {
     snippets?: SnippetCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
     Notification?: NotificationCreateNestedManyWithoutSiteInput
+    collections?: CollectionCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutCustomFeedTemplatesInput = {
@@ -37270,6 +40233,7 @@ export namespace Prisma {
     snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutSiteInput
+    collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutCustomFeedTemplatesInput = {
@@ -37319,6 +40283,7 @@ export namespace Prisma {
     snippets?: SnippetUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutCustomFeedTemplatesInput = {
@@ -37352,6 +40317,7 @@ export namespace Prisma {
     snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteCreateWithoutMergedFeedsInput = {
@@ -37386,6 +40352,7 @@ export namespace Prisma {
     snippets?: SnippetCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
     Notification?: NotificationCreateNestedManyWithoutSiteInput
+    collections?: CollectionCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutMergedFeedsInput = {
@@ -37420,6 +40387,7 @@ export namespace Prisma {
     snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutSiteInput
+    collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutMergedFeedsInput = {
@@ -37469,6 +40437,7 @@ export namespace Prisma {
     snippets?: SnippetUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutMergedFeedsInput = {
@@ -37502,6 +40471,7 @@ export namespace Prisma {
     snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type ThemeBlockCreateWithoutThemeInput = {
@@ -37686,6 +40656,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
     Notification?: NotificationCreateNestedManyWithoutSiteInput
+    collections?: CollectionCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutInstalledThemesInput = {
@@ -37720,6 +40691,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutSiteInput
+    collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutInstalledThemesInput = {
@@ -37800,6 +40772,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutInstalledThemesInput = {
@@ -37833,6 +40806,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type ThemeUpsertWithoutInstalledInInput = {
@@ -37949,6 +40923,7 @@ export namespace Prisma {
     snippets?: SnippetCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
+    collections?: CollectionCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutNotificationInput = {
@@ -37983,6 +40958,7 @@ export namespace Prisma {
     snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
     customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
     mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
+    collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutNotificationInput = {
@@ -38130,6 +41106,7 @@ export namespace Prisma {
     snippets?: SnippetUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutNotificationInput = {
@@ -38163,6 +41140,7 @@ export namespace Prisma {
     snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
     customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutSentNotificationsInput = {
@@ -38214,6 +41192,274 @@ export namespace Prisma {
     Article?: ArticleUncheckedUpdateManyWithoutAuthorNestedInput
     Page?: PageUncheckedUpdateManyWithoutUserNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type CollectionItemCreateWithoutCollectionInput = {
+    id?: string
+    data: InputJsonValue
+    slug: string
+    status?: $Enums.ItemStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CollectionItemUncheckedCreateWithoutCollectionInput = {
+    id?: string
+    data: InputJsonValue
+    slug: string
+    status?: $Enums.ItemStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CollectionItemCreateOrConnectWithoutCollectionInput = {
+    where: CollectionItemWhereUniqueInput
+    create: XOR<CollectionItemCreateWithoutCollectionInput, CollectionItemUncheckedCreateWithoutCollectionInput>
+  }
+
+  export type CollectionItemCreateManyCollectionInputEnvelope = {
+    data: CollectionItemCreateManyCollectionInput | CollectionItemCreateManyCollectionInput[]
+  }
+
+  export type SiteCreateWithoutCollectionsInput = {
+    id?: string
+    subdomain: string
+    url: string
+    views?: number
+    limitViews?: number
+    title: string
+    description?: string | null
+    logo?: string | null
+    theme?: InputJsonValue | null
+    status?: string
+    defaultThemePreference?: string
+    template_schema?: InputJsonValue | null
+    settings?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    home_Id?: string | null
+    privacy_policy_id?: string | null
+    cookies_id?: string | null
+    terms_id?: string | null
+    user?: UserCreateNestedOneWithoutSiteInput
+    features?: FeaturesCreateNestedOneWithoutSiteInput
+    subscription?: SubscriptionCreateNestedOneWithoutSiteInput
+    category?: CategoryCreateNestedManyWithoutSiteInput
+    Article?: ArticleCreateNestedManyWithoutSiteInput
+    Page?: PageCreateNestedManyWithoutSiteInput
+    RSS?: RssCreateNestedManyWithoutSiteInput
+    AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
+    snippets?: SnippetCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
+    Notification?: NotificationCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteUncheckedCreateWithoutCollectionsInput = {
+    id?: string
+    subdomain: string
+    url: string
+    views?: number
+    limitViews?: number
+    title: string
+    description?: string | null
+    logo?: string | null
+    theme?: InputJsonValue | null
+    status?: string
+    defaultThemePreference?: string
+    template_schema?: InputJsonValue | null
+    settings?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    home_Id?: string | null
+    privacy_policy_id?: string | null
+    cookies_id?: string | null
+    terms_id?: string | null
+    userId?: string | null
+    featuresId?: string | null
+    subscriptionId?: string | null
+    category?: CategoryUncheckedCreateNestedManyWithoutSiteInput
+    Article?: ArticleUncheckedCreateNestedManyWithoutSiteInput
+    Page?: PageUncheckedCreateNestedManyWithoutSiteInput
+    RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
+    AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
+    snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
+    Notification?: NotificationUncheckedCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteCreateOrConnectWithoutCollectionsInput = {
+    where: SiteWhereUniqueInput
+    create: XOR<SiteCreateWithoutCollectionsInput, SiteUncheckedCreateWithoutCollectionsInput>
+  }
+
+  export type CollectionItemUpsertWithWhereUniqueWithoutCollectionInput = {
+    where: CollectionItemWhereUniqueInput
+    update: XOR<CollectionItemUpdateWithoutCollectionInput, CollectionItemUncheckedUpdateWithoutCollectionInput>
+    create: XOR<CollectionItemCreateWithoutCollectionInput, CollectionItemUncheckedCreateWithoutCollectionInput>
+  }
+
+  export type CollectionItemUpdateWithWhereUniqueWithoutCollectionInput = {
+    where: CollectionItemWhereUniqueInput
+    data: XOR<CollectionItemUpdateWithoutCollectionInput, CollectionItemUncheckedUpdateWithoutCollectionInput>
+  }
+
+  export type CollectionItemUpdateManyWithWhereWithoutCollectionInput = {
+    where: CollectionItemScalarWhereInput
+    data: XOR<CollectionItemUpdateManyMutationInput, CollectionItemUncheckedUpdateManyWithoutCollectionInput>
+  }
+
+  export type CollectionItemScalarWhereInput = {
+    AND?: CollectionItemScalarWhereInput | CollectionItemScalarWhereInput[]
+    OR?: CollectionItemScalarWhereInput[]
+    NOT?: CollectionItemScalarWhereInput | CollectionItemScalarWhereInput[]
+    id?: StringFilter<"CollectionItem"> | string
+    collectionId?: StringFilter<"CollectionItem"> | string
+    data?: JsonFilter<"CollectionItem">
+    slug?: StringFilter<"CollectionItem"> | string
+    status?: EnumItemStatusFilter<"CollectionItem"> | $Enums.ItemStatus
+    createdAt?: DateTimeFilter<"CollectionItem"> | Date | string
+    updatedAt?: DateTimeFilter<"CollectionItem"> | Date | string
+  }
+
+  export type SiteUpsertWithoutCollectionsInput = {
+    update: XOR<SiteUpdateWithoutCollectionsInput, SiteUncheckedUpdateWithoutCollectionsInput>
+    create: XOR<SiteCreateWithoutCollectionsInput, SiteUncheckedCreateWithoutCollectionsInput>
+    where?: SiteWhereInput
+  }
+
+  export type SiteUpdateToOneWithWhereWithoutCollectionsInput = {
+    where?: SiteWhereInput
+    data: XOR<SiteUpdateWithoutCollectionsInput, SiteUncheckedUpdateWithoutCollectionsInput>
+  }
+
+  export type SiteUpdateWithoutCollectionsInput = {
+    subdomain?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    views?: IntFieldUpdateOperationsInput | number
+    limitViews?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    theme?: InputJsonValue | InputJsonValue | null
+    status?: StringFieldUpdateOperationsInput | string
+    defaultThemePreference?: StringFieldUpdateOperationsInput | string
+    template_schema?: InputJsonValue | InputJsonValue | null
+    settings?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_Id?: NullableStringFieldUpdateOperationsInput | string | null
+    privacy_policy_id?: NullableStringFieldUpdateOperationsInput | string | null
+    cookies_id?: NullableStringFieldUpdateOperationsInput | string | null
+    terms_id?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneWithoutSiteNestedInput
+    features?: FeaturesUpdateOneWithoutSiteNestedInput
+    subscription?: SubscriptionUpdateOneWithoutSiteNestedInput
+    category?: CategoryUpdateManyWithoutSiteNestedInput
+    Article?: ArticleUpdateManyWithoutSiteNestedInput
+    Page?: PageUpdateManyWithoutSiteNestedInput
+    RSS?: RssUpdateManyWithoutSiteNestedInput
+    AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
+    Notification?: NotificationUpdateManyWithoutSiteNestedInput
+  }
+
+  export type SiteUncheckedUpdateWithoutCollectionsInput = {
+    subdomain?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    views?: IntFieldUpdateOperationsInput | number
+    limitViews?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    theme?: InputJsonValue | InputJsonValue | null
+    status?: StringFieldUpdateOperationsInput | string
+    defaultThemePreference?: StringFieldUpdateOperationsInput | string
+    template_schema?: InputJsonValue | InputJsonValue | null
+    settings?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_Id?: NullableStringFieldUpdateOperationsInput | string | null
+    privacy_policy_id?: NullableStringFieldUpdateOperationsInput | string | null
+    cookies_id?: NullableStringFieldUpdateOperationsInput | string | null
+    terms_id?: NullableStringFieldUpdateOperationsInput | string | null
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    featuresId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    category?: CategoryUncheckedUpdateManyWithoutSiteNestedInput
+    Article?: ArticleUncheckedUpdateManyWithoutSiteNestedInput
+    Page?: PageUncheckedUpdateManyWithoutSiteNestedInput
+    RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
+    AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
+    Notification?: NotificationUncheckedUpdateManyWithoutSiteNestedInput
+  }
+
+  export type CollectionCreateWithoutItemsInput = {
+    id?: string
+    name: string
+    slug: string
+    description?: string | null
+    fields: InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    site: SiteCreateNestedOneWithoutCollectionsInput
+  }
+
+  export type CollectionUncheckedCreateWithoutItemsInput = {
+    id?: string
+    siteId: string
+    name: string
+    slug: string
+    description?: string | null
+    fields: InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CollectionCreateOrConnectWithoutItemsInput = {
+    where: CollectionWhereUniqueInput
+    create: XOR<CollectionCreateWithoutItemsInput, CollectionUncheckedCreateWithoutItemsInput>
+  }
+
+  export type CollectionUpsertWithoutItemsInput = {
+    update: XOR<CollectionUpdateWithoutItemsInput, CollectionUncheckedUpdateWithoutItemsInput>
+    create: XOR<CollectionCreateWithoutItemsInput, CollectionUncheckedCreateWithoutItemsInput>
+    where?: CollectionWhereInput
+  }
+
+  export type CollectionUpdateToOneWithWhereWithoutItemsInput = {
+    where?: CollectionWhereInput
+    data: XOR<CollectionUpdateWithoutItemsInput, CollectionUncheckedUpdateWithoutItemsInput>
+  }
+
+  export type CollectionUpdateWithoutItemsInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    fields?: InputJsonValue | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    site?: SiteUpdateOneRequiredWithoutCollectionsNestedInput
+  }
+
+  export type CollectionUncheckedUpdateWithoutItemsInput = {
+    siteId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    fields?: InputJsonValue | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SessionCreateManyUserInput = {
@@ -38430,6 +41676,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutUserInput = {
@@ -38463,6 +41710,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateManyWithoutUserInput = {
@@ -38908,6 +42156,16 @@ export namespace Prisma {
     senderId?: string | null
   }
 
+  export type CollectionCreateManySiteInput = {
+    id?: string
+    name: string
+    slug: string
+    description?: string | null
+    fields: InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type CategoryUpdateWithoutSiteInput = {
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
@@ -39272,6 +42530,35 @@ export namespace Prisma {
     senderId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+  export type CollectionUpdateWithoutSiteInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    fields?: InputJsonValue | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    items?: CollectionItemUpdateManyWithoutCollectionNestedInput
+  }
+
+  export type CollectionUncheckedUpdateWithoutSiteInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    fields?: InputJsonValue | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    items?: CollectionItemUncheckedUpdateManyWithoutCollectionNestedInput
+  }
+
+  export type CollectionUncheckedUpdateManyWithoutSiteInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    fields?: InputJsonValue | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type SiteCreateManyFeaturesInput = {
     id?: string
     subdomain: string
@@ -39327,6 +42614,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutFeaturesInput = {
@@ -39360,6 +42648,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateManyWithoutFeaturesInput = {
@@ -39450,6 +42739,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutSubscriptionInput = {
@@ -39483,6 +42773,7 @@ export namespace Prisma {
     customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
     mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateManyWithoutSubscriptionInput = {
@@ -39632,6 +42923,39 @@ export namespace Prisma {
   export type SiteThemeUncheckedUpdateManyWithoutThemeInput = {
     siteId?: StringFieldUpdateOperationsInput | string
     installedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CollectionItemCreateManyCollectionInput = {
+    id?: string
+    data: InputJsonValue
+    slug: string
+    status?: $Enums.ItemStatus
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type CollectionItemUpdateWithoutCollectionInput = {
+    data?: InputJsonValue | InputJsonValue
+    slug?: StringFieldUpdateOperationsInput | string
+    status?: EnumItemStatusFieldUpdateOperationsInput | $Enums.ItemStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CollectionItemUncheckedUpdateWithoutCollectionInput = {
+    data?: InputJsonValue | InputJsonValue
+    slug?: StringFieldUpdateOperationsInput | string
+    status?: EnumItemStatusFieldUpdateOperationsInput | $Enums.ItemStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type CollectionItemUncheckedUpdateManyWithoutCollectionInput = {
+    data?: InputJsonValue | InputJsonValue
+    slug?: StringFieldUpdateOperationsInput | string
+    status?: EnumItemStatusFieldUpdateOperationsInput | $Enums.ItemStatus
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

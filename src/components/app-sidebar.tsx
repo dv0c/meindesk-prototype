@@ -26,7 +26,8 @@ import {
   Send,
   Settings,
   SidebarIcon,
-  Store
+  Store,
+  Database
 } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
 import { usePathname } from "next/navigation"
@@ -158,6 +159,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       features.articles && { name: "Articles", url: "/projects/website/articles", icon: FileText },
       features.pages && { name: "Pages", url: "/projects/website/pages", icon: FileIcon },
       features.categories && { name: "Categories", url: "/projects/website/categories", icon: Folder },
+      { name: "Collections", url: `/collections`, icon: Database },
       features.media && { name: "Media Gallery", url: "/projects/website/media-gallery", icon: Image },
     ].filter(Boolean)
 

@@ -391,6 +391,27 @@ exports.Prisma.NotificationScalarFieldEnum = {
   senderId: 'senderId'
 };
 
+exports.Prisma.CollectionScalarFieldEnum = {
+  id: 'id',
+  siteId: 'siteId',
+  name: 'name',
+  slug: 'slug',
+  description: 'description',
+  fields: 'fields',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.CollectionItemScalarFieldEnum = {
+  id: 'id',
+  collectionId: 'collectionId',
+  data: 'data',
+  slug: 'slug',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -433,6 +454,12 @@ exports.NotificationType = exports.$Enums.NotificationType = {
   SYSTEM: 'SYSTEM'
 };
 
+exports.ItemStatus = exports.$Enums.ItemStatus = {
+  PUBLISHED: 'PUBLISHED',
+  DRAFT: 'DRAFT',
+  ARCHIVED: 'ARCHIVED'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   Account: 'Account',
@@ -454,7 +481,9 @@ exports.Prisma.ModelName = {
   Theme: 'Theme',
   ThemeBlock: 'ThemeBlock',
   SiteTheme: 'SiteTheme',
-  Notification: 'Notification'
+  Notification: 'Notification',
+  Collection: 'Collection',
+  CollectionItem: 'CollectionItem'
 };
 
 /**
