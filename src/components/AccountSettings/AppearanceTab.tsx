@@ -82,16 +82,16 @@ export function AppearanceTab() {
                     isActive={theme === 'cyberpunk'}
                     className="border-primary/20"
                 >
-                    <div className="absolute inset-0 bg-[#050116] p-2 font-mono">
-                        <div className="h-full w-full rounded-sm border border-[#d9f21d]/30 bg-[#0a0220] flex overflow-hidden">
-                            <div className="w-1/4 bg-[#050116] border-r border-[#d9f21d]/20 p-1.5 space-y-1.5">
-                                <div className="h-1.5 w-8 bg-[#d9f21d]/40 rounded-none" />
-                                <div className="h-1.5 w-12 bg-[#2a0a38] rounded-none" />
+                    <div className="absolute inset-0 bg-[#141414] p-2 font-mono">
+                        <div className="h-full w-full rounded-none border border-[#404040] bg-[#1f1f1f] flex overflow-hidden">
+                            <div className="w-1/4 bg-[#1a1a1a] border-r border-[#404040] p-1.5 space-y-1.5">
+                                <div className="h-1.5 w-8 bg-[#f2f2f2] rounded-none" />
+                                <div className="h-1.5 w-12 bg-[#404040] rounded-none" />
                             </div>
                             <div className="flex-1 p-2 space-y-2">
-                                <div className="h-2 w-24 bg-[#00f0ff]/20 rounded-none border-l-2 border-[#00f0ff]" />
+                                <div className="h-2 w-24 bg-[#e07730]/40 rounded-none border-l-2 border-[#e07730]" />
                                 <div className="flex gap-2">
-                                    <div className="flex-1 h-12 bg-[#0a0220] border border-[#ff003c]/40 rounded-none shadow-[0_0_10px_rgba(255,0,60,0.1)]" />
+                                    <div className="flex-1 h-12 bg-[#1a1a1a] border border-[#404040] rounded-none" />
                                 </div>
                             </div>
                         </div>

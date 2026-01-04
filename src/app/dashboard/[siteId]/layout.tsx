@@ -52,7 +52,6 @@ const Layout: FC<LayoutProps> = ({ children }) => {
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <NotificationBell />
-                                    <ThemeTogglerButton />
                                 </div>
                             </header>
                         )}
