@@ -29,6 +29,7 @@ import {
   Store
 } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react"
+import { usePathname } from "next/navigation"
 import { NavProjects } from "./nav-projects"
 import { NavRSS } from "./nav-rss"
 import { TeamSwitcher } from "./team-switcher"
@@ -43,19 +44,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { team: activeTeam, loading: loadingTeam } = useTeam(siteId || undefined)
 
   const [hovered, setHovered] = useState(false)
-  const { newOpen, setNewOpen } = useSidebar()
-  const [isMobile, setIsMobile] = useState(false)
+  const { newOpen, setNewOpen, isMobile, setOpenMobile } = useSidebar()
   const collapseTimer = useRef<NodeJS.Timeout | null>(null)
   const sidebarRef = useRef<HTMLDivElement | null>(null)
   const prevTeamId = useRef<string | null>(null)
+  const pathname = usePathname()
 
-  // Detect mobile
+  // Close mobile sidebar on path change
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768)
-    handleResize()
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
+    if (isMobile) {
+      setOpenMobile(false)
+    }
+  }, [pathname, isMobile, setOpenMobile])
 
   // Restore sidebar state from localStorage
   useEffect(() => {
@@ -104,7 +104,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return () => window.removeEventListener("mousemove", handleMouseMove)
   }, [hovered, isMobile])
 
-  const isOpen = isMobile ? newOpen : hovered || newOpen
+  // CRITICAL FIX: On mobile, force isOpen to false (width 0) for the wrapper.
+  // The Sidebar component itself will handle the Sheet rendering (Overlay).
+  const isOpen = isMobile ? false : (hovered || newOpen)
 
   // Track team transitions
   useEffect(() => {

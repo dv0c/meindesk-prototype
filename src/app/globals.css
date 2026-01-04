@@ -116,6 +116,55 @@
   --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
 }
 
+/* Cyberpunk Theme */
+[data-theme='cyberpunk'] {
+  --background: oklch(0.10 0.02 260);
+  --foreground: oklch(0.9850 0 0);
+  --card: oklch(0.12 0.04 260);
+  --card-foreground: oklch(0.9850 0 0);
+  --popover: oklch(0.10 0.02 260);
+  --popover-foreground: oklch(0.9850 0 0);
+  --primary: oklch(0.85 0.18 95); /* Neon Yellow */
+  --primary-foreground: oklch(0.10 0.02 260);
+  --secondary: oklch(0.20 0.05 260);
+  --secondary-foreground: oklch(0.9850 0 0);
+  --muted: oklch(0.20 0.05 260);
+  --muted-foreground: oklch(0.70 0.05 260);
+  --accent: oklch(0.85 0.18 320); /* Neon Pink */
+  --accent-foreground: oklch(0.9850 0 0);
+  --destructive: oklch(0.6 0.25 20);
+  --destructive-foreground: oklch(0.9850 0 0);
+  --border: oklch(0.30 0.05 260);
+  --input: oklch(0.20 0.05 260);
+  --ring: oklch(0.85 0.18 95);
+  --radius: 0px;
+  --font-sans: var(--font-mono);
+}
+
+/* Modern Theme */
+[data-theme='modern'] {
+  --background: oklch(0.98 0.01 240);
+  --foreground: oklch(0.20 0.02 240);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.20 0.02 240);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.20 0.02 240);
+  --primary: oklch(0.55 0.25 280); /* Vivid Purple */
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.95 0.02 240);
+  --secondary-foreground: oklch(0.20 0.02 240);
+  --muted: oklch(0.95 0.02 240);
+  --muted-foreground: oklch(0.50 0.02 240);
+  --accent: oklch(0.95 0.02 240);
+  --accent-foreground: oklch(0.55 0.25 280);
+  --destructive: oklch(0.6 0.2 20);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.90 0.02 240);
+  --input: oklch(0.90 0.02 240);
+  --ring: oklch(0.55 0.25 280);
+  --radius: 1rem;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
