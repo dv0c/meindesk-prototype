@@ -81,9 +81,15 @@ export const Text = ({
         ? text
         : resolveCollectionTemplate(text, collectionContext?.data)
 
+    // Fluid typography: scales with viewport between min and max
+    const minFontSize = Math.max(10, fontSize * 0.3) // Minimum 30% of intended size or 10px
+    const vwValue = fontSize * 0.08 // 8% of font size as vw scaling factor
+    const fluidFontSize = `clamp(${minFontSize / 16}rem, ${vwValue}vw + 0.5rem, ${fontSize / 16}rem)`
+
     const style: React.CSSProperties = {
         width: "100%",
-        fontSize,
+        height: "auto",
+        fontSize: fluidFontSize,
         fontWeight,
         fontFamily: "var(--design-font-base, inherit)",
         color: color === "#374151" ? "var(--design-neutral, #374151)" : color,

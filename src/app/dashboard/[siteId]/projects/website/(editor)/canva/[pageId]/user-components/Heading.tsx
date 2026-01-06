@@ -28,8 +28,12 @@ const HeadingBase = forwardRef<HTMLDivElement, HeadingProps>(
         },
         ref
     ) => {
+        // Fluid typography: scales with viewport between min and max
+        const minFontSize = Math.max(12, fontSize * 0.3) // Minimum 30% or 12px for headings
+        const vwValue = fontSize * 0.08 // 8% of font size as vw scaling factor
+        const fluidFontSize = `clamp(${minFontSize / 16}rem, ${vwValue}vw + 0.5rem, ${fontSize / 16}rem)`
+
         const baseStyle = propsToStyle({
-            fontSize,
             fontWeight,
             color: color || "var(--design-neutral, inherit)",
             textAlign,
@@ -38,6 +42,7 @@ const HeadingBase = forwardRef<HTMLDivElement, HeadingProps>(
 
         const style: React.CSSProperties = {
             width: "100%",
+            fontSize: fluidFontSize,
             fontWeight: `var(--design-font-weight-heading, ${fontWeight})`,
             fontFamily: "var(--design-font-heading, inherit)",
             lineHeight: 1.2,

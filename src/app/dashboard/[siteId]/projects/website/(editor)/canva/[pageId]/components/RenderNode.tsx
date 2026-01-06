@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import { useNode, useEditor } from "@craftjs/core"
 import { useEffect, useRef, useState, useCallback } from "react"
 import { createPortal } from "react-dom"
@@ -506,11 +507,14 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
         document.body.style.cursor = cursor
     }
 
+    // Clone the render element to add context menu handler directly
+    const renderWithContextMenu = React.cloneElement(render, {
+        onContextMenu: handleContextMenu,
+    })
+
     return (
         <>
-            <div onContextMenu={handleContextMenu} style={{ display: "contents" }}>
-                {render}
-            </div>
+            {renderWithContextMenu}
 
             {/* Render indicator as a portal outside the component DOM */}
             {enabled && indicatorPosition && (isHovered || isActive) && typeof window !== "undefined" && createPortal(
