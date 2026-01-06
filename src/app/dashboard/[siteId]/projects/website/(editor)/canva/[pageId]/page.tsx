@@ -13,6 +13,7 @@ import { DesignProvider, useDesign } from "./components/DesignContext"
 import { MarketplaceProvider } from "./components/MarketplaceContext"
 import { SEOProvider, useSEO } from "./components/seo"
 import { ArticleProvider } from "./user-components/article"
+import { HoverProvider } from "./components/HoverContext"
 
 
 // Resolver for all user components - now using resolverWithFallback from registry
@@ -129,26 +130,28 @@ function EditorWithDesign({ resolver, pageName, setPageName, pageStatus, setPage
     }, [settings.baseFont, settings.headingFont])
 
     return (
-        <Editor resolver={resolver} onRender={RenderNode}>
-            <EditorContent
-                pageName={pageName}
-                setPageName={setPageName}
-                pageStatus={pageStatus}
-                setPageStatus={setPageStatus}
-                isLocked={isLocked}
-                setIsLocked={setIsLocked}
-                deviceMode={deviceMode}
-                setDeviceMode={setDeviceMode}
-                isSaving={isSaving}
-                setIsSaving={setIsSaving}
-                showSidebar={showSidebar}
-                setShowSidebar={setShowSidebar}
-                siteId={siteId}
-                pageId={pageId}
-                getCanvasWidth={getCanvasWidth}
-                getCssVariables={getCssVariables}
-            />
-        </Editor>
+        <HoverProvider>
+            <Editor resolver={resolver} onRender={RenderNode}>
+                <EditorContent
+                    pageName={pageName}
+                    setPageName={setPageName}
+                    pageStatus={pageStatus}
+                    setPageStatus={setPageStatus}
+                    isLocked={isLocked}
+                    setIsLocked={setIsLocked}
+                    deviceMode={deviceMode}
+                    setDeviceMode={setDeviceMode}
+                    isSaving={isSaving}
+                    setIsSaving={setIsSaving}
+                    showSidebar={showSidebar}
+                    setShowSidebar={setShowSidebar}
+                    siteId={siteId}
+                    pageId={pageId}
+                    getCanvasWidth={getCanvasWidth}
+                    getCssVariables={getCssVariables}
+                />
+            </Editor>
+        </HoverProvider>
     )
 }
 

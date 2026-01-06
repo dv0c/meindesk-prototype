@@ -1,10 +1,11 @@
 "use client"
 
 import { useNode, useEditor } from "@craftjs/core"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useCallback } from "react"
 import { createPortal } from "react-dom"
 import { CraftContextMenu } from "./CraftContextMenu"
 import { componentMap } from "../user-components"
+import { useHoverContext } from "./HoverContext"
 
 interface RenderNodeProps {
     render: React.ReactElement
@@ -12,13 +13,14 @@ interface RenderNodeProps {
 
 export const RenderNode = ({ render }: RenderNodeProps) => {
     const { id } = useNode()
-    const { isActive, isHovered, dom, name, moveable, deletable, parent, isResizable, connectors } = useNode(
+    const { isActive, isHovered, dom, name, moveable, deletable, parent, isResizable, connectors, displayName } = useNode(
         (node) => {
             return {
                 isActive: node.events.selected,
                 isHovered: node.events.hovered,
                 dom: node.dom,
                 name: node.data.custom?.displayName || node.data.displayName || node.data.name || "Component",
+                displayName: node.data.displayName || node.data.name || "",
                 moveable: node.data.custom?.moveable !== false,
                 deletable: node.data.custom?.deletable !== false,
                 parent: node.data.parent,
@@ -29,7 +31,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
         }
     )
 
-    const { actions, enabled, isParentOfSelected, query } = useEditor((state) => {
+    const { actions, enabled, isParentOfSelected, query, nodes } = useEditor((state) => {
         const selected = state.events.selected
         let isParent = false
         if (selected.size > 0) {
@@ -45,8 +47,43 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
         return {
             enabled: state.options.enabled,
             isParentOfSelected: isParent,
+            nodes: state.nodes,
         }
     })
+
+    // Hover context for parent hierarchy visualization
+    const { hoveredAncestors, setHoveredNode } = useHoverContext()
+
+    // Check if this node is an ancestor of the currently hovered node
+    const isAncestorOfHovered = hoveredAncestors.includes(id)
+
+    // Check if this is a container-type component that should show hierarchy outlines
+    const isContainerType = ["Container", "Grid", "MeindeskContainer", "CollectionContainer"].includes(displayName)
+
+    // Build ancestor chain when this node is hovered
+    const getAncestorChain = useCallback((nodeId: string): string[] => {
+        const ancestors: string[] = []
+        let currentId = nodeId
+        let safetyCounter = 0
+        const maxDepth = 50  // Prevent infinite loops
+
+        while (currentId && safetyCounter < maxDepth) {
+            const node = nodes[currentId]
+            if (!node || !node.data.parent) break
+            ancestors.push(node.data.parent)
+            currentId = node.data.parent
+            safetyCounter++
+        }
+        return ancestors
+    }, [nodes])
+
+    // Update hover context when this node is hovered
+    useEffect(() => {
+        if (isHovered && enabled) {
+            const ancestors = getAncestorChain(id)
+            setHoveredNode(id, ancestors)
+        }
+    }, [isHovered, enabled, id, getAncestorChain, setHoveredNode])
 
     const [indicatorPosition, setIndicatorPosition] = useState<{ top: number; left: number } | null>(null)
     const [resizeHandlePosition, setResizeHandlePosition] = useState<{ bottom: number; right: number } | null>(null)
@@ -197,21 +234,38 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
         }
     }, [dom, isActive, isHovered, enabled, isResizable, isParentOfSelected])
 
-    // Apply outline styles
+    // Apply outline styles - including parent hierarchy visualization
     useEffect(() => {
         if (dom && enabled) {
             if (isActive) {
+                // Selected element - solid blue outline
                 dom.style.outline = "2px solid #2680eb"
                 dom.style.outlineOffset = "-1px"
             } else if (isHovered) {
+                // Hovered element - solid blue outline
                 dom.style.outline = "2px solid #2680eb"
+                dom.style.outlineOffset = "-1px"
+            } else if (isAncestorOfHovered && isContainerType) {
+                // Parent container of hovered element - dashed lighter outline
+                dom.style.outline = "1px dashed rgba(38, 128, 235, 0.6)"
                 dom.style.outlineOffset = "-1px"
             } else {
                 dom.style.outline = "none"
                 dom.style.outlineOffset = "0"
             }
         }
-    }, [dom, isActive, isHovered, enabled])
+
+        // Cleanup when component unmounts or conditions change
+        return () => {
+            if (dom) {
+                // Only clear if we're not being hovered/active anymore
+                if (!isActive && !isHovered && !isAncestorOfHovered) {
+                    dom.style.outline = "none"
+                    dom.style.outlineOffset = "0"
+                }
+            }
+        }
+    }, [dom, isActive, isHovered, enabled, isAncestorOfHovered, isContainerType])
 
     const handleSelectParent = () => {
         if (parent) {

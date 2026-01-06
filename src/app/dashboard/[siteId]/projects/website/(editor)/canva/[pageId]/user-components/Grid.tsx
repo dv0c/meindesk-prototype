@@ -38,9 +38,13 @@ export const Grid = ({
         enabled: state.options.enabled,
     }))
 
-    // Check if grid is empty
-    const isEmpty = !children || (Array.isArray(children) && children.length === 0) ||
-        (React.Children.count(children) === 0)
+    // Count actual children
+    const childCount = React.Children.count(children)
+
+    // Only show placeholders to fill the FIRST row if it's incomplete
+    // Once you have at least `columns` children, no placeholders needed
+    // If you have fewer children than columns, show placeholders for remaining slots
+    const emptySlots = childCount >= columns ? 0 : columns - childCount
 
     const style: React.CSSProperties = {
         display: "grid",
@@ -55,37 +59,43 @@ export const Grid = ({
         width: "100%",
     }
 
+    // Placeholder component for empty slots
+    const PlaceholderSlot = ({ index }: { index: number }) => (
+        <div
+            style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: 160,
+                border: "2px dashed var(--design-border-color, #e5e7eb)",
+                borderRadius: 8,
+                color: "var(--design-text-color, #9ca3af)",
+                fontSize: 12,
+                fontWeight: 500,
+                padding: 16,
+                textAlign: "center",
+                opacity: 0.7,
+            }}
+        >
+            Drop here
+        </div>
+    )
+
     return (
         <div
             ref={(ref: any) => connect(drag(ref))}
             className={className}
             style={style}
         >
-            {isEmpty && enabled ? (
-                // Show placeholder columns
-                Array.from({ length: columns }).map((_, i) => (
-                    <div
-                        key={i}
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            minHeight: 160,
-                            border: "2px dashed var(--design-border-color, #e5e7eb)",
-                            borderRadius: 8,
-                            color: "var(--design-text-color, #9ca3af)",
-                            fontSize: 12,
-                            fontWeight: 500,
-                            padding: 16,
-                            textAlign: "center",
-                        }}
-                    >
-                        Column {i + 1}
-                    </div>
+            {/* Render actual children */}
+            {children}
+
+            {/* Render placeholder slots for empty columns (only in editor mode) */}
+            {enabled && emptySlots > 0 &&
+                Array.from({ length: emptySlots }).map((_, i) => (
+                    <PlaceholderSlot key={`placeholder-${i}`} index={childCount + i} />
                 ))
-            ) : (
-                children
-            )}
+            }
         </div>
     )
 }
