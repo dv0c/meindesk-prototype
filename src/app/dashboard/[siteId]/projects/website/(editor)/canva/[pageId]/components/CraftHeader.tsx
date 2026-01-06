@@ -218,6 +218,9 @@ export function CraftHeader({
                     <PublishDropdown
                         pageStatus={pageStatus}
                         pageSlug={pageSlug}
+                        pageName={pageName}
+                        pageStatus={pageStatus}
+                        setPageStatus={setPageStatus}
                         siteUrl={siteUrl}
                         subdomain={subdomain}
                         seoScore={seoScore}
