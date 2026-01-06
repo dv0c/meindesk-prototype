@@ -508,7 +508,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
 
     return (
         <>
-            <div onContextMenu={handleContextMenu} style={{ width: "100%" }}>
+            <div onContextMenu={handleContextMenu} style={{ display: "contents" }}>
                 {render}
             </div>
 
