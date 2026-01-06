@@ -67,7 +67,9 @@ export const Text = ({
         id: state.id,
     }))
 
-    const { actions: editorActions } = useEditor()
+    const { actions: editorActions, enabled } = useEditor((state) => ({
+        enabled: state.options.enabled
+    }))
     const collectionContext = useCollectionItem()
 
     const [isEditing, setIsEditing] = useState(false)
@@ -102,16 +104,21 @@ export const Text = ({
         borderStyle: borderWidth ? "solid" : undefined,
         boxShadow,
         outline: isEditing ? "none" : undefined,
-        cursor: selected ? "text" : "pointer",
+        cursor: isEditing ? "text" : (enabled ? "default" : "auto"),
         whiteSpace: isEditing ? "pre-wrap" : undefined,
     }
 
-    // Logic for editing state
+    // Double-click to enter edit mode (only in editor mode)
+    const handleDoubleClick = useCallback((e: React.MouseEvent) => {
+        e.stopPropagation()
+        if (enabled && selected) {
+            setIsEditing(true)
+        }
+    }, [enabled, selected])
+
     const handleClick = useCallback((e: React.MouseEvent) => {
         e.stopPropagation()
-        if (selected) {
-            setIsEditing(true)
-        } else {
+        if (!selected) {
             editorActions.selectNode(id)
         }
     }, [selected, editorActions, id])
@@ -159,18 +166,18 @@ export const Text = ({
 
     return (
         <p
-            ref={(ref: any) => connect(drag(ref))}
+            ref={(ref: any) => {
+                connect(drag(ref))
+                contentRef.current = ref
+            }}
             className={className}
             style={style}
             contentEditable={isEditing}
             suppressContentEditableWarning
             onClick={handleClick}
+            onDoubleClick={handleDoubleClick}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
-            ref={(ref: any) => {
-                connect(drag(ref))
-                contentRef.current = ref
-            }}
         >
             {displayText}
         </p>

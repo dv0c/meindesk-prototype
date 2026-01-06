@@ -6,6 +6,7 @@ import { toast } from "sonner"
 import { Button as UIButton } from "@/components/ui/button"
 import { CraftHeader } from "./components/CraftHeader"
 import { CraftSidebar } from "./components/CraftSidebar"
+import { TemplatesPanel } from "./components/TemplatesPanel"
 import { RenderNode } from "./components/RenderNode"
 import { Button, Container, Divider, Grid, Heading, Image, NavigationLinks, Spacer, Text, Card, resolverWithFallback } from "./user-components"
 import { Navbar } from "./user-components/Navbar"
@@ -27,6 +28,7 @@ export default function CraftJSEditorPage({ params }: { params: { siteId: string
     const [isLocked, setIsLocked] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
     const [showSidebar, setShowSidebar] = useState(true)
+    const [showTemplates, setShowTemplates] = useState(true)
     const [deviceMode, setDeviceMode] = useState<"desktop" | "tablet" | "mobile">("desktop")
 
     // Device width based on mode
@@ -59,6 +61,8 @@ export default function CraftJSEditorPage({ params }: { params: { siteId: string
                         setIsSaving={setIsSaving}
                         showSidebar={showSidebar}
                         setShowSidebar={setShowSidebar}
+                        showTemplates={showTemplates}
+                        setShowTemplates={setShowTemplates}
                         siteId={siteId}
                         pageId={pageId}
                         getCanvasWidth={getCanvasWidth}
@@ -70,7 +74,7 @@ export default function CraftJSEditorPage({ params }: { params: { siteId: string
 }
 
 // Separate component to access design context and CraftJS editor
-function EditorWithDesign({ resolver, pageName, setPageName, pageStatus, setPageStatus, isLocked, setIsLocked, deviceMode, setDeviceMode, isSaving, setIsSaving, showSidebar, setShowSidebar, siteId, pageId, getCanvasWidth }: any) {
+function EditorWithDesign({ resolver, pageName, setPageName, pageStatus, setPageStatus, isLocked, setIsLocked, deviceMode, setDeviceMode, isSaving, setIsSaving, showSidebar, setShowSidebar, showTemplates, setShowTemplates, siteId, pageId, getCanvasWidth }: any) {
     const { getCssVariables, settings } = useDesign()
 
     // Helper to detect Fontshare fonts
@@ -145,6 +149,8 @@ function EditorWithDesign({ resolver, pageName, setPageName, pageStatus, setPage
                     setIsSaving={setIsSaving}
                     showSidebar={showSidebar}
                     setShowSidebar={setShowSidebar}
+                    showTemplates={showTemplates}
+                    setShowTemplates={setShowTemplates}
                     siteId={siteId}
                     pageId={pageId}
                     getCanvasWidth={getCanvasWidth}
@@ -156,7 +162,7 @@ function EditorWithDesign({ resolver, pageName, setPageName, pageStatus, setPage
 }
 
 // Inner component that has access to useEditor
-function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLocked, setIsLocked, deviceMode, setDeviceMode, isSaving, setIsSaving, showSidebar, setShowSidebar, siteId, pageId, getCanvasWidth, getCssVariables }: any) {
+function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLocked, setIsLocked, deviceMode, setDeviceMode, isSaving, setIsSaving, showSidebar, setShowSidebar, showTemplates, setShowTemplates, siteId, pageId, getCanvasWidth, getCssVariables }: any) {
     const { query, actions } = useEditor()
     const { settings, updateSettings, registerSaveHandler } = useDesign()
     const { seoSettings, updateSEOSettings, registerSEOSaveHandler } = useSEO()
@@ -316,11 +322,13 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                     subdomain={subdomain}
                     seoScore={seoScore}
                     pageSlug={pageSlug}
+                    showTemplates={showTemplates}
+                    setShowTemplates={setShowTemplates}
                 />
 
                 {/* Main Content */}
                 <div className="flex-1 flex h-full overflow-hidden">
-                    {/* Sidebar */}
+                    {/* Left Sidebar */}
                     {showSidebar && <CraftSidebar isArticlePage={pageSlug === 'article'} />}
 
                     {/* Canvas Area */}
@@ -360,6 +368,11 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                             </div>
                         </div>
                     </div>
+
+                    {/* Right Sidebar - Templates */}
+                    {showTemplates && (
+                        <TemplatesPanel onClose={() => setShowTemplates(false)} />
+                    )}
                 </div>
             </div>
         </div>

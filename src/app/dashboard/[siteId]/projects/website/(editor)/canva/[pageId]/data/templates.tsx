@@ -8,6 +8,7 @@ export interface Template {
     description: string
     category: string
     icon: React.ElementType
+    previewImage: string
     content: React.ReactElement
 }
 
@@ -18,6 +19,7 @@ export const templates: Template[] = [
         description: "High impact hero section with centered text and call to action",
         category: "Hero",
         icon: LayoutTemplate,
+        previewImage: "/templates/template_hero_centered_1767726506566.png",
         content: (
             <Container padding={80} alignItems="center" justifyContent="center" backgroundColor="#f9fafb">
                 <Heading level="h1" text="Build Your Dream Website" textAlign="center" marginBottom={20} fontSize={56} />
@@ -42,6 +44,7 @@ export const templates: Template[] = [
         description: "Three column layout highlighting key features",
         category: "Features",
         icon: AlignCenter,
+        previewImage: "/templates/template_features_grid_1767726521938.png",
         content: (
             <Container padding={60} backgroundColor="#ffffff">
                 <Container alignItems="center" marginBottom={50} minHeight="auto">
@@ -86,6 +89,7 @@ export const templates: Template[] = [
         description: "Minimal call to action strip",
         category: "CTA",
         icon: CreditCard,
+        previewImage: "/templates/template_cta_simple_1767726537320.png",
         content: (
             <Container padding={60} backgroundColor="#111827" alignItems="center" justifyContent="center">
                 <Heading level="h2" text="Ready to get started?" color="#ffffff" textAlign="center" marginBottom={16} />
@@ -100,6 +104,7 @@ export const templates: Template[] = [
         description: "Single testimonial card",
         category: "Testimonials",
         icon: MessageSquare,
+        previewImage: "/templates/template_testimonial_1767726551471.png",
         content: (
             <Container padding={60} backgroundColor="#f3f4f6" alignItems="center">
                 <Container maxWidth="800px" padding={40} backgroundColor="#ffffff" borderRadius={16} boxShadow="md">
@@ -125,6 +130,7 @@ export const templates: Template[] = [
         description: "Simple contact info layout",
         category: "Contact",
         icon: Phone,
+        previewImage: "/templates/template_contact_1767726569601.png",
         content: (
             <Container padding={60} backgroundColor="#ffffff">
                 <Container flexDirection="row" gap={40} alignItems="center" className="container mx-auto">

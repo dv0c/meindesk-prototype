@@ -1,7 +1,7 @@
 "use client"
 
 import { useNode, useEditor } from "@craftjs/core"
-import { useState, useRef, useEffect, useCallback } from "react"
+import { useCallback, useState } from "react"
 import {
     PropertySection,
     PropertyRow,
@@ -76,7 +76,6 @@ export const Button = ({
         connectors: { connect, drag },
         selected,
         id,
-        actions: { setProp },
     } = useNode((state) => ({
         selected: state.events.selected,
         id: state.id,
@@ -86,8 +85,6 @@ export const Button = ({
         enabled: state.options.enabled
     }))
 
-    const [isEditing, setIsEditing] = useState(false)
-    const contentRef = useRef<HTMLButtonElement>(null)
     const collectionContext = useCollectionItem()
 
     // Resolve properties
@@ -127,88 +124,53 @@ export const Button = ({
         fontSize: sizeStyle.fontSize,
         fontWeight: 500,
         fontFamily: "var(--design-font-base, inherit)",
-        cursor: selected ? "text" : "pointer",
+        cursor: "pointer",
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
         width: fullWidth ? "100%" : "auto",
         transition: "all 0.2s ease",
-        outline: isEditing ? "none" : undefined,
     }
 
-    const displayText = (isEditing) ? text : resolvedText
+    const displayText = resolvedText
 
-    // Single click to edit when already selected
+    // Single click behavior: select in editor, navigate in preview
     const handleClick = useCallback((e: React.MouseEvent) => {
+        if (!enabled) {
+            // Preview mode - navigate if URL exists
+            if (resolvedUrl) {
+                if (openInNewTab) {
+                    window.open(resolvedUrl, "_blank")
+                } else {
+                    window.location.href = resolvedUrl
+                }
+            }
+            return
+        }
+
+        // Editor mode - select the button
         e.preventDefault()
         e.stopPropagation()
-        if (selected) {
-            setIsEditing(true)
-        } else {
+        if (!selected) {
             editorActions.selectNode(id)
         }
-    }, [selected, editorActions, id])
+    }, [enabled, selected, editorActions, id, resolvedUrl, openInNewTab])
 
-    const handleBlur = useCallback(() => {
-        setIsEditing(false)
-        if (contentRef.current) {
-            const newText = contentRef.current.innerText.trim()
-            if (newText) {
-                setProp((p: ButtonProps) => {
-                    p.text = newText
-                })
-            }
-        }
-    }, [setProp])
-
-    const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-        if (e.key === "Enter") {
-            e.preventDefault()
-            contentRef.current?.blur()
-        }
-        if (e.key === "Escape") {
-            setIsEditing(false)
-            if (contentRef.current) {
-                contentRef.current.innerText = text || ""
-            }
-        }
-    }, [text])
-
-    // When deselected, exit edit mode
-    useEffect(() => {
-        if (!selected && isEditing) {
-            setIsEditing(false)
-        }
-    }, [selected, isEditing])
-
-    useEffect(() => {
-        if (isEditing && contentRef.current) {
-            contentRef.current.focus()
-            setTimeout(() => {
-                if (contentRef.current) {
-                    const range = document.createRange()
-                    range.selectNodeContents(contentRef.current)
-                    const selection = window.getSelection()
-                    selection?.removeAllRanges()
-                    selection?.addRange(range)
-                }
-            }, 0)
-        }
-    }, [isEditing])
+    const [isHovered, setIsHovered] = useState(false)
 
     return (
         <button
-            ref={(ref: any) => {
-                connect(drag(ref))
-                contentRef.current = ref
-            }}
+            ref={(ref: any) => connect(drag(ref))}
             className={className}
-            style={style}
+            style={{
+                ...style,
+                cursor: "pointer",
+                opacity: isHovered ? 0.85 : 1,
+                transform: isHovered ? "translateY(-1px)" : undefined,
+            }}
             onClick={handleClick}
-            onBlur={handleBlur}
-            onKeyDown={handleKeyDown}
-            contentEditable={isEditing}
-            suppressContentEditableWarning
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
         >
             {displayText}
         </button>

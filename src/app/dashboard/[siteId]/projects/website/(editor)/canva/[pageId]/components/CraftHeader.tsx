@@ -28,6 +28,8 @@ interface CraftHeaderProps {
     subdomain?: string
     seoScore?: number
     pageSlug?: string
+    showTemplates?: boolean
+    setShowTemplates?: (show: boolean) => void
 }
 
 export function CraftHeader({
@@ -47,6 +49,8 @@ export function CraftHeader({
     subdomain,
     seoScore = 0,
     pageSlug,
+    showTemplates,
+    setShowTemplates,
 }: CraftHeaderProps) {
     const { actions, query, canUndo, canRedo, enabled, selected } = useEditor((state, query) => {
         const currentNodeId = state.events.selected?.values().next().value
@@ -61,7 +65,7 @@ export function CraftHeader({
 
 
     const [showLayers, setShowLayers] = useState(false)
-    const [showTemplates, setShowTemplates] = useState(false)
+    const [showTemplatesDialog, setShowTemplatesDialog] = useState(false)
 
 
 
@@ -165,8 +169,8 @@ export function CraftHeader({
                                 variant={showTemplates ? "secondary" : "ghost"}
                                 size="icon"
                                 className="h-8 w-8"
-                                onClick={() => setShowTemplates(true)}
-                                title="Templates"
+                                onClick={() => setShowTemplates?.(!showTemplates)}
+                                title="Toggle Sections Panel"
                             >
                                 <LayoutTemplate className="h-4 w-4" />
                             </Button>
@@ -233,8 +237,8 @@ export function CraftHeader({
             {/* Floating Layers Popup */}
             <CraftLayersPopup isOpen={showLayers} onClose={() => setShowLayers(false)} />
 
-            {/* Templates Dialog */}
-            <TemplatesDialog open={showTemplates} onOpenChange={setShowTemplates} />
+            {/* Templates Dialog (for dialog-based template selection) */}
+            <TemplatesDialog open={showTemplatesDialog} onOpenChange={setShowTemplatesDialog} />
         </>
     )
 }
