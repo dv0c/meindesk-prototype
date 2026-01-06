@@ -41,13 +41,14 @@ const headerVariants = {
 }
 
 export function CraftSidebar({ isArticlePage = false }: { isArticlePage?: boolean }) {
-    const { selected, name, isDeletable, actions } = useEditor((state) => {
+    const { selected, name, isDeletable, styleConfig, actions } = useEditor((state) => {
         const currentNodeId = state.events.selected?.values().next().value
         const node = currentNodeId ? state.nodes[currentNodeId] : null
         return {
             selected: currentNodeId,
             name: node?.data.custom.displayName || node?.data.displayName || node?.data.name,
             isDeletable: node && node.data.custom.isDeletable !== false,
+            styleConfig: node?.data.custom.styleConfig, // Get style config from component
         }
     })
 
@@ -75,6 +76,7 @@ export function CraftSidebar({ isArticlePage = false }: { isArticlePage?: boolea
                             selected={selected}
                             name={name}
                             isDeletable={isDeletable as boolean}
+                            styleConfig={styleConfig}
                             onBack={() => actions.selectNode(undefined)}
                             onDelete={() => {
                                 if (selected) actions.delete(selected)
@@ -104,12 +106,14 @@ function PropertiesView({
     selected,
     name,
     isDeletable,
+    styleConfig,
     onBack,
     onDelete
 }: {
     selected: string
     name?: string
     isDeletable?: boolean
+    styleConfig?: any
     onBack: () => void
     onDelete: () => void
 }) {

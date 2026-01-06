@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect, useCallback, type JSX } from 'react
 import { generateSettings, SettingsConfig } from './generateSettings'
 import { useSite } from '@/components/Contexts/site-id-context'
 import MediaLibraryDialog, { MediaItem } from '@/components/MediaGallery/media-select'
+import { STANDARD_DEFAULTS, StandardStyleSettings, createCombinedSettings } from './StandardStyleSettings'
 
 /**
  * Common props that all Craft components can have
@@ -68,13 +69,15 @@ export interface CraftComponentProps {
 interface WithCraftComponentOptions<P> {
     displayName: string
     defaultProps?: Partial<P>
-    settingsConfig?: SettingsConfig  // NEW: Auto-generate settings
-    sectionTitle?: string  // NEW: Section title for auto-generated settings
+    settingsConfig?: SettingsConfig  // Auto-generate content settings
+    sectionTitle?: string  // Section title for auto-generated settings
+
+    // Standard settings options
+    includeStyleSettings?: boolean  // Auto-include style settings (default: true)
+    includeStandardDefaults?: boolean  // Merge standard defaults (default: true)
+    customSettings?: React.ComponentType  // Custom settings component (instead of auto-generated)
 }
 
-/**
- * Convert component props to inline styles
- */
 /**
  * Helper to convert value to CSS string
  */
@@ -520,11 +523,21 @@ export function useInlineEdit<T extends HTMLElement = HTMLElement>(
 
 /**
  * Higher-order component that wraps a component with CraftJS functionality
+ * 
+ * Features:
+ * - Automatic standard style settings (margin, padding, colors, border, etc.)
+ * - Standard default props merged with component defaults
+ * - Auto-generated content settings from settingsConfig
+ * - CraftJS connectors (connect, drag) automatically applied
  */
 export function withCraftComponent<P extends CraftComponentProps, E extends HTMLElement = HTMLElement>(
     Component: React.ForwardRefExoticComponent<P & React.RefAttributes<E>>,
     options: Partial<WithCraftComponentOptions<P>>
 ) {
+    // Determine settings behavior
+    const includeStyleSettings = options.includeStyleSettings !== false // Default: true
+    const includeStandardDefaults = options.includeStandardDefaults !== false // Default: true
+
     const WrappedComponent: React.FC<P> = (props) => {
         const { connectors: { connect, drag }, nodeProps } = useNode((node) => ({
             nodeProps: node.data.props
@@ -547,15 +560,39 @@ export function withCraftComponent<P extends CraftComponentProps, E extends HTML
 
     const craftComponent = WrappedComponent as unknown as UserComponent<P>
 
+    // Build merged default props (standard defaults + component defaults)
+    const mergedDefaults = includeStandardDefaults
+        ? { ...STANDARD_DEFAULTS, ...(options.defaultProps || {}) }
+        : (options.defaultProps || {})
+
+    // Build settings component
+    let SettingsComponent: React.ComponentType | undefined = undefined
+
+    if (options.customSettings) {
+        // Use custom settings if provided
+        SettingsComponent = includeStyleSettings
+            ? createCombinedSettings(options.customSettings, { showStyles: true })
+            : options.customSettings
+    } else if (options.settingsConfig) {
+        // Auto-generate content settings
+        const ContentSettings = generateSettings<P>(
+            options.settingsConfig,
+            options.sectionTitle || 'Content',
+            options.defaultProps
+        )
+        SettingsComponent = includeStyleSettings
+            ? createCombinedSettings(ContentSettings, { showStyles: true })
+            : ContentSettings
+    } else if (includeStyleSettings) {
+        // Only style settings (no content settings)
+        SettingsComponent = StandardStyleSettings
+    }
+
     craftComponent.craft = {
         displayName: options.displayName || 'Component',
-        props: options.defaultProps || {},
+        props: mergedDefaults,
         related: {
-            // If settingsConfig provided, auto-generate settings
-            // Pass defaultProps so generateSettings can auto-detect types
-            settings: options.settingsConfig
-                ? generateSettings<P>(options.settingsConfig, options.sectionTitle, options.defaultProps)
-                : undefined as any
+            settings: SettingsComponent
         },
         custom: {
             resizable: true,

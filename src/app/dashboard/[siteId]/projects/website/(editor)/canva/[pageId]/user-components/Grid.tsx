@@ -10,6 +10,7 @@ import {
     PropertyButtonGroup,
     PropertySliderWithUnit,
 } from "../components/PropertySection"
+import { toast } from "sonner"
 
 interface GridProps {
     children?: React.ReactNode
@@ -32,19 +33,42 @@ export const Grid = ({
 }: GridProps) => {
     const {
         connectors: { connect, drag },
-    } = useNode()
+        nodeIds,
+        id,
+    } = useNode((node) => ({
+        nodeIds: node.data.nodes || [],
+        id: node.id,
+    }))
 
-    const { enabled } = useEditor((state) => ({
+    const { enabled, actions } = useEditor((state) => ({
         enabled: state.options.enabled,
     }))
 
-    // Count actual children
-    const childCount = React.Children.count(children)
+    // The actual child count from CraftJS node data
+    const childCount = nodeIds.length
+
+    // Check if grid is full
+    const isFull = childCount >= columns
+
+    // Auto-delete excess children when they exceed column count
+    React.useEffect(() => {
+        if (enabled && childCount > columns) {
+            // Get the extra node IDs (beyond the column limit)
+            const extraNodes = nodeIds.slice(columns)
+            // Delete each extra node
+            extraNodes.forEach((nodeId: string) => {
+                try {
+                    actions.delete(nodeId)
+                    toast.info(`You can't add more than ${columns} columns`)
+                } catch (e) {
+                    console.log('Could not delete extra node:', nodeId)
+                }
+            })
+        }
+    }, [childCount, columns, nodeIds, enabled, actions])
 
     // Only show placeholders to fill the FIRST row if it's incomplete
-    // Once you have at least `columns` children, no placeholders needed
-    // If you have fewer children than columns, show placeholders for remaining slots
-    const emptySlots = childCount >= columns ? 0 : columns - childCount
+    const emptySlots = isFull ? 0 : columns - childCount
 
     const style: React.CSSProperties = {
         display: "grid",
@@ -57,6 +81,7 @@ export const Grid = ({
         marginLeft: "auto",
         marginRight: "auto",
         width: "100%",
+        position: "relative",
     }
 
     // Placeholder component for empty slots
@@ -81,14 +106,17 @@ export const Grid = ({
         </div>
     )
 
+    // Limit children to only show up to the column count
+    const limitedChildren = React.Children.toArray(children).slice(0, columns)
+
     return (
         <div
             ref={(ref: any) => connect(drag(ref))}
             className={className}
             style={style}
         >
-            {/* Render actual children */}
-            {children}
+            {/* Only render children up to the column limit */}
+            {limitedChildren}
 
             {/* Render placeholder slots for empty columns (only in editor mode) */}
             {enabled && emptySlots > 0 &&
@@ -199,6 +227,15 @@ Grid.craft = {
     },
     rules: {
         canDrag: () => true,
+        // Limit children to the number of columns
+        canMoveIn: (incomingNodes: any[], currentNode: any, helpers: any) => {
+            const columns = currentNode.data.props?.columns || 2
+            // Use helpers to get the descendants/children count
+            const currentChildren = currentNode.data.nodes?.length || 0
+            const canDrop = currentChildren + incomingNodes.length <= columns
+            console.log('canMoveIn check:', { columns, currentChildren, incoming: incomingNodes.length, canDrop })
+            return canDrop
+        },
     },
     related: {
         settings: GridSettings,

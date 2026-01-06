@@ -491,24 +491,42 @@ export function PropertyToggle({ value, onChange, label }: PropertyToggleProps) 
     )
 }
 
+
 interface PropertySpacingProps {
     values: Partial<Record<"top" | "right" | "bottom" | "left", string>>
     onChange: (side: "top" | "right" | "bottom" | "left", value: string) => void
+    unit?: string
+    onUnitChange?: (unit: string) => void
 }
 
-export function PropertySpacing({ values, onChange }: PropertySpacingProps) {
+export function PropertySpacing({ values, onChange, unit, onUnitChange }: PropertySpacingProps) {
     return (
-        <div className="grid grid-cols-2 gap-2">
-            {(["top", "right", "bottom", "left"] as const).map((side) => (
-                <div key={side} className="relative">
-                    <input
-                        value={values[side] || ""}
-                        onChange={(e) => onChange(side, e.target.value)}
-                        placeholder={side.charAt(0).toUpperCase() + side.slice(1)}
-                        className="w-full h-8 px-2 text-xs border rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring"
-                    />
+        <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-2">
+                {(["top", "right", "bottom", "left"] as const).map((side) => (
+                    <div key={side} className="relative">
+                        <input
+                            value={values[side] || ""}
+                            onChange={(e) => onChange(side, e.target.value)}
+                            placeholder={side.charAt(0).toUpperCase() + side.slice(1)}
+                            className="w-full h-8 px-2 text-xs border rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring"
+                        />
+                    </div>
+                ))}
+            </div>
+            {onUnitChange && (
+                <div className="flex justify-end">
+                    <select
+                        value={unit || 'px'}
+                        onChange={(e) => onUnitChange(e.target.value)}
+                        className="h-6 px-2 text-xs border rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring"
+                    >
+                        {['px', '%', 'em', 'rem', 'auto'].map((u) => (
+                            <option key={u} value={u}>{u}</option>
+                        ))}
+                    </select>
                 </div>
-            ))}
+            )}
         </div>
     )
 }
@@ -686,6 +704,68 @@ export function PropertyRichText({ value, onChange, label, description }: Proper
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+        </div>
+    )
+}
+
+interface BoxModelInputProps {
+    value: string | number
+    onChange: (value: string) => void
+    className?: string
+    placeholder?: string
+}
+
+function BoxModelInput({ value, onChange, className, placeholder }: BoxModelInputProps) {
+    return (
+        <input
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className={cn(
+                "w-8 h-6 text-[10px] text-center bg-transparent border-none focus:outline-none focus:ring-0 p-0 hover:bg-black/10 rounded cursor-text",
+                className
+            )}
+            placeholder={placeholder || "-"}
+            onClick={(e) => (e.target as HTMLInputElement).select()}
+        />
+    )
+}
+
+interface PropertyBoxModelProps {
+    margin: Record<"top" | "right" | "bottom" | "left", string | number>
+    padding: Record<"top" | "right" | "bottom" | "left", string | number>
+    onChangeMargin: (side: "top" | "right" | "bottom" | "left", value: string) => void
+    onChangePadding: (side: "top" | "right" | "bottom" | "left", value: string) => void
+}
+
+export function PropertyBoxModel({ margin, padding, onChangeMargin, onChangePadding }: PropertyBoxModelProps) {
+    return (
+        <div className="flex justify-center text-[10px] select-none">
+            {/* Margin Box (Outer) */}
+            <div className="relative bg-[#F9CC9D]/80 dark:bg-[#F9CC9D]/40 border border-[#F9CC9D] border-dashed rounded p-6 flex flex-col items-center justify-center gap-1 group/margin">
+                <span className="absolute top-1 left-2 text-[9px] text-muted-foreground/50 uppercase tracking-tighter mix-blend-multiply dark:mix-blend-lighten">Margin</span>
+
+                {/* Margin Inputs */}
+                <BoxModelInput value={margin.top} onChange={(v) => onChangeMargin("top", v)} className="absolute top-1 left-1/2 -translate-x-1/2" />
+                <BoxModelInput value={margin.right} onChange={(v) => onChangeMargin("right", v)} className="absolute right-1 top-1/2 -translate-y-1/2" />
+                <BoxModelInput value={margin.bottom} onChange={(v) => onChangeMargin("bottom", v)} className="absolute bottom-1 left-1/2 -translate-x-1/2" />
+                <BoxModelInput value={margin.left} onChange={(v) => onChangeMargin("left", v)} className="absolute left-1 top-1/2 -translate-y-1/2" />
+
+                {/* Padding Box (Inner) */}
+                <div className="relative bg-[#C3E3B4]/80 dark:bg-[#C3E3B4]/40 border border-[#C3E3B4] border-dashed rounded p-6 flex flex-col items-center justify-center group/padding w-full h-full min-w-[140px]">
+                    <span className="absolute top-1 left-2 text-[9px] text-muted-foreground/50 uppercase tracking-tighter mix-blend-multiply dark:mix-blend-lighten">Padding</span>
+
+                    {/* Padding Inputs */}
+                    <BoxModelInput value={padding.top} onChange={(v) => onChangePadding("top", v)} className="absolute top-1 left-1/2 -translate-x-1/2" />
+                    <BoxModelInput value={padding.right} onChange={(v) => onChangePadding("right", v)} className="absolute right-1 top-1/2 -translate-y-1/2" />
+                    <BoxModelInput value={padding.bottom} onChange={(v) => onChangePadding("bottom", v)} className="absolute bottom-1 left-1/2 -translate-x-1/2" />
+                    <BoxModelInput value={padding.left} onChange={(v) => onChangePadding("left", v)} className="absolute left-1 top-1/2 -translate-y-1/2" />
+
+                    {/* Content Box (Innermost) */}
+                    <div className="bg-[#9FC4E7]/80 dark:bg-[#9FC4E7]/40 border border-[#9FC4E7] rounded w-full py-2 flex items-center justify-center text-xs text-muted-foreground/70 min-h-[24px]">
+                        Content
+                    </div>
+                </div>
+            </div>
         </div>
     )
 }

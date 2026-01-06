@@ -21,8 +21,8 @@ const HeadingBase = forwardRef<HTMLDivElement, HeadingProps>(
             level = "h2",
             fontSize = 32,
             fontWeight = "700",
-            color = "#000000",
-            textAlign = "left",
+            color,
+            textAlign,
             className = "",
             ...styleProps
         },
@@ -31,7 +31,7 @@ const HeadingBase = forwardRef<HTMLDivElement, HeadingProps>(
         const baseStyle = propsToStyle({
             fontSize,
             fontWeight,
-            color: color === "#000000" ? "var(--design-neutral, #000000)" : color,
+            color: color || "var(--design-neutral, inherit)",
             textAlign,
             ...styleProps,
         })
@@ -59,43 +59,52 @@ const HeadingBase = forwardRef<HTMLDivElement, HeadingProps>(
 
 HeadingBase.displayName = "HeadingBase"
 
-// Default props for the component
-const defaultProps: Partial<HeadingProps> = {
-    text: "Heading",
-    level: "h2",
-    fontSize: 32,
-    fontWeight: "700",
-    color: "#000000",
-    textAlign: "left",
-    marginTop: 0,
-    marginBottom: 16,
-}
-
 // Wrap with CraftJS functionality
+// Now using the new standard system:
+// - Style settings (color, spacing, etc.) are auto-included
+// - Only content-specific settings need to be defined
 export const Heading = withCraftComponent<HeadingProps, HTMLDivElement>(
     HeadingBase,
     {
         displayName: "Heading",
-        defaultProps,
-        sectionTitle: "Heading",
+
+        // Component-specific defaults (style defaults are auto-merged from STANDARD_DEFAULTS)
+        defaultProps: {
+            text: "Heading",
+            level: "h2",
+            fontSize: 32,
+            fontWeight: "700",
+            marginBottom: 16,
+        },
+
+        sectionTitle: "Content",
+
+        // Only content-specific settings - styles are in the auto-included Styles panels
         settingsConfig: {
             text: { type: "text", label: "Text" },
             level: {
                 type: "select",
-                label: "Level",
+                label: "Heading Level",
                 options: [
-                    { label: "H1", value: "h1" },
-                    { label: "H2", value: "h2" },
-                    { label: "H3", value: "h3" },
-                    { label: "H4", value: "h4" },
-                    { label: "H5", value: "h5" },
-                    { label: "H6", value: "h6" },
+                    { label: "H1 - Main Title", value: "h1" },
+                    { label: "H2 - Section Title", value: "h2" },
+                    { label: "H3 - Subsection", value: "h3" },
+                    { label: "H4 - Small Heading", value: "h4" },
+                    { label: "H5 - Minor Heading", value: "h5" },
+                    { label: "H6 - Smallest", value: "h6" },
                 ],
             },
-            fontSize: { type: "slider", label: "Font Size", min: 12, max: 120 },
+            fontSize: {
+                type: "slider",
+                label: "Font Size",
+                min: 12,
+                max: 120,
+                section: "Typography"
+            },
             fontWeight: {
                 type: "select",
                 label: "Font Weight",
+                section: "Typography",
                 options: [
                     { label: "Regular", value: "400" },
                     { label: "Medium", value: "500" },
@@ -104,16 +113,10 @@ export const Heading = withCraftComponent<HeadingProps, HTMLDivElement>(
                     { label: "Extra Bold", value: "800" },
                 ],
             },
-            textAlign: {
-                type: "select",
-                label: "Text Align",
-                options: [
-                    { label: "Left", value: "left" },
-                    { label: "Center", value: "center" },
-                    { label: "Right", value: "right" },
-                ],
-            },
-            color: { type: "color", label: "Color" },
         },
+
+        // Style settings auto-included (default: true)
+        // includeStyleSettings: true,  // Already default
+
     }
 )
