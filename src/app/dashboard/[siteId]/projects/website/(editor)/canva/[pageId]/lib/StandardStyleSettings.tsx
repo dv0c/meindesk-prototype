@@ -3,6 +3,12 @@
 import React, { useState } from 'react'
 import { useNode } from '@craftjs/core'
 import {
+    AlignLeft,
+    AlignCenter,
+    AlignRight,
+    AlignJustify
+} from 'lucide-react'
+import {
     PropertySection,
     PropertyRow,
     PropertySlider,
@@ -12,6 +18,7 @@ import {
     PropertySliderWithUnit,
     PropertyShadowSelect,
     PropertyButtonGroup,
+    PropertyIconButtonGroup,
     PropertyBoxModel,
 } from '../components/PropertySection'
 
@@ -119,7 +126,6 @@ export function StandardStyleSettings() {
     }))
 
 
-
     // Helper to parse value with unit
     const parseValueWithUnit = (val: string | number | undefined, defaultUnit = 'px', defaultValue = 0): { value: number; unit: string } => {
         if (typeof val === 'number') return { value: val, unit: 'px' }
@@ -165,13 +171,14 @@ export function StandardStyleSettings() {
                     />
                 </PropertyRow>
                 <PropertyRow label="Text Align">
-                    <PropertyButtonGroup
+                    <PropertyIconButtonGroup
                         value={textAlign || 'left'}
                         onChange={(v) => setProp((props: any) => (props.textAlign = v))}
                         options={[
-                            { label: 'Left', value: 'left' },
-                            { label: 'Center', value: 'center' },
-                            { label: 'Right', value: 'right' },
+                            { label: 'Left', value: 'left', icon: AlignLeft },
+                            { label: 'Center', value: 'center', icon: AlignCenter },
+                            { label: 'Right', value: 'right', icon: AlignRight },
+                            { label: 'Justify', value: 'justify', icon: AlignJustify },
                         ]}
                     />
                 </PropertyRow>
