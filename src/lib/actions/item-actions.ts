@@ -248,8 +248,9 @@ async function findIncomingReferences(itemId: string, siteId: string) {
 }
 
 export async function getItems(collectionId: string) {
-    const session = await getAuthSession()
-    if (!session) return { error: "Unauthorized" }
+    // Public access allowed
+    // const session = await getAuthSession()
+    // if (!session) return { error: "Unauthorized" }
 
     try {
         const items = await db.collectionItem.findMany({
@@ -263,8 +264,9 @@ export async function getItems(collectionId: string) {
 }
 
 export async function getItem(id: string) {
-    const session = await getAuthSession()
-    if (!session) return { error: "Unauthorized" }
+    // Public access allowed
+    // const session = await getAuthSession()
+    // if (!session) return { error: "Unauthorized" }
 
     try {
         const item = await db.collectionItem.findUnique({
@@ -278,8 +280,9 @@ export async function getItem(id: string) {
 }
 
 export async function getResolvedNames(ids: string[]) {
-    const session = await getAuthSession()
-    if (!session) return { error: "Unauthorized" }
+    // Public access allowed
+    // const session = await getAuthSession()
+    // if (!session) return { error: "Unauthorized" }
 
     if (ids.length === 0) return { names: {} }
 

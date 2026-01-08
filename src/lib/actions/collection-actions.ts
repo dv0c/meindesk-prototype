@@ -178,8 +178,9 @@ export async function createCollection(data: z.infer<typeof CreateCollectionSche
 }
 
 export async function getCollections(siteId: string) {
-    const session = await getAuthSession()
-    if (!session) return { error: "Unauthorized" }
+    // Public access allowed
+    // const session = await getAuthSession()
+    // if (!session) return { error: "Unauthorized" }
 
     try {
         const collections = await db.collection.findMany({
@@ -193,8 +194,9 @@ export async function getCollections(siteId: string) {
 }
 
 export async function getCollection(id: string) {
-    const session = await getAuthSession()
-    if (!session) return { error: "Unauthorized" }
+    // Public access allowed
+    // const session = await getAuthSession()
+    // if (!session) return { error: "Unauthorized" }
 
     try {
         const collection = await db.collection.findUnique({

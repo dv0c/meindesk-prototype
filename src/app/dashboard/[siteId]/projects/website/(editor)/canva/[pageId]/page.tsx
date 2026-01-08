@@ -28,18 +28,35 @@ export default function CraftJSEditorPage({ params }: { params: { siteId: string
     const [isLocked, setIsLocked] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
     const [showSidebar, setShowSidebar] = useState(true)
-    const [showTemplates, setShowTemplates] = useState(true)
+    const [showTemplates, setShowTemplates] = useState(false)
     const [deviceMode, setDeviceMode] = useState<"desktop" | "tablet" | "mobile">("desktop")
+
+    // Fixed device widths
+    const DESKTOP_WIDTH = 1440
+    const TABLET_WIDTH = 768
+    const MOBILE_WIDTH = 375
 
     // Device width based on mode
     const getCanvasWidth = () => {
         switch (deviceMode) {
             case "mobile":
-                return "375px"
+                return `${MOBILE_WIDTH}px`
             case "tablet":
-                return "768px"
+                return `${TABLET_WIDTH}px`
             default:
-                return "100%"
+                return `${DESKTOP_WIDTH}px`
+        }
+    }
+
+    // Get the actual pixel width for scale calculation
+    const getDevicePixelWidth = () => {
+        switch (deviceMode) {
+            case "mobile":
+                return MOBILE_WIDTH
+            case "tablet":
+                return TABLET_WIDTH
+            default:
+                return DESKTOP_WIDTH
         }
     }
 
@@ -66,6 +83,7 @@ export default function CraftJSEditorPage({ params }: { params: { siteId: string
                         siteId={siteId}
                         pageId={pageId}
                         getCanvasWidth={getCanvasWidth}
+                        getDevicePixelWidth={getDevicePixelWidth}
                     />
                 </SEOProvider>
             </MarketplaceProvider>
@@ -74,7 +92,7 @@ export default function CraftJSEditorPage({ params }: { params: { siteId: string
 }
 
 // Separate component to access design context and CraftJS editor
-function EditorWithDesign({ resolver, pageName, setPageName, pageStatus, setPageStatus, isLocked, setIsLocked, deviceMode, setDeviceMode, isSaving, setIsSaving, showSidebar, setShowSidebar, showTemplates, setShowTemplates, siteId, pageId, getCanvasWidth }: any) {
+function EditorWithDesign({ resolver, pageName, setPageName, pageStatus, setPageStatus, isLocked, setIsLocked, deviceMode, setDeviceMode, isSaving, setIsSaving, showSidebar, setShowSidebar, showTemplates, setShowTemplates, siteId, pageId, getCanvasWidth, getDevicePixelWidth }: any) {
     const { getCssVariables, settings } = useDesign()
 
     // Helper to detect Fontshare fonts
@@ -154,6 +172,7 @@ function EditorWithDesign({ resolver, pageName, setPageName, pageStatus, setPage
                     siteId={siteId}
                     pageId={pageId}
                     getCanvasWidth={getCanvasWidth}
+                    getDevicePixelWidth={getDevicePixelWidth}
                     getCssVariables={getCssVariables}
                 />
             </Editor>
@@ -162,7 +181,7 @@ function EditorWithDesign({ resolver, pageName, setPageName, pageStatus, setPage
 }
 
 // Inner component that has access to useEditor
-function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLocked, setIsLocked, deviceMode, setDeviceMode, isSaving, setIsSaving, showSidebar, setShowSidebar, showTemplates, setShowTemplates, siteId, pageId, getCanvasWidth, getCssVariables }: any) {
+function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLocked, setIsLocked, deviceMode, setDeviceMode, isSaving, setIsSaving, showSidebar, setShowSidebar, showTemplates, setShowTemplates, siteId, pageId, getCanvasWidth, getDevicePixelWidth, getCssVariables }: any) {
     const { query, actions } = useEditor()
     const { settings, updateSettings, registerSaveHandler } = useDesign()
     const { seoSettings, updateSEOSettings, registerSEOSaveHandler } = useSEO()
@@ -172,6 +191,33 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
     const [subdomain, setSubdomain] = useState("")
     const [seoScore, setSeoScore] = useState(0)
     const hasLoaded = useRef(false)
+    const canvasContainerRef = useRef<HTMLDivElement>(null)
+    const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
+
+    // Measure container for scaling
+    useEffect(() => {
+        const updateSize = () => {
+            if (canvasContainerRef.current) {
+                const rect = canvasContainerRef.current.getBoundingClientRect()
+                setContainerSize({ width: rect.width, height: rect.height })
+            }
+        }
+        updateSize()
+        window.addEventListener('resize', updateSize)
+        return () => window.removeEventListener('resize', updateSize)
+    }, [showSidebar, showTemplates])
+
+    // Calculate scale for desktop mode
+    const getScale = () => {
+        const deviceWidth = getDevicePixelWidth()
+        const padding = 40 // Account for container padding
+        const availableWidth = containerSize.width - padding
+        if (availableWidth <= 0 || deviceWidth <= availableWidth) return 1
+        return availableWidth / deviceWidth
+    }
+
+    const scale = getScale()
+    const deviceWidth = getDevicePixelWidth()
 
     // Load page data on mount only
     useEffect(() => {
@@ -328,18 +374,25 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
 
                 {/* Main Content */}
                 <div className="flex-1 flex h-full overflow-hidden">
-                    {/* Left Sidebar */}
-                    {showSidebar && <CraftSidebar isArticlePage={pageSlug === 'article'} />}
+                    {/* Left Sidebar with animation */}
+                    <div
+                        className={`transition-all duration-300 ease-in-out overflow-hidden ${showSidebar ? 'w-[380px] opacity-100' : 'w-0 opacity-0'
+                            }`}
+                    >
+                        <CraftSidebar isArticlePage={pageSlug === 'article'} />
+                    </div>
 
                     {/* Canvas Area */}
-                    <div className="flex-1 h-full overflow-hidden flex flex-col relative">
-                        <div className="overflow-auto h-full bg-zinc-50 dark:bg-zinc-900 p-5">
+                    <div ref={canvasContainerRef} className="flex-1 h-full overflow-hidden flex flex-col relative">
+                        <div className="overflow-auto h-full bg-zinc-50 dark:bg-zinc-900 p-5 flex justify-center">
                             <div
-                                className="canvas-preview shadow-lg transition-all duration-300 mx-auto h-full overflow-y-auto overflow-x-hidden"
+                                className="canvas-preview shadow-lg transition-all duration-300 overflow-y-auto overflow-x-hidden"
                                 style={{
                                     width: getCanvasWidth(),
-                                    minHeight: "100%",
+                                    minHeight: scale < 1 ? `${100 / scale}%` : "100%",
                                     backgroundColor: "var(--design-background, #ffffff)",
+                                    transform: scale < 1 ? `scale(${scale})` : undefined,
+                                    transformOrigin: "top center",
                                     ...Object.fromEntries(
                                         getCssVariables()
                                             .split(';')
@@ -369,10 +422,13 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                         </div>
                     </div>
 
-                    {/* Right Sidebar - Templates */}
-                    {showTemplates && (
+                    {/* Right Sidebar - Templates with animation */}
+                    <div
+                        className={`transition-all duration-300 ease-in-out overflow-hidden ${showTemplates ? 'w-[320px] opacity-100' : 'w-0 opacity-0'
+                            }`}
+                    >
                         <TemplatesPanel onClose={() => setShowTemplates(false)} />
-                    )}
+                    </div>
                 </div>
             </div>
         </div>

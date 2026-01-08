@@ -69,6 +69,7 @@ export function CraftHeader({
 
 
 
+
     return (
         <>
             <header className="h-16 border-b backdrop-blur-xl bg-background/80 shadow-sm flex items-center justify-between px-6 z-30 shrink-0">
@@ -139,6 +140,7 @@ export function CraftHeader({
                         <Smartphone className="h-4 w-4" />
                     </Button>
                 </div>
+
 
                 {/* Right: Actions */}
                 <div className="flex items-center gap-2">
@@ -212,6 +214,7 @@ export function CraftHeader({
                             setShowSidebar(newEnabled)
                             if (!newEnabled) {
                                 setShowLayers(false)
+                                setShowTemplates?.(false)
                             }
                         }}
                     >

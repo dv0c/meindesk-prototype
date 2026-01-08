@@ -24,6 +24,7 @@ import {
     Calendar,
     Tag,
     Database,
+    Search as SearchIcon,
 } from 'lucide-react'
 
 // Import all components
@@ -62,6 +63,7 @@ import {
 import { MeindeskContainer } from './themes/Meindesk/MeindeskContainer'
 import { CollectionList, CollectionItem, CollectionField, RelatedItems, CollectionContainer } from './collections'
 import { Link2 } from 'lucide-react'
+import { Search, SearchSettings } from './Search'
 
 /**
  * Component metadata interface
@@ -159,6 +161,14 @@ export const componentRegistry: ComponentRegistration[] = [
         description: 'A clickable button',
         icon: <Square className="h-5 w-5" />,
         settings: ButtonSettings,
+    },
+    {
+        name: 'Search',
+        component: Search,
+        category: 'Interactive',
+        description: 'Search block with overlay',
+        icon: <SearchIcon className="h-5 w-5" />,
+        settings: SearchSettings,
     },
 
     // Media components
@@ -407,4 +417,5 @@ export {
     UpdatesCarousel,
     FooterInfo,
     MeindeskContainer,
+    Search,
 }

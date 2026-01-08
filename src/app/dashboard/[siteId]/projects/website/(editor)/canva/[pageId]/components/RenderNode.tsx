@@ -507,10 +507,31 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
         document.body.style.cursor = cursor
     }
 
-    // Clone the render element to add context menu handler directly
-    const renderWithContextMenu = React.cloneElement(render, {
-        onContextMenu: handleContextMenu,
-    })
+    // Attach context menu listener directly to DOM
+    useEffect(() => {
+        if (dom && enabled) {
+            const handleRightClick = (e: MouseEvent) => {
+                e.preventDefault()
+                e.stopPropagation()
+
+                // Select the node
+                actions.selectNode(id)
+
+                // Show context menu
+                setContextMenu({ x: e.clientX, y: e.clientY })
+            }
+
+            dom.addEventListener("contextmenu", handleRightClick)
+
+            return () => {
+                dom.removeEventListener("contextmenu", handleRightClick)
+            }
+        }
+    }, [dom, enabled, id, actions])
+
+    // Clone the render element
+    // We don't need to pass onContextMenu here anymore as we're attaching it to the DOM
+    const renderWithContextMenu = React.cloneElement(render)
 
     return (
         <>
