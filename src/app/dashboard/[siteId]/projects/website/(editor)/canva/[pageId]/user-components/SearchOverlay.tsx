@@ -1,20 +1,20 @@
 "use client"
 
 import * as React from "react"
-import { Search as SearchIcon, X, FileText, Box, ShoppingBag, ArrowRight, Zap, Loader2 } from "lucide-react"
-import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { useRouter } from "next/navigation"
+import { Search as SearchIcon, ArrowRight, Zap, Loader2, Box, FileText, ShoppingBag } from "lucide-react"
+import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { cn } from "@/lib/utils"
 import { getItems } from "@/lib/actions/item-actions"
 import { getCollections } from "@/lib/actions/collection-actions"
 import { getArticles } from "@/lib/actions/article-actions"
-
 
 interface SearchItem {
     id: string
     title: string
     category: string
     slug: string
+    href?: string // Added href to SearchItem
     icon: any
 }
 
@@ -24,34 +24,46 @@ interface SearchOverlayProps {
     collections?: string[]
     siteId: string
     theme?: "light" | "dark"
+    layout?: "minimal" | "dashboard" | "classic" | "modern"
 }
 
-export function SearchOverlay({ open, onOpenChange, collections = [], siteId, theme = "light" }: SearchOverlayProps) {
+export function SearchOverlay({ open, onOpenChange, collections = [], siteId, theme = "light", layout = "minimal" }: SearchOverlayProps) {
     const [query, setQuery] = React.useState("")
     const [items, setItems] = React.useState<SearchItem[]>([])
     const [loading, setLoading] = React.useState(false)
+    const router = useRouter()
 
-    // Fetch items when open or collections change
+    // Fetch items when mounted (Preload) or siteId changes
     React.useEffect(() => {
-        if (!open || !siteId) return
+        if (!siteId) return
 
         const fetchData = async () => {
             setLoading(true)
             try {
-                // Determine which collection IDs to fetch
-                let targetCollectionIds = collections
+                // Fetch all collections first to get slugs/names
+                const allCollectionsRes = await getCollections(siteId)
+                console.log("[SearchOverlay] siteId:", siteId)
+                console.log("[SearchOverlay] allCollectionsRes:", allCollectionsRes)
 
-                // If no specific collections selected, fetch ALL collections for the site
-                if (collections.length === 0) {
-                    const colRes = await getCollections(siteId)
-                    if (colRes.collections) {
-                        targetCollectionIds = colRes.collections.map(c => c.id)
-                    }
+                const colMap = new Map<string, { name: string, slug: string }>()
+
+                if (allCollectionsRes.collections) {
+                    allCollectionsRes.collections.forEach(c => {
+                        colMap.set(c.id, { name: c.name, slug: c.slug })
+                    })
                 }
+                console.log("[SearchOverlay] colMap content:", Array.from(colMap.entries()))
 
-                // Fetch items for each collection
-                // In a production app, we would have a dedicated searchable endpoint or use Algolia
-                // For this prototype, we'll fetch items concurrently
+                // Determine which collection IDs to fetch items from
+                let targetCollectionIds = collections
+                console.log("[SearchOverlay] collections prop:", collections)
+
+                if (collections.length === 0) {
+                    targetCollectionIds = Array.from(colMap.keys())
+                }
+                console.log("[SearchOverlay] targetCollectionIds:", targetCollectionIds)
+
+                // Fetch items
                 const promises = targetCollectionIds.map(async (colId) => {
                     // Special handling for "Articles"
                     if (colId === "Articles") {
@@ -61,7 +73,7 @@ export function SearchOverlay({ open, onOpenChange, collections = [], siteId, th
                                 colId: "Articles",
                                 items: res.articles.map((a: any) => ({
                                     id: a.id,
-                                    data: { title: a.title }, // Normalize to match collection items structure roughly
+                                    data: { title: a.title },
                                     slug: a.slug,
                                     category: "Articles"
                                 }))
@@ -71,23 +83,6 @@ export function SearchOverlay({ open, onOpenChange, collections = [], siteId, th
                     }
 
                     const res = await getItems(colId)
-
-                    // We also need the collection name for the category
-                    // Optimization: We could pass the names down or fetch them once, 
-                    // but getItems returns items which have collectionId, so we might need to map it back if we don't have the name.
-                    // Actually getItems doesn't return collection name attached usually unless we include it.
-                    // So we probably want to fetch the collection details or assume we have the map.
-
-                    // Let's rely on the fact that we can get collection details.
-
-                    // IMPROVEMENT: getItems usually returns simple items. We might check if it includes collection.
-                    // Looking at the action, it does NOT include collection name by default in the list return.
-                    // So we probably want to fetch the collection details or assume we have the map.
-
-                    // Let's cheat slightly and just use collectionId as category temporarily or 
-                    // implement a smarter fetch.
-                    // Actually, let's just make sure we display something reasonable.
-
                     return {
                         colId,
                         items: res.items || []
@@ -95,13 +90,10 @@ export function SearchOverlay({ open, onOpenChange, collections = [], siteId, th
                 })
 
                 const results = await Promise.all(promises)
+                console.log("[SearchOverlay] results:", results)
 
-                // We need collection names to display as categories.
-                // Let's fetch all collections once to build a map
-                const allCollectionsRes = await getCollections(siteId)
-                const colMap = new Map(allCollectionsRes.collections?.map(c => [c.id, c.name]) || [])
-                // Add virtual collection for Articles
-                colMap.set("Articles", "Articles")
+                // Virtual "Articles" collection map entry
+                // colMap.set("Articles", { name: "Articles", slug: "articles" }) 
 
                 const iconMap: Record<string, any> = {
                     'Articles': FileText,
@@ -111,18 +103,32 @@ export function SearchOverlay({ open, onOpenChange, collections = [], siteId, th
 
                 const allItems: SearchItem[] = []
                 results.forEach(({ colId, items }) => {
-                    const categoryName = colMap.get(colId) || "Other"
+                    console.log(`[SearchOverlay] Processing colId: ${colId}`)
+                    const colDetails = colMap.get(colId)
+                    console.log(`[SearchOverlay] colDetails for ${colId}:`, colDetails)
+
+                    const categoryName = colDetails?.name || (colId === "Articles" ? "Articles" : "Other")
+                    const collectionSlug = colDetails?.slug
 
                     items.forEach((item: any) => {
-                        // Determine title
                         const title = item.data.title || item.data.name || item.slug || "Untitled"
+
+                        // Construct URL
+                        let href = "#"
+                        if (categoryName === "Articles") {
+                            href = `/article/${item.slug}`
+                        } else if (collectionSlug) {
+                            href = `/c/${collectionSlug}/${item.slug}`
+                        }
+                        console.log(`[SearchOverlay] Item: ${title}, Category: ${categoryName}, Slug: ${item.slug}, CollectionSlug: ${collectionSlug}, Href: ${href}`)
 
                         allItems.push({
                             id: item.id,
                             title,
                             category: categoryName,
                             slug: item.slug,
-                            icon: iconMap[categoryName] || FileText // Default icon
+                            href, // Add href to item
+                            icon: iconMap[categoryName] || FileText
                         })
                     })
                 })
@@ -136,12 +142,7 @@ export function SearchOverlay({ open, onOpenChange, collections = [], siteId, th
         }
 
         fetchData()
-    }, [open, collections, siteId])
-
-    // Filter items based on search query
-    // Command component handles filtering automatically if we pass the items to it, 
-    // but we can also pre-filter or rely on Command's fuzzy search.
-    // Command's client-side filtering is good for < 1000 items.
+    }, [siteId]) // Check dependencies: removed 'open' to enable preload. 'collections' might change, but usually static per instance.
 
     // Group items by category
     const groupedItems = items.reduce((acc, item) => {
@@ -149,6 +150,14 @@ export function SearchOverlay({ open, onOpenChange, collections = [], siteId, th
         acc[item.category].push(item)
         return acc
     }, {} as Record<string, typeof items>)
+
+    const handleSelect = (item: SearchItem) => {
+        setQuery("")
+        onOpenChange(false)
+        if (item.href && item.href !== "#") {
+            router.push(item.href)
+        }
+    }
 
     return (
         <CommandDialog open={open} onOpenChange={onOpenChange}>
@@ -186,6 +195,7 @@ export function SearchOverlay({ open, onOpenChange, collections = [], siteId, th
                                 <CommandItem
                                     key={item.id}
                                     value={`${item.title} ${category}`}
+                                    onSelect={() => handleSelect(item)}
                                     className="group flex items-center gap-3 rounded-lg px-3 py-3 text-sm aria-selected:bg-primary/5 aria-selected:text-primary cursor-pointer transition-all"
                                 >
                                     <div className="flex items-center justify-center h-8 w-8 rounded-md bg-muted/50 group-aria-selected:bg-primary/10 group-aria-selected:text-primary transition-colors">
@@ -217,7 +227,7 @@ export function SearchOverlay({ open, onOpenChange, collections = [], siteId, th
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-1.5">
                             <Zap className="h-3 w-3 fill-yellow-500/50 text-yellow-600" />
-                            <span>Powered by <strong>Meindesk</strong></span>
+                            <span>Powered by <strong>Prototype</strong></span>
                         </div>
                         {items.length > 0 && <span><strong>{items.length}</strong> results</span>}
                     </div>

@@ -1,28 +1,33 @@
 "use client"
 
-import { useEditor, useNode } from "@craftjs/core"
-import { Search as SearchIcon, Settings, X, Check, ChevronsUpDown } from "lucide-react"
-import React, { useState, useEffect } from "react"
-import { cn } from "@/lib/utils"
-import { useParams } from "next/navigation"
 import { useTeam } from "@/hooks/useTeam"
+import { cn } from "@/lib/utils"
+import { useEditor, useNode } from "@craftjs/core"
+import { Check, ChevronsUpDown, Search as SearchIcon, X } from "lucide-react"
+import { useParams } from "next/navigation"
+import React, { useEffect, useState } from "react"
 // @ts-ignore
 import ContentEditable from "react-contenteditable"
 
-import { Container } from "./Container"
-import { SearchOverlay } from "./SearchOverlay"
-import {
-    PropertySection,
-    PropertyRow,
-    PropertySlider,
-    PropertyColor,
-    PropertyInput,
-    PropertyCheckbox,
-} from "../components/PropertySection"
-import { getCollections } from "@/lib/actions/collection-actions"
+import { Badge } from "@/components/ui/badge"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Badge } from "@/components/ui/badge"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import { getCollections } from "@/lib/actions/collection-actions"
+import {
+    PropertyColor,
+    PropertyInput,
+    PropertyRow,
+    PropertySection,
+    PropertySlider
+} from "../components/PropertySection"
+import { SearchOverlay } from "./SearchOverlay"
 
 // No longer using fixed available collections
 // const AVAILABLE_COLLECTIONS = ["Articles", "Products", "Documentation"]
@@ -35,6 +40,7 @@ interface SearchProps {
     color?: string
     borderRadius?: number
     collections?: string[]
+    overlayTheme?: "minimal" | "dashboard" | "classic" | "modern"
 }
 
 export const Search = ({
@@ -44,7 +50,8 @@ export const Search = ({
     backgroundColor = "#ffffff",
     color = "#6b7280",
     borderRadius = 8,
-    collections = []
+    collections = [],
+    overlayTheme = "minimal"
 }: SearchProps) => {
     const { connectors: { connect, drag }, actions: { setProp }, selected, isHovered } = useNode((state) => ({
         selected: state.events.selected,
@@ -56,9 +63,13 @@ export const Search = ({
         enabled: state.options.enabled
     }))
 
-    // Use useTeam to reliably get the site ID in the canvas iframe
+    // Determine siteId based on context
+    // 1. If params.tenantId exists, we are in the Live Site (Tenant View). ALWAYS use it.
+    // 2. If valid team.id exists (Editor/Dashboard), use it.
+    // 3. Fallback to params.siteId.
+    const params = useParams()
     const { team } = useTeam(undefined, 'tenant')
-    const siteId = team?.id
+    const siteId = (params.tenantId as string) || team?.id || (params.siteId as string)
 
     const [open, setOpen] = useState(false)
 
@@ -119,8 +130,11 @@ export const Search = ({
             <SearchOverlay
                 open={open}
                 onOpenChange={setOpen}
+                onOpenChange={setOpen}
                 collections={collections}
                 siteId={siteId}
+                theme="light"
+                layout={overlayTheme}
             />
 
             {/* Editor-only visual indicator of selected collections */}
@@ -142,7 +156,8 @@ export const SearchSettings = () => {
         padding,
         backgroundColor,
         color,
-        borderRadius
+        borderRadius,
+        overlayTheme
     } = useNode((node) => ({
         collections: node.data.props.collections || [],
         placeholder: node.data.props.placeholder,
@@ -151,6 +166,7 @@ export const SearchSettings = () => {
         backgroundColor: node.data.props.backgroundColor,
         color: node.data.props.color,
         borderRadius: node.data.props.borderRadius,
+        overlayTheme: node.data.props.overlayTheme,
     }))
 
     const params = useParams()
@@ -273,6 +289,22 @@ export const SearchSettings = () => {
                 </div>
             </PropertySection>
 
+            <PropertySection title="Overlay Theme">
+                <PropertyRow label="Theme">
+                    <Select
+                        value={overlayTheme || "minimal"}
+                        onValueChange={(value) => setProp((props: any) => props.overlayTheme = value)}
+                    >
+                        <SelectTrigger className="w-full h-8 text-xs bg-transparent">
+                            <SelectValue placeholder="Select theme" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="minimal">Default</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </PropertyRow>
+            </PropertySection>
+
             <PropertySection title="Style">
                 <PropertyRow label="Background Color">
                     <PropertyColor
@@ -325,7 +357,10 @@ Search.craft = {
         backgroundColor: "#ffffff",
         color: "#6b7280",
         borderRadius: 8,
-        collections: []
+        color: "#6b7280",
+        borderRadius: 8,
+        collections: [],
+        overlayTheme: "minimal"
     },
     related: {
         settings: SearchSettings
