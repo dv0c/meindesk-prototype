@@ -11,7 +11,15 @@ export async function getArticles(siteId: string) {
     try {
         const articles = await db.article.findMany({
             where: { siteId },
-            include: {
+            select: {
+                id: true,
+                siteId: true,
+                title: true,
+                slug: true,
+                status: true,
+                cover: true,
+                createdAt: true,
+                updateAt: true,
                 author: {
                     select: {
                         name: true,

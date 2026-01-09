@@ -5,69 +5,69 @@
  * When adding a new component, simply add it to the registry array below.
  */
 
-import React from 'react'
 import {
     Box,
-    Type,
+    Calendar,
+    CreditCard,
+    Database,
+    FileText,
+    GalleryHorizontal,
     Heading as HeadingIcon,
     Image as ImageIcon,
     LayoutGrid,
-    Minus,
-    Square,
-    Navigation,
     Link as LinkIcon,
-    CreditCard,
-    GalleryHorizontal,
+    Minus,
+    Navigation,
     Newspaper,
-    FileText,
-    User,
-    Calendar,
-    Tag,
-    Database,
     Search as SearchIcon,
+    Square,
+    Tag,
+    Type,
+    User,
 } from 'lucide-react'
+import React from 'react'
 
 // Import all components
-import { Container } from './Container'
-import { Heading } from './Heading'
-import { Text, TextSettings } from './Text'
+import { Link2 } from 'lucide-react'
+import {
+    ArticleAuthor,
+    ArticleCategories,
+    ArticleContent,
+    ArticleCover,
+    ArticleDate,
+    ArticleTitle,
+} from './article'
+import { Articles } from './Articles'
 import { Button } from './Button'
-import { Image, ImageSettings } from './Image'
-import { Grid } from './Grid'
+import { CollectionContainer, CollectionField, CollectionItem, CollectionList, RelatedItems } from './collections'
+import { Container } from './Container'
 import { Divider, DividerSettings } from './Divider'
-import { Spacer, SpacerSettings } from './Spacer'
+import { Card } from './ExampleCard'
+import { Grid } from './Grid'
+import { Heading } from './Heading'
+import { Image, ImageSettings } from './Image'
 import { Navbar } from './Navbar'
 import { NavigationLinks } from './NavigationLinks'
-import { Card } from './ExampleCard'
-import { Hero } from './themes/SophiaPlatanisioti/Hero'
-import { Footer } from './themes/SophiaPlatanisioti/Footer'
-import { Articles } from './Articles'
+import { Search, SearchSettings } from './Search'
+import { Section } from './Section'
 import { SingleArticle } from './SingleArticle'
-import { SophiaArticle } from './themes/SophiaPlatanisioti/SophiaArticle'
+import { Spacer, SpacerSettings } from './Spacer'
+import { Text, TextSettings } from './Text'
 import {
-    ArticleTitle,
-    ArticleCover,
-
-    ArticleContent,
-    ArticleAuthor,
-    ArticleDate,
-    ArticleCategories,
-} from './article'
-import {
-    HeroSection,
     FeaturesGrid,
+    FooterInfo,
+    HeroSection,
     PrinciplesSection,
     UpdatesCarousel,
-    FooterInfo,
 } from './themes/Meindesk'
 import { MeindeskContainer } from './themes/Meindesk/MeindeskContainer'
-import { CollectionList, CollectionItem, CollectionField, RelatedItems, CollectionContainer } from './collections'
-import { Link2 } from 'lucide-react'
-import { Search, SearchSettings } from './Search'
-import { TIGNavbar } from './themes/TimeIsGolden/TIGNavbar'
-import { TIGHero } from './themes/TimeIsGolden/TIGHero'
+import { Footer } from './themes/SophiaPlatanisioti/Footer'
+import { Hero } from './themes/SophiaPlatanisioti/Hero'
+import { SophiaArticle } from './themes/SophiaPlatanisioti/SophiaArticle'
 import { TIGArticleGrid } from './themes/TimeIsGolden/TIGArticleGrid'
 import { TIGFooter } from './themes/TimeIsGolden/TIGFooter'
+import { TIGHero } from './themes/TimeIsGolden/TIGHero'
+import { TIGNavbar } from './themes/TimeIsGolden/TIGNavbar'
 import { TIGSingleArticle } from './themes/TimeIsGolden/TIGSingleArticle'
 
 /**
@@ -95,7 +95,6 @@ export const componentRegistry: ComponentRegistration[] = [
         category: 'Layout',
         description: 'A container for grouping elements',
         icon: <Box className="h-5 w-5" />,
-        icon: <Box className="h-5 w-5" />,
         isContainer: true,
     },
     {
@@ -103,7 +102,6 @@ export const componentRegistry: ComponentRegistration[] = [
         component: Grid,
         category: 'Layout',
         description: 'A responsive grid layout',
-        icon: <LayoutGrid className="h-5 w-5" />,
         icon: <LayoutGrid className="h-5 w-5" />,
         isContainer: true,
     },
@@ -163,7 +161,6 @@ export const componentRegistry: ComponentRegistration[] = [
         component: Button,
         category: 'Interactive',
         description: 'A clickable button',
-        icon: <Square className="h-5 w-5" />,
         icon: <Square className="h-5 w-5" />,
     },
     {
@@ -280,6 +277,14 @@ export const componentRegistry: ComponentRegistration[] = [
         category: 'Meindesk Theme',
         description: 'Animated hero section with parallax effect',
         icon: <LayoutGrid className="h-5 w-5" />,
+    },
+    {
+        name: 'Section',
+        component: Section,
+        category: 'Layout',
+        description: 'A semantic section for building page structure',
+        icon: <LayoutGrid className="h-5 w-5" />,
+        isContainer: true,
     },
     {
         name: 'MeindeskContainer',
@@ -431,46 +436,16 @@ export const componentDefinitions = componentRegistry.map((item) => ({
  * Re-export all components for convenience
  */
 export {
-    Container,
-    ContainerSettings,
-    Heading,
-    Text,
-    TextSettings,
-    Button,
-    ButtonSettings,
-    Image,
-    ImageSettings,
-    Grid,
-    GridSettings,
-    Divider,
-    DividerSettings,
-    Spacer,
-    SpacerSettings,
-    Navbar,
-    Card,
-    Hero,
+    ArticleAuthor, ArticleCategories, ArticleContent, ArticleCover, ArticleDate,
     // Article Components
-    Articles,
-    SingleArticle,
-    SophiaArticle,
-    ArticleTitle,
-    ArticleCover,
-    ArticleContent,
-    ArticleAuthor,
-    ArticleDate,
-    ArticleCategories,
+    Articles, ArticleTitle, Button, Card, Container, Divider,
+    DividerSettings, FeaturesGrid, FooterInfo, Grid, Heading, Hero,
     // Meindesk Theme Components
-    HeroSection,
-    FeaturesGrid,
-    PrinciplesSection,
-    UpdatesCarousel,
-    FooterInfo,
-    MeindeskContainer,
-    Search,
+    HeroSection, Image, MeindeskContainer, Navbar, PrinciplesSection, Search, Section, SingleArticle,
+    SophiaArticle, Spacer,
+    SpacerSettings, Text, TIGArticleGrid,
+    TIGFooter, TIGHero,
     // Time is Golden
-    TIGNavbar,
-    TIGHero,
-    TIGArticleGrid,
-    TIGFooter,
-    TIGSingleArticle,
+    TIGNavbar, TIGSingleArticle, UpdatesCarousel
 }
+

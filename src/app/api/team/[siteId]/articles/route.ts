@@ -24,23 +24,26 @@ export async function GET(
 
     const articles = await db.article.findMany({
       where: { siteId, authorId: session.user.id },
-      include: {
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        excerpt: true,
+        cover: true,
+        createdAt: true,
+        updateAt: true,
+        status: true,
+        siteId: true,
+        authorId: true,
         author: {
           select: {
             id: true,
             name: true,
-            email: true,
             image: true,
           },
         },
-        site: {
-          select: {
-            id: true,
-            title: true,
-          },
-        },
       },
-      orderBy: { createdAt: "desc", },
+      orderBy: { createdAt: "desc" },
       ...(parsedLimit > 0 ? { take: parsedLimit } : {}), // no limit if 0
     })
 

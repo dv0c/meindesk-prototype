@@ -304,6 +304,20 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
         let finalWidth = startWidth
         let finalHeight = startHeight
 
+        // Pre-calculate parent width once
+        const parentEl = dom.parentElement
+        let parentWidth = window.innerWidth
+        if (parentEl) {
+            const parentRect = parentEl.getBoundingClientRect()
+            const parentStyle = window.getComputedStyle(parentEl)
+            const pLeft = parseFloat(parentStyle.paddingLeft) || 0
+            const pRight = parseFloat(parentStyle.paddingRight) || 0
+            const bLeft = parseFloat(parentStyle.borderLeftWidth) || 0
+            const bRight = parseFloat(parentStyle.borderRightWidth) || 0
+            // Content width = BorderBox - Padding - Border
+            parentWidth = parentRect.width - pLeft - pRight - bLeft - bRight
+        }
+
         const handleMouseMove = (moveEvent: MouseEvent) => {
             const deltaX = moveEvent.clientX - startX
             const deltaY = moveEvent.clientY - startY
@@ -311,56 +325,43 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
             let newWidth = Math.max(50, startWidth + deltaX)
             let newHeight = Math.max(20, startHeight + deltaY)
 
-            // Get parent element and compute its content width (available space for child)
-            const parentEl = dom.parentElement
-            let parentWidth = window.innerWidth
+            // Constraint: Don't go higher than parent width
+            newWidth = Math.min(newWidth, parentWidth)
 
-            if (parentEl) {
-                const parentRect = parentEl.getBoundingClientRect()
-                const parentStyle = window.getComputedStyle(parentEl)
-                const pLeft = parseFloat(parentStyle.paddingLeft) || 0
-                const pRight = parseFloat(parentStyle.paddingRight) || 0
-                const bLeft = parseFloat(parentStyle.borderLeftWidth) || 0
-                const bRight = parseFloat(parentStyle.borderRightWidth) || 0
-
-                // Content width = BorderBox - Padding - Border
-                parentWidth = parentRect.width - pLeft - pRight - bLeft - bRight
-            }
+            // Calculate percentage
+            let widthPercent = (newWidth / parentWidth) * 100
+            if (widthPercent > 100) widthPercent = 100
 
             // Snapping Logic
-            const node = query.node(id).get()
-            const shouldSnap = node.data.props.enableSnapping === true
+            // Snap to common grid percentages: 25%, 33.33%, 50%, 66.66%, 75%, 100%
+            const snapPoints = [25, 33.33, 50, 66.66, 75, 100]
+            const snapThreshold = 3 // 3% snapping range
 
-            if (shouldSnap) {
-                const breakpoints = [640, 768, 1024, 1280, 1536]
-                const threshold = 20
-
-                for (const bp of breakpoints) {
-                    if (Math.abs(newWidth - bp) < threshold) {
-                        newWidth = bp
-                        break
-                    }
+            let snapped = false
+            for (const point of snapPoints) {
+                if (Math.abs(widthPercent - point) < snapThreshold) {
+                    widthPercent = point
+                    snapped = true
+                    break
                 }
             }
 
-            // Constraint: Don't go higher than screen width (or parent width)
-            // Applied AFTER snapping to ensure we don't snap outside the container
-            newWidth = Math.min(newWidth, parentWidth)
+            // If snapped, recalculate pixel width for display fidelity
+            // if not snapped, we just use the raw percentage
+            if (snapped) {
+                newWidth = (widthPercent / 100) * parentWidth
+            }
 
-            // Convert to percentage
-            let widthPercent = (newWidth / parentWidth) * 100
-
-            // Hard clamp to 100% to handle precision issues
-            if (widthPercent > 100) widthPercent = 100
-
-            finalWidth = newWidth // Keep pixel value for height calculation if needed
+            finalWidth = newWidth
             finalHeight = newHeight
 
             // Update DOM directly for smooth feedback
             dom.style.width = `${widthPercent}%`
             dom.style.minWidth = `${widthPercent}%`
-            dom.style.maxWidth = `${widthPercent}%`
-            dom.style.minHeight = `${finalHeight}px` // Height usually stays px for images unless ratio locked? 
+            dom.style.maxWidth = `${widthPercent}%` // Force max-width to follow incase it was set
+
+            // Height logic - usually PX based unless explicit requirement
+            dom.style.minHeight = `${finalHeight}px`
             dom.style.height = `${finalHeight}px`
 
             // Update resize handle position
@@ -382,48 +383,59 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
             // Clear the temporary inline styles so CraftJS can take over
             dom.style.minWidth = originalMinWidth
             dom.style.height = originalHeight
-
-            // Calculate final % for saving
-            const parentEl = dom.parentElement
-            let parentWidth = window.innerWidth
-
-            if (parentEl) {
-                const parentRect = parentEl.getBoundingClientRect()
-                const parentStyle = window.getComputedStyle(parentEl)
-                const pLeft = parseFloat(parentStyle.paddingLeft) || 0
-                const pRight = parseFloat(parentStyle.paddingRight) || 0
-                const bLeft = parseFloat(parentStyle.borderLeftWidth) || 0
-                const bRight = parseFloat(parentStyle.borderRightWidth) || 0
-                parentWidth = parentRect.width - pLeft - pRight - bLeft - bRight
-            }
+            dom.style.maxWidth = originalMaxWidth
 
             const finalPercent = (finalWidth / parentWidth) * 100
 
+            // Re-apply snapping logic for the final save to be clean
+            const snapPoints = [25, 33.33, 50, 66.66, 75, 100]
+            // We can be a bit more aggressive on save-snap to clean up numbers
+            let savePercent = finalPercent
+            for (const point of snapPoints) {
+                if (Math.abs(savePercent - point) < 2) {
+                    savePercent = point
+                    break
+                }
+            }
+
             // Sync final values to CraftJS state
             actions.setProp(id, (prop: Record<string, any>) => {
-                // Determine if we should update style or direct props
                 const hasStyle = prop.style && typeof prop.style === 'object'
 
-                if (prop.width !== undefined || name === "Container" || name === "Grid") {
-                    const val = `${finalPercent.toFixed(2)}%`
-                    if (hasStyle) prop.style.width = val
-                    else prop.width = val
+                // Allow resizing for generic components if explicitly enabled or specific types
+                const shouldResizeWidth = prop.width !== undefined ||
+                    ["Container", "Grid", "Section", "Image"].includes(name);
 
-                    // Also update maxWidth if it exists/is set
-                    if (prop.maxWidth !== undefined || (hasStyle && prop.style.maxWidth !== undefined)) {
-                        if (hasStyle) prop.style.maxWidth = val
-                        else prop.maxWidth = val
+                if (shouldResizeWidth) {
+                    const val = `${parseFloat(savePercent.toFixed(2))}%`
+
+                    if (hasStyle) {
+                        prop.style.width = val
+                        // Clear fixed widths if switching to fluid
+                        // prop.style.maxWidth = val; 
+                    } else {
+                        prop.width = val
+                    }
+
+                    // Specific fix: If resizing a Container/Section that was "Centered", 
+                    // dragging it manually should probably switch it to custom width/fluid behavior
+                    if (prop.previewLayout === 'centered' && Math.abs(savePercent - 100) > 1) {
+                        // If user resizes a centered container, we might want to keep it centered but change max-width?
+                        // OR, we assume manual resize overrides the preset.
+                        // For now, let's just update width.
+                        if (hasStyle) prop.style.maxWidth = '100%' // Reset constraints if making it custom
                     }
                 }
 
-                if (prop.height !== undefined || name === "Spacer") {
-                    const val = finalHeight
+                if (prop.height !== undefined || name === "Spacer" || prop.style?.height !== undefined) {
+                    const val = `${Math.round(finalHeight)}px`
                     if (hasStyle) prop.style.height = val
                     else prop.height = val
                 }
 
-                if (prop.minHeight !== undefined) {
-                    const val = finalHeight
+                // Also update minHeight if present
+                if (prop.minHeight !== undefined || prop.style?.minHeight !== undefined) {
+                    const val = `${Math.round(finalHeight)}px`
                     if (hasStyle) prop.style.minHeight = val
                     else prop.minHeight = val
                 }
