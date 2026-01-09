@@ -124,6 +124,8 @@ export interface BlockAPI<P = any> extends React.FC<P> {
             description?: string
         }
     }
+    // SSR-safe runtime component
+    Runtime: React.FC<P>
 }
 
 // --- Hook for Style Generation ---
@@ -218,8 +220,17 @@ export function defineBlock<P extends object>(config: BlockConfig<P>): BlockAPI<
         )
     }
 
+    // 2. Runtime Component (unwrapped, safe for SSR)
+    const RuntimeComponent: React.FC<P> = (props) => {
+        const { theme } = useEditorTheme()
+        const Render = config.render
+        // Render directly without BlockWrapper
+        return <Render {...props} theme={theme} />
+    }
+
     // Attach Craft.js static properties
     const CraftComponent = Component as BlockAPI<P>
+    CraftComponent.Runtime = RuntimeComponent
 
     CraftComponent.craft = {
         displayName: config.name,
