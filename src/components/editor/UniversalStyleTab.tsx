@@ -1,4 +1,7 @@
-import React from "react"
+import React, { useState } from "react"
+import { useParams } from "next/navigation"
+import MediaLibraryDialog, { MediaItem } from "@/components/MediaGallery/media-select"
+import { Button } from "@/components/ui/button"
 import { useNode } from "@craftjs/core"
 import {
     PropertySection,
@@ -16,7 +19,8 @@ import {
 import {
     AlignLeft, AlignCenter, AlignRight, AlignJustify,
     ArrowRight, ArrowDown, ArrowUp, ArrowLeft,
-    LayoutGrid, Box, Type, MousePointer2
+    LayoutGrid, Box, Type, MousePointer2,
+    ImageIcon, X
 } from "lucide-react"
 
 export const UniversalStyleTab = () => {
@@ -26,6 +30,17 @@ export const UniversalStyleTab = () => {
     } = useNode((node) => ({
         style: node.data.props.style || {}
     }))
+
+    const params = useParams()
+    const siteId = params.siteId as string
+    const [isMediaDialogOpen, setIsMediaDialogOpen] = useState(false)
+
+    const handleMediaSelect = (items: MediaItem[]) => {
+        if (items.length > 0) {
+            const selectedImage = items[0]
+            setStyle('backgroundImage', selectedImage.url)
+        }
+    }
 
     const setStyle = (key: string, value: any) => {
         setProp((props: any) => {
@@ -45,7 +60,7 @@ export const UniversalStyleTab = () => {
         width, height, maxWidth, minHeight,
         display, flexDirection, alignItems, justifyContent, gap,
         backgroundColor, borderRadius, borderWidth, borderColor, boxShadow,
-        opacity, position, zIndex
+        opacity, position, zIndex, backgroundImage
     } = style
 
     return (
