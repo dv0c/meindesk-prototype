@@ -30,7 +30,7 @@ const defaultStyles: BlockStyle = {
     minHeight: 100,
     width: "100%",
     height: "auto",
-    display: "flex",
+    display: "block",
     flexDirection: "column",
     alignItems: "flex-start",
     justifyContent: "flex-start",
@@ -61,15 +61,6 @@ export const Container = defineBlock<ContainerProps>({
         const { enabled } = useEditor((state) => ({
             enabled: state.options.enabled
         }))
-
-        // We still need useNode here just for the isApp checks or we can pass it down?
-        // Actually, defineBlock hides useNode. 
-        // If we strictly follow the plan, "Remove all direct Craft.js useNode() imports".
-        // BUT, `isApp` check specific logic might need it.
-        // Let's check how to get `isApp` without `useNode` inside the component?
-        // We can't. 
-        // Exception: If we need Node specific data NOT provided by wrapper (like custom data), we might need useNode.
-        // But let's try to stick to the plan.
 
         // Fetch Collection Data
         const collectionData = useCollectionData({

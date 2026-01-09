@@ -186,7 +186,9 @@ function EditorWithDesign({ resolver, pageName, setPageName, pageStatus, setPage
 
 // Inner component that has access to useEditor
 function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLocked, setIsLocked, deviceMode, setDeviceMode, isSaving, setIsSaving, showSidebar, setShowSidebar, showTemplates, setShowTemplates, siteId, pageId, getCanvasWidth, getDevicePixelWidth, getCssVariables }: any) {
-    const { query, actions } = useEditor()
+    const { query, actions, enabled } = useEditor((state) => ({
+        enabled: state.options.enabled
+    }))
     const { settings, updateSettings, registerSaveHandler } = useDesign()
     const { seoSettings, updateSEOSettings, registerSEOSaveHandler } = useSEO()
     const [isLoading, setIsLoading] = useState(true)
@@ -406,17 +408,17 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
 
                     {/* Canvas Area */}
                     <div ref={canvasContainerRef} className="flex-1 h-full overflow-hidden flex flex-col relative">
-                        <div className="overflow-auto h-full bg-zinc-50 dark:bg-zinc-900 p-5 flex justify-center">
+                        <div className={`overflow-auto h-full flex justify-center transition-all duration-300 ${Boolean(enabled) ? "bg-zinc-50 dark:bg-zinc-900 p-5" : "bg-background p-0"}`}>
                             <div
                                 className="canvas-preview shadow-lg transition-all duration-300 overflow-y-auto overflow-x-hidden"
                                 style={{
-                                    width: getCanvasWidth(),
+                                    width: enabled ? getCanvasWidth() : "100%",
                                     minHeight: "100%", // Let content drive height
                                     height: "fit-content",
                                     backgroundColor: "var(--design-background, #ffffff)",
-                                    transform: `scale(${scale}) translateZ(0)`, // translateZ for crisp text
+                                    transform: `scale(${enabled ? scale : 1}) translateZ(0)`, // translateZ for crisp text
                                     transformOrigin: "top center",
-                                    marginBottom: "40px", // Visual spacing at bottom
+                                    marginBottom: enabled ? "40px" : "0", // Visual spacing at bottom only in editor
                                     ...Object.fromEntries(
                                         getCssVariables()
                                             .split(';')

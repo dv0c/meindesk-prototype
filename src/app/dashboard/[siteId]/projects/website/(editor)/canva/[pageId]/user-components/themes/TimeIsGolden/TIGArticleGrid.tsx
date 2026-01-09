@@ -69,11 +69,41 @@ const TIGArticleGridBase = forwardRef<HTMLDivElement, TIGArticleGridProps>(
                     // Assuming user selects a real collection ID via settings or "Articles" works.
                     // For safety, I'll assume usage of real collection IDs.
 
-                    const { data } = await axios.get(
-                        `/api/v1/${team.id}/collections/${collectionId}/items?limit=${limit}`,
-                        { signal: controller.signal }
-                    )
-                    setItems(data.items || [])
+                    let endpoint = `/api/v1/${team.id}/collections/${collectionId}/items?limit=${limit}`
+
+                    // Handle "articles" special collection
+                    if (collectionId === "articles" || collectionId === "Articles") {
+                        endpoint = `/api/v1/${team.id}/articles?limit=${limit}&status=PUBLISHED`
+                    }
+
+                    const { data } = await axios.get(endpoint, { signal: controller.signal })
+
+                    // Normalize data: Articles API might return different structure than Collections API
+                    // Collections: { items: [...] }
+                    // Articles: { articles: [...] } or [...] ?
+                    // Let's assume consistent wrapper or handle both.
+
+                    let fetchedItems = data.items || data.articles || data || []
+
+                    // Map Articles to CollectionItem format if needed
+                    if (collectionId === "articles" || collectionId === "Articles") {
+                        fetchedItems = fetchedItems.map((article: any) => ({
+                            id: article.id,
+                            slug: article.slug,
+                            status: article.status,
+                            createdAt: article.createdAt,
+                            updatedAt: article.updatedAt,
+                            // Map flat article fields to 'data' object expected by Grid
+                            data: {
+                                title: article.title,
+                                description: article.description || article.excerpt,
+                                image: article.coverImage || article.image,
+                                ...article
+                            }
+                        }))
+                    }
+
+                    setItems(fetchedItems)
                 } catch (err: any) {
                     if (axios.isCancel(err)) return
                     console.error("Failed to load items:", err)

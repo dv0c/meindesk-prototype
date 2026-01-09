@@ -311,8 +311,21 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
             let newWidth = Math.max(50, startWidth + deltaX)
             let newHeight = Math.max(20, startHeight + deltaY)
 
-            // Get parent width for % calculation
-            const parentWidth = dom.parentElement?.getBoundingClientRect().width || window.innerWidth
+            // Get parent element and compute its content width (available space for child)
+            const parentEl = dom.parentElement
+            let parentWidth = window.innerWidth
+
+            if (parentEl) {
+                const parentRect = parentEl.getBoundingClientRect()
+                const parentStyle = window.getComputedStyle(parentEl)
+                const pLeft = parseFloat(parentStyle.paddingLeft) || 0
+                const pRight = parseFloat(parentStyle.paddingRight) || 0
+                const bLeft = parseFloat(parentStyle.borderLeftWidth) || 0
+                const bRight = parseFloat(parentStyle.borderRightWidth) || 0
+
+                // Content width = BorderBox - Padding - Border
+                parentWidth = parentRect.width - pLeft - pRight - bLeft - bRight
+            }
 
             // Snapping Logic
             const node = query.node(id).get()
@@ -371,22 +384,48 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
             dom.style.height = originalHeight
 
             // Calculate final % for saving
-            const parentWidth = dom.parentElement?.getBoundingClientRect().width || window.innerWidth
+            const parentEl = dom.parentElement
+            let parentWidth = window.innerWidth
+
+            if (parentEl) {
+                const parentRect = parentEl.getBoundingClientRect()
+                const parentStyle = window.getComputedStyle(parentEl)
+                const pLeft = parseFloat(parentStyle.paddingLeft) || 0
+                const pRight = parseFloat(parentStyle.paddingRight) || 0
+                const bLeft = parseFloat(parentStyle.borderLeftWidth) || 0
+                const bRight = parseFloat(parentStyle.borderRightWidth) || 0
+                parentWidth = parentRect.width - pLeft - pRight - bLeft - bRight
+            }
+
             const finalPercent = (finalWidth / parentWidth) * 100
 
             // Sync final values to CraftJS state
             actions.setProp(id, (prop: Record<string, any>) => {
+                // Determine if we should update style or direct props
+                const hasStyle = prop.style && typeof prop.style === 'object'
+
                 if (prop.width !== undefined || name === "Container" || name === "Grid") {
-                    prop.width = `${finalPercent.toFixed(2)}%`
+                    const val = `${finalPercent.toFixed(2)}%`
+                    if (hasStyle) prop.style.width = val
+                    else prop.width = val
+
+                    // Also update maxWidth if it exists/is set
+                    if (prop.maxWidth !== undefined || (hasStyle && prop.style.maxWidth !== undefined)) {
+                        if (hasStyle) prop.style.maxWidth = val
+                        else prop.maxWidth = val
+                    }
                 }
-                if (prop.maxWidth !== undefined) {
-                    prop.maxWidth = `${finalPercent.toFixed(2)}%`
-                }
+
                 if (prop.height !== undefined || name === "Spacer") {
-                    prop.height = finalHeight
+                    const val = finalHeight
+                    if (hasStyle) prop.style.height = val
+                    else prop.height = val
                 }
+
                 if (prop.minHeight !== undefined) {
-                    prop.minHeight = finalHeight
+                    const val = finalHeight
+                    if (hasStyle) prop.style.minHeight = val
+                    else prop.minHeight = val
                 }
             })
         }
