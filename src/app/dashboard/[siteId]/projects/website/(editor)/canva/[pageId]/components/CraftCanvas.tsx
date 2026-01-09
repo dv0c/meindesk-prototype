@@ -19,6 +19,7 @@ export function CraftCanvas() {
                     is={Container}
                     canvas
                     padding={20}
+                    height={"100vh"}
                     backgroundColor="transparent"
                     minHeight={400}
                     className="min-h-full"

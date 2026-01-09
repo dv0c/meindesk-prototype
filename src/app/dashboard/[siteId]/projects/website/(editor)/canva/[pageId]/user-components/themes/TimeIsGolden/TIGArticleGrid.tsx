@@ -1,18 +1,33 @@
 "use client"
 
-import React, { forwardRef, useEffect, useState } from "react"
-import { useTeam } from "@/hooks/useTeam"
-import axios from "axios"
-import Link from "next/link"
-import { useNode } from "@craftjs/core"
 import {
-    withCraftComponent,
-    CraftComponentProps,
-} from "../../../lib/withCraftComponent"
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from "@/components/ui/command"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
+import { Switch } from "@/components/ui/switch"
+import { useTeam } from "@/hooks/useTeam"
+import { getCollections } from "@/lib/actions/collection-actions"
+import { BlockStyle, defineBlock, useBlockStyles } from "@/lib/block-api"
 import { cn } from "@/lib/utils"
-import { PropertySection, PropertyRow, PropertyInput } from "../../../components/PropertySection"
+import { useNode } from "@craftjs/core"
+import axios from "axios"
+import { Check, ChevronsUpDown } from "lucide-react"
+import Link from "next/link"
+import { useParams } from "next/navigation"
+import { useEffect, useState } from "react"
+import { PropertyRow, PropertySection, PropertySlider } from "../../../components/PropertySection"
 
-// Types duplicated from CollectionList for independence
+// --- Types ---
+
 interface CollectionItem {
     id: string
     slug: string
@@ -22,33 +37,158 @@ interface CollectionItem {
     updatedAt: string
 }
 
-interface TIGArticleGridProps extends CraftComponentProps {
+export interface TIGArticleGridProps {
     collectionId?: string
     limit?: number
     showImage?: boolean
+    style?: BlockStyle
+    className?: string
 }
 
-const TIGArticleGridBase = forwardRef<HTMLDivElement, TIGArticleGridProps>(
-    (
-        {
-            collectionId = "Articles", // Default to "Articles" for TIG
-            limit = 9,
-            showImage = true,
-            className = "",
-        },
-        ref
-    ) => {
+// --- Component ---
+
+export const TIGArticleGrid = defineBlock<TIGArticleGridProps>({
+    name: "TIG Grid",
+    category: "Time is Golden",
+    icon: <div className="p-1 border rounded bg-muted/20">Grid</div>,
+
+    defaultProps: {
+        collectionId: "",
+        limit: 9,
+        showImage: true,
+        style: {
+            width: "100%",
+            paddingTop: 0,
+            paddingBottom: 0,
+            paddingLeft: 0,
+            paddingRight: 0,
+        }
+    },
+
+    settings: () => {
+        const {
+            actions: { setProp },
+            collectionId,
+            limit,
+            showImage
+        } = useNode((node) => ({
+            collectionId: node.data.props.collectionId,
+            limit: node.data.props.limit,
+            showImage: node.data.props.showImage,
+        }))
+
+        const params = useParams()
+        const siteId = (params.tenantId as string) || (params.siteId as string)
+        const [availableCollections, setAvailableCollections] = useState<{ label: string, value: string }[]>([])
+        const [openCombobox, setOpenCombobox] = useState(false)
+
+        useEffect(() => {
+            if (!siteId) return
+            const fetchCollections = async () => {
+                const res = await getCollections(siteId)
+                const options = [
+                    { label: "Articles", value: "Articles" }
+                ]
+                if (res.collections) {
+                    res.collections.forEach(c => {
+                        options.push({ label: c.name, value: c.id })
+                    })
+                }
+                setAvailableCollections(options)
+            }
+            fetchCollections()
+        }, [siteId])
+
+        const selectedLabel = availableCollections.find(c => c.value === collectionId)?.label || collectionId
+
+        return (
+            <div className="space-y-4">
+                <PropertySection title="Data Source">
+                    <div className="space-y-2 mt-2">
+                        <label className="text-xs font-semibold text-muted-foreground uppercase">Collection</label>
+                        <Popover open={openCombobox} onOpenChange={setOpenCombobox}>
+                            <PopoverTrigger asChild>
+                                <button
+                                    role="combobox"
+                                    aria-expanded={openCombobox}
+                                    className="w-full flex items-center justify-between border rounded-md px-3 py-2 text-sm bg-background hover:bg-muted/50 transition-colors"
+                                >
+                                    <span className="text-muted-foreground truncate">
+                                        {collectionId ? selectedLabel : "Select collection..."}
+                                    </span>
+                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[240px] p-0" align="start">
+                                <Command>
+                                    <CommandInput placeholder="Search collections..." />
+                                    <CommandList>
+                                        <CommandEmpty>No collection found.</CommandEmpty>
+                                        <CommandGroup>
+                                            {availableCollections.map((collection) => (
+                                                <CommandItem
+                                                    key={collection.value}
+                                                    value={collection.label}
+                                                    onSelect={() => {
+                                                        setProp((props: any) => props.collectionId = collection.value)
+                                                        setOpenCombobox(false)
+                                                    }}
+                                                >
+                                                    <div className={cn(
+                                                        "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                                                        collectionId === collection.value
+                                                            ? "bg-primary text-primary-foreground"
+                                                            : "opacity-50 [&_svg]:invisible"
+                                                    )}>
+                                                        <Check className={cn("h-4 w-4")} />
+                                                    </div>
+                                                    {collection.label}
+                                                </CommandItem>
+                                            ))}
+                                        </CommandGroup>
+                                    </CommandList>
+                                </Command>
+                            </PopoverContent>
+                        </Popover>
+                    </div>
+
+                    <PropertyRow label="Count">
+                        <PropertySlider
+                            value={limit || 9}
+                            onChange={(v) => setProp((props: any) => props.limit = v)}
+                            min={1}
+                            max={20}
+                        />
+                    </PropertyRow>
+                </PropertySection>
+
+                <PropertySection title="Display">
+                    <PropertyRow label="Show Image">
+                        <Switch
+                            checked={showImage}
+                            onCheckedChange={(v) => setProp((props: any) => props.showImage = v)}
+                        />
+                    </PropertyRow>
+                </PropertySection>
+            </div>
+        )
+    },
+
+    render: ({ collectionId, limit, showImage, style, className }) => {
         const [items, setItems] = useState<CollectionItem[]>([])
         const [loading, setLoading] = useState(true)
         const [error, setError] = useState<string | null>(null)
         const { team, loading: teamLoading } = useTeam(undefined, 'tenant')
-        const { connectors: { connect, drag } } = useNode()
+
+        // useBlockStyles hook for styles
+        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+            style,
+            className: cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12", className)
+        })
 
         useEffect(() => {
             if (!team?.id || !collectionId) {
-                // If it's the "Articles" virtual collection, we might handle it differently, 
-                // but for now relying on existing API which handles collectionId string.
-                if (collectionId === "Articles" && team?.id) {
+                if ((collectionId === "Articles" || collectionId === "articles") && team?.id) {
                     // Proceed
                 } else {
                     setLoading(false)
@@ -61,13 +201,6 @@ const TIGArticleGridBase = forwardRef<HTMLDivElement, TIGArticleGridProps>(
                 try {
                     setLoading(true)
                     setError(null)
-                    // If "Articles", we might need a specific endpoint or just rely on 'Articles' being a valid collection ID/Slug in the backend?
-                    // The standard getItems action supports real collections.
-                    // For "Articles" system collection, we generally use getArticles.
-                    // But here we are fetching from API /api/v1/.../collections/...
-                    // If collectionId is a UUID, it works. If it's "Articles", the API needs to support it.
-                    // Assuming user selects a real collection ID via settings or "Articles" works.
-                    // For safety, I'll assume usage of real collection IDs.
 
                     let endpoint = `/api/v1/${team.id}/collections/${collectionId}/items?limit=${limit}`
 
@@ -77,11 +210,6 @@ const TIGArticleGridBase = forwardRef<HTMLDivElement, TIGArticleGridProps>(
                     }
 
                     const { data } = await axios.get(endpoint, { signal: controller.signal })
-
-                    // Normalize data: Articles API might return different structure than Collections API
-                    // Collections: { items: [...] }
-                    // Articles: { articles: [...] } or [...] ?
-                    // Let's assume consistent wrapper or handle both.
 
                     let fetchedItems = data.items || data.articles || data || []
 
@@ -93,7 +221,6 @@ const TIGArticleGridBase = forwardRef<HTMLDivElement, TIGArticleGridProps>(
                             status: article.status,
                             createdAt: article.createdAt,
                             updatedAt: article.updatedAt,
-                            // Map flat article fields to 'data' object expected by Grid
                             data: {
                                 title: article.title,
                                 description: article.description || article.excerpt,
@@ -119,6 +246,7 @@ const TIGArticleGridBase = forwardRef<HTMLDivElement, TIGArticleGridProps>(
             return () => controller.abort()
         }, [team?.id, collectionId, limit])
 
+
         const renderItem = (item: CollectionItem, index: number) => {
             // Magazine Logic: First item is featured (larger)
             const isFeatured = index === 0
@@ -129,7 +257,7 @@ const TIGArticleGridBase = forwardRef<HTMLDivElement, TIGArticleGridProps>(
             return (
                 <Link
                     key={item.id}
-                    href={`/article/${item.slug}`} // Assuming standard article path for TIG for now
+                    href={`/article/${item.slug}`}
                     className={cn(
                         "group block overflow-hidden",
                         isFeatured ? "md:col-span-2 lg:col-span-2 row-span-2" : "col-span-1"
@@ -149,7 +277,6 @@ const TIGArticleGridBase = forwardRef<HTMLDivElement, TIGArticleGridProps>(
                             </div>
                         )}
                         <div className="flex flex-col gap-2">
-                            {/* Category Tag (Fake for now or derived) */}
                             <span className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">
                                 {item.data.category || "Story"}
                             </span>
@@ -177,7 +304,7 @@ const TIGArticleGridBase = forwardRef<HTMLDivElement, TIGArticleGridProps>(
 
         if (loading || teamLoading) {
             return (
-                <div ref={ref} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+                <div style={computedStyle} className={computedClassName}>
                     {[1, 2, 3].map(i => (
                         <div key={i} className="space-y-4 animate-pulse">
                             <div className="bg-muted aspect-video w-full" />
@@ -189,51 +316,13 @@ const TIGArticleGridBase = forwardRef<HTMLDivElement, TIGArticleGridProps>(
             )
         }
 
-        if (error) return <div ref={ref}>Error loading articles.</div>
-        if (!items.length) return <div ref={ref} className="p-8 border border-dashed text-center text-muted-foreground">Select a collection to display articles.</div>
+        if (error) return <div style={computedStyle} className={computedClassName}>Error loading items.</div>
+        if (!items.length) return <div style={computedStyle} className={computedClassName + " p-8 border border-dashed text-center text-muted-foreground"}>Select a collection to display items.</div>
 
         return (
-            <div
-                ref={ref}
-                className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12", className)}
-            >
+            <div style={computedStyle} className={computedClassName}>
                 {items.map((item, i) => renderItem(item, i))}
             </div>
         )
     }
-)
-
-TIGArticleGridBase.displayName = "TIGArticleGridBase"
-
-const defaultProps = {
-    collectionId: "",
-    limit: 7,
-    showImage: true
-}
-
-export const TIGArticleGrid = withCraftComponent<TIGArticleGridProps, HTMLDivElement>(
-    TIGArticleGridBase,
-    {
-        displayName: "TIG Grid",
-        defaultProps,
-        settingsConfig: {
-            collectionId: {
-                label: "Collection",
-                type: "collection-select",
-                section: "Data",
-            },
-            limit: {
-                label: "Count",
-                type: "slider",
-                min: 1,
-                max: 20,
-                section: "Data",
-            },
-            showImage: {
-                label: "Show Image",
-                type: "checkbox",
-                section: "Display",
-            }
-        }
-    }
-)
+})

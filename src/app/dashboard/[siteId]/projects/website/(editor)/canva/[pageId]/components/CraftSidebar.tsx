@@ -189,6 +189,7 @@ function PropertiesView({
                         </TabsTrigger>
                         <TabsTrigger
                             value="styles"
+                            disabled
                             className={cn(
                                 "relative flex items-center gap-1 px-2 py-2 rounded-md transition-all duration-200",
                                 "data-[state=active]:bg-background data-[state=active]:shadow-sm",

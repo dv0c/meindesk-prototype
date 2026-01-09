@@ -436,6 +436,7 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                                             is={Container}
                                             canvas
                                             minHeight="100vh"
+                                            height="100vh"
                                             flexDirection="column"
                                             alignItems="stretch"
                                             custom={{ displayName: "App", isDeletable: false }}
