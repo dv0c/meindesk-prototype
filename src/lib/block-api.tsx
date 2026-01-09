@@ -1,9 +1,9 @@
 import React from "react"
-import { useNode } from "@craftjs/core"
-import { cn } from "@/lib/utils"
 // @ts-ignore - Importing from deep app path as requested
 import { useEditorTheme, type EditorTheme } from "@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ThemeContext"
 import { BlockWrapper } from "@/components/editor/BlockWrapper"
+// @ts-ignore
+import { GlobalStylesPanel } from "@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/GlobalSettings"
 
 // --- Types ---
 
@@ -232,6 +232,21 @@ export function defineBlock<P extends object>(config: BlockConfig<P>): BlockAPI<
     const CraftComponent = Component as BlockAPI<P>
     CraftComponent.Runtime = RuntimeComponent
 
+    // ... (existing code)
+
+    // Compose Settings if needed
+    const CombinedSettings = () => {
+        const Settings = config.settings
+        return (
+            <div className="space-y-6">
+                {Settings && <Settings />}
+                <div className="pt-4 border-t">
+                    <GlobalStylesPanel />
+                </div>
+            </div>
+        )
+    }
+
     CraftComponent.craft = {
         displayName: config.name,
         props: config.defaultProps || {},
@@ -243,7 +258,7 @@ export function defineBlock<P extends object>(config: BlockConfig<P>): BlockAPI<
             } : {})
         },
         related: {
-            settings: config.settings || (() => <div className="p-4 text-sm text-muted-foreground">No settings available</div>)
+            settings: CombinedSettings
         },
         custom: {
             category: config.category,

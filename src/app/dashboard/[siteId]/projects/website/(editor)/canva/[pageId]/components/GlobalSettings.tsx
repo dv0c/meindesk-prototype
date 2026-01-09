@@ -56,22 +56,75 @@ export const GlobalStylesPanel = () => {
 
     if (!id || !currentProps) return null
 
+    // Helper to determine if we should update 'style' object or root props
+    const hasStyleObject = currentProps.style && typeof currentProps.style === 'object'
+
     const setProp = (cb: (props: any) => void) => {
-        actions.setProp(id, cb)
+        actions.setProp(id, (props: any) => {
+            if (hasStyleObject) {
+                // If using defineBlock pattern (props.style), ensure we pass a proxy or handle logic
+                // But simpler: just intercept the callback logic if possible, or expect the cb to handle it?
+                // The callbacks below (e.g., props.fontFamily = val) assume root level.
+                // We need to intercept.
+
+                // Workaround: We wrapper the callback
+                const styleProxy = new Proxy(props.style || {}, {
+                    set: (target, key, value) => {
+                        target[key] = value
+                        return true
+                    },
+                    get: (target, key) => target[key]
+                })
+
+                // We try to let the original cb run on a mock object to catch what it wants to set?
+                // No, that's complex.
+                // Better: Rewrite the handlers below to use a smart setter.
+            }
+            cb(props)
+        })
     }
 
-    const {
-        marginTop, marginRight, marginBottom, marginLeft,
-        paddingTop, paddingRight, paddingBottom, paddingLeft,
-        backgroundColor,
-        borderRadius,
-        borderWidth,
-        borderColor,
-        boxShadow,
-        fontFamily,
-        fontSize,
-        fontWeight,
-    } = currentProps
+    // Helper to get value from style object or root
+    const getValue = (key: string) => {
+        if (hasStyleObject) {
+            return currentProps.style[key]
+        }
+        return currentProps[key]
+    }
+
+    // Helper to set value to style object or root
+    const updateProp = (key: string, value: any) => {
+        actions.setProp(id, (props: any) => {
+            if (hasStyleObject) {
+                if (!props.style) props.style = {}
+                props.style[key] = value
+            } else {
+                props[key] = value
+            }
+        })
+    }
+
+    const setMargin = (side: string, val: any) => updateProp(`margin${side.charAt(0).toUpperCase() + side.slice(1)}`, val)
+    const setPadding = (side: string, val: any) => updateProp(`padding${side.charAt(0).toUpperCase() + side.slice(1)}`, val)
+
+    const fontFamily = getValue('fontFamily')
+    const fontSize = getValue('fontSize')
+    const backgroundColor = getValue('backgroundColor')
+    const borderWidth = getValue('borderWidth')
+    const borderRadius = getValue('borderRadius')
+    const borderColor = getValue('borderColor')
+    const boxShadow = getValue('boxShadow')
+
+    const marginTop = getValue('marginTop')
+    const marginRight = getValue('marginRight')
+    const marginBottom = getValue('marginBottom')
+    const marginLeft = getValue('marginLeft')
+
+    const paddingTop = getValue('paddingTop')
+    const paddingRight = getValue('paddingRight')
+    const paddingBottom = getValue('paddingBottom')
+    const paddingLeft = getValue('paddingLeft')
+
 
     return (
         <div className="space-y-6">
@@ -80,34 +133,33 @@ export const GlobalStylesPanel = () => {
                 <PropertyRow label="Font Family">
                     <PropertySelect
                         value={fontFamily || "Inter"}
-                        onChange={(val) => setProp((props: any) => props.fontFamily = val)}
+                        onChange={(val) => updateProp('fontFamily', val)}
                         options={fontOptions}
                     />
                 </PropertyRow>
-                {fontSize !== undefined && (
-                    <PropertyRow label="Font Size">
-                        <PropertySlider
-                            value={fontSize || 16}
-                            onChange={(val) => setProp((props: any) => props.fontSize = val)}
-                            min={8}
-                            max={120}
-                            unit="px"
-                        />
-                    </PropertyRow>
-                )}
+                <PropertyRow label="Font Size">
+                    {/* Size might need unit handling if defineBlock uses strings '16px' vs numbers */}
+                    <PropertySlider
+                        value={parseInt(fontSize || 16)}
+                        onChange={(val) => updateProp('fontSize', val)}
+                        min={8}
+                        max={120}
+                        unit="px"
+                    />
+                </PropertyRow>
             </PropertySection>
 
             <PropertySection title="Spacing & Alignment" defaultOpen={true}>
                 <PropertyRow label="Margin (px/auto)">
                     <PropertySpacing
                         values={{ top: marginTop, right: marginRight, bottom: marginBottom, left: marginLeft }}
-                        onChange={(side, val) => setProp((props: any) => props[`margin${side.charAt(0).toUpperCase() + side.slice(1)}`] = val)}
+                        onChange={(side, val) => setMargin(side, val)}
                     />
                 </PropertyRow>
                 <PropertyRow label="Padding (px)">
                     <PropertySpacing
                         values={{ top: paddingTop, right: paddingRight, bottom: paddingBottom, left: paddingLeft }}
-                        onChange={(side, val) => setProp((props: any) => props[`padding${side.charAt(0).toUpperCase() + side.slice(1)}`] = val)}
+                        onChange={(side, val) => setPadding(side, val)}
                     />
                 </PropertyRow>
             </PropertySection>
@@ -116,7 +168,7 @@ export const GlobalStylesPanel = () => {
                 <PropertyRow label="Background">
                     <PropertyColor
                         value={backgroundColor}
-                        onChange={(color) => setProp((props: any) => props.backgroundColor = color)}
+                        onChange={(color) => updateProp('backgroundColor', color)}
                     />
                 </PropertyRow>
                 <PropertyRow label="Border">
@@ -125,8 +177,8 @@ export const GlobalStylesPanel = () => {
                             <span className="text-[10px] text-muted-foreground w-12 shrink-0">Width</span>
                             <div className="flex-1">
                                 <PropertySlider
-                                    value={borderWidth || 0}
-                                    onChange={(val) => setProp((props: any) => props.borderWidth = val)}
+                                    value={parseInt(borderWidth || 0)}
+                                    onChange={(val) => updateProp('borderWidth', val)}
                                     max={20}
                                     unit="px"
                                 />
@@ -136,8 +188,8 @@ export const GlobalStylesPanel = () => {
                             <span className="text-[10px] text-muted-foreground w-12 shrink-0">Radius</span>
                             <div className="flex-1">
                                 <PropertySlider
-                                    value={borderRadius || 0}
-                                    onChange={(val) => setProp((props: any) => props.borderRadius = val)}
+                                    value={parseInt(borderRadius || 0)}
+                                    onChange={(val) => updateProp('borderRadius', val)}
                                     max={50}
                                     unit="px"
                                 />
@@ -148,7 +200,7 @@ export const GlobalStylesPanel = () => {
                             <div className="flex-1">
                                 <PropertyColor
                                     value={borderColor}
-                                    onChange={(color) => setProp((props: any) => props.borderColor = color)}
+                                    onChange={(color) => updateProp('borderColor', color)}
                                 />
                             </div>
                         </div>
@@ -157,7 +209,7 @@ export const GlobalStylesPanel = () => {
                 <PropertyRow label="Shadow">
                     <PropertyShadowSelect
                         value={boxShadow || ""}
-                        onChange={(val) => setProp((props: any) => props.boxShadow = val)}
+                        onChange={(val) => updateProp('boxShadow', val)}
                     />
                 </PropertyRow>
             </PropertySection>
