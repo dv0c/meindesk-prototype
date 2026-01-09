@@ -1,14 +1,12 @@
 "use client"
 
-import React, { forwardRef, useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useTeam } from "@/hooks/useTeam"
 import axios from "axios"
 import Link from "next/link"
-import {
-    withCraftComponent,
-    CraftComponentProps,
-} from "../lib/withCraftComponent"
+import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
+import { cn } from "@/lib/utils"
 
 // Image component - simple wrapper for external images
 const ArticleImage = ({ src, alt, className }: { src: string; alt: string; className?: string }) => (
@@ -28,29 +26,70 @@ interface Article {
     createdAt: Date
 }
 
-interface ArticlesProps extends CraftComponentProps {
+export interface ArticlesProps {
     title?: string
     thumbnail?: boolean
     limit?: number
     style?: "boxed" | "simple" | "minimal" | "magazine"
     category?: string
+
+    // Block styles
+    blockStyle?: BlockStyle
+    className?: string
 }
 
-const ArticlesBase = forwardRef<HTMLDivElement, ArticlesProps>(
-    (
-        {
-            title = "Latest Articles",
-            thumbnail = true,
-            limit = 10,
-            style = "magazine",
-            category = "ARTICLES",
-            className = "",
+export const Articles = defineBlock<ArticlesProps>({
+    name: "Articles",
+    category: "Content",
+    icon: <div className="p-1">📰</div>,
+
+    defaultProps: {
+        title: "Latest Articles",
+        thumbnail: true,
+        limit: 10,
+        style: "magazine",
+        category: "ARTICLES",
+        blockStyle: {},
+    },
+
+    settingsConfig: {
+        // Display Section
+        title: { label: "Title", type: "text", section: "Display" },
+        style: {
+            label: "Style",
+            type: "select",
+            section: "Display",
+            options: [
+                { label: "Magazine", value: "magazine" },
+                { label: "Boxed", value: "boxed" },
+                { label: "Simple", value: "simple" },
+                { label: "Minimal", value: "minimal" },
+            ],
         },
-        ref
-    ) => {
+        thumbnail: { label: "Show Thumbnails", type: "checkbox", section: "Display" },
+
+        // Data Section
+        limit: { label: "Articles Limit", type: "slider", min: 1, max: 50, section: "Data" },
+        category: { label: "Default Category", type: "text", section: "Data" },
+    },
+
+    render: ({
+        title = "Latest Articles",
+        thumbnail = true,
+        limit = 10,
+        style = "magazine",
+        category = "ARTICLES",
+        className = "",
+        blockStyle,
+    }) => {
         const [articles, setArticles] = useState<Article[]>([])
         const [loading, setLoading] = useState(true)
         const { team, loading: teamLoading } = useTeam(undefined, 'tenant')
+
+        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+            style: blockStyle,
+            className
+        })
 
         useEffect(() => {
             if (!team?.id) return
@@ -80,7 +119,7 @@ const ArticlesBase = forwardRef<HTMLDivElement, ArticlesProps>(
             // Magazine style skeleton
             if (style === "magazine") {
                 return (
-                    <div ref={ref} className={`space-y-0 ${className}`}>
+                    <div className={cn("space-y-0", computedClassName)} style={computedStyle}>
                         {[1, 2, 3].map((i) => (
                             <div key={i} className="border-b border-border py-8 flex items-center gap-6">
                                 <div className="hidden md:flex items-center justify-center min-w-[80px]">
@@ -105,7 +144,7 @@ const ArticlesBase = forwardRef<HTMLDivElement, ArticlesProps>(
             // Boxed style skeleton
             if (style === "boxed") {
                 return (
-                    <Card ref={ref} className={className}>
+                    <Card className={computedClassName} style={computedStyle}>
                         <CardHeader>
                             <div className="h-6 bg-muted animate-pulse rounded w-48 mb-2" />
                             <div className="h-4 bg-muted animate-pulse rounded w-32" />
@@ -133,7 +172,7 @@ const ArticlesBase = forwardRef<HTMLDivElement, ArticlesProps>(
             // Simple style skeleton
             if (style === "simple") {
                 return (
-                    <div ref={ref} className={`space-y-4 ${className}`}>
+                    <div className={cn("space-y-4", computedClassName)} style={computedStyle}>
                         {Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
                             <div key={i} className="border-b pb-4 last:border-0 flex gap-3">
                                 {thumbnail && (
@@ -152,7 +191,7 @@ const ArticlesBase = forwardRef<HTMLDivElement, ArticlesProps>(
 
             // Minimal style skeleton
             return (
-                <div ref={ref} className={`space-y-4 ${className}`}>
+                <div className={cn("space-y-4", computedClassName)} style={computedStyle}>
                     {Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
                         <div key={i} className="border-b pb-4 last:border-0 flex gap-3">
                             {thumbnail && (
@@ -172,7 +211,7 @@ const ArticlesBase = forwardRef<HTMLDivElement, ArticlesProps>(
         // Empty state
         if (!articles.length) {
             return (
-                <Card ref={ref} className={className}>
+                <Card className={computedClassName} style={computedStyle}>
                     <CardHeader>
                         <CardTitle>{title}</CardTitle>
                         <CardDescription>No articles found</CardDescription>
@@ -185,7 +224,7 @@ const ArticlesBase = forwardRef<HTMLDivElement, ArticlesProps>(
         }
 
         return (
-            <div ref={ref} className={className}>
+            <div className={computedClassName} style={computedStyle}>
                 {/* Boxed Style */}
                 {style === "boxed" && (
                     <Card>
@@ -355,48 +394,6 @@ const ArticlesBase = forwardRef<HTMLDivElement, ArticlesProps>(
             </div>
         )
     }
-)
+})
 
-ArticlesBase.displayName = "ArticlesBase"
-
-// Default props
-const defaultProps: Partial<ArticlesProps> = {
-    title: "Latest Articles",
-    thumbnail: true,
-    limit: 10,
-    style: "magazine",
-    category: "ARTICLES",
-}
-
-// Wrap with CraftJS functionality
-export const Articles = withCraftComponent<ArticlesProps, HTMLDivElement>(
-    ArticlesBase,
-    {
-        displayName: "Articles",
-        defaultProps,
-        sectionTitle: "Articles",
-        settingsConfig: {
-            // Display Section
-            title: { label: "Title", type: "text", section: "Display" },
-            style: {
-                label: "Style",
-                type: "select",
-                section: "Display",
-                options: [
-                    { label: "Magazine", value: "magazine" },
-                    { label: "Boxed", value: "boxed" },
-                    { label: "Simple", value: "simple" },
-                    { label: "Minimal", value: "minimal" },
-                ],
-            },
-            thumbnail: { label: "Show Thumbnails", type: "checkbox", section: "Display" },
-
-            // Data Section
-            limit: { label: "Articles Limit", type: "slider", min: 1, max: 50, section: "Data" },
-            category: { label: "Default Category", type: "text", section: "Data" },
-        },
-    }
-)
-
-// Keep default export for backward compatibility
 export default Articles

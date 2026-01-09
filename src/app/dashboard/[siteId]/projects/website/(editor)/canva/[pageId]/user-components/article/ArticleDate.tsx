@@ -1,15 +1,15 @@
 "use client"
 
-import React, { forwardRef } from "react"
-import {
-    withCraftComponent,
-    CraftComponentProps,
-} from "../../lib/withCraftComponent"
+import React from "react"
+import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
 import { useArticle } from "./ArticleContext"
+import { cn } from "@/lib/utils"
 
-interface ArticleDateProps extends CraftComponentProps {
+export interface ArticleDateProps {
     format?: "short" | "long" | "relative"
     locale?: string
+    blockStyle?: BlockStyle
+    className?: string
 }
 
 /**
@@ -38,14 +38,58 @@ function formatDate(dateString: string, format: "short" | "long" | "relative", l
     return date.toLocaleDateString(locale, options)
 }
 
-const ArticleDateBase = forwardRef<HTMLTimeElement, ArticleDateProps>(
-    ({ format = "long", locale = "en-US", className = "" }, ref) => {
+export const ArticleDate = defineBlock<ArticleDateProps>({
+    name: "ArticleDate",
+    category: "Article",
+    icon: <div className="p-1">📅</div>,
+
+    defaultProps: {
+        format: "long",
+        locale: "en-US",
+        blockStyle: {},
+    },
+
+    settingsConfig: {
+        format: {
+            label: "Format",
+            type: "select",
+            section: "Display",
+            options: [
+                { label: "Short (Jan 1, 2024)", value: "short" },
+                { label: "Long (January 1, 2024)", value: "long" },
+                { label: "Relative (2 days ago)", value: "relative" },
+            ],
+        },
+        locale: {
+            label: "Locale",
+            type: "select",
+            section: "Display",
+            options: [
+                { label: "English (US)", value: "en-US" },
+                { label: "English (UK)", value: "en-GB" },
+                { label: "Greek", value: "el-GR" },
+                { label: "German", value: "de-DE" },
+                { label: "French", value: "fr-FR" },
+            ],
+        },
+    },
+
+    render: ({ format = "long", locale = "en-US", className = "", blockStyle }) => {
         const { article, loading, error, isEditor } = useArticle()
+
+        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+            style: {
+                ...blockStyle,
+                color: blockStyle?.color || 'var(--design-neutral, inherit)',
+                opacity: blockStyle?.opacity ?? 0.7,
+            },
+            className: cn("text-sm", className)
+        })
 
         // Loading skeleton
         if (loading) {
             return (
-                <div className={`h-4 bg-muted/50 animate-pulse rounded w-32 ${className}`} />
+                <div className={cn("h-4 bg-muted/50 animate-pulse rounded w-32", className)} />
             )
         }
 
@@ -54,8 +98,8 @@ const ArticleDateBase = forwardRef<HTMLTimeElement, ArticleDateProps>(
             if (isEditor) {
                 return (
                     <time
-                        ref={ref}
-                        className={`text-sm text-muted-foreground ${className}`}
+                        className={cn("text-muted-foreground", computedClassName)}
+                        style={computedStyle}
                     >
                         {formatDate(new Date().toISOString(), format, locale)}
                     </time>
@@ -66,55 +110,14 @@ const ArticleDateBase = forwardRef<HTMLTimeElement, ArticleDateProps>(
 
         return (
             <time
-                ref={ref}
                 dateTime={article.createdAt}
-                className={`text-sm ${className}`}
-                style={{ color: 'var(--design-neutral, inherit)', opacity: 0.7 }}
+                className={computedClassName}
+                style={computedStyle}
             >
                 {formatDate(article.createdAt, format, locale)}
             </time>
         )
     }
-)
-
-ArticleDateBase.displayName = "ArticleDateBase"
-
-const defaultProps: Partial<ArticleDateProps> = {
-    format: "long",
-    locale: "en-US",
-}
-
-export const ArticleDate = withCraftComponent<ArticleDateProps, HTMLTimeElement>(
-    ArticleDateBase,
-    {
-        displayName: "ArticleDate",
-        defaultProps,
-        sectionTitle: "Date",
-        settingsConfig: {
-            format: {
-                label: "Format",
-                type: "select",
-                section: "Display",
-                options: [
-                    { label: "Short (Jan 1, 2024)", value: "short" },
-                    { label: "Long (January 1, 2024)", value: "long" },
-                    { label: "Relative (2 days ago)", value: "relative" },
-                ],
-            },
-            locale: {
-                label: "Locale",
-                type: "select",
-                section: "Display",
-                options: [
-                    { label: "English (US)", value: "en-US" },
-                    { label: "English (UK)", value: "en-GB" },
-                    { label: "Greek", value: "el-GR" },
-                    { label: "German", value: "de-DE" },
-                    { label: "French", value: "fr-FR" },
-                ],
-            },
-        },
-    }
-)
+})
 
 export default ArticleDate

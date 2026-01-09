@@ -3,6 +3,8 @@
 import React from "react"
 import { useNode } from "@craftjs/core"
 import { useArticle } from "./ArticleContext"
+import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
+import { cn } from "@/lib/utils"
 import {
     PropertySection,
     PropertyRow,
@@ -12,7 +14,7 @@ import {
     PropertyCheckbox,
 } from "../../components/PropertySection"
 
-interface ArticleCoverProps {
+export interface ArticleCoverProps {
     aspectRatio?: "16:9" | "4:3" | "2:1" | "1:1" | "auto"
     objectFit?: "cover" | "contain"
     borderRadius?: number
@@ -20,6 +22,7 @@ interface ArticleCoverProps {
     height?: string
     className?: string
     enableSnapping?: boolean
+    blockStyle?: BlockStyle
 }
 
 const aspectRatioMap = {
@@ -30,72 +33,7 @@ const aspectRatioMap = {
     "auto": "",
 }
 
-export const ArticleCover = ({
-    aspectRatio = "16:9",
-    objectFit = "cover",
-    borderRadius = 8,
-    width = "100%",
-    height = "auto",
-    className = "",
-    enableSnapping = false,
-}: ArticleCoverProps) => {
-    const {
-        connectors: { connect, drag },
-    } = useNode()
-
-    const { article, loading, isEditor } = useArticle()
-
-    const style = {
-        width,
-        height,
-        borderRadius,
-        position: 'relative' as const, // Ensure it can contain absolute children if needed, though current implementation doesn't use them
-    }
-
-    // Loading skeleton
-    if (loading) {
-        return (
-            <div
-                ref={(ref) => { if (ref) connect(drag(ref)) }}
-                className={`bg-muted/50 animate-pulse ${aspectRatioMap[aspectRatio]} ${className}`}
-                style={style}
-            />
-        )
-    }
-
-    // No cover image
-    if (!article?.cover) {
-        if (isEditor) {
-            return (
-                <div
-                    ref={(ref) => { if (ref) connect(drag(ref)) }}
-                    className={`bg-muted/30 flex items-center justify-center ${aspectRatioMap[aspectRatio]} ${className}`}
-                    style={style}
-                >
-                    <span className="text-muted-foreground text-sm">No cover image</span>
-                </div>
-            )
-        }
-        return null
-    }
-
-    return (
-        <div
-            ref={(ref) => { if (ref) connect(drag(ref)) }}
-            className={`overflow-hidden ${aspectRatioMap[aspectRatio]} ${className}`}
-            style={style}
-        >
-            <img
-                src={article.cover}
-                alt={article.title}
-                className="w-full h-full"
-                style={{ objectFit }}
-            />
-        </div>
-    )
-}
-
-export const ArticleCoverSettings = () => {
+const ArticleCoverSettings = () => {
     const {
         actions: { setProp },
         aspectRatio,
@@ -185,22 +123,85 @@ export const ArticleCoverSettings = () => {
     )
 }
 
-ArticleCover.craft = {
-    displayName: "ArticleCover",
-    props: {
+export const ArticleCover = defineBlock<ArticleCoverProps>({
+    name: "ArticleCover",
+    category: "Article",
+    icon: <div className="p-1">🖼️</div>,
+
+    defaultProps: {
         aspectRatio: "16:9",
         objectFit: "cover",
         borderRadius: 8,
         width: "100%",
         height: "auto",
         enableSnapping: false,
+        blockStyle: {},
     },
-    related: {
-        settings: ArticleCoverSettings,
-    },
-    custom: {
-        resizable: true,
-    },
-}
+
+    settings: ArticleCoverSettings,
+
+    render: ({
+        aspectRatio = "16:9",
+        objectFit = "cover",
+        borderRadius = 8,
+        width = "100%",
+        height = "auto",
+        className = "",
+        enableSnapping = false,
+        blockStyle,
+    }) => {
+        const { article, loading, isEditor } = useArticle()
+
+        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+            style: {
+                ...blockStyle,
+                width,
+                height,
+                borderRadius,
+                position: 'relative'
+            },
+            className: cn("overflow-hidden", aspectRatioMap[aspectRatio], className)
+        })
+
+        // Loading skeleton
+        if (loading) {
+            return (
+                <div
+                    className={cn("bg-muted/50 animate-pulse", computedClassName)}
+                    style={computedStyle}
+                />
+            )
+        }
+
+        // No cover image
+        if (!article?.cover) {
+            if (isEditor) {
+                return (
+                    <div
+                        className={cn("bg-muted/30 flex items-center justify-center", computedClassName)}
+                        style={computedStyle}
+                    >
+                        <span className="text-muted-foreground text-sm">No cover image</span>
+                    </div>
+                )
+            }
+            return null
+        }
+
+        return (
+            <div
+                className={computedClassName}
+                style={computedStyle}
+            >
+                <img
+                    src={article.cover}
+                    alt={article.title}
+                    className="w-full h-full"
+                    style={{ objectFit }}
+                />
+            </div>
+        )
+    }
+})
 
 export default ArticleCover

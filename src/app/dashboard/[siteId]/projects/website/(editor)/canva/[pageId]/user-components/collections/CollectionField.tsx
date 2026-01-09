@@ -1,44 +1,105 @@
 "use client"
 
-import React, { forwardRef } from "react"
-import {
-    withCraftComponent,
-    CraftComponentProps,
-} from "../../lib/withCraftComponent"
+import React from "react"
 import { cn } from "@/lib/utils"
 import { useCollectionField } from "./CollectionItemContext"
+import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
 
-/**
- * CollectionField - A building block component for displaying a single field value
- * 
- * When placed inside a CollectionItem (with any layout), it automatically
- * binds to the field data from the parent's collection item context.
- */
-interface CollectionFieldProps extends CraftComponentProps {
-    fieldName?: string  // Which field to display from the collection item
-    value?: any        // Static value override (used when no context)
+export interface CollectionFieldProps {
+    fieldName?: string
+    value?: any
     renderAs?: "text" | "heading" | "paragraph" | "image" | "badge" | "date" | "link"
     headingLevel?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
     dateFormat?: "short" | "long" | "relative"
     placeholder?: string
     linkHref?: string
+
+    style?: BlockStyle
+    className?: string
 }
 
-const CollectionFieldBase = forwardRef<HTMLDivElement, CollectionFieldProps>(
-    (
-        {
-            fieldName = "",
-            value: staticValue,
-            renderAs = "text",
-            headingLevel = "h2",
-            dateFormat = "short",
-            placeholder = "—",
-            linkHref = "",
-            className = "",
+export const CollectionField = defineBlock<CollectionFieldProps>({
+    name: "Collection Field",
+    category: "Collections",
+    icon: <div className="p-1">T</div>,
+
+    defaultProps: {
+        fieldName: "",
+        renderAs: "text",
+        headingLevel: "h2",
+        dateFormat: "short",
+        placeholder: "—",
+        style: {},
+    },
+
+    settingsConfig: {
+        // Data Section
+        fieldName: {
+            label: "Field Name",
+            type: "collection-field-select",
+            section: "Data",
+            description: "Name of the field from the parent CollectionItem"
         },
-        ref
-    ) => {
-        // Get field value from context if available
+
+        // Rendering Section
+        renderAs: {
+            label: "Render As",
+            type: "select",
+            section: "Rendering",
+            options: [
+                { label: "Text", value: "text" },
+                { label: "Heading", value: "heading" },
+                { label: "Paragraph", value: "paragraph" },
+                { label: "Image", value: "image" },
+                { label: "Badge", value: "badge" },
+                { label: "Date", value: "date" },
+                { label: "Link", value: "link" },
+            ],
+        },
+        headingLevel: {
+            label: "Heading Level",
+            type: "select",
+            section: "Rendering",
+            options: [
+                { label: "H1", value: "h1" },
+                { label: "H2", value: "h2" },
+                { label: "H3", value: "h3" },
+                { label: "H4", value: "h4" },
+            ],
+        },
+        dateFormat: {
+            label: "Date Format",
+            type: "select",
+            section: "Rendering",
+            options: [
+                { label: "Short", value: "short" },
+                { label: "Long", value: "long" },
+                { label: "Relative", value: "relative" },
+            ],
+        },
+        placeholder: {
+            label: "Placeholder",
+            type: "text",
+            section: "Rendering",
+        },
+    },
+
+    render: ({
+        fieldName = "",
+        value: staticValue,
+        renderAs = "text",
+        headingLevel = "h2",
+        dateFormat = "short",
+        placeholder = "—",
+        linkHref = "",
+        style,
+        className
+    }) => {
+        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+            style,
+            className
+        })
+
         const contextField = useCollectionField(fieldName)
 
         // Use static value if provided, otherwise use context value
@@ -49,7 +110,7 @@ const CollectionFieldBase = forwardRef<HTMLDivElement, CollectionFieldProps>(
         if (value === null || value === undefined || value === "") {
             if (!fieldName && !staticValue) {
                 return (
-                    <div ref={ref} className={cn("border-2 border-dashed border-border p-4 text-center", className)}>
+                    <div className={cn("border-2 border-dashed border-border p-4 text-center", computedClassName)} style={computedStyle}>
                         <p className="text-muted-foreground font-mono text-xs uppercase">
                             Set "Field Name" in settings
                         </p>
@@ -57,13 +118,12 @@ const CollectionFieldBase = forwardRef<HTMLDivElement, CollectionFieldProps>(
                 )
             }
             return (
-                <span ref={ref} className={cn("text-muted-foreground", className)}>
+                <span className={cn("text-muted-foreground", computedClassName)} style={computedStyle}>
                     {placeholder}
                 </span>
             )
         }
 
-        // Render based on fieldType and renderAs
         const renderValue = () => {
             // Image rendering
             if (fieldType === "image" || renderAs === "image") {
@@ -71,7 +131,8 @@ const CollectionFieldBase = forwardRef<HTMLDivElement, CollectionFieldProps>(
                     <img
                         src={value}
                         alt=""
-                        className={cn("max-w-full h-auto", className)}
+                        className={cn("max-w-full h-auto", computedClassName)}
+                        style={computedStyle}
                     />
                 )
             }
@@ -79,7 +140,10 @@ const CollectionFieldBase = forwardRef<HTMLDivElement, CollectionFieldProps>(
             // Boolean rendering
             if (fieldType === "boolean") {
                 return (
-                    <span className={cn(value ? "text-green-500" : "text-muted-foreground", className)}>
+                    <span
+                        className={cn(value ? "text-green-500" : "text-muted-foreground", computedClassName)}
+                        style={computedStyle}
+                    >
                         {value ? "Yes" : "No"}
                     </span>
                 )
@@ -113,14 +177,15 @@ const CollectionFieldBase = forwardRef<HTMLDivElement, CollectionFieldProps>(
                     }
                 }
 
-                return <span className={className}>{formatted}</span>
+                return <span className={computedClassName} style={computedStyle}>{formatted}</span>
             }
 
             // Rich text rendering
             if (fieldType === "richtext") {
                 return (
                     <div
-                        className={cn("prose prose-sm max-w-none", className)}
+                        className={cn("prose prose-sm max-w-none", computedClassName)}
+                        style={computedStyle}
                         dangerouslySetInnerHTML={{ __html: value }}
                     />
                 )
@@ -130,8 +195,8 @@ const CollectionFieldBase = forwardRef<HTMLDivElement, CollectionFieldProps>(
             if (renderAs === "badge") {
                 const values = Array.isArray(value) ? value : [value]
                 return (
-                    <div className={cn("flex flex-wrap gap-2", className)}>
-                        {values.map((v, i) => (
+                    <div className={cn("flex flex-wrap gap-2", computedClassName)} style={computedStyle}>
+                        {values.map((v: any, i: number) => (
                             <span
                                 key={i}
                                 className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
@@ -148,7 +213,8 @@ const CollectionFieldBase = forwardRef<HTMLDivElement, CollectionFieldProps>(
                 return (
                     <a
                         href={linkHref}
-                        className={cn("text-primary hover:underline", className)}
+                        className={cn("text-primary hover:underline", computedClassName)}
+                        style={computedStyle}
                     >
                         {String(value)}
                     </a>
@@ -159,7 +225,7 @@ const CollectionFieldBase = forwardRef<HTMLDivElement, CollectionFieldProps>(
             if (renderAs === "heading") {
                 const HeadingTag = headingLevel as keyof JSX.IntrinsicElements
                 return (
-                    <HeadingTag className={className}>
+                    <HeadingTag className={computedClassName} style={computedStyle}>
                         {String(value)}
                     </HeadingTag>
                 )
@@ -167,100 +233,26 @@ const CollectionFieldBase = forwardRef<HTMLDivElement, CollectionFieldProps>(
 
             // Paragraph rendering
             if (renderAs === "paragraph") {
-                return <p className={className}>{String(value)}</p>
+                return <p className={computedClassName} style={computedStyle}>{String(value)}</p>
             }
 
             // Handle arrays
             if (Array.isArray(value)) {
-                return <span className={className}>{value.join(", ")}</span>
+                return <span className={computedClassName} style={computedStyle}>{value.join(", ")}</span>
             }
 
             // Handle objects (resolved relations)
             if (typeof value === "object") {
                 const displayValue = value.title || value.name || value.slug || JSON.stringify(value)
-                return <span className={className}>{displayValue}</span>
+                return <span className={computedClassName} style={computedStyle}>{displayValue}</span>
             }
 
             // Default text rendering
-            return <span className={className}>{String(value)}</span>
+            return <span className={computedClassName} style={computedStyle}>{String(value)}</span>
         }
 
-        return (
-            <div ref={ref}>
-                {renderValue()}
-            </div>
-        )
+        return renderValue()
     }
-)
-
-CollectionFieldBase.displayName = "CollectionFieldBase"
-
-const defaultProps: Partial<CollectionFieldProps> = {
-    fieldName: "",
-    renderAs: "text",
-    headingLevel: "h2",
-    dateFormat: "short",
-    placeholder: "—",
-}
-
-export const CollectionField = withCraftComponent<CollectionFieldProps, HTMLDivElement>(
-    CollectionFieldBase,
-    {
-        displayName: "CollectionField",
-        defaultProps,
-        sectionTitle: "Collection Field",
-        settingsConfig: {
-            // Data Section
-            fieldName: {
-                label: "Field Name",
-                type: "collection-field-select",
-                section: "Data",
-                description: "Name of the field from the parent CollectionItem"
-            },
-
-            // Rendering Section
-            renderAs: {
-                label: "Render As",
-                type: "select",
-                section: "Rendering",
-                options: [
-                    { label: "Text", value: "text" },
-                    { label: "Heading", value: "heading" },
-                    { label: "Paragraph", value: "paragraph" },
-                    { label: "Image", value: "image" },
-                    { label: "Badge", value: "badge" },
-                    { label: "Date", value: "date" },
-                    { label: "Link", value: "link" },
-                ],
-            },
-            headingLevel: {
-                label: "Heading Level",
-                type: "select",
-                section: "Rendering",
-                options: [
-                    { label: "H1", value: "h1" },
-                    { label: "H2", value: "h2" },
-                    { label: "H3", value: "h3" },
-                    { label: "H4", value: "h4" },
-                ],
-            },
-            dateFormat: {
-                label: "Date Format",
-                type: "select",
-                section: "Rendering",
-                options: [
-                    { label: "Short", value: "short" },
-                    { label: "Long", value: "long" },
-                    { label: "Relative", value: "relative" },
-                ],
-            },
-            placeholder: {
-                label: "Placeholder",
-                type: "text",
-                section: "Rendering",
-            },
-        },
-    }
-)
+})
 
 export default CollectionField

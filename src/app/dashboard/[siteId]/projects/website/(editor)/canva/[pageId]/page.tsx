@@ -309,7 +309,7 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [siteId, pageId])
 
-    const handleSave = useCallback(async () => {
+    const handleSave = useCallback(async (statusOverride?: "DRAFT" | "PUBLISHED" | "ARCHIVED") => {
         setIsSaving(true)
         try {
             // Get the serialized page layout from CraftJS
@@ -321,7 +321,7 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     name: pageName,
-                    status: pageStatus,
+                    status: statusOverride || pageStatus,
                     // Save design settings in meta
                     meta: {
                         design: settings,

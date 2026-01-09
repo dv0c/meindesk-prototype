@@ -114,8 +114,20 @@ export async function PUT(
     }
     // Otherwise, if the CURRENT page slug is "untitled" (and no new valid slug provided), 
     // try to generate a real one from the name.
-    else if (!page.slug || /^untitled/i.test(page.slug)) {
+    // Otherwise, try to generate a real one from the name, BUT ONLY if:
+    // 1. The current slug is missing/untitled AND
+    // 2. The new name is meaningful (not just "Untitled Page" again)
+    // Actually, if the user SAVES with "Untitled Page", we should probably just keep the current slug constant (e.g. "untitled" or "untitled-1")
+    // instead of generating a new unique one every time (untitled-2, untitled-3).
+
+    else if ((!page.slug || /^untitled/i.test(page.slug)) && body.name && !/^untitled/i.test(body.name)) {
+      // Only auto-generate from name if the NAME is no longer "Untitled..."
       finalSlug = await generateSlug(body.name, "page", siteId);
+    }
+    // If name is STILL "Untitled...", keep the existing slug (e.g. "untitled-5") to avoids loops.
+    // If page.slug was null/empty and name is "Untitled", generateSlug might default to "untitled-N" once, but we need to fetch it.
+    else if (!page.slug) {
+      finalSlug = await generateSlug(body.name || "page", "page", siteId);
     }
     // Else: Keep existing page.slug
     // This prevents "home" -> "home-1" when body.slug is missing in generic updates

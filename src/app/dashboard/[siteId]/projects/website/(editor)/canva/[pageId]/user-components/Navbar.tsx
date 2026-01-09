@@ -4,7 +4,8 @@ import React, { useState, useEffect } from "react"
 import { Menu, Mail, Phone } from "lucide-react"
 import Image from "next/image"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { withCraftComponent, CraftComponentProps } from '../lib/withCraftComponent'
+import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
+import { cn } from "@/lib/utils"
 
 // Navigation link type with submenu support
 interface NavLink {
@@ -14,7 +15,7 @@ interface NavLink {
     submenu?: NavLink[]
 }
 
-interface NavbarProps extends CraftComponentProps {
+export interface NavbarProps {
     // Brand
     brandName?: string
     tagline?: string
@@ -37,6 +38,9 @@ interface NavbarProps extends CraftComponentProps {
     // Banner
     bannerImage?: string
     bannerOpacity?: number
+
+    style?: BlockStyle
+    className?: string
 }
 
 // Icons
@@ -234,235 +238,237 @@ function FixedNav({ links, brandName, brandColor, textColor, maxWidth, isScrolle
     )
 }
 
-// Main Navbar Component
-const NavbarComponent = React.forwardRef<HTMLDivElement, NavbarProps>(({
-    brandName = "Σοφία Πλατανησιώτη",
-    tagline = "Σύμβουλος Ψυχικής Υγείας",
-    brandColor = "#5a5933",
-    navBackgroundColor = "#a9c8be",
-    topBarBackground = "#000000",
-    topBarTextColor = "#ffffff",
-    textColor = "#000000",
-    email = "platanisiotisophia@gmail.com",
-    phone = "+30 6947777532",
-    facebookUrl = "https://www.facebook.com/PlatanisiotiSophia",
-    instagramUrl = "https://www.instagram.com/sophia.platanisioti",
-    links = [
-        { id: "nav-1", label: "ΑΡΧΙΚΗ", href: "/" },
-        { id: "nav-2", label: "ΥΠΗΡΕΣΙΕΣ", href: "/services" },
-        { id: "nav-3", label: "ΒΙΟΓΡΑΦΙΚΟ", href: "/about" },
-        { id: "nav-4", label: "ΕΠΙΚΟΙΝΩΝΙΑ", href: "/contact" },
-    ],
-    showTopBar = true,
-    maxWidth = "90vw",
-    bannerImage = "",
-    bannerOpacity = 80,
-}, ref) => {
-    const [isScrolled, setIsScrolled] = useState(false)
+export const Navbar = defineBlock<NavbarProps>({
+    name: 'Navbar',
+    category: 'Layout',
+    icon: <div className="p-1">🧭</div>,
 
-    useEffect(() => {
-        const handleScroll = () => {
-            setIsScrolled(window.scrollY > 10)
-        }
-        window.addEventListener("scroll", handleScroll)
-        return () => window.removeEventListener("scroll", handleScroll)
-    }, [])
+    defaultProps: {
+        brandName: "Σοφία Πλατανησιώτη",
+        tagline: "Σύμβουλος Ψυχικής Υγείας",
+        brandColor: "#5a5933",
+        navBackgroundColor: "#a9c8be",
+        textColor: "#000000",
+        topBarBackground: "#000000",
+        topBarTextColor: "#ffffff",
+        email: "platanisiotisophia@gmail.com",
+        phone: "+30 6947777532",
+        facebookUrl: "https://www.facebook.com/PlatanisiotiSophia",
+        instagramUrl: "https://www.instagram.com/sophia.platanisioti",
+        showTopBar: true,
+        maxWidth: "90vw",
+        bannerImage: "",
+        bannerOpacity: 80,
+        links: [
+            { id: "nav-1", label: "ΑΡΧΙΚΗ", href: "/" },
+            { id: "nav-2", label: "ΥΠΗΡΕΣΙΕΣ", href: "/services" },
+            { id: "nav-3", label: "ΒΙΟΓΡΑΦΙΚΟ", href: "/about" },
+            { id: "nav-4", label: "ΕΠΙΚΟΙΝΩΝΙΑ", href: "/contact" },
+        ],
+        style: {}
+    },
 
-    return (
-        <div
-            ref={ref}
-            className="w-full max-w-full relative @container overflow-hidden"
-            style={{ fontFamily: "var(--design-font-base, sans-serif)" }}
-        >
-            {/* Top Bar - Desktop */}
-            {showTopBar && (
-                <section className="hidden @lg:block" style={{ backgroundColor: topBarBackground }}>
-                    <div className="max-w-5xl mx-auto flex justify-between items-center px-5">
-                        <div className="flex items-center gap-3 py-3">
-                            {facebookUrl && (
-                                <a href={facebookUrl} target="_blank" rel="noreferrer noopener">
-                                    <Facebook fill={topBarTextColor} />
-                                </a>
-                            )}
-                            {instagramUrl && (
-                                <a href={instagramUrl} target="_blank" rel="noreferrer noopener">
-                                    <Instagram fill={topBarTextColor} />
-                                </a>
-                            )}
-                        </div>
-                        <div className="flex gap-3">
-                            {email && (
-                                <a href={`mailto:${email}`} className="items-center flex gap-1">
-                                    <Mail size={15} style={{ color: topBarTextColor }} className="mt-1" />
-                                    <span
-                                        className="border-b hover:border-b-gray-100 transition-all border-b-gray-500 text-sm font-light"
-                                        style={{ color: topBarTextColor }}
-                                    >
-                                        {email}
-                                    </span>
-                                </a>
-                            )}
-                            {phone && (
-                                <a href={`tel:${phone}`} className="items-center flex gap-1">
-                                    <Phone size={15} style={{ color: topBarTextColor }} className="mt-1" />
-                                    <span
-                                        className="border-b hover:border-b-gray-100 transition-all border-b-gray-500 text-sm font-light"
-                                        style={{ color: topBarTextColor }}
-                                    >
-                                        {phone}
-                                    </span>
-                                </a>
-                            )}
-                        </div>
-                    </div>
-                </section>
-            )}
+    settingsConfig: {
+        // Brand Section
+        brandName: { label: 'Brand Name', type: 'text', section: 'Brand' },
+        tagline: { label: 'Tagline', type: 'text', section: 'Brand' },
+        brandColor: { label: 'Brand Color', type: 'color', section: 'Brand' },
 
-            {/* Main Nav */}
-            <nav
-                className="relative px-5 border-b border-b-black/40 z-0"
-                style={{ backgroundColor: navBackgroundColor }}
-            >
-                <section
-                    className="mx-auto h-24 md:h-40 flex gap-20 items-center justify-between lg:justify-start"
-                    style={{ maxWidth }}
-                >
-                    <a href="/" className="z-10 min-w-0 flex-shrink">
-                        <h1
-                            className="text-lg @sm:text-xl @md:text-2xl @lg:text-4xl mb-1 @md:mb-2 truncate"
-                            style={{
-                                color: brandColor,
-                                fontFamily: "var(--design-font-heading, inherit)",
-                                fontWeight: "var(--design-font-weight-heading, 500)"
-                            }}
-                        >
-                            {brandName}
-                        </h1>
-                        {tagline && (
-                            <h2
-                                className="text-xs @sm:text-sm @md:text-base @lg:text-[1.3125rem] truncate"
-                                style={{ color: textColor }}
-                            >
-                                {tagline}
-                            </h2>
-                        )}
-                    </a>
+        // Colors Section
+        navBackgroundColor: { label: 'Nav Background', type: 'color', section: 'Colors' },
+        textColor: { label: 'Text Color', type: 'color', section: 'Colors' },
+        topBarBackground: { label: 'Top Bar Background', type: 'color', section: 'Colors' },
+        topBarTextColor: { label: 'Top Bar Text', type: 'color', section: 'Colors' },
 
-                    <DesktopNavLinks links={links} textColor={textColor} />
+        // Contact Section
+        email: { label: 'Email', type: 'text', placeholder: 'email@example.com', section: 'Contact' },
+        phone: { label: 'Phone', type: 'text', placeholder: '+30 123 456 789', section: 'Contact' },
+        facebookUrl: { label: 'Facebook URL', type: 'text', placeholder: 'https://facebook.com/...', section: 'Contact' },
+        instagramUrl: { label: 'Instagram URL', type: 'text', placeholder: 'https://instagram.com/...', section: 'Contact' },
 
-                    <MobileMenu
-                        links={links}
-                        brandColor={brandColor}
-                        email={email}
-                        phone={phone}
-                        facebookUrl={facebookUrl}
-                        instagramUrl={instagramUrl}
-                    />
-                </section>
+        // Layout Section
+        showTopBar: { label: 'Show Top Bar', type: 'checkbox', section: 'Layout' },
+        maxWidth: { label: 'Max Width', type: 'text', placeholder: '90vw', section: 'Layout' },
+        bannerImage: { label: 'Banner Image', type: 'media', section: 'Layout' },
+        bannerOpacity: { label: 'Banner Opacity', type: 'slider', min: 0, max: 100, unit: '%', section: 'Layout' },
 
-                {/* Banner Background */}
-                {bannerImage && (
-                    <div className="absolute inset-0 -z-10 overflow-hidden">
-                        <Image
-                            src={bannerImage}
-                            fill
-                            alt="banner"
-                            className="object-cover pr-[20px]"
-                            style={{ opacity: bannerOpacity / 100 }}
-                            priority
-                        />
-                    </div>
-                )}
-            </nav>
-
-            {/* Fixed Nav on Scroll */}
-            <FixedNav
-                links={links}
-                brandName={brandName}
-                brandColor={brandColor}
-                textColor={textColor}
-                maxWidth={maxWidth}
-                isScrolled={isScrolled}
-            />
-        </div>
-    )
-})
-
-NavbarComponent.displayName = "NavbarComponent"
-
-// Export with withCraftComponent wrapper (settings will be auto-generated)
-export const Navbar = withCraftComponent(
-    NavbarComponent,
-    {
-        displayName: 'Navbar',
-        defaultProps: {
-            brandName: "Σοφία Πλατανησιώτη",
-            tagline: "Σύμβουλος Ψυχικής Υγείας",
-            brandColor: "#5a5933",
-            navBackgroundColor: "#a9c8be",
-            textColor: "#000000",
-            topBarBackground: "#000000",
-            topBarTextColor: "#ffffff",
-            email: "platanisiotisophia@gmail.com",
-            phone: "+30 6947777532",
-            facebookUrl: "https://www.facebook.com/PlatanisiotiSophia",
-            instagramUrl: "https://www.instagram.com/sophia.platanisioti",
-            showTopBar: true,
-            maxWidth: "90vw",
-            bannerImage: "",
-            bannerOpacity: 80,
-            links: [
-                { id: "nav-1", label: "ΑΡΧΙΚΗ", href: "/" },
-                { id: "nav-2", label: "ΥΠΗΡΕΣΙΕΣ", href: "/services" },
-                { id: "nav-3", label: "ΒΙΟΓΡΑΦΙΚΟ", href: "/about" },
-                { id: "nav-4", label: "ΕΠΙΚΟΙΝΩΝΙΑ", href: "/contact" },
-            ],
-        },
-        settingsConfig: {
-            // Brand Section
-            brandName: { label: 'Brand Name', type: 'text', section: 'Brand' },
-            tagline: { label: 'Tagline', type: 'text', section: 'Brand' },
-            brandColor: { label: 'Brand Color', type: 'color', section: 'Brand' },
-
-            // Colors Section
-            navBackgroundColor: { label: 'Nav Background', type: 'color', section: 'Colors' },
-            textColor: { label: 'Text Color', type: 'color', section: 'Colors' },
-            topBarBackground: { label: 'Top Bar Background', type: 'color', section: 'Colors' },
-            topBarTextColor: { label: 'Top Bar Text', type: 'color', section: 'Colors' },
-
-            // Contact Section
-            email: { label: 'Email', type: 'text', placeholder: 'email@example.com', section: 'Contact' },
-            phone: { label: 'Phone', type: 'text', placeholder: '+30 123 456 789', section: 'Contact' },
-            facebookUrl: { label: 'Facebook URL', type: 'text', placeholder: 'https://facebook.com/...', section: 'Contact' },
-            instagramUrl: { label: 'Instagram URL', type: 'text', placeholder: 'https://instagram.com/...', section: 'Contact' },
-
-            // Layout Section
-            showTopBar: { label: 'Show Top Bar', type: 'checkbox', section: 'Layout' },
-            maxWidth: { label: 'Max Width', type: 'text', placeholder: '90vw', section: 'Layout' },
-            bannerImage: { label: 'Banner Image', type: 'media', section: 'Layout' },
-            bannerOpacity: { label: 'Banner Opacity', type: 'slider', min: 0, max: 100, unit: '%', section: 'Layout' },
-
-            // Navigation Links Section (collapsed by default)
-            links: {
-                label: 'Navigation Links',
-                type: 'array',
-                section: 'Navigation Links',
-                defaultCollapsed: true,
-                arrayFields: {
-                    label: { label: 'Label', type: 'text' },
-                    href: { label: 'URL', type: 'text' },
-                    submenu: {
-                        label: 'Submenu Items',
-                        type: 'array',
-                        arrayFields: {
-                            label: { label: 'Label', type: 'text' },
-                            href: { label: 'URL', type: 'text' }
-                        }
+        // Navigation Links Section
+        links: {
+            label: 'Navigation Links',
+            type: 'array',
+            section: 'Navigation Links',
+            defaultCollapsed: true,
+            arrayFields: {
+                label: { label: 'Label', type: 'text' },
+                href: { label: 'URL', type: 'text' },
+                submenu: {
+                    label: 'Submenu Items',
+                    type: 'array',
+                    arrayFields: {
+                        label: { label: 'Label', type: 'text' },
+                        href: { label: 'URL', type: 'text' }
                     }
                 }
             }
-        },
-        sectionTitle: 'Navbar'
-    }
-)
+        }
+    },
 
+    render: ({
+        brandName = "Σοφία Πλατανησιώτη",
+        tagline = "Σύμβουλος Ψυχικής Υγείας",
+        brandColor = "#5a5933",
+        navBackgroundColor = "#a9c8be",
+        topBarBackground = "#000000",
+        topBarTextColor = "#ffffff",
+        textColor = "#000000",
+        email = "platanisiotisophia@gmail.com",
+        phone = "+30 6947777532",
+        facebookUrl = "https://www.facebook.com/PlatanisiotiSophia",
+        instagramUrl = "https://www.instagram.com/sophia.platanisioti",
+        links = [],
+        showTopBar = true,
+        maxWidth = "90vw",
+        bannerImage = "",
+        bannerOpacity = 80,
+        style,
+        className
+    }) => {
+        const [isScrolled, setIsScrolled] = useState(false)
+
+        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+            style,
+            className: cn("w-full max-w-full relative @container overflow-hidden", className)
+        })
+
+        useEffect(() => {
+            const handleScroll = () => {
+                setIsScrolled(window.scrollY > 10)
+            }
+            window.addEventListener("scroll", handleScroll)
+            return () => window.removeEventListener("scroll", handleScroll)
+        }, [])
+
+        return (
+            <div
+                className={computedClassName}
+                style={{
+                    fontFamily: "var(--design-font-base, sans-serif)",
+                    ...computedStyle
+                }}
+            >
+                {/* Top Bar - Desktop */}
+                {showTopBar && (
+                    <section className="hidden @lg:block" style={{ backgroundColor: topBarBackground }}>
+                        <div className="max-w-5xl mx-auto flex justify-between items-center px-5">
+                            <div className="flex items-center gap-3 py-3">
+                                {facebookUrl && (
+                                    <a href={facebookUrl} target="_blank" rel="noreferrer noopener">
+                                        <Facebook fill={topBarTextColor} />
+                                    </a>
+                                )}
+                                {instagramUrl && (
+                                    <a href={instagramUrl} target="_blank" rel="noreferrer noopener">
+                                        <Instagram fill={topBarTextColor} />
+                                    </a>
+                                )}
+                            </div>
+                            <div className="flex gap-3">
+                                {email && (
+                                    <a href={`mailto:${email}`} className="items-center flex gap-1">
+                                        <Mail size={15} style={{ color: topBarTextColor }} className="mt-1" />
+                                        <span
+                                            className="border-b hover:border-b-gray-100 transition-all border-b-gray-500 text-sm font-light"
+                                            style={{ color: topBarTextColor }}
+                                        >
+                                            {email}
+                                        </span>
+                                    </a>
+                                )}
+                                {phone && (
+                                    <a href={`tel:${phone}`} className="items-center flex gap-1">
+                                        <Phone size={15} style={{ color: topBarTextColor }} className="mt-1" />
+                                        <span
+                                            className="border-b hover:border-b-gray-100 transition-all border-b-gray-500 text-sm font-light"
+                                            style={{ color: topBarTextColor }}
+                                        >
+                                            {phone}
+                                        </span>
+                                    </a>
+                                )}
+                            </div>
+                        </div>
+                    </section>
+                )}
+
+                {/* Main Nav */}
+                <nav
+                    className="relative px-5 border-b border-b-black/40 z-0"
+                    style={{ backgroundColor: navBackgroundColor }}
+                >
+                    <section
+                        className="mx-auto h-24 md:h-40 flex gap-20 items-center justify-between lg:justify-start"
+                        style={{ maxWidth }}
+                    >
+                        <a href="/" className="z-10 min-w-0 flex-shrink">
+                            <h1
+                                className="text-lg @sm:text-xl @md:text-2xl @lg:text-4xl mb-1 @md:mb-2 truncate"
+                                style={{
+                                    color: brandColor,
+                                    fontFamily: "var(--design-font-heading, inherit)",
+                                    fontWeight: "var(--design-font-weight-heading, 500)"
+                                }}
+                            >
+                                {brandName}
+                            </h1>
+                            {tagline && (
+                                <h2
+                                    className="text-xs @sm:text-sm @md:text-base @lg:text-[1.3125rem] truncate"
+                                    style={{ color: textColor }}
+                                >
+                                    {tagline}
+                                </h2>
+                            )}
+                        </a>
+
+                        <DesktopNavLinks links={links} textColor={textColor} />
+
+                        <MobileMenu
+                            links={links}
+                            brandColor={brandColor}
+                            email={email}
+                            phone={phone}
+                            facebookUrl={facebookUrl}
+                            instagramUrl={instagramUrl}
+                        />
+                    </section>
+
+                    {/* Banner Background */}
+                    {bannerImage && (
+                        <div className="absolute inset-0 -z-10 overflow-hidden">
+                            <Image
+                                src={bannerImage}
+                                fill
+                                alt="banner"
+                                className="object-cover pr-[20px]"
+                                style={{ opacity: bannerOpacity / 100 }}
+                                priority
+                            />
+                        </div>
+                    )}
+                </nav>
+
+                {/* Fixed Nav on Scroll */}
+                <FixedNav
+                    links={links}
+                    brandName={brandName}
+                    brandColor={brandColor}
+                    textColor={textColor}
+                    maxWidth={maxWidth}
+                    isScrolled={isScrolled}
+                />
+            </div>
+        )
+    }
+})
+
+export default Navbar

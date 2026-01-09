@@ -1,24 +1,12 @@
 "use client"
 
-import React, { forwardRef, useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useTeam } from "@/hooks/useTeam"
 import axios from "axios"
 import Link from "next/link"
-import {
-    withCraftComponent,
-    CraftComponentProps,
-} from "../../lib/withCraftComponent"
+import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
 import { cn } from "@/lib/utils"
 import { useCollectionItem } from "./CollectionItemContext"
-
-/**
- * RelatedItems - Shows items from another collection that reference the current item
- * 
- * Example: On an Author page, show "Books by this author"
- * 
- * This component reads from CollectionItemContext to get the current item,
- * then fetches items from another collection that have a relation pointing to it.
- */
 
 interface CollectionFieldDef {
     name: string
@@ -26,7 +14,7 @@ interface CollectionFieldDef {
     label: string
 }
 
-interface RelatedItemsProps extends CraftComponentProps {
+export interface RelatedItemsProps {
     // Which collection to search for related items
     relatedCollectionId?: string
     // The field in that collection that points to the current item
@@ -39,24 +27,109 @@ interface RelatedItemsProps extends CraftComponentProps {
     showImage?: boolean
     imageField?: string
     titleField?: string
+
+    style?: BlockStyle
+    className?: string
 }
 
-const RelatedItemsBase = forwardRef<HTMLDivElement, RelatedItemsProps>(
-    (
-        {
-            relatedCollectionId = "",
-            relationFieldName = "",
-            layout = "grid",
-            columns = 3,
-            limit = 6,
-            title = "Related Items",
-            showImage = true,
-            imageField = "",
-            titleField = "",
-            className = "",
+export const RelatedItems = defineBlock<RelatedItemsProps>({
+    name: "RelatedItems",
+    category: "Collections",
+    icon: <div className="p-1">🔗</div>,
+
+    defaultProps: {
+        relatedCollectionId: "",
+        relationFieldName: "",
+        layout: "grid",
+        columns: 3,
+        limit: 6,
+        title: "Related Items",
+        showImage: true,
+        imageField: "",
+        titleField: "",
+        style: {}
+    },
+
+    settingsConfig: {
+        // Data Section
+        relatedCollectionId: {
+            label: "Related Collection",
+            type: "collection-select",
+            section: "Data",
+            description: "Collection to find related items from"
         },
-        ref
-    ) => {
+        relationFieldName: {
+            label: "Relation Field Name",
+            type: "text",
+            section: "Data",
+            description: "The field that points to this item (e.g., 'author')"
+        },
+        limit: {
+            label: "Max Items",
+            type: "slider",
+            min: 1,
+            max: 20,
+            section: "Data",
+        },
+
+        // Display Section
+        title: {
+            label: "Section Title",
+            type: "text",
+            section: "Display",
+        },
+        layout: {
+            label: "Layout",
+            type: "select",
+            section: "Display",
+            options: [
+                { label: "Grid", value: "grid" },
+                { label: "Cards", value: "cards" },
+                { label: "List", value: "list" },
+            ],
+        },
+        columns: {
+            label: "Columns",
+            type: "select",
+            section: "Display",
+            options: [
+                { label: "2", value: 2 },
+                { label: "3", value: 3 },
+                { label: "4", value: 4 },
+            ],
+        },
+        showImage: {
+            label: "Show Images",
+            type: "checkbox",
+            section: "Display",
+        },
+        imageField: {
+            label: "Image Field",
+            type: "text",
+            section: "Display",
+            description: "Leave empty to auto-detect"
+        },
+        titleField: {
+            label: "Title Field",
+            type: "text",
+            section: "Display",
+            description: "Leave empty to auto-detect"
+        },
+    },
+
+    render: ({
+        relatedCollectionId = "",
+        relationFieldName = "",
+        layout = "grid",
+        columns = 3,
+        limit = 6,
+        title = "Related Items",
+        showImage = true,
+        imageField = "",
+        titleField = "",
+        style,
+        className = "",
+    }) => {
         const [items, setItems] = useState<any[]>([])
         const [collection, setCollection] = useState<{ name: string; slug: string; fields: CollectionFieldDef[] } | null>(null)
         const [loading, setLoading] = useState(true)
@@ -66,6 +139,11 @@ const RelatedItemsBase = forwardRef<HTMLDivElement, RelatedItemsProps>(
 
         // Get current item from context (provided by parent CollectionItem)
         const currentItem = useCollectionItem()
+
+        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+            style,
+            className
+        })
 
         useEffect(() => {
             if (!team?.id || !relatedCollectionId || !relationFieldName || !currentItem?.id) {
@@ -141,7 +219,7 @@ const RelatedItemsBase = forwardRef<HTMLDivElement, RelatedItemsProps>(
         // Loading skeleton
         if (loading || teamLoading) {
             return (
-                <div ref={ref} className={cn("space-y-4", className)}>
+                <div className={cn("space-y-4", computedClassName)} style={computedStyle}>
                     {title && <h3 className="text-lg font-semibold">{title}</h3>}
                     <div className="grid gap-4" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
                         {Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
@@ -158,7 +236,7 @@ const RelatedItemsBase = forwardRef<HTMLDivElement, RelatedItemsProps>(
         // Not inside a CollectionItem context
         if (!currentItem) {
             return (
-                <div ref={ref} className={cn("border-2 border-dashed border-border p-6 text-center", className)}>
+                <div className={cn("border-2 border-dashed border-border p-6 text-center", computedClassName)} style={computedStyle}>
                     <p className="text-muted-foreground font-mono text-sm uppercase tracking-wider">
                         Place inside a CollectionItem component
                     </p>
@@ -169,7 +247,7 @@ const RelatedItemsBase = forwardRef<HTMLDivElement, RelatedItemsProps>(
         // Missing configuration
         if (!relatedCollectionId || !relationFieldName) {
             return (
-                <div ref={ref} className={cn("border-2 border-dashed border-border p-6 text-center", className)}>
+                <div className={cn("border-2 border-dashed border-border p-6 text-center", computedClassName)} style={computedStyle}>
                     <p className="text-muted-foreground font-mono text-sm uppercase tracking-wider">
                         Configure related collection and field in settings
                     </p>
@@ -180,7 +258,7 @@ const RelatedItemsBase = forwardRef<HTMLDivElement, RelatedItemsProps>(
         // Error state
         if (error) {
             return (
-                <div ref={ref} className={cn("border border-destructive/50 bg-destructive/5 p-6 text-center", className)}>
+                <div className={cn("border border-destructive/50 bg-destructive/5 p-6 text-center", computedClassName)} style={computedStyle}>
                     <p className="text-destructive font-mono text-sm">{error}</p>
                 </div>
             )
@@ -189,7 +267,7 @@ const RelatedItemsBase = forwardRef<HTMLDivElement, RelatedItemsProps>(
         // No related items
         if (!items.length) {
             return (
-                <div ref={ref} className={cn("space-y-4", className)}>
+                <div className={cn("space-y-4", computedClassName)} style={computedStyle}>
                     {title && <h3 className="text-lg font-semibold">{title}</h3>}
                     <p className="text-muted-foreground text-sm">No related items found</p>
                 </div>
@@ -201,7 +279,7 @@ const RelatedItemsBase = forwardRef<HTMLDivElement, RelatedItemsProps>(
         const collectionSlug = collection?.slug || ''
 
         return (
-            <div ref={ref} className={cn("space-y-4", className)}>
+            <div className={cn("space-y-4", computedClassName)} style={computedStyle}>
                 {title && <h3 className="text-lg font-semibold">{title}</h3>}
 
                 {/* Grid/Cards Layout */}
@@ -273,95 +351,6 @@ const RelatedItemsBase = forwardRef<HTMLDivElement, RelatedItemsProps>(
             </div>
         )
     }
-)
-
-RelatedItemsBase.displayName = "RelatedItemsBase"
-
-const defaultProps: Partial<RelatedItemsProps> = {
-    relatedCollectionId: "",
-    relationFieldName: "",
-    layout: "grid",
-    columns: 3,
-    limit: 6,
-    title: "Related Items",
-    showImage: true,
-    imageField: "",
-    titleField: "",
-}
-
-export const RelatedItems = withCraftComponent<RelatedItemsProps, HTMLDivElement>(
-    RelatedItemsBase,
-    {
-        displayName: "RelatedItems",
-        defaultProps,
-        sectionTitle: "Related Items",
-        settingsConfig: {
-            // Data Section
-            relatedCollectionId: {
-                label: "Related Collection",
-                type: "collection-select",
-                section: "Data",
-                description: "Collection to find related items from"
-            },
-            relationFieldName: {
-                label: "Relation Field Name",
-                type: "text",
-                section: "Data",
-                description: "The field that points to this item (e.g., 'author')"
-            },
-            limit: {
-                label: "Max Items",
-                type: "slider",
-                min: 1,
-                max: 20,
-                section: "Data",
-            },
-
-            // Display Section
-            title: {
-                label: "Section Title",
-                type: "text",
-                section: "Display",
-            },
-            layout: {
-                label: "Layout",
-                type: "select",
-                section: "Display",
-                options: [
-                    { label: "Grid", value: "grid" },
-                    { label: "Cards", value: "cards" },
-                    { label: "List", value: "list" },
-                ],
-            },
-            columns: {
-                label: "Columns",
-                type: "select",
-                section: "Display",
-                options: [
-                    { label: "2", value: 2 },
-                    { label: "3", value: 3 },
-                    { label: "4", value: 4 },
-                ],
-            },
-            showImage: {
-                label: "Show Images",
-                type: "checkbox",
-                section: "Display",
-            },
-            imageField: {
-                label: "Image Field",
-                type: "text",
-                section: "Display",
-                description: "Leave empty to auto-detect"
-            },
-            titleField: {
-                label: "Title Field",
-                type: "text",
-                section: "Display",
-                description: "Leave empty to auto-detect"
-            },
-        },
-    }
-)
+})
 
 export default RelatedItems

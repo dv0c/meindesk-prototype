@@ -4,6 +4,8 @@ import { useEditorTheme, type EditorTheme } from "@/app/dashboard/[siteId]/proje
 import { BlockWrapper } from "@/components/editor/BlockWrapper"
 // @ts-ignore
 import { GlobalStylesPanel } from "@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/GlobalSettings"
+// @ts-ignore
+import { generateSettings, SettingsConfig } from "@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/lib/generateSettings"
 
 // --- Types ---
 
@@ -106,6 +108,7 @@ export interface BlockConfig<P> {
 
     // Custom settings component
     settings?: React.ComponentType<any>
+    settingsConfig?: SettingsConfig
     editorSettings?: EditorSettingsSchema
 }
 
@@ -236,7 +239,9 @@ export function defineBlock<P extends object>(config: BlockConfig<P>): BlockAPI<
 
     // Compose Settings if needed
     const CombinedSettings = () => {
-        const Settings = config.settings
+        // Use manual settings or generated settings
+        const Settings = config.settings || (config.settingsConfig ? generateSettings(config.settingsConfig, 'Content', config.defaultProps) : null)
+
         return (
             <div className="space-y-6">
                 {Settings && <Settings />}

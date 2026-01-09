@@ -6,7 +6,6 @@ import {
     PropertyRow,
     PropertyColor,
     PropertySlider,
-    PropertySpacing,
     PropertyShadowSelect,
     PropertySelect,
 } from "./PropertySection"
@@ -104,9 +103,6 @@ export const GlobalStylesPanel = () => {
         })
     }
 
-    const setMargin = (side: string, val: any) => updateProp(`margin${side.charAt(0).toUpperCase() + side.slice(1)}`, val)
-    const setPadding = (side: string, val: any) => updateProp(`padding${side.charAt(0).toUpperCase() + side.slice(1)}`, val)
-
     const fontFamily = getValue('fontFamily')
     const fontSize = getValue('fontSize')
     const backgroundColor = getValue('backgroundColor')
@@ -114,16 +110,6 @@ export const GlobalStylesPanel = () => {
     const borderRadius = getValue('borderRadius')
     const borderColor = getValue('borderColor')
     const boxShadow = getValue('boxShadow')
-
-    const marginTop = getValue('marginTop')
-    const marginRight = getValue('marginRight')
-    const marginBottom = getValue('marginBottom')
-    const marginLeft = getValue('marginLeft')
-
-    const paddingTop = getValue('paddingTop')
-    const paddingRight = getValue('paddingRight')
-    const paddingBottom = getValue('paddingBottom')
-    const paddingLeft = getValue('paddingLeft')
 
 
     return (
@@ -145,21 +131,6 @@ export const GlobalStylesPanel = () => {
                         min={8}
                         max={120}
                         unit="px"
-                    />
-                </PropertyRow>
-            </PropertySection>
-
-            <PropertySection title="Spacing & Alignment" defaultOpen={true}>
-                <PropertyRow label="Margin (px/auto)">
-                    <PropertySpacing
-                        values={{ top: marginTop, right: marginRight, bottom: marginBottom, left: marginLeft }}
-                        onChange={(side, val) => setMargin(side, val)}
-                    />
-                </PropertyRow>
-                <PropertyRow label="Padding (px)">
-                    <PropertySpacing
-                        values={{ top: paddingTop, right: paddingRight, bottom: paddingBottom, left: paddingLeft }}
-                        onChange={(side, val) => setPadding(side, val)}
                     />
                 </PropertyRow>
             </PropertySection>

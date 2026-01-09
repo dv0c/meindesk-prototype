@@ -218,12 +218,12 @@ export function PublishDropdown({
                         </button>
 
                         <button
-                            onClick={onSave}
+                            onClick={() => onSave()}
                             disabled={isSaving}
                             className="group flex items-center justify-center gap-2 bg-white text-black border border-white px-4 py-2 hover:bg-zinc-200 transition-all duration-300 disabled:opacity-50"
                         >
                             <ScrambleTextOnHover
-                                text={isSaving ? "SYNCING" : "PUBLISH"}
+                                text={isSaving ? "SYNCING" : (pageStatus === "PUBLISHED" ? "PUBLISH" : "SAVE DRAFT")}
                                 as="span"
                                 className="font-mono text-[9px] uppercase tracking-widest font-bold"
                             />

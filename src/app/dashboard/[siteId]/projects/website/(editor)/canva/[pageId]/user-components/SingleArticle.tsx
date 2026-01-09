@@ -1,14 +1,12 @@
 "use client"
 
-import React, { forwardRef, useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useTeam } from "@/hooks/useTeam"
 import { useParams, usePathname } from "next/navigation"
 import axios from "axios"
-import {
-    withCraftComponent,
-    CraftComponentProps,
-} from "../lib/withCraftComponent"
+import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
 import { useEditor } from "@craftjs/core"
+import { cn } from "@/lib/utils"
 
 interface Author {
     id: string
@@ -36,7 +34,7 @@ interface ArticleData {
     }
 }
 
-interface SingleArticleProps extends CraftComponentProps {
+export interface SingleArticleProps {
     // Layout options
     showCover?: boolean
     showAuthor?: boolean
@@ -49,6 +47,10 @@ interface SingleArticleProps extends CraftComponentProps {
 
     // For editor preview only
     previewArticleId?: string
+
+    // Block styles
+    blockStyle?: BlockStyle
+    className?: string
 }
 
 // Placeholder article for editor preview
@@ -85,27 +87,71 @@ const placeholderArticle: ArticleData = {
     },
 }
 
-const SingleArticleBase = forwardRef<HTMLDivElement, SingleArticleProps>(
-    (
-        {
-            showCover = true,
-            showAuthor = true,
-            showDate = true,
-            showCategories = true,
-            titleSize = "xl",
-            contentMaxWidth = "800px",
-            previewArticleId,
-            className = "",
+export const SingleArticle = defineBlock<SingleArticleProps>({
+    name: "SingleArticle",
+    category: "Content",
+    icon: <div className="p-1">📝</div>,
+
+    defaultProps: {
+        showCover: true,
+        showAuthor: true,
+        showDate: true,
+        showCategories: true,
+        titleSize: "xl",
+        contentMaxWidth: "800px",
+        blockStyle: {},
+    },
+
+    settingsConfig: {
+        // Display Section
+        showCover: { label: "Show Cover Image", type: "checkbox", section: "Display" },
+        showAuthor: { label: "Show Author", type: "checkbox", section: "Display" },
+        showDate: { label: "Show Date", type: "checkbox", section: "Display" },
+        showCategories: { label: "Show Categories", type: "checkbox", section: "Display" },
+
+        // Layout Section
+        titleSize: {
+            label: "Title Size",
+            type: "select",
+            section: "Layout",
+            options: [
+                { label: "Small", value: "sm" },
+                { label: "Medium", value: "md" },
+                { label: "Large", value: "lg" },
+                { label: "Extra Large", value: "xl" },
+            ],
         },
-        ref
-    ) => {
+        contentMaxWidth: {
+            label: "Content Max Width",
+            type: "text",
+            placeholder: "800px",
+            section: "Layout"
+        },
+    },
+
+    render: ({
+        showCover = true,
+        showAuthor = true,
+        showDate = true,
+        showCategories = true,
+        titleSize = "xl",
+        contentMaxWidth = "800px",
+        previewArticleId,
+        className = "",
+        blockStyle,
+    }) => {
         const [article, setArticle] = useState<ArticleData | null>(null)
         const [loading, setLoading] = useState(true)
         const [error, setError] = useState<string | null>(null)
 
         const { team, loading: teamLoading } = useTeam(undefined, 'tenant')
         const params = useParams()
-        const pathname = usePathname()
+        // const pathname = usePathname() // Unused
+
+        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+            style: blockStyle,
+            className: cn("w-full", className)
+        })
 
         // Check if we're in the editor
         let isEditor = false
@@ -174,7 +220,7 @@ const SingleArticleBase = forwardRef<HTMLDivElement, SingleArticleProps>(
         // Loading state
         if (loading || teamLoading) {
             return (
-                <div ref={ref} className={`w-full ${className}`}>
+                <div className={computedClassName} style={computedStyle}>
                     <div className="mx-auto" style={{ maxWidth: contentMaxWidth }}>
                         {showCover && (
                             <div className="w-full aspect-[2/1] bg-muted animate-pulse rounded-lg mb-8" />
@@ -199,7 +245,7 @@ const SingleArticleBase = forwardRef<HTMLDivElement, SingleArticleProps>(
         // Error state
         if (error) {
             return (
-                <div ref={ref} className={`w-full ${className}`}>
+                <div className={computedClassName} style={computedStyle}>
                     <div className="mx-auto text-center py-16" style={{ maxWidth: contentMaxWidth }}>
                         <h2 className="text-2xl font-bold text-destructive mb-2">Article Not Found</h2>
                         <p className="text-muted-foreground">{error}</p>
@@ -211,7 +257,7 @@ const SingleArticleBase = forwardRef<HTMLDivElement, SingleArticleProps>(
         // No article
         if (!article) {
             return (
-                <div ref={ref} className={`w-full ${className}`}>
+                <div className={computedClassName} style={computedStyle}>
                     <div className="mx-auto text-center py-16" style={{ maxWidth: contentMaxWidth }}>
                         <p className="text-muted-foreground">No article to display</p>
                     </div>
@@ -220,7 +266,7 @@ const SingleArticleBase = forwardRef<HTMLDivElement, SingleArticleProps>(
         }
 
         return (
-            <div ref={ref} className={`w-full ${className}`}>
+            <div className={computedClassName} style={computedStyle}>
                 <article className="mx-auto" style={{ maxWidth: contentMaxWidth }}>
                     {/* Cover Image */}
                     {showCover && article.cover && (
@@ -319,54 +365,6 @@ const SingleArticleBase = forwardRef<HTMLDivElement, SingleArticleProps>(
             </div>
         )
     }
-)
-
-SingleArticleBase.displayName = "SingleArticleBase"
-
-// Default props
-const defaultProps: Partial<SingleArticleProps> = {
-    showCover: true,
-    showAuthor: true,
-    showDate: true,
-    showCategories: true,
-    titleSize: "xl",
-    contentMaxWidth: "800px",
-}
-
-// Wrap with CraftJS functionality
-export const SingleArticle = withCraftComponent<SingleArticleProps, HTMLDivElement>(
-    SingleArticleBase,
-    {
-        displayName: "SingleArticle",
-        defaultProps,
-        sectionTitle: "Article",
-        settingsConfig: {
-            // Display Section
-            showCover: { label: "Show Cover Image", type: "checkbox", section: "Display" },
-            showAuthor: { label: "Show Author", type: "checkbox", section: "Display" },
-            showDate: { label: "Show Date", type: "checkbox", section: "Display" },
-            showCategories: { label: "Show Categories", type: "checkbox", section: "Display" },
-
-            // Layout Section
-            titleSize: {
-                label: "Title Size",
-                type: "select",
-                section: "Layout",
-                options: [
-                    { label: "Small", value: "sm" },
-                    { label: "Medium", value: "md" },
-                    { label: "Large", value: "lg" },
-                    { label: "Extra Large", value: "xl" },
-                ],
-            },
-            contentMaxWidth: {
-                label: "Content Max Width",
-                type: "text",
-                placeholder: "800px",
-                section: "Layout"
-            },
-        },
-    }
-)
+})
 
 export default SingleArticle

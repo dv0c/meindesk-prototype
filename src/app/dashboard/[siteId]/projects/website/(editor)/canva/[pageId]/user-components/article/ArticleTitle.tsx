@@ -1,26 +1,61 @@
 "use client"
 
-import React, { forwardRef } from "react"
-import {
-    withCraftComponent,
-    CraftComponentProps,
-} from "../../lib/withCraftComponent"
+import React from "react"
+import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
 import { useArticle } from "./ArticleContext"
+import { cn } from "@/lib/utils"
 
-interface ArticleTitleProps extends CraftComponentProps {
+export interface ArticleTitleProps {
     textAlign?: "left" | "center" | "right"
+    blockStyle?: BlockStyle
+    className?: string
 }
 
-const ArticleTitleBase = forwardRef<HTMLHeadingElement, ArticleTitleProps>(
-    ({ textAlign = "center", className = "" }, ref) => {
+export const ArticleTitle = defineBlock<ArticleTitleProps>({
+    name: "ArticleTitle",
+    category: "Article",
+    icon: <div className="p-1">T</div>,
+
+    defaultProps: {
+        textAlign: "center",
+        blockStyle: {},
+    },
+
+    settingsConfig: {
+        textAlign: {
+            label: "Alignment",
+            type: "select",
+            section: "Style",
+            options: [
+                { label: "Left", value: "left" },
+                { label: "Center", value: "center" },
+                { label: "Right", value: "right" },
+            ],
+        },
+    },
+
+    render: ({ textAlign = "center", className = "", blockStyle }) => {
         const { article, loading, error, isEditor } = useArticle()
+
+        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+            style: {
+                ...blockStyle,
+                textAlign,
+                fontFamily: 'var(--design-font-heading, Georgia, serif)',
+                color: computedStyle?.color || 'var(--design-primary, inherit)',
+            },
+            className: cn("text-2xl md:text-3xl lg:text-4xl font-bold leading-tight", className)
+        })
 
         // Loading skeleton
         if (loading) {
             return (
                 <div
-                    ref={ref as React.Ref<HTMLDivElement>}
-                    className={`h-12 bg-muted/50 animate-pulse rounded w-3/4 ${textAlign === 'center' ? 'mx-auto' : ''} ${className}`}
+                    className={cn(
+                        "h-12 bg-muted/50 animate-pulse rounded w-3/4",
+                        textAlign === 'center' ? 'mx-auto' : '',
+                        className
+                    )}
                 />
             )
         }
@@ -29,12 +64,8 @@ const ArticleTitleBase = forwardRef<HTMLHeadingElement, ArticleTitleProps>(
         if (error || !article) {
             return (
                 <h1
-                    ref={ref}
-                    className={`text-2xl md:text-3xl lg:text-4xl font-bold leading-tight text-muted-foreground ${className}`}
-                    style={{
-                        textAlign,
-                        fontFamily: 'var(--design-font-heading, Georgia, serif)',
-                    }}
+                    className={cn("text-muted-foreground", computedClassName)}
+                    style={computedStyle}
                 >
                     {isEditor ? "Article Title" : "No article found"}
                 </h1>
@@ -43,45 +74,13 @@ const ArticleTitleBase = forwardRef<HTMLHeadingElement, ArticleTitleProps>(
 
         return (
             <h1
-                ref={ref}
-                className={`text-2xl md:text-3xl lg:text-4xl font-bold leading-tight ${className}`}
-                style={{
-                    textAlign,
-                    fontFamily: 'var(--design-font-heading, Georgia, serif)',
-                    color: 'var(--design-primary, inherit)',
-                }}
+                className={computedClassName}
+                style={computedStyle}
             >
                 {article.title}
             </h1>
         )
     }
-)
-
-ArticleTitleBase.displayName = "ArticleTitleBase"
-
-const defaultProps: Partial<ArticleTitleProps> = {
-    textAlign: "center",
-}
-
-export const ArticleTitle = withCraftComponent<ArticleTitleProps, HTMLHeadingElement>(
-    ArticleTitleBase,
-    {
-        displayName: "ArticleTitle",
-        defaultProps,
-        sectionTitle: "Title",
-        settingsConfig: {
-            textAlign: {
-                label: "Alignment",
-                type: "select",
-                section: "Style",
-                options: [
-                    { label: "Left", value: "left" },
-                    { label: "Center", value: "center" },
-                    { label: "Right", value: "right" },
-                ],
-            },
-        },
-    }
-)
+})
 
 export default ArticleTitle

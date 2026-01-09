@@ -1,12 +1,9 @@
 "use client"
 
-import React, { forwardRef, useState } from "react"
+import React, { useState } from "react"
 import { ChevronDown } from "lucide-react"
-import {
-    withCraftComponent,
-    CraftComponentProps,
-    propsToStyle,
-} from "../lib/withCraftComponent"
+import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
+import { cn } from "@/lib/utils"
 
 // Navigation link type with submenu support
 interface NavLink {
@@ -16,7 +13,7 @@ interface NavLink {
     submenu?: NavLink[]
 }
 
-interface NavigationLinksProps extends CraftComponentProps {
+export interface NavigationLinksProps {
     links?: NavLink[]
     direction?: "row" | "column"
     gap?: number
@@ -24,33 +21,100 @@ interface NavigationLinksProps extends CraftComponentProps {
     textColor?: string
     fontSize?: number
     fontWeight?: string
+
+    style?: BlockStyle
+    className?: string
 }
 
-// Base component with forwardRef
-const NavigationLinksBase = forwardRef<HTMLElement, NavigationLinksProps>(
-    (
-        {
-            links = [
-                { id: "nav-1", label: "Home", href: "/" },
-                { id: "nav-2", label: "About", href: "/about" },
-                { id: "nav-3", label: "Services", href: "/services" },
-            ],
-            direction = "row",
-            gap = 24,
-            alignment = "center",
-            textColor = "#333333",
-            fontSize = 14,
-            fontWeight = "500",
-            className = "",
-            ...styleProps
+export const NavigationLinks = defineBlock<NavigationLinksProps>({
+    name: "Nav Links",
+    category: "Navigation", // Assuming a category or use 'Content'
+    icon: <div className="p-1">🔗</div>,
+
+    defaultProps: {
+        links: [
+            { id: "nav-1", label: "Home", href: "/" },
+            { id: "nav-2", label: "About", href: "/about" },
+            { id: "nav-3", label: "Contact", href: "/contact" },
+        ],
+        direction: "row",
+        gap: 24,
+        alignment: "center",
+        textColor: "#333333",
+        fontSize: 14,
+        fontWeight: "500",
+        style: {},
+    },
+
+    settingsConfig: {
+        links: {
+            type: "array",
+            label: "Navigation Links",
+            arrayFields: {
+                label: { type: "text", label: "Label" },
+                href: { type: "text", label: "URL" },
+                submenu: {
+                    type: "array",
+                    label: "Submenu Items",
+                    arrayFields: {
+                        label: { type: "text", label: "Label" },
+                        href: { type: "text", label: "URL" },
+                    },
+                },
+            },
         },
-        ref
-    ) => {
+        direction: {
+            type: "select",
+            label: "Direction",
+            options: [
+                { label: "Horizontal", value: "row" },
+                { label: "Vertical", value: "column" },
+            ],
+        },
+        alignment: {
+            type: "select",
+            label: "Alignment",
+            options: [
+                { label: "Left", value: "flex-start" },
+                { label: "Center", value: "center" },
+                { label: "Right", value: "flex-end" },
+            ],
+        },
+        gap: { type: "slider", label: "Gap", min: 0, max: 100 },
+        textColor: { type: "color", label: "Text Color" },
+        fontSize: { type: "slider", label: "Font Size", min: 10, max: 48 },
+        fontWeight: {
+            type: "select",
+            label: "Font Weight",
+            options: [
+                { label: "Light", value: "300" },
+                { label: "Regular", value: "400" },
+                { label: "Medium", value: "500" },
+                { label: "Semi Bold", value: "600" },
+                { label: "Bold", value: "700" },
+            ],
+        },
+    },
+
+    render: ({
+        links = [],
+        direction = "row",
+        gap = 24,
+        alignment = "center",
+        textColor = "#333333",
+        fontSize = 14,
+        fontWeight = "500",
+        className = "",
+        style,
+    }) => {
         const [openSubmenu, setOpenSubmenu] = useState<number | null>(null)
 
-        const baseStyle = propsToStyle(styleProps)
+        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+            style,
+            className
+        })
 
-        const navStyle: React.CSSProperties = {
+        const flexStyle: React.CSSProperties = {
             display: "flex",
             flexDirection: direction,
             justifyContent: alignment,
@@ -59,11 +123,11 @@ const NavigationLinksBase = forwardRef<HTMLElement, NavigationLinksProps>(
                 : "center",
             gap: `${gap}px`,
             width: "100%",
-            ...baseStyle,
+            ...computedStyle, // Merge block styles (padding, margin, etc.)
         }
 
         return (
-            <nav ref={ref} className={className} style={navStyle}>
+            <nav className={computedClassName} style={flexStyle}>
                 <ul
                     style={{
                         display: "flex",
@@ -147,83 +211,6 @@ const NavigationLinksBase = forwardRef<HTMLElement, NavigationLinksProps>(
             </nav>
         )
     }
-)
+})
 
-NavigationLinksBase.displayName = "NavigationLinksBase"
-
-// Default props
-const defaultProps: Partial<NavigationLinksProps> = {
-    links: [
-        { id: "nav-1", label: "Home", href: "/" },
-        { id: "nav-2", label: "About", href: "/about" },
-        { id: "nav-3", label: "Contact", href: "/contact" },
-    ],
-    direction: "row",
-    gap: 24,
-    alignment: "center",
-    textColor: "#333333",
-    fontSize: 14,
-    fontWeight: "500",
-}
-
-// Wrap with CraftJS functionality using auto-generated settings with accordion
-export const NavigationLinks = withCraftComponent<NavigationLinksProps, HTMLElement>(
-    NavigationLinksBase,
-    {
-        displayName: "Nav Links",
-        defaultProps,
-        sectionTitle: "Navigation",
-        settingsConfig: {
-            links: {
-                type: "array",
-                label: "Navigation Links",
-                arrayFields: {
-                    label: { type: "text", label: "Label" },
-                    href: { type: "text", label: "URL" },
-                    submenu: {
-                        type: "array",
-                        label: "Submenu Items",
-                        arrayFields: {
-                            label: { type: "text", label: "Label" },
-                            href: { type: "text", label: "URL" },
-                        },
-                    },
-                },
-            },
-            direction: {
-                type: "select",
-                label: "Direction",
-                options: [
-                    { label: "Horizontal", value: "row" },
-                    { label: "Vertical", value: "column" },
-                ],
-            },
-            alignment: {
-                type: "select",
-                label: "Alignment",
-                options: [
-                    { label: "Left", value: "flex-start" },
-                    { label: "Center", value: "center" },
-                    { label: "Right", value: "flex-end" },
-                ],
-            },
-            gap: { type: "slider", label: "Gap", min: 0, max: 100 },
-            textColor: { type: "color", label: "Text Color" },
-            fontSize: { type: "slider", label: "Font Size", min: 10, max: 48 },
-            fontWeight: {
-                type: "select",
-                label: "Font Weight",
-                options: [
-                    { label: "Light", value: "300" },
-                    { label: "Regular", value: "400" },
-                    { label: "Medium", value: "500" },
-                    { label: "Semi Bold", value: "600" },
-                    { label: "Bold", value: "700" },
-                ],
-            },
-        },
-    }
-)
-
-// Keep the old settings export for backward compatibility (now unused since auto-generated)
-export const NavigationLinksSettings = () => null
+export default NavigationLinks

@@ -1,24 +1,38 @@
 "use client"
 
-import React, { forwardRef } from "react"
-import {
-    withCraftComponent,
-    CraftComponentProps,
-} from "../../lib/withCraftComponent"
+import React from "react"
+import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
 import { useArticle } from "./ArticleContext"
+import { cn } from "@/lib/utils"
 
-interface ArticleCategoriesProps extends CraftComponentProps {
-    // No additional props needed - styling from design tokens
+export interface ArticleCategoriesProps {
+    blockStyle?: BlockStyle
+    className?: string
 }
 
-const ArticleCategoriesBase = forwardRef<HTMLDivElement, ArticleCategoriesProps>(
-    ({ className = "" }, ref) => {
+export const ArticleCategories = defineBlock<ArticleCategoriesProps>({
+    name: "ArticleCategories",
+    category: "Article",
+    icon: <div className="p-1">🏷️</div>,
+
+    defaultProps: {
+        blockStyle: {},
+    },
+
+    settingsConfig: {},
+
+    render: ({ className = "", blockStyle }) => {
         const { article, loading, error, isEditor } = useArticle()
+
+        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+            style: blockStyle,
+            className: cn("flex flex-wrap gap-2", className)
+        })
 
         // Loading skeleton
         if (loading) {
             return (
-                <div ref={ref} className={`flex flex-wrap gap-2 ${className}`}>
+                <div className={computedClassName} style={computedStyle}>
                     <div className="h-6 bg-muted/50 animate-pulse rounded-full w-20" />
                     <div className="h-6 bg-muted/50 animate-pulse rounded-full w-16" />
                 </div>
@@ -29,7 +43,7 @@ const ArticleCategoriesBase = forwardRef<HTMLDivElement, ArticleCategoriesProps>
         if (!article?.categories || article.categories.length === 0) {
             if (isEditor) {
                 return (
-                    <div ref={ref} className={`flex flex-wrap gap-2 ${className}`}>
+                    <div className={computedClassName} style={computedStyle}>
                         <span
                             className="px-3 py-1 text-sm font-medium rounded-full"
                             style={{
@@ -57,7 +71,7 @@ const ArticleCategoriesBase = forwardRef<HTMLDivElement, ArticleCategoriesProps>
         }
 
         return (
-            <div ref={ref} className={`flex flex-wrap gap-2 ${className}`}>
+            <div className={computedClassName} style={computedStyle}>
                 {article.categories.map((category, index) => (
                     <span
                         key={index}
@@ -73,20 +87,6 @@ const ArticleCategoriesBase = forwardRef<HTMLDivElement, ArticleCategoriesProps>
             </div>
         )
     }
-)
-
-ArticleCategoriesBase.displayName = "ArticleCategoriesBase"
-
-const defaultProps: Partial<ArticleCategoriesProps> = {}
-
-export const ArticleCategories = withCraftComponent<ArticleCategoriesProps, HTMLDivElement>(
-    ArticleCategoriesBase,
-    {
-        displayName: "ArticleCategories",
-        defaultProps,
-        sectionTitle: "Categories",
-        settingsConfig: {},
-    }
-)
+})
 
 export default ArticleCategories

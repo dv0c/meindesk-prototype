@@ -1,24 +1,46 @@
 "use client"
 
-import React, { forwardRef } from "react"
-import {
-    withCraftComponent,
-    CraftComponentProps,
-} from "../../lib/withCraftComponent"
+import React from "react"
+import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
 import { useArticle } from "./ArticleContext"
+import { cn } from "@/lib/utils"
 
-interface ArticleAuthorProps extends CraftComponentProps {
+export interface ArticleAuthorProps {
     showAvatar?: boolean
+    blockStyle?: BlockStyle
+    className?: string
 }
 
-const ArticleAuthorBase = forwardRef<HTMLDivElement, ArticleAuthorProps>(
-    ({ showAvatar = true, className = "" }, ref) => {
+export const ArticleAuthor = defineBlock<ArticleAuthorProps>({
+    name: "ArticleAuthor",
+    category: "Article",
+    icon: <div className="p-1">👤</div>,
+
+    defaultProps: {
+        showAvatar: true,
+        blockStyle: {},
+    },
+
+    settingsConfig: {
+        showAvatar: {
+            label: "Show Avatar",
+            type: "checkbox",
+            section: "Display",
+        },
+    },
+
+    render: ({ showAvatar = true, className = "", blockStyle }) => {
         const { article, loading, error, isEditor } = useArticle()
+
+        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+            style: blockStyle,
+            className: cn("flex items-center gap-3", className)
+        })
 
         // Loading skeleton
         if (loading) {
             return (
-                <div ref={ref} className={`flex items-center gap-3 ${className}`}>
+                <div className={computedClassName} style={computedStyle}>
                     {showAvatar && (
                         <div className="w-10 h-10 rounded-full bg-muted/50 animate-pulse" />
                     )}
@@ -31,7 +53,7 @@ const ArticleAuthorBase = forwardRef<HTMLDivElement, ArticleAuthorProps>(
         if (!article?.author) {
             if (isEditor) {
                 return (
-                    <div ref={ref} className={`flex items-center gap-3 text-muted-foreground ${className}`}>
+                    <div className={cn("text-muted-foreground", computedClassName)} style={computedStyle}>
                         {showAvatar && (
                             <div className="w-10 h-10 rounded-full bg-muted/30 flex items-center justify-center">
                                 <span className="text-sm">?</span>
@@ -47,7 +69,7 @@ const ArticleAuthorBase = forwardRef<HTMLDivElement, ArticleAuthorProps>(
         const author = article.author
 
         return (
-            <div ref={ref} className={`flex items-center gap-3 ${className}`}>
+            <div className={computedClassName} style={computedStyle}>
                 {showAvatar && (
                     author.image ? (
                         <img
@@ -78,28 +100,6 @@ const ArticleAuthorBase = forwardRef<HTMLDivElement, ArticleAuthorProps>(
             </div>
         )
     }
-)
-
-ArticleAuthorBase.displayName = "ArticleAuthorBase"
-
-const defaultProps: Partial<ArticleAuthorProps> = {
-    showAvatar: true,
-}
-
-export const ArticleAuthor = withCraftComponent<ArticleAuthorProps, HTMLDivElement>(
-    ArticleAuthorBase,
-    {
-        displayName: "ArticleAuthor",
-        defaultProps,
-        sectionTitle: "Author",
-        settingsConfig: {
-            showAvatar: {
-                label: "Show Avatar",
-                type: "checkbox",
-                section: "Display",
-            },
-        },
-    }
-)
+})
 
 export default ArticleAuthor

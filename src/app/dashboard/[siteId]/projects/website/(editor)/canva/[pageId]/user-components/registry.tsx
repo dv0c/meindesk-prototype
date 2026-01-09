@@ -37,7 +37,7 @@ import { Grid } from './Grid'
 import { Divider, DividerSettings } from './Divider'
 import { Spacer, SpacerSettings } from './Spacer'
 import { Navbar } from './Navbar'
-import { NavigationLinks, NavigationLinksSettings } from './NavigationLinks'
+import { NavigationLinks } from './NavigationLinks'
 import { Card } from './ExampleCard'
 import { Hero } from './themes/SophiaPlatanisioti/Hero'
 import { Footer } from './themes/SophiaPlatanisioti/Footer'
@@ -138,7 +138,6 @@ export const componentRegistry: ComponentRegistration[] = [
         category: 'Navigation',
         description: 'A list of navigation links',
         icon: <LinkIcon className="h-5 w-5" />,
-        settings: NavigationLinksSettings,
     },
 
     // Typography components
@@ -448,10 +447,18 @@ export {
     Spacer,
     SpacerSettings,
     Navbar,
-    NavigationLinks,
-    NavigationLinksSettings,
     Card,
     Hero,
+    // Article Components
+    Articles,
+    SingleArticle,
+    SophiaArticle,
+    ArticleTitle,
+    ArticleCover,
+    ArticleContent,
+    ArticleAuthor,
+    ArticleDate,
+    ArticleCategories,
     // Meindesk Theme Components
     HeroSection,
     FeaturesGrid,
