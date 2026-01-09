@@ -1,5 +1,5 @@
 import React from 'react'
-import { Container, Heading, Text, Button } from "../user-components"
+import { Container, Heading, Text, Button, TIGNavbar, TIGHero, TIGArticleGrid, TIGFooter } from "../user-components"
 import { LayoutTemplate, AlignCenter, Type, CreditCard, MessageSquare, Phone } from "lucide-react"
 
 export interface Template {
@@ -162,6 +162,24 @@ export const templates: Template[] = [
                         <Button text="Send Message" fullWidth />
                     </Container>
                 </Container>
+            </Container>
+        )
+    },
+    {
+        id: "tig-home",
+        name: "Time is Golden",
+        description: "Minimal magazine style homepage",
+        category: "Full Page",
+        icon: LayoutTemplate,
+        previewImage: "https://images.unsplash.com/photo-1493612276216-993924c58e6e?w=800&q=80",
+        content: (
+            <Container padding={0} backgroundColor="#f8f9fa">
+                <TIGNavbar />
+                <TIGHero />
+                <Container padding={80} backgroundColor="transparent" maxWidth="1200px" className="mx-auto">
+                    <TIGArticleGrid collectionId="Articles" limit={7} showImage={true} />
+                </Container>
+                <TIGFooter />
             </Container>
         )
     }

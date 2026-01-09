@@ -64,6 +64,11 @@ import { MeindeskContainer } from './themes/Meindesk/MeindeskContainer'
 import { CollectionList, CollectionItem, CollectionField, RelatedItems, CollectionContainer } from './collections'
 import { Link2 } from 'lucide-react'
 import { Search, SearchSettings } from './Search'
+import { TIGNavbar } from './themes/TimeIsGolden/TIGNavbar'
+import { TIGHero } from './themes/TimeIsGolden/TIGHero'
+import { TIGArticleGrid } from './themes/TimeIsGolden/TIGArticleGrid'
+import { TIGFooter } from './themes/TimeIsGolden/TIGFooter'
+import { TIGSingleArticle } from './themes/TimeIsGolden/TIGSingleArticle'
 
 /**
  * Component metadata interface
@@ -352,6 +357,43 @@ export const componentRegistry: ComponentRegistration[] = [
         isContainer: true,
     },
 
+    // Time is Golden Theme
+    {
+        name: 'TIGNavbar',
+        component: TIGNavbar,
+        category: 'Time is Golden',
+        description: 'Golden Theme Navbar',
+        icon: <Navigation className="h-5 w-5" />,
+    },
+    {
+        name: 'TIGHero',
+        component: TIGHero,
+        category: 'Time is Golden',
+        description: 'Golden Theme Hero Area',
+        icon: <LayoutGrid className="h-5 w-5" />,
+    },
+    {
+        name: 'TIGArticleGrid',
+        component: TIGArticleGrid,
+        category: 'Time is Golden',
+        description: 'Golden Theme Article List',
+        icon: <GalleryHorizontal className="h-5 w-5" />,
+    },
+    {
+        name: 'TIGFooter',
+        component: TIGFooter,
+        category: 'Time is Golden',
+        description: 'Golden Theme Footer',
+        icon: <LayoutGrid className="h-5 w-5" />,
+    },
+    {
+        name: 'TIGSingleArticle',
+        component: TIGSingleArticle,
+        category: 'Time is Golden',
+        description: 'Golden Theme Single Article',
+        icon: <FileText className="h-5 w-5" />,
+    },
+
 ]
 
 // Component map (name -> component)
@@ -418,4 +460,10 @@ export {
     FooterInfo,
     MeindeskContainer,
     Search,
+    // Time is Golden
+    TIGNavbar,
+    TIGHero,
+    TIGArticleGrid,
+    TIGFooter,
+    TIGSingleArticle,
 }
