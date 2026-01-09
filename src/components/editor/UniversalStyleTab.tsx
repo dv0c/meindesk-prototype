@@ -192,6 +192,47 @@ export const UniversalStyleTab = () => {
                         onChange={(v) => setStyle('backgroundColor', v)}
                     />
                 </PropertyRow>
+                <PropertyRow label="Background Image">
+                    <div className="flex flex-col gap-2 w-full">
+                        {backgroundImage ? (
+                            <div className="relative group w-full aspect-video bg-muted rounded-md overflow-hidden border border-border">
+                                <img
+                                    src={backgroundImage.replace(/^url\((['"]?)(.*?)\1\)$/, '$2')}
+                                    alt="Background"
+                                    className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                    <Button
+                                        variant="secondary"
+                                        size="icon"
+                                        className="h-8 w-8"
+                                        onClick={() => setIsMediaDialogOpen(true)}
+                                    >
+                                        <ImageIcon className="h-4 w-4" />
+                                    </Button>
+                                    <Button
+                                        variant="destructive"
+                                        size="icon"
+                                        className="h-8 w-8"
+                                        onClick={() => setStyle('backgroundImage', undefined)}
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                        ) : (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="w-full flex items-center justify-center gap-2 h-10 border-dashed"
+                                onClick={() => setIsMediaDialogOpen(true)}
+                            >
+                                <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                                <span className="text-muted-foreground">Select Image</span>
+                            </Button>
+                        )}
+                    </div>
+                </PropertyRow>
                 <PropertyRow label="Border Radius">
                     <PropertySlider
                         value={parseInt(borderRadius) || 0}
@@ -265,6 +306,14 @@ export const UniversalStyleTab = () => {
                     </div>
                 )}
             </PropertySection>
+
+            <MediaLibraryDialog
+                siteId={siteId}
+                isOpen={isMediaDialogOpen}
+                onClose={() => setIsMediaDialogOpen(false)}
+                onSelect={handleMediaSelect}
+                multiSelect={false}
+            />
         </div>
     )
 }
