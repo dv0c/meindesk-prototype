@@ -1,16 +1,18 @@
 "use client"
 
+import React, { useState } from "react"
 import { useNode } from "@craftjs/core"
-import { useState } from "react"
 import { useParams } from "next/navigation"
 import MediaLibraryDialog, { MediaItem } from "@/components/MediaGallery/media-select"
 import { Button } from "@/components/ui/button"
 import { ImageIcon } from "lucide-react"
+import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
+import { useCollectionItem } from "./collections/CollectionItemContext"
+import { resolveCollectionTemplate } from "@/lib/collection-utils"
 import {
     PropertySection,
     PropertyRow,
     PropertySlider,
-    PropertyColor,
     PropertyInput,
     PropertySelect,
     PropertySliderWithUnit,
@@ -24,47 +26,12 @@ interface ImageProps {
     objectFit?: "cover" | "contain" | "fill" | "none"
     borderRadius?: number
     className?: string
+    style?: BlockStyle
 }
 
-// Add imports
-import { useCollectionItem } from "./collections/CollectionItemContext"
-import { resolveCollectionTemplate } from "@/lib/collection-utils"
-
-export const Image = ({
-    src = "https://placehold.co/600x400/e2e8f0/64748b?text=Image",
-    alt = "Image",
-    width = "50%",
-    height = "auto",
-    objectFit = "cover",
-    borderRadius = 0,
-    className = "",
-}: ImageProps) => {
-    const {
-        connectors: { connect, drag },
-    } = useNode()
-
-    const collectionContext = useCollectionItem()
-
-    const resolvedSrc = resolveCollectionTemplate(src, collectionContext?.data)
-    const displaySrc = resolvedSrc || src
-
-    const style: React.CSSProperties = {
-        width,
-        height,
-        objectFit,
-        borderRadius,
-        display: "block",
-    }
-
-    return (
-        <img
-            ref={(ref: any) => connect(drag(ref))}
-            src={displaySrc}
-            alt={alt}
-            className={className}
-            style={style}
-        />
-    )
+const defaultStyles: BlockStyle = {
+    width: "100%",
+    height: "auto",
 }
 
 // Settings component for Image
@@ -103,8 +70,7 @@ export const ImageSettings = () => {
     // Helper to parse dimension string (e.g., "100%" -> { value: 100, unit: "%" })
     const parseDimension = (val: string | undefined, defaultVal: number, defaultUnit: string) => {
         if (!val) return { value: defaultVal, unit: defaultUnit }
-        // Handle "auto"
-        if (val === 'auto') return { value: defaultVal, unit: defaultUnit } // Control doesn't support "auto" well, fallback
+        if (val === 'auto') return { value: defaultVal, unit: defaultUnit }
         const match = val.toString().match(/^([\d.]+)(px|%|vh|vw|rem)?$/)
         if (match) {
             return {
@@ -116,7 +82,7 @@ export const ImageSettings = () => {
     }
 
     const widthDim = parseDimension(width, 100, '%')
-    const heightDim = parseDimension(height, 300, 'px') // Use 300px as default fallback visual if auto/unset
+    const heightDim = parseDimension(height, 300, 'px')
 
     const dimensionsSummary = `${width} × ${height}`
 
@@ -183,7 +149,7 @@ export const ImageSettings = () => {
                         unit={widthDim.unit}
                         onChange={(val, unit) => setProp((props: ImageProps) => (props.width = `${val}${unit}`))}
                         min={0}
-                        max={100} // Let slider adjust based on unit? Component usually handles it.
+                        max={100}
                         units={["%", "px", "vw"]}
                     />
                 </PropertyRow>
@@ -230,21 +196,54 @@ export const ImageSettings = () => {
     )
 }
 
+export const Image = defineBlock<ImageProps>({
+    name: "Image",
+    category: "Media",
+    icon: <ImageIcon className="w-4 h-4" />,
+    description: "Display an image",
 
-Image.craft = {
-    displayName: "Image",
-    props: {
+    defaultProps: {
         src: "https://placehold.co/600x400/e2e8f0/64748b?text=Image",
         alt: "Image",
         width: "100%",
         height: "auto",
         objectFit: "cover",
         borderRadius: 0,
+        style: defaultStyles
     },
-    rules: {
-        canDrag: () => true,
+
+    settings: ImageSettings,
+
+    render: ({ src, alt, width, height, objectFit, borderRadius, className, style, theme }) => {
+        const collectionContext = useCollectionItem()
+        const resolvedSrc = resolveCollectionTemplate(src, collectionContext?.data)
+        const displaySrc = resolvedSrc || src
+
+        // Merge props into style for consistency with useBlockStyles
+        const effectiveStyle = {
+            ...style,
+            width,
+            height,
+            objectFit,
+            borderRadius: borderRadius ? `${borderRadius}px` : undefined,
+            // Force block display usually
+            display: style?.display || "block"
+        }
+
+        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+            style: effectiveStyle,
+            className
+        })
+
+        return (
+            <img
+                src={displaySrc}
+                alt={alt}
+                className={computedClassName}
+                style={computedStyle}
+            />
+        )
     },
-    related: {
-        settings: ImageSettings,
-    },
-}
+
+    childrenAllowed: false
+})

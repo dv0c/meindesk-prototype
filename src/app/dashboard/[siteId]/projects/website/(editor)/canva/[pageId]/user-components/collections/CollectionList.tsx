@@ -1,14 +1,21 @@
 "use client"
 
-import React, { forwardRef, useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useTeam } from "@/hooks/useTeam"
 import axios from "axios"
 import Link from "next/link"
-import {
-    withCraftComponent,
-    CraftComponentProps,
-} from "../../lib/withCraftComponent"
+import { useNode } from "@craftjs/core"
+import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
 import { cn } from "@/lib/utils"
+import { Database } from "lucide-react"
+import {
+    PropertySection,
+    PropertyRow,
+    PropertySelect,
+    PropertyInput,
+    PropertyCheckbox,
+    PropertySlider,
+} from "../../components/PropertySection"
 
 interface CollectionItem {
     id: string
@@ -24,14 +31,12 @@ interface CollectionField {
     type: string
     label: string
     required?: boolean
-    relatedCollectionId?: string
-    relationType?: string
 }
 
-interface CollectionListProps extends CraftComponentProps {
+interface CollectionListProps {
     collectionId?: string
     layout?: "grid" | "list" | "cards"
-    columns?: 2 | 3 | 4
+    columns?: number
     limit?: number
     showImage?: boolean
     imageField?: string
@@ -39,30 +44,192 @@ interface CollectionListProps extends CraftComponentProps {
     descriptionField?: string
     linkToDetail?: boolean
     detailPagePath?: string
+    style?: BlockStyle
+    className?: string
 }
 
-const CollectionListBase = forwardRef<HTMLDivElement, CollectionListProps>(
-    (
-        {
-            collectionId = "",
-            layout = "grid",
-            columns = 3,
-            limit = 12,
-            showImage = true,
-            imageField = "",
-            titleField = "",
-            descriptionField = "",
-            linkToDetail = true,
-            detailPagePath = "/item",
-            className = "",
-        },
-        ref
-    ) => {
+const defaultStyles: BlockStyle = {
+    width: "100%",
+    gap: 16
+}
+
+const CollectionListSettings = () => {
+    const {
+        actions: { setProp },
+        collectionId,
+        layout,
+        columns,
+        limit,
+        showImage,
+        imageField,
+        titleField,
+        descriptionField,
+        linkToDetail,
+        detailPagePath
+    } = useNode((node) => ({
+        collectionId: node.data.props.collectionId,
+        layout: node.data.props.layout,
+        columns: node.data.props.columns,
+        limit: node.data.props.limit,
+        showImage: node.data.props.showImage,
+        imageField: node.data.props.imageField,
+        titleField: node.data.props.titleField,
+        descriptionField: node.data.props.descriptionField,
+        linkToDetail: node.data.props.linkToDetail,
+        detailPagePath: node.data.props.detailPagePath
+    }))
+
+    return (
+        <div>
+            <PropertySection title="Data Source">
+                <PropertyRow label="Collection">
+                    <PropertyInput
+                        value={collectionId || ""}
+                        onChange={(v) => setProp((props: CollectionListProps) => (props.collectionId = v))}
+                        placeholder="Collection ID"
+                    />
+                </PropertyRow>
+                <PropertyRow label="Limit">
+                    <PropertySlider
+                        value={limit || 12}
+                        onChange={(v) => setProp((props: CollectionListProps) => (props.limit = v))}
+                        min={1}
+                        max={50}
+                    />
+                </PropertyRow>
+            </PropertySection>
+
+            <PropertySection title="Layout">
+                <PropertyRow label="Style">
+                    <PropertySelect
+                        value={layout || "grid"}
+                        onChange={(v) => setProp((props: CollectionListProps) => (props.layout = v as any))}
+                        options={[
+                            { label: "Grid", value: "grid" },
+                            { label: "Cards", value: "cards" },
+                            { label: "List", value: "list" },
+                        ]}
+                    />
+                </PropertyRow>
+                {(layout === 'grid' || layout === 'cards') && (
+                    <PropertyRow label="Columns">
+                        <PropertySelect
+                            value={String(columns || 3)}
+                            onChange={(v) => setProp((props: CollectionListProps) => (props.columns = parseInt(v)))}
+                            options={[
+                                { label: "2 Columns", value: 2 },
+                                { label: "3 Columns", value: 3 },
+                                { label: "4 Columns", value: 4 },
+                            ]}
+                        />
+                    </PropertyRow>
+                )}
+            </PropertySection>
+
+            <PropertySection title="Display">
+                <PropertyRow label="Show Image">
+                    <PropertyCheckbox
+                        checked={showImage !== false}
+                        onChange={(v) => setProp((props: CollectionListProps) => (props.showImage = v))}
+                    />
+                </PropertyRow>
+                <PropertyRow label="Image Field">
+                    <PropertyInput
+                        value={imageField || ""}
+                        onChange={(v) => setProp((props: CollectionListProps) => (props.imageField = v))}
+                        placeholder="Auto"
+                    />
+                </PropertyRow>
+                <PropertyRow label="Title Field">
+                    <PropertyInput
+                        value={titleField || ""}
+                        onChange={(v) => setProp((props: CollectionListProps) => (props.titleField = v))}
+                        placeholder="Auto"
+                    />
+                </PropertyRow>
+                <PropertyRow label="Desc Field">
+                    <PropertyInput
+                        value={descriptionField || ""}
+                        onChange={(v) => setProp((props: CollectionListProps) => (props.descriptionField = v))}
+                        placeholder="Auto"
+                    />
+                </PropertyRow>
+            </PropertySection>
+
+            <PropertySection title="Navigation">
+                <PropertyRow label="Link to Detail">
+                    <PropertyCheckbox
+                        checked={linkToDetail !== false}
+                        onChange={(v) => setProp((props: CollectionListProps) => (props.linkToDetail = v))}
+                    />
+                </PropertyRow>
+                <PropertyRow label="Detail Path">
+                    <PropertyInput
+                        value={detailPagePath || ""}
+                        onChange={(v) => setProp((props: CollectionListProps) => (props.detailPagePath = v))}
+                        placeholder="/item/..."
+                    />
+                </PropertyRow>
+            </PropertySection>
+        </div>
+    )
+}
+
+export const CollectionList = defineBlock<CollectionListProps>({
+    name: "CollectionList",
+    category: "Data",
+    icon: <Database className="w-4 h-4" />,
+    description: "Display a list of items from a collection",
+
+    defaultProps: {
+        collectionId: "",
+        layout: "grid",
+        columns: 3,
+        limit: 12,
+        showImage: true,
+        imageField: "",
+        titleField: "",
+        descriptionField: "",
+        linkToDetail: true,
+        detailPagePath: "/item",
+        style: defaultStyles
+    },
+
+    settings: CollectionListSettings,
+
+    render: ({
+        collectionId,
+        layout = "grid",
+        columns = 3,
+        limit = 12,
+        showImage = true,
+        imageField,
+        titleField,
+        descriptionField,
+        linkToDetail = true,
+        detailPagePath = "/item",
+        style,
+        className,
+        theme
+    }) => {
         const [items, setItems] = useState<CollectionItem[]>([])
         const [collection, setCollection] = useState<{ name: string; slug: string; fields: CollectionField[] } | null>(null)
         const [loading, setLoading] = useState(true)
         const [error, setError] = useState<string | null>(null)
         const { team, loading: teamLoading } = useTeam(undefined, 'tenant')
+
+        const effectiveStyle = {
+            ...style,
+            width: "100%",
+            display: (layout === "grid" || layout === "cards") ? "grid" : "block",
+            gridTemplateColumns: (layout === "grid" || layout === "cards") ? `repeat(${columns}, 1fr)` : undefined,
+            gap: (layout === "grid" || layout === "cards") ? (style?.gap ?? 16) : undefined
+        }
+
+        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+            style: effectiveStyle,
+            className
+        })
 
         useEffect(() => {
             if (!team?.id || !collectionId) {
@@ -94,7 +261,6 @@ const CollectionListBase = forwardRef<HTMLDivElement, CollectionListProps>(
             return () => controller.abort()
         }, [team?.id, collectionId, limit])
 
-        // Auto-detect fields if not specified
         const getImageField = () => {
             if (imageField) return imageField
             const imgField = collection?.fields?.find(f => f.type === 'image')
@@ -122,70 +288,61 @@ const CollectionListBase = forwardRef<HTMLDivElement, CollectionListProps>(
             return descCandidate?.name || ''
         }
 
-        // Render helpers
         const getItemValue = (item: CollectionItem, fieldName: string) => {
             return item.data?.[fieldName] || null
         }
 
-        const renderFieldValue = (value: any, fieldType?: string) => {
+        const renderFieldValue = (value: any) => {
             if (value === null || value === undefined) return null
-
-            if (Array.isArray(value)) {
-                return value.join(', ')
-            }
-
-            if (typeof value === 'boolean') {
-                return value ? 'Yes' : 'No'
-            }
-
-            if (typeof value === 'object') {
-                // Resolved relation
-                return value.title || value.name || value.slug || JSON.stringify(value)
-            }
-
+            if (Array.isArray(value)) return value.join(', ')
+            if (typeof value === 'object') return value.title || value.name || value.slug || JSON.stringify(value)
             return String(value)
         }
 
-        // Loading skeleton
+        const getDetailLink = (itemSlug: string) => {
+            if (detailPagePath && detailPagePath !== '/item') {
+                return `${detailPagePath}/${itemSlug}`
+            }
+            return `/c/${collection?.slug || 'item'}/${itemSlug}`
+        }
+
+        const commonClasses = cn(computedClassName, "w-full")
+
         if (loading || teamLoading) {
             return (
-                <div ref={ref} className={cn("grid gap-4", className)} style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
-                    {Array.from({ length: Math.min(limit, 6) }).map((_, i) => (
-                        <div key={i} className="border border-border bg-card p-4 space-y-3">
+                <div className={commonClasses} style={computedStyle}>
+                    {Array.from({ length: Math.min(limit || 3, 3) }).map((_, i) => (
+                        <div key={i} className="border border-border bg-card p-4 space-y-3 mb-4 last:mb-0">
                             {showImage && <div className="aspect-video bg-muted animate-pulse" />}
                             <div className="h-5 bg-muted animate-pulse rounded w-3/4" />
                             <div className="h-4 bg-muted animate-pulse rounded w-full" />
-                            <div className="h-4 bg-muted animate-pulse rounded w-2/3" />
                         </div>
                     ))}
                 </div>
             )
         }
 
-        // Empty state - no collection selected
         if (!collectionId) {
             return (
-                <div ref={ref} className={cn("border-2 border-dashed border-border p-8 text-center", className)}>
+                <div className={cn("border-2 border-dashed border-border p-8 text-center", commonClasses)} style={{ ...computedStyle, display: 'block' }}>
                     <p className="text-muted-foreground font-mono text-sm uppercase tracking-wider">
-                        Select a collection in the settings panel
+                        Select a collection in settings
                     </p>
                 </div>
             )
         }
 
-        // Error state
         if (error) {
             return (
-                <div ref={ref} className={cn("border border-destructive/50 bg-destructive/5 p-8 text-center", className)}>
+                <div className={cn("border border-destructive/50 bg-destructive/5 p-8 text-center", commonClasses)} style={{ ...computedStyle, display: 'block' }}>
                     <p className="text-destructive font-mono text-sm">{error}</p>
                 </div>
             )
         }
 
-        // Empty state - no items
         if (!items.length) {
             return (
-                <div ref={ref} className={cn("border border-border p-8 text-center", className)}>
+                <div className={cn("border border-border p-8 text-center", commonClasses)} style={{ ...computedStyle, display: 'block' }}>
                     <p className="text-muted-foreground font-mono text-sm uppercase tracking-wider">
                         No items in this collection
                     </p>
@@ -197,217 +354,72 @@ const CollectionListBase = forwardRef<HTMLDivElement, CollectionListProps>(
         const ttlField = getTitleField()
         const descField = getDescriptionField()
 
-        // Auto-generate detail page path using collection slug
-        const getDetailLink = (itemSlug: string) => {
-            if (detailPagePath && detailPagePath !== '/item') {
-                // User specified a custom path
-                return `${detailPagePath}/${itemSlug}`
-            }
-            // Use /c/collection-slug/item-slug format
-            return `/c/${collection?.slug || 'item'}/${itemSlug}`
-        }
+        const renderItemContent = (item: CollectionItem) => {
+            const imageUrl = imgField ? getItemValue(item, imgField) : null
+            const title = ttlField ? getItemValue(item, ttlField) : item.slug
+            const description = descField ? getItemValue(item, descField) : null
 
-        // Grid layout
-        if (layout === "grid" || layout === "cards") {
-            return (
-                <div
-                    ref={ref}
-                    className={cn("grid gap-4", className)}
-                    style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
-                >
-                    {items.map((item) => {
-                        const imageUrl = imgField ? getItemValue(item, imgField) : null
-                        const title = ttlField ? getItemValue(item, ttlField) : item.slug
-                        const description = descField ? getItemValue(item, descField) : null
-
-                        const content = (
-                            <div className={cn(
-                                "border border-border bg-card overflow-hidden transition-all",
-                                layout === "cards" && "rounded-lg shadow-sm hover:shadow-md",
-                                linkToDetail && "cursor-pointer hover:border-primary/50"
-                            )}>
-                                {showImage && imageUrl && (
-                                    <div className="aspect-video overflow-hidden bg-muted">
-                                        <img
-                                            src={imageUrl}
-                                            alt={String(title)}
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </div>
-                                )}
-                                <div className="p-4 space-y-2">
-                                    <h3 className="font-semibold text-foreground line-clamp-2">
-                                        {renderFieldValue(title)}
-                                    </h3>
-                                    {description && (
-                                        <p className="text-sm text-muted-foreground line-clamp-2">
-                                            {renderFieldValue(description)}
-                                        </p>
-                                    )}
-                                </div>
+            if (layout === "list") {
+                return (
+                    <div className={cn(
+                        "flex gap-4 border-b border-border pb-4 last:border-0",
+                        linkToDetail && "cursor-pointer hover:bg-muted/50 -mx-2 px-2 py-2 transition-colors"
+                    )}>
+                        {showImage && imageUrl && (
+                            <div className="w-32 h-24 flex-shrink-0 overflow-hidden bg-muted">
+                                <img src={imageUrl} alt={String(title)} className="w-full h-full object-cover" />
                             </div>
-                        )
+                        )}
+                        <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-foreground line-clamp-1">{renderFieldValue(title)}</h3>
+                            {description && (
+                                <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{renderFieldValue(description)}</p>
+                            )}
+                        </div>
+                    </div>
+                )
+            }
 
-                        if (linkToDetail) {
-                            return (
-                                <Link key={item.id} href={getDetailLink(item.slug)}>
-                                    {content}
-                                </Link>
-                            )
-                        }
-
-                        return <div key={item.id}>{content}</div>
-                    })}
+            // Grid or Cards
+            return (
+                <div className={cn(
+                    "border border-border bg-card overflow-hidden transition-all",
+                    layout === "cards" && "rounded-lg shadow-sm hover:shadow-md",
+                    linkToDetail && "cursor-pointer hover:border-primary/50"
+                )}>
+                    {showImage && imageUrl && (
+                        <div className="aspect-video overflow-hidden bg-muted">
+                            <img src={imageUrl} alt={String(title)} className="w-full h-full object-cover" />
+                        </div>
+                    )}
+                    <div className="p-4 space-y-2">
+                        <h3 className="font-semibold text-foreground line-clamp-2">{renderFieldValue(title)}</h3>
+                        {description && (
+                            <p className="text-sm text-muted-foreground line-clamp-2">{renderFieldValue(description)}</p>
+                        )}
+                    </div>
                 </div>
             )
         }
 
-        // List layout
         return (
-            <div ref={ref} className={cn("space-y-4", className)}>
-                {items.map((item) => {
-                    const imageUrl = imgField ? getItemValue(item, imgField) : null
-                    const title = ttlField ? getItemValue(item, ttlField) : item.slug
-                    const description = descField ? getItemValue(item, descField) : null
-
-                    const content = (
-                        <div className={cn(
-                            "flex gap-4 border-b border-border pb-4 last:border-0",
-                            linkToDetail && "cursor-pointer hover:bg-muted/50 -mx-2 px-2 py-2 transition-colors"
-                        )}>
-                            {showImage && imageUrl && (
-                                <div className="w-32 h-24 flex-shrink-0 overflow-hidden bg-muted">
-                                    <img
-                                        src={imageUrl}
-                                        alt={String(title)}
-                                        className="w-full h-full object-cover"
-                                    />
-                                </div>
-                            )}
-                            <div className="flex-1 min-w-0">
-                                <h3 className="font-semibold text-foreground line-clamp-1">
-                                    {renderFieldValue(title)}
-                                </h3>
-                                {description && (
-                                    <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
-                                        {renderFieldValue(description)}
-                                    </p>
-                                )}
-                            </div>
+            <div className={commonClasses} style={computedStyle}>
+                {items.map((item) => (
+                    linkToDetail ? (
+                        <Link key={item.id} href={getDetailLink(item.slug)} className="block">
+                            {renderItemContent(item)}
+                        </Link>
+                    ) : (
+                        <div key={item.id}>
+                            {renderItemContent(item)}
                         </div>
                     )
-
-                    if (linkToDetail) {
-                        return (
-                            <Link key={item.id} href={getDetailLink(item.slug)}>
-                                {content}
-                            </Link>
-                        )
-                    }
-
-                    return <div key={item.id}>{content}</div>
-                })}
+                ))}
             </div>
         )
-    }
-)
+    },
 
-CollectionListBase.displayName = "CollectionListBase"
-
-// Default props
-const defaultProps: Partial<CollectionListProps> = {
-    collectionId: "",
-    layout: "grid",
-    columns: 3,
-    limit: 12,
-    showImage: true,
-    imageField: "",
-    titleField: "",
-    descriptionField: "",
-    linkToDetail: true,
-    detailPagePath: "/item",
-}
-
-// Wrap with CraftJS functionality
-export const CollectionList = withCraftComponent<CollectionListProps, HTMLDivElement>(
-    CollectionListBase,
-    {
-        displayName: "CollectionList",
-        defaultProps,
-        sectionTitle: "Collection List",
-        settingsConfig: {
-            // Data Section
-            collectionId: {
-                label: "Collection",
-                type: "collection-select",
-                section: "Data",
-            },
-            limit: {
-                label: "Items Limit",
-                type: "slider",
-                min: 1,
-                max: 50,
-                section: "Data",
-            },
-
-            // Layout Section
-            layout: {
-                label: "Layout Style",
-                type: "select",
-                section: "Layout",
-                options: [
-                    { label: "Grid", value: "grid" },
-                    { label: "Cards", value: "cards" },
-                    { label: "List", value: "list" },
-                ],
-            },
-            columns: {
-                label: "Columns",
-                type: "select",
-                section: "Layout",
-                options: [
-                    { label: "2 Columns", value: 2 },
-                    { label: "3 Columns", value: 3 },
-                    { label: "4 Columns", value: 4 },
-                ],
-            },
-
-            // Display Section
-            showImage: {
-                label: "Show Image",
-                type: "checkbox",
-                section: "Display",
-            },
-            imageField: {
-                label: "Image Field",
-                type: "text",
-                section: "Display",
-            },
-            titleField: {
-                label: "Title Field",
-                type: "text",
-                section: "Display",
-            },
-            descriptionField: {
-                label: "Description Field",
-                type: "text",
-                section: "Display",
-            },
-
-            // Links Section
-            linkToDetail: {
-                label: "Link to Detail Page",
-                type: "checkbox",
-                section: "Links",
-            },
-            detailPagePath: {
-                label: "Custom Detail Path (optional)",
-                type: "text",
-                section: "Links",
-                description: "Leave empty to use collection slug (e.g., /books/[slug])"
-            },
-        },
-    }
-)
+    childrenAllowed: false
+})
 
 export default CollectionList

@@ -1,43 +1,19 @@
 "use client"
 
 import { useNode } from "@craftjs/core"
+import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
 import {
     PropertySection,
     PropertyRow,
     PropertySlider,
     PropertyButtonGroup,
 } from "../components/PropertySection"
+import { MoveVertical } from "lucide-react"
 
 interface SpacerProps {
     height?: number
     className?: string
-}
-
-export const Spacer = ({
-    height = 40,
-    className = "",
-}: SpacerProps) => {
-    const {
-        connectors: { connect, drag },
-        selected,
-    } = useNode((state) => ({
-        selected: state.events.selected,
-    }))
-
-    const style: React.CSSProperties = {
-        height,
-        width: "100%",
-    }
-
-    const finalClassName = `${className || ""} ${selected ? "bg-muted/20" : ""}`
-
-    return (
-        <div
-            ref={(ref: any) => connect(drag(ref))}
-            className={finalClassName}
-            style={style}
-        />
-    )
+    style?: BlockStyle
 }
 
 // Settings component for Spacer
@@ -78,15 +54,40 @@ export const SpacerSettings = () => {
     )
 }
 
-Spacer.craft = {
-    displayName: "Spacer",
-    props: {
+export const Spacer = defineBlock<SpacerProps>({
+    name: "Spacer",
+    category: "Layout",
+    icon: <MoveVertical className="w-4 h-4" />,
+    description: "Vertical spacing helper",
+
+    defaultProps: {
         height: 40,
+        style: {}
     },
-    rules: {
-        canDrag: () => true,
+
+    settings: SpacerSettings,
+
+    render: ({ height, className, style, theme }) => {
+        const { selected } = useNode((node) => ({
+            selected: node.events.selected
+        }))
+
+        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+            style: {
+                ...style,
+                height,
+                width: "100%",
+            },
+            className: `${className || ""} ${selected ? "bg-muted/20" : ""}`
+        })
+
+        return (
+            <div
+                className={computedClassName}
+                style={computedStyle}
+            />
+        )
     },
-    related: {
-        settings: SpacerSettings,
-    },
-}
+
+    childrenAllowed: false
+})

@@ -28,12 +28,12 @@ import {
 } from 'lucide-react'
 
 // Import all components
-import { Container, ContainerSettings } from './Container'
+import { Container } from './Container'
 import { Heading } from './Heading'
 import { Text, TextSettings } from './Text'
-import { Button, ButtonSettings } from './Button'
+import { Button } from './Button'
 import { Image, ImageSettings } from './Image'
-import { Grid, GridSettings } from './Grid'
+import { Grid } from './Grid'
 import { Divider, DividerSettings } from './Divider'
 import { Spacer, SpacerSettings } from './Spacer'
 import { Navbar } from './Navbar'
@@ -95,7 +95,7 @@ export const componentRegistry: ComponentRegistration[] = [
         category: 'Layout',
         description: 'A container for grouping elements',
         icon: <Box className="h-5 w-5" />,
-        settings: ContainerSettings,
+        icon: <Box className="h-5 w-5" />,
         isContainer: true,
     },
     {
@@ -104,7 +104,7 @@ export const componentRegistry: ComponentRegistration[] = [
         category: 'Layout',
         description: 'A responsive grid layout',
         icon: <LayoutGrid className="h-5 w-5" />,
-        settings: GridSettings,
+        icon: <LayoutGrid className="h-5 w-5" />,
         isContainer: true,
     },
     {
@@ -165,7 +165,7 @@ export const componentRegistry: ComponentRegistration[] = [
         category: 'Interactive',
         description: 'A clickable button',
         icon: <Square className="h-5 w-5" />,
-        settings: ButtonSettings,
+        icon: <Square className="h-5 w-5" />,
     },
     {
         name: 'Search',

@@ -1,313 +1,79 @@
 "use client"
 
-import { useNode, useEditor } from "@craftjs/core"
-import { useCallback, useState } from "react"
-import {
-    PropertySection,
-    PropertyRow,
-    PropertySlider,
-    PropertyColor,
-    PropertyInput,
-    PropertySelect,
-    PropertyButtonGroup,
-    PropertyCheckbox,
-} from "../components/PropertySection"
-import { useDesign } from "../components/DesignContext"
-
-interface ButtonProps {
-    text?: string
-    variant?: "primary" | "secondary" | "outline" | "ghost"
-    size?: "sm" | "md" | "lg"
-    url?: string
-    openInNewTab?: boolean
-    backgroundColor?: string
-    textColor?: string
-    borderRadius?: number
-    fullWidth?: boolean
-    className?: string
-}
-
-const variantStyles = {
-    primary: {
-        bg: "#000000",
-        text: "#ffffff",
-        border: "transparent",
-    },
-    secondary: {
-        bg: "#f1f5f9",
-        text: "#0f172a",
-        border: "transparent",
-    },
-    outline: {
-        bg: "transparent",
-        text: "#000000",
-        border: "#000000",
-    },
-    ghost: {
-        bg: "transparent",
-        text: "#000000",
-        border: "transparent",
-    },
-}
-
-const sizeStyles = {
-    sm: { padding: "8px 16px", fontSize: 14 },
-    md: { padding: "12px 24px", fontSize: 16 },
-    lg: { padding: "16px 32px", fontSize: 18 },
-}
-
-// Add imports
-import { useCollectionItem } from "./collections/CollectionItemContext"
+import React from "react"
+import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
+import { UniversalStyleTab } from "@/components/editor/UniversalStyleTab"
 import { resolveCollectionTemplate } from "@/lib/collection-utils"
+import { useCollectionItem } from "./collections/CollectionItemContext"
+import { Square } from "lucide-react"
 
-export const Button = ({
-    text = "Button",
-    variant = "primary",
-    size = "md",
-    url = "",
-    openInNewTab = false,
-    backgroundColor,
-    textColor,
-    borderRadius = 6,
-    fullWidth = false,
-    className = "",
-}: ButtonProps) => {
-    const {
-        connectors: { connect, drag },
-        selected,
-        id,
-    } = useNode((state) => ({
-        selected: state.events.selected,
-        id: state.id,
-    }))
-
-    const { actions: editorActions, enabled } = useEditor((state) => ({
-        enabled: state.options.enabled
-    }))
-
-    const collectionContext = useCollectionItem()
-
-    // Resolve properties
-    const resolvedText = resolveCollectionTemplate(text, collectionContext?.data)
-    const resolvedUrl = resolveCollectionTemplate(url, collectionContext?.data)
-
-    const { settings: designSettings } = useDesign()
-
-    const variantStyle = variantStyles[variant]
-    const sizeStyle = sizeStyles[size]
-
-    // Determine if button should use outline style based on variant AND design setting
-    const designButtonStyle = designSettings?.buttonStyle || "filled"
-    const isOutline = variant === "outline" || (variant === "primary" && designButtonStyle === "outline")
-    const isGhost = variant === "ghost" || (variant === "primary" && designButtonStyle === "ghost")
-    const isFilled = !isOutline && !isGhost
-
-    // Use CSS variables from design context with fallbacks
-    const style: React.CSSProperties = {
-        backgroundColor: backgroundColor || (
-            isOutline || isGhost
-                ? "transparent"
-                : "var(--design-primary, #000000)"
-        ),
-        color: textColor || (
-            isOutline
-                ? "var(--design-primary, #000000)"
-                : isFilled
-                    ? "#ffffff"
-                    : variantStyle.text
-        ),
-        borderColor: isOutline ? "var(--design-primary, #000000)" : variantStyle.border,
-        borderWidth: isOutline ? 2 : 0,
-        borderStyle: "solid",
-        borderRadius: `var(--design-button-radius, ${borderRadius}px)`,
-        padding: sizeStyle.padding,
-        fontSize: sizeStyle.fontSize,
-        fontWeight: 500,
-        fontFamily: "var(--design-font-base, inherit)",
-        cursor: "pointer",
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-        width: fullWidth ? "100%" : "auto",
-        transition: "all 0.2s ease",
-    }
-
-    const displayText = resolvedText
-
-    // Single click behavior: select in editor, navigate in preview
-    const handleClick = useCallback((e: React.MouseEvent) => {
-        if (!enabled) {
-            // Preview mode - navigate if URL exists
-            if (resolvedUrl) {
-                if (openInNewTab) {
-                    window.open(resolvedUrl, "_blank")
-                } else {
-                    window.location.href = resolvedUrl
-                }
-            }
-            return
-        }
-
-        // Editor mode - select the button
-        e.preventDefault()
-        e.stopPropagation()
-        if (!selected) {
-            editorActions.selectNode(id)
-        }
-    }, [enabled, selected, editorActions, id, resolvedUrl, openInNewTab])
-
-    const [isHovered, setIsHovered] = useState(false)
-
-    return (
-        <button
-            ref={(ref: any) => connect(drag(ref))}
-            className={className}
-            style={{
-                ...style,
-                cursor: "pointer",
-                opacity: isHovered ? 0.85 : 1,
-                transform: isHovered ? "translateY(-1px)" : undefined,
-            }}
-            onClick={handleClick}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-        >
-            {displayText}
-        </button>
-    )
+export interface ButtonProps {
+    text?: string
+    url?: string
+    style?: BlockStyle
+    className?: string
+    variant?: "primary" | "secondary" | "outline" | "ghost"
 }
 
-// Settings component for Button
-export const ButtonSettings = () => {
-    const {
-        actions: { setProp },
-        text,
-        variant,
-        size,
-        url,
-        openInNewTab,
-        backgroundColor,
-        textColor,
-        borderRadius,
-        fullWidth,
-    } = useNode((node) => ({
-        text: node.data.props.text,
-        variant: node.data.props.variant,
-        size: node.data.props.size,
-        url: node.data.props.url,
-        openInNewTab: node.data.props.openInNewTab,
-        backgroundColor: node.data.props.backgroundColor,
-        textColor: node.data.props.textColor,
-        borderRadius: node.data.props.borderRadius,
-        fullWidth: node.data.props.fullWidth,
-    }))
-
-    return (
-        <div>
-            <PropertySection title="Content">
-                <PropertyRow label="Button Text">
-                    <PropertyInput
-                        value={text || ""}
-                        onChange={(v) => setProp((props: ButtonProps) => (props.text = v))}
-                    />
-                </PropertyRow>
-                <div className="px-4 pb-2 text-xs text-muted-foreground">
-                    Tip: Use <code>{`{field_name}`}</code> for dynamic text or URL.
-                </div>
-                <PropertyRow label="URL">
-                    <PropertyInput
-                        type="url"
-                        value={url || ""}
-                        onChange={(v) => setProp((props: ButtonProps) => (props.url = v))}
-                        placeholder="https://..."
-                    />
-                </PropertyRow>
-                <PropertyCheckbox
-                    id="openInNewTab"
-                    label="Open in new tab"
-                    checked={openInNewTab || false}
-                    onChange={(v) => setProp((props: ButtonProps) => (props.openInNewTab = v))}
-                />
-            </PropertySection>
-
-            <PropertySection title="Style" summary={`${variant}, ${size?.toUpperCase()}`}>
-                <PropertyRow label="Variant">
-                    <PropertySelect
-                        value={variant || "primary"}
-                        onChange={(v) => setProp((props: ButtonProps) => (props.variant = v as ButtonProps["variant"]))}
-                        options={[
-                            { label: "Primary", value: "primary" },
-                            { label: "Secondary", value: "secondary" },
-                            { label: "Outline", value: "outline" },
-                            { label: "Ghost", value: "ghost" },
-                        ]}
-                    />
-                </PropertyRow>
-                <PropertyRow label="Size">
-                    <PropertyButtonGroup
-                        value={size || "md"}
-                        onChange={(v) => setProp((props: ButtonProps) => (props.size = v as ButtonProps["size"]))}
-                        options={[
-                            { label: "SM", value: "sm" },
-                            { label: "MD", value: "md" },
-                            { label: "LG", value: "lg" },
-                        ]}
-                    />
-                </PropertyRow>
-                <PropertyCheckbox
-                    id="fullWidth"
-                    label="Full width"
-                    checked={fullWidth || false}
-                    onChange={(v) => setProp((props: ButtonProps) => (props.fullWidth = v))}
-                />
-            </PropertySection>
-
-            <PropertySection title="Colors" defaultOpen={false}>
-                <PropertyRow label="Background (Override)">
-                    <PropertyColor
-                        value={backgroundColor || ""}
-                        onChange={(v) => setProp((props: ButtonProps) => (props.backgroundColor = v))}
-                        placeholder="Use variant default"
-                    />
-                </PropertyRow>
-                <PropertyRow label="Text (Override)">
-                    <PropertyColor
-                        value={textColor || ""}
-                        onChange={(v) => setProp((props: ButtonProps) => (props.textColor = v))}
-                        placeholder="Use variant default"
-                    />
-                </PropertyRow>
-            </PropertySection>
-
-            <PropertySection title="Decoration" summary={`${borderRadius}px radius`} defaultOpen={false}>
-                <PropertyRow label="Border Radius">
-                    <PropertySlider
-                        value={borderRadius || 6}
-                        onChange={(v) => setProp((props: ButtonProps) => (props.borderRadius = v))}
-                        min={0}
-                        max={50}
-                    />
-                </PropertyRow>
-            </PropertySection>
-        </div>
-    )
+const defaultStyles: BlockStyle = {
+    paddingTop: 10,
+    paddingRight: 20,
+    paddingBottom: 10,
+    paddingLeft: 20,
+    borderRadius: 6,
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+    fontWeight: 500,
+    backgroundColor: "#000000",
+    color: "#ffffff",
+    borderWidth: 0,
 }
 
-Button.craft = {
-    displayName: "Button",
-    props: {
+export const Button = defineBlock<ButtonProps>({
+    name: "Button",
+    category: "Interactive",
+    icon: <Square className="w-4 h-4" />,
+    description: "Clickable button element",
+
+    defaultProps: {
         text: "Button",
-        variant: "primary",
-        size: "md",
-        url: "",
-        openInNewTab: false,
-        borderRadius: 6,
-        fullWidth: false,
+        url: "#",
+        style: defaultStyles,
+        variant: "primary"
     },
-    rules: {
-        canDrag: () => true,
+
+    settings: UniversalStyleTab,
+
+    render: ({ text, url, style, className, variant, theme }) => {
+        const collectionContext = useCollectionItem()
+        const resolvedText = resolveCollectionTemplate(text, collectionContext?.data)
+
+        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+            style: {
+                ...style,
+                // Example of using theme tokens if style isn't overridden
+                // fontFamily: theme?.typography?.fontFamily // if we had that structure
+            },
+            className
+        })
+
+        const handleClick = (e: React.MouseEvent) => {
+            // Navigation handled by Next.js Link or external wrapper usually
+            // but in editor, defaultPrevented by wrapper
+        }
+
+        return (
+            <button
+                className={computedClassName}
+                style={computedStyle}
+                onClick={handleClick}
+            >
+                {resolvedText}
+            </button>
+        )
     },
-    related: {
-        settings: ButtonSettings,
-    },
-}
+
+    childrenAllowed: false
+})

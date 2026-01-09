@@ -1,6 +1,7 @@
 "use client"
 
 import { useNode } from "@craftjs/core"
+import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
 import {
     PropertySection,
     PropertyRow,
@@ -8,44 +9,23 @@ import {
     PropertyColor,
     PropertySelect,
 } from "../components/PropertySection"
+import { Minus } from "lucide-react"
 
 interface DividerProps {
     color?: string
     height?: number
+    styleType?: "solid" | "dashed" | "dotted" // Renamed from 'style' to avoid conflict with BlockStyle 'style'
+    className?: string
+    style?: BlockStyle
+    // Legacy props mapping
     marginTop?: number
     marginBottom?: number
-    style?: "solid" | "dashed" | "dotted"
-    className?: string
 }
 
-export const Divider = ({
-    color = "#e5e7eb",
-    height = 1,
-    marginTop = 16,
-    marginBottom = 16,
-    style = "solid",
-    className = "",
-}: DividerProps) => {
-    const {
-        connectors: { connect, drag },
-    } = useNode()
-
-    const dividerStyle: React.CSSProperties = {
-        width: "100%",
-        height,
-        backgroundColor: style === "solid" ? color : "transparent",
-        borderTop: style !== "solid" ? `${height}px ${style} ${color}` : "none",
-        marginTop,
-        marginBottom,
-    }
-
-    return (
-        <hr
-            ref={(ref: any) => connect(drag(ref))}
-            className={className}
-            style={dividerStyle}
-        />
-    )
+const defaultStyles: BlockStyle = {
+    width: "100%",
+    marginTop: 16,
+    marginBottom: 16,
 }
 
 // Settings component for Divider
@@ -56,20 +36,20 @@ export const DividerSettings = () => {
         height,
         marginTop,
         marginBottom,
-        style,
+        styleType,
     } = useNode((node) => ({
         color: node.data.props.color,
         height: node.data.props.height,
-        marginTop: node.data.props.marginTop,
-        marginBottom: node.data.props.marginBottom,
-        style: node.data.props.style,
+        marginTop: node.data.props.style?.marginTop ?? node.data.props.marginTop,
+        marginBottom: node.data.props.style?.marginBottom ?? node.data.props.marginBottom,
+        styleType: node.data.props.styleType,
     }))
 
     const marginSummary = `${marginTop || 0}px ${marginBottom || 0}px`
 
     return (
         <div>
-            <PropertySection title="Appearance" summary={`${height}px, ${style}`}>
+            <PropertySection title="Appearance" summary={`${height}px, ${styleType}`}>
                 <PropertyRow label="Height">
                     <PropertySlider
                         value={height || 1}
@@ -80,8 +60,8 @@ export const DividerSettings = () => {
                 </PropertyRow>
                 <PropertyRow label="Style">
                     <PropertySelect
-                        value={style || "solid"}
-                        onChange={(v) => setProp((props: DividerProps) => (props.style = v as DividerProps["style"]))}
+                        value={styleType || "solid"}
+                        onChange={(v) => setProp((props: DividerProps) => (props.styleType = v as DividerProps["styleType"]))}
                         options={[
                             { label: "Solid", value: "solid" },
                             { label: "Dashed", value: "dashed" },
@@ -101,7 +81,12 @@ export const DividerSettings = () => {
                 <PropertyRow label="Top">
                     <PropertySlider
                         value={marginTop || 0}
-                        onChange={(v) => setProp((props: DividerProps) => (props.marginTop = v))}
+                        onChange={(v) => setProp((props: DividerProps) => {
+                            // Update both legacy and new style prop
+                            props.marginTop = v
+                            if (!props.style) props.style = {}
+                            props.style.marginTop = v
+                        })}
                         min={0}
                         max={100}
                     />
@@ -109,7 +94,11 @@ export const DividerSettings = () => {
                 <PropertyRow label="Bottom">
                     <PropertySlider
                         value={marginBottom || 0}
-                        onChange={(v) => setProp((props: DividerProps) => (props.marginBottom = v))}
+                        onChange={(v) => setProp((props: DividerProps) => {
+                            props.marginBottom = v
+                            if (!props.style) props.style = {}
+                            props.style.marginBottom = v
+                        })}
                         min={0}
                         max={100}
                     />
@@ -119,19 +108,50 @@ export const DividerSettings = () => {
     )
 }
 
-Divider.craft = {
-    displayName: "Divider",
-    props: {
+export const Divider = defineBlock<DividerProps>({
+    name: "Divider",
+    category: "Basic",
+    icon: <Minus className="w-4 h-4" />,
+    description: "Horizontal visual separator",
+
+    defaultProps: {
         color: "#e5e7eb",
         height: 1,
+        styleType: "solid",
+        style: defaultStyles,
+        // Legacy defaults
         marginTop: 16,
         marginBottom: 16,
-        style: "solid",
     },
-    rules: {
-        canDrag: () => true,
+
+    settings: DividerSettings,
+
+    render: ({ color, height, styleType, style, className, theme, ...props }) => {
+        // Merge legacy margin props if they exist and aren't in style yet
+        const effectiveStyle = {
+            ...style,
+            marginTop: props.marginTop ?? style?.marginTop,
+            marginBottom: props.marginBottom ?? style?.marginBottom,
+
+            // Divider specific styles
+            width: "100%",
+            height,
+            backgroundColor: styleType === "solid" ? color : "transparent",
+            borderTop: styleType !== "solid" ? `${height}px ${styleType} ${color}` : "none",
+        }
+
+        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+            style: effectiveStyle,
+            className
+        })
+
+        return (
+            <hr
+                className={computedClassName}
+                style={computedStyle}
+            />
+        )
     },
-    related: {
-        settings: DividerSettings,
-    },
-}
+
+    childrenAllowed: false
+})

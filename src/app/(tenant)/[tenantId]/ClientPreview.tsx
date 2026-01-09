@@ -7,6 +7,8 @@ import { PageData } from "@/lib/types"
 import { DesignSystemStyles } from "@/components/DesignSystemStyles"
 import { DesignSettings } from "@/lib/design-system"
 
+import { EditorThemeProvider } from "@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ThemeContext"
+
 interface ClientPreviewProps {
   tenantId: string
   page: PageData
@@ -41,9 +43,11 @@ function ClientPreview({ tenantId, page }: ClientPreviewProps) {
   return (
     <main>
       <DesignSystemStyles settings={designSettings} />
-      <Editor enabled={false} resolver={resolverWithFallback}>
-        <Frame json={craftStateJson} />
-      </Editor>
+      <EditorThemeProvider>
+        <Editor enabled={false} resolver={resolverWithFallback}>
+          <Frame json={craftStateJson} />
+        </Editor>
+      </EditorThemeProvider>
     </main>
   )
 }

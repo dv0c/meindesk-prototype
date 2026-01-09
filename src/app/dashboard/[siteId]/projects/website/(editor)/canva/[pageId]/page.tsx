@@ -17,6 +17,8 @@ import { ArticleProvider } from "./user-components/article"
 import { HoverProvider } from "./components/HoverContext"
 
 
+import { EditorThemeProvider } from "./components/ThemeContext"
+
 // Resolver for all user components - now using resolverWithFallback from registry
 // This automatically handles missing components (e.g., from uninstalled themes)
 const resolver = resolverWithFallback
@@ -62,31 +64,33 @@ export default function CraftJSEditorPage({ params }: { params: { siteId: string
 
     return (
         <DesignProvider>
-            <MarketplaceProvider>
-                <SEOProvider>
-                    <EditorWithDesign
-                        resolver={resolver}
-                        pageName={pageName}
-                        setPageName={setPageName}
-                        pageStatus={pageStatus}
-                        setPageStatus={setPageStatus}
-                        isLocked={isLocked}
-                        setIsLocked={setIsLocked}
-                        deviceMode={deviceMode}
-                        setDeviceMode={setDeviceMode}
-                        isSaving={isSaving}
-                        setIsSaving={setIsSaving}
-                        showSidebar={showSidebar}
-                        setShowSidebar={setShowSidebar}
-                        showTemplates={showTemplates}
-                        setShowTemplates={setShowTemplates}
-                        siteId={siteId}
-                        pageId={pageId}
-                        getCanvasWidth={getCanvasWidth}
-                        getDevicePixelWidth={getDevicePixelWidth}
-                    />
-                </SEOProvider>
-            </MarketplaceProvider>
+            <EditorThemeProvider>
+                <MarketplaceProvider>
+                    <SEOProvider>
+                        <EditorWithDesign
+                            resolver={resolver}
+                            pageName={pageName}
+                            setPageName={setPageName}
+                            pageStatus={pageStatus}
+                            setPageStatus={setPageStatus}
+                            isLocked={isLocked}
+                            setIsLocked={setIsLocked}
+                            deviceMode={deviceMode}
+                            setDeviceMode={setDeviceMode}
+                            isSaving={isSaving}
+                            setIsSaving={setIsSaving}
+                            showSidebar={showSidebar}
+                            setShowSidebar={setShowSidebar}
+                            showTemplates={showTemplates}
+                            setShowTemplates={setShowTemplates}
+                            siteId={siteId}
+                            pageId={pageId}
+                            getCanvasWidth={getCanvasWidth}
+                            getDevicePixelWidth={getDevicePixelWidth}
+                        />
+                    </SEOProvider>
+                </MarketplaceProvider>
+            </EditorThemeProvider>
         </DesignProvider>
     )
 }
@@ -194,26 +198,44 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
     const canvasContainerRef = useRef<HTMLDivElement>(null)
     const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
 
-    // Measure container for scaling
+    // Measure container for scaling using ResizeObserver
     useEffect(() => {
-        const updateSize = () => {
-            if (canvasContainerRef.current) {
-                const rect = canvasContainerRef.current.getBoundingClientRect()
-                setContainerSize({ width: rect.width, height: rect.height })
+        if (!canvasContainerRef.current) return
+
+        const resizeObserver = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                const { width, height } = entry.contentRect
+                setContainerSize({ width, height })
             }
-        }
-        updateSize()
-        window.addEventListener('resize', updateSize)
-        return () => window.removeEventListener('resize', updateSize)
+        })
+
+        resizeObserver.observe(canvasContainerRef.current)
+        return () => resizeObserver.disconnect()
     }, [showSidebar, showTemplates])
 
-    // Calculate scale for desktop mode
+    // Calculate scale for device mode
     const getScale = () => {
         const deviceWidth = getDevicePixelWidth()
-        const padding = 40 // Account for container padding
-        const availableWidth = containerSize.width - padding
-        if (availableWidth <= 0 || deviceWidth <= availableWidth) return 1
-        return availableWidth / deviceWidth
+        // Add some padding around the canvas for better visibility
+        const paddingX = 48
+        const paddingY = 48
+
+        // Available space
+        const availableWidth = containerSize.width - paddingX
+        const availableHeight = containerSize.height - paddingY
+
+        if (availableWidth <= 0) return 1
+
+        // If device width fits, use scale 1 (unless we want to "fit to screen" mode specifically)
+        // But usually we want to scale DOWN if it doesn't fit.
+
+        const scaleX = availableWidth / deviceWidth
+
+        // We typically scale based on width to ensure the site fits horizontally.
+        // If scaleX < 1, we scale down. If scaleX > 1, we cap at 1 to prevent zooming in pixelation?
+        // Or maybe allow zooming up to 1.
+
+        return Math.min(1, scaleX)
     }
 
     const scale = getScale()
@@ -389,10 +411,12 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                                 className="canvas-preview shadow-lg transition-all duration-300 overflow-y-auto overflow-x-hidden"
                                 style={{
                                     width: getCanvasWidth(),
-                                    minHeight: scale < 1 ? `${100 / scale}%` : "100%",
+                                    minHeight: "100%", // Let content drive height
+                                    height: "fit-content",
                                     backgroundColor: "var(--design-background, #ffffff)",
-                                    transform: scale < 1 ? `scale(${scale})` : undefined,
+                                    transform: `scale(${scale}) translateZ(0)`, // translateZ for crisp text
                                     transformOrigin: "top center",
+                                    marginBottom: "40px", // Visual spacing at bottom
                                     ...Object.fromEntries(
                                         getCssVariables()
                                             .split(';')
