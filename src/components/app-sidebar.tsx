@@ -152,7 +152,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     }
 
     // Use the active team instead of teams[0]
-    const features = activeTeam.features || {}
+    const features = activeTeam.features || {
+      articles: true,
+      pages: true,
+      categories: true,
+      media: true,
+      analytics: true
+    }
 
     // Filter projects based on active team features
     const projects = [
