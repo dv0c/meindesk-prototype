@@ -15,6 +15,8 @@ import { MarketplaceProvider } from "./components/MarketplaceContext"
 import { SEOProvider, useSEO } from "./components/seo"
 import { ArticleProvider } from "./user-components/article"
 import { HoverProvider } from "./components/HoverContext"
+import { BuilderLoader } from "./components/BuilderLoader"
+import { AnimatePresence } from "framer-motion"
 
 
 import { EditorThemeProvider } from "./components/ThemeContext"
@@ -250,6 +252,7 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
         hasLoaded.current = true
 
         async function loadPage() {
+            const startTime = Date.now()
             try {
                 // Fetch page data
                 const response = await fetch(`/api/team/${siteId}/pages/${pageId}`)
@@ -302,6 +305,11 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                 console.error("Failed to load page:", error)
                 toast.error("Failed to load page")
             } finally {
+                // Ensure minimum loading time of 2.5s for the animation
+                const elapsed = Date.now() - startTime
+                if (elapsed < 2500) {
+                    await new Promise(resolve => setTimeout(resolve, 2500 - elapsed))
+                }
                 setIsLoading(false)
             }
         }
@@ -354,6 +362,9 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
 
     return (
         <div className="h-screen flex flex-col bg-muted/10 overflow-hidden">
+            <AnimatePresence mode="wait">
+                {isLoading && <BuilderLoader key="loader" />}
+            </AnimatePresence>
             {/* Mobile/Tablet Warning Overlay */}
             <div className="flex md:hidden flex-col items-center justify-center h-full p-6 text-center bg-background">
                 <div className="w-16 h-16 bg-muted rounded-2xl flex items-center justify-center mb-4">
