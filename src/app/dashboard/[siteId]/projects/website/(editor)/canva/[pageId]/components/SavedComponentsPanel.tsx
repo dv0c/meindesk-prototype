@@ -80,6 +80,13 @@ export function SavedComponentsPanel({ siteId }: { siteId?: string }) {
                 if (ResolvedComponent) {
                     newNode.data.type = ResolvedComponent
                     newNode.data.name = componentName
+
+                    // RE-ATTACH RELATED SETTINGS
+                    // Craft doesn't automatically re-attach 'related' when we manually construct nodes like this
+                    if (ResolvedComponent.craft?.related) {
+                        if (!newNode.related) newNode.related = {}
+                        newNode.related.settings = ResolvedComponent.craft.related.settings
+                    }
                 }
             }
             newNodes[id] = newNode

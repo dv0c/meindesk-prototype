@@ -1,6 +1,6 @@
 "use client"
 
-import { useEditor } from "@craftjs/core"
+import { useEditor, NodeProvider } from "@craftjs/core"
 
 export function CraftPropertiesPanel() {
     const { selected, node } = useEditor((state) => {
@@ -41,8 +41,10 @@ export function CraftPropertiesPanel() {
             </div>
 
             {/* Render Settings Component */}
-            {SettingsComponent ? (
-                <SettingsComponent />
+            {SettingsComponent && node.id ? (
+                <NodeProvider id={node.id}>
+                    <SettingsComponent />
+                </NodeProvider>
             ) : (
                 <div className="text-center text-muted-foreground text-sm py-8">
                     No editable properties available
