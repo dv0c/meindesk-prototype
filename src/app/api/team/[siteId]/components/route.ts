@@ -1,7 +1,7 @@
 
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { getAuthSession } from "@/lib/auth"
+import { requireAuth, requireSiteOwnership, createErrorResponse } from "@/lib/security/route-auth"
 
 // GET: List all saved components for a site
 export async function GET(
@@ -9,16 +9,15 @@ export async function GET(
     { params }: { params: { siteId: string } }
 ) {
     try {
-        const session = await getAuthSession()
-        if (!session?.user) {
-            return new NextResponse("Unauthorized", { status: 401 })
-        }
-
-        const { siteId } = await params
+        const session = await requireAuth();
+        const { siteId } = await params;
 
         if (!siteId) {
-            return new NextResponse("Missing siteId", { status: 400 })
+            return new NextResponse("Missing siteId", { status: 400 });
         }
+
+        // Verify site ownership
+        await requireSiteOwnership(siteId, session.user.id);
 
         const components = await db.snippet.findMany({
             where: {
@@ -32,8 +31,7 @@ export async function GET(
 
         return NextResponse.json(components)
     } catch (error) {
-        console.error("[COMPONENTS_GET]", error)
-        return new NextResponse("Internal Error", { status: 500 })
+        return createErrorResponse(error);
     }
 }
 
@@ -43,18 +41,17 @@ export async function POST(
     { params }: { params: { siteId: string } }
 ) {
     try {
-        const session = await getAuthSession()
-        if (!session?.user) {
-            return new NextResponse("Unauthorized", { status: 401 })
-        }
-
-        const { siteId } = await params
-        const body = await req.json()
-        const { name, content, description } = body
+        const session = await requireAuth();
+        const { siteId } = await params;
+        const body = await req.json();
+        const { name, content, description } = body;
 
         if (!content || !name) {
-            return new NextResponse("Missing content or name", { status: 400 })
+            return new NextResponse("Missing content or name", { status: 400 });
         }
+
+        // Verify site ownership
+        await requireSiteOwnership(siteId, session.user.id);
 
         const component = await db.snippet.create({
             data: {
@@ -68,7 +65,6 @@ export async function POST(
 
         return NextResponse.json(component)
     } catch (error) {
-        console.error("[COMPONENTS_POST]", error)
-        return new NextResponse("Internal Error", { status: 500 })
+        return createErrorResponse(error);
     }
 }

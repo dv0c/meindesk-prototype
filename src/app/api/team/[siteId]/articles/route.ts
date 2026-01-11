@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { getAuthSession } from "@/lib/auth"
+import { requireAuth, requireSiteOwnership, createErrorResponse } from "@/lib/security/route-auth"
 
 export const runtime = "nodejs"
 
@@ -11,19 +11,19 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { siteId: string } }
 ) {
-  const { siteId } = await params
-  const { searchParams } = new URL(req.url)
-  const limitParam = searchParams.get("limit")
-  const parsedLimit = limitParam ? parseInt(limitParam, 10) : 20
-
   try {
-    const session = await getAuthSession()
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Not authorized" }, { status: 401 })
-    }
+    const session = await requireAuth();
+    const { siteId } = await params;
+
+    // Verify site ownership first
+    await requireSiteOwnership(siteId, session.user.id);
+
+    const { searchParams } = new URL(req.url);
+    const limitParam = searchParams.get("limit");
+    const parsedLimit = limitParam ? parseInt(limitParam, 10) : 20;
 
     const articles = await db.article.findMany({
-      where: { siteId, authorId: session.user.id },
+      where: { siteId },
       select: {
         id: true,
         title: true,
@@ -47,16 +47,8 @@ export async function GET(
       ...(parsedLimit > 0 ? { take: parsedLimit } : {}), // no limit if 0
     })
 
-    if (!articles.length) {
-      return NextResponse.json([])
-    }
-
-    return NextResponse.json(articles)
+    return NextResponse.json(articles);
   } catch (error) {
-    console.error("Error fetching articles:", error)
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    )
+    return createErrorResponse(error);
   }
 }

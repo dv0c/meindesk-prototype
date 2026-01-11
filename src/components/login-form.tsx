@@ -3,22 +3,6 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldSeparator,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
 import { login } from "@/lib/actions/authentication/login-actions"
 
 export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
@@ -28,7 +12,6 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Call server action directly
   async function handleEmailLogin(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
@@ -39,10 +22,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
       formData.append("email", email)
       formData.append("password", password)
 
-      // **Directly call the server action**
       await login(formData)
-
-      // Redirect happens inside server action
       setLoading(false)
     } catch (err: any) {
       setError(err.message || "Login failed")
@@ -51,89 +31,113 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
   }
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">Welcome back</CardTitle>
-          <CardDescription>Login with your Apple or Google account</CardDescription>
-        </CardHeader>
+    <div className={cn("flex flex-col gap-8", className)} {...props}>
+      <form onSubmit={handleEmailLogin} className="space-y-6">
+        {/* Email Field */}
+        <div className="space-y-2">
+          <label
+            htmlFor="email"
+            className="block font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground"
+          >
+            Email Address
+          </label>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="m@example.com"
+            required
+            className="w-full bg-transparent border border-foreground/20 px-4 py-3 font-mono text-sm text-foreground placeholder:text-muted-foreground/40 focus:border-accent focus:outline-none transition-colors"
+          />
+        </div>
 
-        <CardContent>
-          <form onSubmit={handleEmailLogin}>
-            <FieldGroup>
-              <Field>
-                <Button
-                  variant="outline"
-                  type="button"
-                  disabled={loading}
-                >
-                  Login with Apple
-                </Button>
+        {/* Password Field */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <label
+              htmlFor="password"
+              className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground"
+            >
+              Password
+            </label>
+            <a
+              href="#"
+              className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Forgot?
+            </a>
+          </div>
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="w-full bg-transparent border border-foreground/20 px-4 py-3 font-mono text-sm text-foreground placeholder:text-muted-foreground/40 focus:border-accent focus:outline-none transition-colors"
+          />
+        </div>
 
-                <Button
-                  variant="outline"
-                  type="button"
-                  disabled={loading}
-                >
-                  Login with Google
-                </Button>
-              </Field>
+        {/* Error Message */}
+        {error && (
+          <div className="border border-red-500/30 bg-red-500/5 px-4 py-2 font-mono text-xs text-red-400">
+            {error}
+          </div>
+        )}
 
-              <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-                Or continue with
-              </FieldSeparator>
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="group w-full border border-foreground/20 px-6 py-3 font-mono text-xs uppercase tracking-widest text-foreground hover:border-accent hover:text-accent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading ? "Authenticating..." : "Login"}
+        </button>
 
-              <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="m@example.com"
-                  required
-                />
-              </Field>
+        {/* Divider */}
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-foreground/10"></div>
+          </div>
+          <div className="relative flex justify-center">
+            <span className="bg-background px-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              Or Continue With
+            </span>
+          </div>
+        </div>
 
-              <Field>
-                <div className="flex items-center">
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <a
-                    href="#"
-                    className="ml-auto text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
-                </div>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </Field>
+        {/* Social Logins */}
+        <div className="grid grid-cols-2 gap-4">
+          <button
+            type="button"
+            disabled={loading}
+            className="border border-foreground/20 px-4 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground hover:border-foreground/40 hover:text-foreground transition-all duration-200 disabled:opacity-50"
+          >
+            Apple
+          </button>
+          <button
+            type="button"
+            disabled={loading}
+            className="border border-foreground/20 px-4 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground hover:border-foreground/40 hover:text-foreground transition-all duration-200 disabled:opacity-50"
+          >
+            Google
+          </button>
+        </div>
+      </form>
 
-              <Field>
-                <Button type="submit" disabled={loading}>
-                  {loading ? "Logging in..." : "Login"}
-                </Button>
-                {error && (
-                  <p className="text-sm text-red-500 text-center mt-2">{error}</p>
-                )}
-                <FieldDescription className="text-center">
-                  Don&apos;t have an account? <a href="/signup">Sign up</a>
-                </FieldDescription>
-              </Field>
-            </FieldGroup>
-          </form>
-        </CardContent>
-      </Card>
-
-      <FieldDescription className="px-6 text-center text-gray-300">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a> and{" "}
-        <a href="#">Privacy Policy</a>.
-      </FieldDescription>
+      {/* Terms */}
+      <div className="border-t border-foreground/10 pt-6">
+        <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/60 text-center">
+          By continuing, you agree to{" "}
+          <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+            Terms
+          </a>
+          {" "}and{" "}
+          <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+            Privacy
+          </a>
+        </p>
+      </div>
     </div>
   )
 }

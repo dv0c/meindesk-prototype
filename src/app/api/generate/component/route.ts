@@ -2,6 +2,8 @@
 import { NextResponse } from "next/server"
 import { model } from "@/lib/ai"
 import { nanoid } from "nanoid"
+import { requireAuth, createErrorResponse } from "@/lib/security/route-auth"
+import { rateLimit, getClientIdentifier } from "@/lib/security/rate-limit"
 
 // Define the recursive structure we ask the AI for
 type AIComponent = {
@@ -13,6 +15,18 @@ type AIComponent = {
 
 export async function POST(req: Request) {
     try {
+        // Require authentication
+        const session = await requireAuth();
+
+        // Rate limit: 10 requests per minute per user
+        const clientId = getClientIdentifier(req, session.user.id);
+        if (!rateLimit(clientId, 10, 60000)) {
+            return NextResponse.json(
+                { error: "Rate limit exceeded. Please try again later." },
+                { status: 429 }
+            );
+        }
+
         const { prompt } = await req.json()
 
         if (!prompt) {
@@ -120,7 +134,6 @@ export async function POST(req: Request) {
         })
 
     } catch (error) {
-        console.error("AI Generation Error:", error)
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
+        return createErrorResponse(error);
     }
 }

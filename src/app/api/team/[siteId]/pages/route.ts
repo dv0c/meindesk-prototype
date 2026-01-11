@@ -1,14 +1,19 @@
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
+import { requireAuth, requireSiteOwnership, createErrorResponse } from "@/lib/security/route-auth";
 
 // ------------------------------------------------------
-// GET /api/sites/:siteId/pages -> list all pages
-// POST /api/sites/:siteId/pages -> create a new page
+// GET /api/team/:siteId/pages -> list all pages
+// POST /api/team/:siteId/pages -> create a new page
 // ------------------------------------------------------
 export async function GET(req: NextRequest, { params }: { params: { siteId: string } }) {
-  const { siteId } = await params;
-
   try {
+    const session = await requireAuth();
+    const { siteId } = await params;
+
+    // Verify site ownership
+    await requireSiteOwnership(siteId, session.user.id);
+
     const pages = await db.page.findMany({
       where: { siteId },
       orderBy: { order: "asc" },
@@ -16,16 +21,19 @@ export async function GET(req: NextRequest, { params }: { params: { siteId: stri
 
     return NextResponse.json(pages, { status: 200 });
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: "Failed to fetch pages" }, { status: 500 });
+    return createErrorResponse(err);
   }
 }
 
 export async function POST(req: NextRequest, { params }: { params: { siteId: string } }) {
-  const { siteId } = params;
-  const body = await req.json();
-
   try {
+    const session = await requireAuth();
+    const { siteId } = await params;
+    const body = await req.json();
+
+    // Verify site ownership
+    await requireSiteOwnership(siteId, session.user.id);
+
     const newPage = await db.page.create({
       data: {
         title: body.title,
@@ -36,7 +44,7 @@ export async function POST(req: NextRequest, { params }: { params: { siteId: str
         status: body.status || "DRAFT",
         order: body.order || 0,
         siteId,
-        userId: body.userId || null,
+        userId: session.user.id, // Use authenticated user ID
         parentId: body.parentId || null,
         meta: body.meta || {},
       },
@@ -44,19 +52,22 @@ export async function POST(req: NextRequest, { params }: { params: { siteId: str
 
     return NextResponse.json(newPage, { status: 201 });
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: "Failed to create page" }, { status: 500 });
+    return createErrorResponse(err);
   }
 }
 
 // ------------------------------------------------------
 // GET / PUT / DELETE single page by id
-// Route: /api/sites/:siteId/pages/:id
+// Route: /api/team/:siteId/pages/:id
 // ------------------------------------------------------
 export async function GETSingle(req: NextRequest, { params }: { params: { siteId: string; id: string } }) {
-  const { siteId, id } = params;
-
   try {
+    const session = await requireAuth();
+    const { siteId, id } = params;
+
+    // Verify site ownership
+    await requireSiteOwnership(siteId, session.user.id);
+
     const page = await db.page.findFirst({
       where: { id, siteId },
     });
@@ -65,16 +76,19 @@ export async function GETSingle(req: NextRequest, { params }: { params: { siteId
 
     return NextResponse.json(page);
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: "Failed to fetch page" }, { status: 500 });
+    return createErrorResponse(err);
   }
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { siteId: string; id: string } }) {
-  const { siteId, id } = params;
-  const body = await req.json();
-
   try {
+    const session = await requireAuth();
+    const { siteId, id } = params;
+    const body = await req.json();
+
+    // Verify site ownership
+    await requireSiteOwnership(siteId, session.user.id);
+
     const updatedPage = await db.page.update({
       where: { id },
       data: {
@@ -91,22 +105,24 @@ export async function PUT(req: NextRequest, { params }: { params: { siteId: stri
 
     return NextResponse.json(updatedPage);
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: "Failed to update page" }, { status: 500 });
+    return createErrorResponse(err);
   }
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: { siteId: string; id: string } }) {
-  const { siteId, id } = params;
-
   try {
+    const session = await requireAuth();
+    const { siteId, id } = params;
+
+    // Verify site ownership
+    await requireSiteOwnership(siteId, session.user.id);
+
     await db.page.delete({
       where: { id },
     });
 
     return NextResponse.json({ message: "Page deleted" });
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: "Failed to delete page" }, { status: 500 });
+    return createErrorResponse(err);
   }
 }

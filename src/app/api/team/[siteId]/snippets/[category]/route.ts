@@ -1,23 +1,22 @@
 
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { getAuthSession } from "@/lib/auth";
+import { requireAuth, requireSiteOwnership, createErrorResponse } from "@/lib/security/route-auth";
 
 export async function GET(
     req: Request,
     { params }: { params: { siteId: string; category: string } }
 ) {
     try {
-        const session = await getAuthSession()
-        if (!session?.user) {
-            return new NextResponse("Unauthorized", { status: 401 })
-        }
-
-        const { siteId, category } = await params
+        const session = await requireAuth();
+        const { siteId, category } = await params;
 
         if (!siteId || !category) {
-            return new NextResponse("Missing params", { status: 400 })
+            return new NextResponse("Missing params", { status: 400 });
         }
+
+        // Verify site ownership
+        await requireSiteOwnership(siteId, session.user.id);
 
         // Find the snippet for this site and category
         // We assume one snippet per category per site for now (Global Header/Footer)
@@ -38,8 +37,7 @@ export async function GET(
 
         return NextResponse.json(snippet)
     } catch (error) {
-        console.error(`[SNIPPET_GET_${params.category}]`, error)
-        return new NextResponse("Internal Error", { status: 500 })
+        return createErrorResponse(error);
     }
 }
 
@@ -48,19 +46,17 @@ export async function PUT(
     { params }: { params: { siteId: string; category: string } }
 ) {
     try {
-
-        const session = await getAuthSession()
-        if (!session?.user) {
-            return new NextResponse("Unauthorized", { status: 401 })
-        }
-
-        const { siteId, category } = await params
-        const body = await req.json()
-        const { content } = body
+        const session = await requireAuth();
+        const { siteId, category } = await params;
+        const body = await req.json();
+        const { content } = body;
 
         if (!content) {
-            return new NextResponse("Missing content", { status: 400 })
+            return new NextResponse("Missing content", { status: 400 });
         }
+
+        // Verify site ownership
+        await requireSiteOwnership(siteId, session.user.id);
 
         // Upsert the snippet
         // We first try to find it to get the ID, or create new
@@ -93,7 +89,6 @@ export async function PUT(
 
         return NextResponse.json(snippet)
     } catch (error) {
-        console.error(`[SNIPPET_PUT_${params.category}]`, error)
-        return new NextResponse("Internal Error", { status: 500 })
+        return createErrorResponse(error);
     }
 }
