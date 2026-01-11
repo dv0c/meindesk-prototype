@@ -11,7 +11,8 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { Sparkles, Loader2 } from "lucide-react"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Sparkles, Loader2, Save } from "lucide-react"
 import { toast } from "sonner"
 
 interface AIComponent {
@@ -21,13 +22,18 @@ interface AIComponent {
     content?: string
 }
 
-export function AIGeneratorDialog() {
+interface AIGeneratorDialogProps {
+    siteId: string
+}
+
+export function AIGeneratorDialog({ siteId }: AIGeneratorDialogProps) {
     const { actions, query, resolvers } = useEditor((state) => ({
         resolvers: state.options.resolver
     }))
     const [open, setOpen] = useState(false)
     const [prompt, setPrompt] = useState("")
     const [isLoading, setIsLoading] = useState(false)
+    const [shouldSave, setShouldSave] = useState(true)
 
     const handleGenerate = async () => {
         if (!prompt.trim()) return
@@ -62,6 +68,31 @@ export function AIGeneratorDialog() {
 
                     actions.addNodeTree(nodeTree, parentId)
 
+                    // Auto-Save if enabled
+                    if (shouldSave && siteId) {
+                        try {
+                            // Serialize the tree to handle function types
+                            const serializedTree = serializeNodeTree(nodeTree)
+
+                            const saveResponse = await fetch(`/api/team/${siteId}/components`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    name: prompt.slice(0, 30) + (prompt.length > 30 ? "..." : ""),
+                                    description: `AI Generated: ${prompt}`,
+                                    content: serializedTree
+                                })
+                            })
+                            if (saveResponse.ok) {
+                                toast.success("Component saved to library!")
+                            } else {
+                                console.error("Failed to save component")
+                            }
+                        } catch (saveErr) {
+                            console.error("Save Error:", saveErr)
+                        }
+                    }
+
                     toast.success("Component generated and added successfully!")
                     setOpen(false)
                     setPrompt("")
@@ -77,6 +108,30 @@ export function AIGeneratorDialog() {
         } finally {
             setIsLoading(false)
         }
+    }
+
+    // Helper to serialize NodeTree (convert function types to strings)
+    const serializeNodeTree = (tree: NodeTree) => {
+        const newNodes: any = {}
+        for (const [id, node] of Object.entries(tree.nodes)) {
+            const newNode = { ...node, data: { ...node.data } }
+
+            // If type is a function (React Component), get its name
+            if (typeof newNode.data.type === 'function') {
+                // Check for explicit displayName or infer from function name
+                const typeName = (newNode.data.type as any).craft?.displayName ||
+                    (newNode.data.type as any).displayName ||
+                    newNode.data.type.name
+
+                newNode.data.type = typeName
+                // Also ensure name is set
+                if (!newNode.data.name) {
+                    newNode.data.name = typeName
+                }
+            }
+            newNodes[id] = newNode
+        }
+        return { rootNodeId: tree.rootNodeId, nodes: newNodes }
     }
 
     // Helper to convert AI Recursive Tree to React Element
@@ -101,7 +156,7 @@ export function AIGeneratorDialog() {
         if (!Component) {
             // Fallback for HTML tags if not in resolver, or error?
             // Craft resolvers usually include user components.
-            // If AI returns "div", and "div" is not in resolver, Craft might handle it if it's a string, 
+            // If AI returns "div", and "div" is not in resolver, Craft might handle it if it's a string,
             // but if it's supposed to be a user component (e.g. Container), we fail.
             // Let's assume standard HTML tags are valid if passed as string to createElement.
             // But for registered components, we MUST use the resolved component.
@@ -163,6 +218,22 @@ export function AIGeneratorDialog() {
                             onChange={(e) => setPrompt(e.target.value)}
                             className="min-h-[120px] rounded-none border-2 border-primary/10 bg-muted/30 focus:border-primary/50 focus:ring-0 text-sm resize-none placeholder:text-muted-foreground/50"
                         />
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="save-component"
+                            checked={shouldSave}
+                            onCheckedChange={(c) => setShouldSave(!!c)}
+                            className="border-primary/50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+                        />
+                        <label
+                            htmlFor="save-component"
+                            className="text-[10px] uppercase tracking-widest font-bold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-2"
+                        >
+                            <Save className="w-3 h-3" />
+                            Save to Library
+                        </label>
                     </div>
 
                     {/* Examples chips */}

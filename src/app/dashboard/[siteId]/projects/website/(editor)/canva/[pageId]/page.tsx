@@ -507,7 +507,7 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                         className={`transition-all duration-300 ease-in-out overflow-hidden ${showSidebar ? 'w-[380px] opacity-100' : 'w-0 opacity-0'
                             }`}
                     >
-                        <CraftSidebar isArticlePage={pageSlug === 'article'} editorMode={editorMode} />
+                        <CraftSidebar isArticlePage={pageSlug === 'article'} editorMode={editorMode} siteId={siteId} />
                     </div>
 
                     {/* Canvas Area */}

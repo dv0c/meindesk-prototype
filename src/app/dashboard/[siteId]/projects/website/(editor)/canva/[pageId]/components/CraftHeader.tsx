@@ -238,7 +238,7 @@ export function CraftHeader({
                         </>
                     )}
 
-                    <AIGeneratorDialog />
+                    <AIGeneratorDialog siteId={siteId} />
 
                     <Button
                         variant={!enabled ? "default" : "outline"}
