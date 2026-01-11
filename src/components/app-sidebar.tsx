@@ -131,7 +131,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         { title: "Theme Store", url: "/store" },
         { title: "Features", url: "/projects/website/features" },
         { title: "Analytics", url: "/projects/website/analytics" },
-        { title: "Subscription", url: "/projects/website/subscription" },
       ],
     },
     { title: "Settings", url: "/projects/settings", icon: Settings, isActive: true },
@@ -188,7 +187,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const mappedTeams = teams.map((t) => ({
       name: t.title || "Untitled Team",
       logo: GalleryVerticalEnd,
-      plan: t.subscription?.billing_cycle || "Free",
+      plan: "Pro",
       id: t.id,
     }))
 

@@ -17,9 +17,11 @@ type SiteData = {
   theme: any;
   defaultThemePreference: string;
   settings: any; // JsonValue from Prisma, will be converted to WebsiteSettings
+  url: string | null; // For analytics tracking
 };
 
 import { PrototypeBadge } from "@/components/PrototypeBadge";
+import { AnalyticsTracker } from "@/components/AnalyticsTracker";
 
 // --- Main Layout Component ---
 
@@ -203,6 +205,7 @@ export default async function TenantLayout({ children }: { children: React.React
       {/* Wrapper with background and text color */}
       <div style={wrapperStyle} className={`min-h-screen ${themeClassName}`}>
         {children}
+        {site.url && <AnalyticsTracker siteUrl={site.url} />}
         <PrototypeBadge />
       </div>
     </>

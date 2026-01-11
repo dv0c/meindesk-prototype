@@ -15,12 +15,6 @@ export interface Site {
   createdAt: string
   updatedAt: string
   userId?: string
-  subscription?: {
-    id: string
-    price: number
-    billing_cycle: string
-    next_billing_date: string
-  } | null
   features: {
     articles: boolean
     pages: boolean

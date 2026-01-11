@@ -12,7 +12,6 @@ const _getActiveTeamCached = unstable_cache(
     return await db.site.findFirst({
       where: { id: siteId, userId },
       include: {
-        subscription: true,
         features: true,
         Article: true,
         category: true,
