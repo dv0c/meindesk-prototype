@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { login } from "@/lib/actions/authentication/login-actions"
+import { signIn } from "next-auth/react"
 
 export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
   const router = useRouter()
@@ -26,6 +27,17 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
       setLoading(false)
     } catch (err: any) {
       setError(err.message || "Login failed")
+      setLoading(false)
+    }
+  }
+
+  async function handleGoogleSignIn() {
+    setLoading(true)
+    setError(null)
+    try {
+      await signIn("google", { callbackUrl: "/dashboard" })
+    } catch (err: any) {
+      setError(err.message || "Google sign-in failed")
       setLoading(false)
     }
   }
@@ -110,15 +122,16 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
         <div className="grid grid-cols-2 gap-4">
           <button
             type="button"
-            disabled={loading}
+            disabled
             className="border border-foreground/20 px-4 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground hover:border-foreground/40 hover:text-foreground transition-all duration-200 disabled:opacity-50"
           >
             Apple
           </button>
           <button
             type="button"
+            onClick={handleGoogleSignIn}
             disabled={loading}
-            className="border border-foreground/20 px-4 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground hover:border-foreground/40 hover:text-foreground transition-all duration-200 disabled:opacity-50"
+            className="border border-foreground/20 px-4 py-3 font-mono text-xs uppercase tracking-widest text-muted-foreground hover:border-foreground/40 hover:text-foreground transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Google
           </button>

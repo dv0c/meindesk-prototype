@@ -2,6 +2,7 @@ import { LoginForm } from "@/components/login-form"
 import { getAuthSession } from "@/lib/auth";
 import { redirect } from "next/navigation"
 import { Bebas_Neue } from "next/font/google";
+import { AnimatedNoise } from "@/app/(home)/components/animated-noise";
 
 const bebas = Bebas_Neue({
   weight: "400",
@@ -16,6 +17,9 @@ export default async function LoginPage() {
     <main className="relative min-h-screen flex items-center justify-center px-6 md:px-12">
       {/* Grid background matching homepage */}
       <div className="grid-bg fixed inset-0 opacity-30" aria-hidden="true" />
+
+      {/* Animated noise ambient effect */}
+      <AnimatedNoise opacity={0.03} />
 
       {/* Left vertical label matching homepage */}
       <div className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2">
