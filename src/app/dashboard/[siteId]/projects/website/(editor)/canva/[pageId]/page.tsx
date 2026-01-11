@@ -16,6 +16,7 @@ import { SEOProvider, useSEO } from "./components/seo"
 import { ArticleProvider } from "./user-components/article"
 import { HoverProvider } from "./components/HoverContext"
 import { BuilderLoader } from "./components/BuilderLoader"
+import { OnboardingTutorial } from "./components/OnboardingTutorial"
 import { AnimatePresence } from "framer-motion"
 
 
@@ -201,6 +202,17 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
     const hasLoaded = useRef(false)
     const canvasContainerRef = useRef<HTMLDivElement>(null)
     const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
+    const [showOnboarding, setShowOnboarding] = useState(false)
+
+    // Check for onboarding status
+    useEffect(() => {
+        const hasSeen = localStorage.getItem("hasSeenOnboarding")
+        if (!hasSeen && !isLoading) {
+            // Short delay to let the loader finish
+            const timer = setTimeout(() => setShowOnboarding(true), 500)
+            return () => clearTimeout(timer)
+        }
+    }, [isLoading])
 
     // Measure container for scaling using ResizeObserver
     useEffect(() => {
@@ -365,6 +377,11 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
             <AnimatePresence mode="wait">
                 {isLoading && <BuilderLoader key="loader" />}
             </AnimatePresence>
+
+            {showOnboarding && (
+                <OnboardingTutorial onClose={() => setShowOnboarding(false)} />
+            )}
+
             {/* Mobile/Tablet Warning Overlay */}
             <div className="flex md:hidden flex-col items-center justify-center h-full p-6 text-center bg-background">
                 <div className="w-16 h-16 bg-muted rounded-2xl flex items-center justify-center mb-4">

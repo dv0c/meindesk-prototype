@@ -198,12 +198,12 @@ function ColorsPanel({ onBack, design, setDesign }: {
                     <PopoverContent className="w-auto p-3">
                         <HexColorPicker
                             color={design.background}
-                            onChange={(color) => setDesign({ ...design, background: color })}
+                            onChange={(color) => setDesign({ ...design, background: color, selectedPalette: null })}
                         />
                         <input
                             className="mt-2 w-full px-2 py-1 text-sm border rounded"
                             value={design.background}
-                            onChange={(e) => setDesign({ ...design, background: e.target.value })}
+                            onChange={(e) => setDesign({ ...design, background: e.target.value, selectedPalette: null })}
                         />
                     </PopoverContent>
                 </Popover>
@@ -220,12 +220,12 @@ function ColorsPanel({ onBack, design, setDesign }: {
                     <PopoverContent className="w-auto p-3">
                         <HexColorPicker
                             color={design.neutral}
-                            onChange={(color) => setDesign({ ...design, neutral: color })}
+                            onChange={(color) => setDesign({ ...design, neutral: color, selectedPalette: null })}
                         />
                         <input
                             className="mt-2 w-full px-2 py-1 text-sm border rounded"
                             value={design.neutral}
-                            onChange={(e) => setDesign({ ...design, neutral: e.target.value })}
+                            onChange={(e) => setDesign({ ...design, neutral: e.target.value, selectedPalette: null })}
                         />
                     </PopoverContent>
                 </Popover>
@@ -245,12 +245,12 @@ function ColorsPanel({ onBack, design, setDesign }: {
                     <PopoverContent className="w-auto p-3">
                         <HexColorPicker
                             color={design.primary}
-                            onChange={(color) => setDesign({ ...design, primary: color })}
+                            onChange={(color) => setDesign({ ...design, primary: color, selectedPalette: null })}
                         />
                         <input
                             className="mt-2 w-full px-2 py-1 text-sm border rounded"
                             value={design.primary}
-                            onChange={(e) => setDesign({ ...design, primary: e.target.value })}
+                            onChange={(e) => setDesign({ ...design, primary: e.target.value, selectedPalette: null })}
                         />
                     </PopoverContent>
                 </Popover>
@@ -266,12 +266,12 @@ function ColorsPanel({ onBack, design, setDesign }: {
                     <PopoverContent className="w-auto p-3">
                         <HexColorPicker
                             color={design.secondary}
-                            onChange={(color) => setDesign({ ...design, secondary: color })}
+                            onChange={(color) => setDesign({ ...design, secondary: color, selectedPalette: null })}
                         />
                         <input
                             className="mt-2 w-full px-2 py-1 text-sm border rounded"
                             value={design.secondary}
-                            onChange={(e) => setDesign({ ...design, secondary: e.target.value })}
+                            onChange={(e) => setDesign({ ...design, secondary: e.target.value, selectedPalette: null })}
                         />
                     </PopoverContent>
                 </Popover>
@@ -287,12 +287,12 @@ function ColorsPanel({ onBack, design, setDesign }: {
                     <PopoverContent className="w-auto p-3">
                         <HexColorPicker
                             color={design.tertiary}
-                            onChange={(color) => setDesign({ ...design, tertiary: color })}
+                            onChange={(color) => setDesign({ ...design, tertiary: color, selectedPalette: null })}
                         />
                         <input
                             className="mt-2 w-full px-2 py-1 text-sm border rounded"
                             value={design.tertiary}
-                            onChange={(e) => setDesign({ ...design, tertiary: e.target.value })}
+                            onChange={(e) => setDesign({ ...design, tertiary: e.target.value, selectedPalette: null })}
                         />
                     </PopoverContent>
                 </Popover>
@@ -321,7 +321,11 @@ function ColorsPanel({ onBack, design, setDesign }: {
                             )}
                         >
                             <div className="flex -space-x-1">
-                                {palette.colors.map((color, idx) => (
+                                <div
+                                    className="w-6 h-6 rounded-full border-2 border-white shadow-sm"
+                                    style={{ backgroundColor: design.background }}
+                                />
+                                {palette.colors.slice(1).map((color, idx) => (
                                     <div
                                         key={idx}
                                         className="w-6 h-6 rounded-full border-2 border-white shadow-sm"
@@ -381,7 +385,7 @@ function ButtonsPanel({ onBack, primaryColor }: { onBack: () => void; primaryCol
                     ].map((shape) => (
                         <button
                             key={shape.id}
-                            onClick={() => updateSettings({ buttonShape: shape.id as any })}
+                            onClick={() => updateSettings({ buttonShape: shape.id as any, selectedTheme: null })}
                             className={cn(
                                 "p-6 rounded-xl border flex items-center justify-center",
                                 settings.buttonShape === shape.id
@@ -502,7 +506,7 @@ function ButtonsPanel({ onBack, primaryColor }: { onBack: () => void; primaryCol
                                 key={style.id}
                                 onClick={() => {
                                     setSelectedStyle(style.id)
-                                    updateSettings({ buttonStyle: style.btn1.includes("filled") ? "filled" : "outline" as any })
+                                    updateSettings({ buttonStyle: style.btn1.includes("filled") ? "filled" : "outline" as any, selectedTheme: null })
                                 }}
                                 className={cn(
                                     "p-5 rounded-2xl flex items-center justify-center gap-2 transition-all",
@@ -530,7 +534,7 @@ function ButtonsPanel({ onBack, primaryColor }: { onBack: () => void; primaryCol
                     ].map((size) => (
                         <button
                             key={size.id}
-                            onClick={() => updateSettings({ buttonSize: size.id as any })}
+                            onClick={() => updateSettings({ buttonSize: size.id as any, selectedTheme: null })}
                             className={cn(
                                 "py-3 rounded-lg border text-sm font-medium transition-all",
                                 settings.buttonSize === size.id
@@ -555,7 +559,7 @@ function ButtonsPanel({ onBack, primaryColor }: { onBack: () => void; primaryCol
                     ].map((border) => (
                         <button
                             key={border.id}
-                            onClick={() => updateSettings({ buttonBorder: border.id as any })}
+                            onClick={() => updateSettings({ buttonBorder: border.id as any, selectedTheme: null })}
                             className={cn(
                                 "py-3 rounded-lg border text-sm font-medium transition-all",
                                 settings.buttonBorder === border.id
@@ -600,7 +604,7 @@ function FormsPanel({ onBack }: { onBack: () => void }) {
                     ].map((shape) => (
                         <button
                             key={shape.id}
-                            onClick={() => updateSettings({ formShape: shape.id as any })}
+                            onClick={() => updateSettings({ formShape: shape.id as any, selectedTheme: null })}
                             className={cn(
                                 "p-4 rounded-xl border flex items-center justify-center",
                                 settings.formShape === shape.id
@@ -634,7 +638,7 @@ function FormsPanel({ onBack }: { onBack: () => void }) {
                         return (
                             <button
                                 key={style.id}
-                                onClick={() => updateSettings({ formStyle: style.id as any })}
+                                onClick={() => updateSettings({ formStyle: style.id as any, selectedTheme: null })}
                                 className={cn(
                                     "p-4 rounded-xl border flex items-center justify-center",
                                     settings.formStyle === style.id
@@ -783,7 +787,7 @@ function FontsPanel({ onBack }: { onBack: () => void }) {
                 <label className="text-xs text-muted-foreground">Base</label>
                 <select
                     value={settings.baseFont}
-                    onChange={(e) => updateSettings({ baseFont: e.target.value })}
+                    onChange={(e) => updateSettings({ baseFont: e.target.value, selectedTheme: null })}
                     className="w-full h-10 px-3 border rounded-lg bg-background text-sm"
                 >
                     {/* Unique base fonts from pairings */}
@@ -799,7 +803,7 @@ function FontsPanel({ onBack }: { onBack: () => void }) {
                 <div className="flex gap-2">
                     <select
                         value={settings.headingFont}
-                        onChange={(e) => updateSettings({ headingFont: e.target.value })}
+                        onChange={(e) => updateSettings({ headingFont: e.target.value, selectedTheme: null })}
                         className="flex-1 h-10 px-3 border rounded-lg bg-background text-sm"
                     >
                         {/* Unique heading fonts from pairings */}
@@ -809,7 +813,7 @@ function FontsPanel({ onBack }: { onBack: () => void }) {
                     </select>
                     <select
                         value={settings.headingWeight}
-                        onChange={(e) => updateSettings({ headingWeight: e.target.value })}
+                        onChange={(e) => updateSettings({ headingWeight: e.target.value, selectedTheme: null })}
                         className="w-28 h-10 px-3 border rounded-lg bg-background text-sm"
                     >
                         <option value="Light">Light</option>
@@ -830,7 +834,7 @@ function FontsPanel({ onBack }: { onBack: () => void }) {
                             key={pairing.id}
                             onClick={() => {
                                 setSelectedPairing(pairing.id)
-                                updateSettings({ baseFont: pairing.body, headingFont: pairing.heading })
+                                updateSettings({ baseFont: pairing.body, headingFont: pairing.heading, selectedTheme: null })
                             }}
                             className={cn(
                                 "p-4 rounded-xl border text-left bg-card hover:bg-muted/50 transition-colors",
@@ -868,6 +872,8 @@ export function DesignPanel() {
         selectedPalette: settings.selectedPalette,
     }
 
+
+
     const setDesign = (newDesign: DesignState) => {
         updateSettings({
             background: newDesign.background,
@@ -876,6 +882,7 @@ export function DesignPanel() {
             secondary: newDesign.secondary,
             tertiary: newDesign.tertiary,
             selectedPalette: newDesign.selectedPalette,
+            selectedTheme: null,
         })
     }
 
@@ -1024,7 +1031,7 @@ export function DesignPanel() {
                                 {
                                     title: "Colors", content: (
                                         <div className="flex -space-x-3">
-                                            <div className="w-12 h-12 rounded-full border-2 border-background shadow-sm" style={{ backgroundColor: design.neutral }} />
+                                            <div className="w-12 h-12 rounded-full border-2 border-background shadow-sm" style={{ backgroundColor: design.background }} />
                                             <div className="w-12 h-12 rounded-full border-2 border-background shadow-sm" style={{ backgroundColor: design.primary }} />
                                             <div className="w-12 h-12 rounded-full border-2 border-background shadow-sm" style={{ backgroundColor: design.secondary }} />
                                         </div>
