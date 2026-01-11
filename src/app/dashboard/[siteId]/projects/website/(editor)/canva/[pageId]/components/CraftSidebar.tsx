@@ -40,7 +40,7 @@ const headerVariants = {
     exit: { opacity: 0, y: 10 }
 }
 
-export function CraftSidebar({ isArticlePage = false }: { isArticlePage?: boolean }) {
+export function CraftSidebar({ isArticlePage = false, editorMode = "page" }: { isArticlePage?: boolean; editorMode?: "page" | "header" | "footer" }) {
     const { selected, name, isDeletable, styleConfig, actions } = useEditor((state) => {
         const currentNodeId = state.events.selected?.values().next().value
         const node = currentNodeId ? state.nodes[currentNodeId] : null
@@ -93,7 +93,7 @@ export function CraftSidebar({ isArticlePage = false }: { isArticlePage?: boolea
                         transition={{ duration: 0.2, ease: "easeOut" }}
                         className="flex flex-col h-full"
                     >
-                        <PaletteView isArticlePage={isArticlePage} />
+                        <PaletteView isArticlePage={isArticlePage} editorMode={editorMode} />
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -238,7 +238,7 @@ function PropertiesView({
 }
 
 // Palette View Component
-const PaletteView = ({ isArticlePage }: { isArticlePage: boolean }) => {
+const PaletteView = ({ isArticlePage, editorMode }: { isArticlePage: boolean; editorMode: "page" | "header" | "footer" }) => {
     const [activeTab, setActiveTab] = useState("elements")
 
 
@@ -291,17 +291,19 @@ const PaletteView = ({ isArticlePage }: { isArticlePage: boolean }) => {
                                 <Palette className="w-4 h-4" />
                                 <span className="font-medium text-[10px] sm:text-xs hidden sm:inline">Design</span>
                             </TabsTrigger>
-                            <TabsTrigger
-                                value="seo"
-                                className={cn(
-                                    "relative flex items-center justify-center gap-1 px-1 py-2 rounded-md transition-all duration-200",
-                                    "data-[state=active]:bg-background data-[state=active]:shadow-sm",
-                                    "hover:bg-background/50"
-                                )}
-                            >
-                                <Search className="w-4 h-4" />
-                                <span className="font-medium text-[10px] sm:text-xs hidden sm:inline">SEO</span>
-                            </TabsTrigger>
+                            {editorMode === "page" && (
+                                <TabsTrigger
+                                    value="seo"
+                                    className={cn(
+                                        "relative flex items-center justify-center gap-1 px-1 py-2 rounded-md transition-all duration-200",
+                                        "data-[state=active]:bg-background data-[state=active]:shadow-sm",
+                                        "hover:bg-background/50"
+                                    )}
+                                >
+                                    <Search className="w-4 h-4" />
+                                    <span className="font-medium text-[10px] sm:text-xs hidden sm:inline">SEO</span>
+                                </TabsTrigger>
+                            )}
                         </TabsList>
                     </div>
                 </motion.div>

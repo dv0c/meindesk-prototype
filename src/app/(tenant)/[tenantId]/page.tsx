@@ -38,7 +38,19 @@ async function getPageData(tenantId: string) {
   if (!response.ok) return null
 
   const page: PageData = await response.json()
-  return { tenant, page }
+
+  // Fetch Global Header and Footer Snippets
+  const headerSnippet = await db.snippet.findFirst({
+    where: { siteId: tenant.id, category: "header" },
+    select: { content: true }
+  })
+
+  const footerSnippet = await db.snippet.findFirst({
+    where: { siteId: tenant.id, category: "footer" },
+    select: { content: true }
+  })
+
+  return { tenant, page, headerSnippet, footerSnippet }
 }
 
 export async function generateMetadata({ params }: PreviewPageProps): Promise<Metadata> {
@@ -86,5 +98,12 @@ export default async function Page({ params }: PreviewPageProps) {
 
   if (!data) notFound()
 
-  return <ClientPreview tenantId={data.tenant.id} page={data.page} />
+  return (
+    <ClientPreview
+      tenantId={data.tenant.id}
+      page={data.page}
+      headerContent={data.headerSnippet?.content}
+      footerContent={data.footerSnippet?.content}
+    />
+  )
 }

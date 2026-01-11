@@ -1,26 +1,26 @@
 "use client"
 
+import { Button as UIButton } from "@/components/ui/button"
 import { Editor, Element, Frame, useEditor } from "@craftjs/core"
+import { AnimatePresence } from "framer-motion"
 import { use, useCallback, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
-import { Button as UIButton } from "@/components/ui/button"
+import { BuilderLoader } from "./components/BuilderLoader"
 import { CraftHeader } from "./components/CraftHeader"
 import { CraftSidebar } from "./components/CraftSidebar"
-import { TemplatesPanel } from "./components/TemplatesPanel"
-import { RenderNode } from "./components/RenderNode"
-import { Button, Container, Divider, Grid, Heading, Image, NavigationLinks, Spacer, Text, Card, resolverWithFallback } from "./user-components"
-import { Navbar } from "./user-components/Navbar"
 import { DesignProvider, useDesign } from "./components/DesignContext"
-import { MarketplaceProvider } from "./components/MarketplaceContext"
-import { SEOProvider, useSEO } from "./components/seo"
-import { ArticleProvider } from "./user-components/article"
 import { HoverProvider } from "./components/HoverContext"
-import { BuilderLoader } from "./components/BuilderLoader"
+import { MarketplaceProvider } from "./components/MarketplaceContext"
 import { OnboardingTutorial } from "./components/OnboardingTutorial"
-import { AnimatePresence } from "framer-motion"
+import { RenderNode } from "./components/RenderNode"
+import { SEOProvider, useSEO } from "./components/seo"
+import { TemplatesPanel } from "./components/TemplatesPanel"
+import { Container, resolverWithFallback } from "./user-components"
+import { ArticleProvider } from "./user-components/article"
 
 
 import { EditorThemeProvider } from "./components/ThemeContext"
+import { ReadOnlySection } from "./components/ReadOnlySection"
 
 // Resolver for all user components - now using resolverWithFallback from registry
 // This automatically handles missing components (e.g., from uninstalled themes)
@@ -203,6 +203,7 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
     const canvasContainerRef = useRef<HTMLDivElement>(null)
     const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
     const [showOnboarding, setShowOnboarding] = useState(false)
+    const [editorMode, setEditorMode] = useState<"page" | "header" | "footer">("page")
 
     // Check for onboarding status
     useEffect(() => {
@@ -257,114 +258,187 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
     const scale = getScale()
     const deviceWidth = getDevicePixelWidth()
 
-    // Load page data on mount only
-    useEffect(() => {
-        // Only load once
-        if (hasLoaded.current) return
-        hasLoaded.current = true
+    const [headerContent, setHeaderContent] = useState<any>(null)
+    const [footerContent, setFooterContent] = useState<any>(null)
 
-        async function loadPage() {
+    // Load content based on editor mode
+    useEffect(() => {
+        async function loadContent() {
+            setIsLoading(true)
             const startTime = Date.now()
             try {
-                // Fetch page data
-                const response = await fetch(`/api/team/${siteId}/pages/${pageId}`)
-                if (response.ok) {
-                    const page = await response.json()
-                    setPageName(page.title || "Untitled Page")
-                    setPageStatus(page.status || "DRAFT")
-                    setPageSlug(page.slug || "")
-                    setIsLocked(page.locked || false)
-
-                    // Load Design Settings if available
-                    if (page.meta && page.meta.design) {
-                        updateSettings(page.meta.design)
+                // 1. Fetch Site Data (Always needed for context)
+                if (!hasLoaded.current) {
+                    const siteResponse = await fetch(`/api/team/${siteId}`)
+                    if (siteResponse.ok) {
+                        const data = await siteResponse.json()
+                        setSiteUrl(data.site?.url || "")
+                        setSubdomain(data.site?.subdomain || "")
                     }
+                    hasLoaded.current = true
+                }
 
-                    // Load SEO Settings if available
-                    if (page.meta && page.meta.seo) {
-                        updateSEOSettings(page.meta.seo)
-                        // Calculate mock SEO score based on SEO settings completeness
-                        const seo = page.meta.seo
-                        let score = 0
-                        if (seo.title) score += 20
-                        if (seo.description) score += 20
-                        if (seo.keywords && seo.keywords.length > 0) score += 15
-                        if (seo.ogImage) score += 15
-                        if (seo.favicon) score += 10
-                        if (seo.title && seo.title.length >= 30 && seo.title.length <= 60) score += 10
-                        if (seo.description && seo.description.length >= 120 && seo.description.length <= 160) score += 10
-                        setSeoScore(score)
+                // 2. Fetch Content based on Mode
+                if (editorMode === "page") {
+                    // Load Page
+                    const response = await fetch(`/api/team/${siteId}/pages/${pageId}`)
+                    if (response.ok) {
+                        const page = await response.json()
+                        setPageName(page.title || "Untitled Page")
+                        setPageStatus(page.status || "DRAFT")
+                        setPageSlug(page.slug || "")
+                        setIsLocked(page.locked || false)
+
+                        if (page.meta && page.meta.design) updateSettings(page.meta.design)
+                        if (page.meta && page.meta.seo) {
+                            updateSEOSettings(page.meta.seo)
+                            // Re-calculate mock SEO score
+                            const seo = page.meta.seo
+                            let score = 0
+                            if (seo.title) score += 20
+                            if (seo.description) score += 20
+                            if (seo.keywords && seo.keywords.length > 0) score += 15
+                            if (seo.ogImage) score += 15
+                            if (seo.favicon) score += 10
+                            if (seo.title && seo.title.length >= 30 && seo.title.length <= 60) score += 10
+                            if (seo.description && seo.description.length >= 120 && seo.description.length <= 160) score += 10
+                            setSeoScore(score)
+                        }
+
+                        if (page.layout && page.layout.length > 0) {
+                            const craftState = page.layout[0]
+                            if (craftState && Object.keys(craftState).length > 0) {
+                                actions.deserialize(JSON.stringify(craftState))
+                            }
+                        } else {
+                            actions.clearEvents() // Clear if empty
+                        }
+
+                        // Fetch Header & Footer for Preview (silent fail if missing)
+                        try {
+                            const [headerRes, footerRes] = await Promise.all([
+                                fetch(`/api/team/${siteId}/snippets/header`),
+                                fetch(`/api/team/${siteId}/snippets/footer`)
+                            ])
+
+                            if (headerRes.ok) {
+                                const header = await headerRes.json()
+                                if (header?.content) setHeaderContent(header.content)
+                            }
+
+                            if (footerRes.ok) {
+                                const footer = await footerRes.json()
+                                if (footer?.content) setFooterContent(footer.content)
+                            }
+                        } catch (e) {
+                            // ignore
+                        }
                     }
+                } else {
+                    // Load Header or Footer Snippet
+                    const response = await fetch(`/api/team/${siteId}/snippets/${editorMode}`)
+                    if (response.ok) {
+                        const snippet = await response.json()
+                        // Snippets don't have page status/slug/locks, but we might want to track them differently
+                        // For now, keep visual UI states as is or reset them
 
-                    // Deserialize the layout into CraftJS
-                    // Layout is stored as Json[] with the CraftJS state as first element
-                    if (page.layout && page.layout.length > 0) {
-                        const craftState = page.layout[0]
-                        if (craftState && Object.keys(craftState).length > 0) {
-                            actions.deserialize(JSON.stringify(craftState))
+                        if (snippet.content && Object.keys(snippet.content).length > 0) {
+                            // Snippet content is stored directly as the JSON object (not array)
+                            actions.deserialize(JSON.stringify(snippet.content))
+                        } else {
+                            // Initialize with empty ROOT container if no content exists
+                            const emptyState = {
+                                "ROOT": {
+                                    "type": { "resolvedName": "Container" },
+                                    "isCanvas": true,
+                                    "props": {
+                                        "flexDirection": "column",
+                                        "alignItems": "center",
+                                        "padding": ["0", "0", "0", "0"],
+                                        "width": "100%",
+                                        "background": "transparent"
+                                    },
+                                    "displayName": "App",
+                                    "custom": { "displayName": "App" },
+                                    "hidden": false,
+                                    "nodes": [],
+                                    "linkedNodes": {}
+                                }
+                            }
+                            actions.deserialize(JSON.stringify(emptyState))
                         }
                     }
                 }
 
-                // Fetch site data
-                const siteResponse = await fetch(`/api/team/${siteId}`)
-                if (siteResponse.ok) {
-                    const data = await siteResponse.json()
-                    setSiteUrl(data.site?.url || "")
-                    setSubdomain(data.site?.subdomain || "")
-                }
             } catch (error) {
-                console.error("Failed to load page:", error)
-                toast.error("Failed to load page")
+                console.error("Failed to load content:", error)
+                toast.error(`Failed to load ${editorMode}`)
             } finally {
-                // Ensure minimum loading time of 2.5s for the animation
+                // Ensure minimum loading time of 1s for transition (reduced from 2.5s for mode switching)
                 const elapsed = Date.now() - startTime
-                if (elapsed < 2500) {
-                    await new Promise(resolve => setTimeout(resolve, 2500 - elapsed))
+                const minTime = hasLoaded.current ? 1000 : 2500 // Longer for initial load
+                if (elapsed < minTime) {
+                    await new Promise(resolve => setTimeout(resolve, minTime - elapsed))
                 }
                 setIsLoading(false)
             }
         }
-        loadPage()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [siteId, pageId])
+
+        loadContent()
+    }, [editorMode, siteId, pageId])
 
     const handleSave = useCallback(async (statusOverride?: "DRAFT" | "PUBLISHED" | "ARCHIVED") => {
         setIsSaving(true)
         try {
-            // Get the serialized page layout from CraftJS
             const json = query.serialize()
+            const content = JSON.parse(json)
 
-            // Make API call to save the page
-            const response = await fetch(`/api/team/${siteId}/pages/${pageId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: pageName,
-                    status: statusOverride || pageStatus,
-                    // Save design settings in meta
-                    meta: {
-                        design: settings,
-                        seo: seoSettings
-                    },
-                    // CraftJS serializes to JSON string, Prisma expects Json[] so wrap in array
-                    layout: [JSON.parse(json)],
-                }),
-            })
+            if (editorMode === "page") {
+                // Save Page
+                const response = await fetch(`/api/team/${siteId}/pages/${pageId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: pageName,
+                        status: statusOverride || pageStatus,
+                        meta: {
+                            design: settings,
+                            seo: seoSettings
+                        },
+                        layout: [content],
+                    }),
+                })
 
-            if (response.ok) {
-                toast.success("Page saved successfully")
+                if (response.ok) {
+                    toast.success("Page saved successfully")
+                } else {
+                    const error = await response.json()
+                    throw new Error(error.error || "Failed to save")
+                }
             } else {
-                const error = await response.json()
-                throw new Error(error.error || "Failed to save")
+                // Save Snippet
+                const response = await fetch(`/api/team/${siteId}/snippets/${editorMode}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        content: content,
+                    }),
+                })
+
+                if (response.ok) {
+                    toast.success(`${editorMode.charAt(0).toUpperCase() + editorMode.slice(1)} saved successfully`)
+                } else {
+                    throw new Error("Failed to save snippet")
+                }
             }
+
         } catch (error: any) {
             console.error("Failed to save:", error)
-            toast.error(error.message || "Failed to save page")
+            toast.error(error.message || "Failed to save")
         } finally {
             setIsSaving(false)
         }
-    }, [query, pageName, pageStatus, siteId, pageId, setIsSaving, settings, seoSettings])
+    }, [query, pageName, pageStatus, siteId, pageId, setIsSaving, settings, seoSettings, editorMode])
 
     // Register the save handler with DesignContext and SEOContext
     useEffect(() => {
@@ -422,6 +496,8 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                     pageSlug={pageSlug}
                     showTemplates={showTemplates}
                     setShowTemplates={setShowTemplates}
+                    editorMode={editorMode}
+                    setEditorMode={setEditorMode}
                 />
 
                 {/* Main Content */}
@@ -431,12 +507,13 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                         className={`transition-all duration-300 ease-in-out overflow-hidden ${showSidebar ? 'w-[380px] opacity-100' : 'w-0 opacity-0'
                             }`}
                     >
-                        <CraftSidebar isArticlePage={pageSlug === 'article'} />
+                        <CraftSidebar isArticlePage={pageSlug === 'article'} editorMode={editorMode} />
                     </div>
 
                     {/* Canvas Area */}
                     <div ref={canvasContainerRef} className="flex-1 h-full overflow-hidden flex flex-col relative">
                         <div className={`overflow-auto h-full flex justify-center transition-all duration-300 ${Boolean(enabled) ? "bg-zinc-50 dark:bg-zinc-900 p-5" : "bg-background p-0"}`}>
+
                             <div
                                 className="canvas-preview shadow-lg transition-all duration-300 overflow-y-auto overflow-x-hidden"
                                 style={{
@@ -447,6 +524,8 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                                     transform: `scale(${enabled ? scale : 1}) translateZ(0)`, // translateZ for crisp text
                                     transformOrigin: "top center",
                                     marginBottom: enabled ? "40px" : "0", // Visual spacing at bottom only in editor
+                                    display: "flex",
+                                    flexDirection: "column",
                                     ...Object.fromEntries(
                                         getCssVariables()
                                             .split(';')
@@ -458,21 +537,31 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                                     )
                                 }}
                             >
-                                <ArticleProvider>
-                                    <Frame>
-                                        <Element
-                                            is={Container}
-                                            canvas
-                                            minHeight="100vh"
-                                            height="100vh"
-                                            flexDirection="column"
-                                            alignItems="stretch"
-                                            custom={{ displayName: "App", isDeletable: false }}
-                                        >
-                                            {/* Components will be added here */}
-                                        </Element>
-                                    </Frame>
-                                </ArticleProvider>
+                                {editorMode === 'page' && (
+                                    <ReadOnlySection content={headerContent} />
+                                )}
+
+                                <div className="flex-1 relative z-10">
+                                    <ArticleProvider>
+                                        <Frame>
+                                            <Element
+                                                is={Container}
+                                                canvas
+                                                minHeight="100vh"
+                                                height="100vh"
+                                                flexDirection="column"
+                                                alignItems="stretch"
+                                                custom={{ displayName: "App", isDeletable: false }}
+                                            >
+                                                {/* Components will be added here */}
+                                            </Element>
+                                        </Frame>
+                                    </ArticleProvider>
+                                </div>
+
+                                {editorMode === 'page' && (
+                                    <ReadOnlySection content={footerContent} />
+                                )}
                             </div>
                         </div>
                     </div>

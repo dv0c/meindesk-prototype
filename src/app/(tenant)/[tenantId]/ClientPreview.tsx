@@ -9,12 +9,15 @@ import { DesignSettings } from "@/lib/design-system"
 
 import { EditorThemeProvider } from "@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ThemeContext"
 
+
 interface ClientPreviewProps {
   tenantId: string
   page: PageData
+  headerContent?: any
+  footerContent?: any
 }
 
-function ClientPreview({ tenantId, page }: ClientPreviewProps) {
+function ClientPreview({ tenantId, page, headerContent, footerContent }: ClientPreviewProps) {
   // Set teamId in localStorage for any components that need it
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -26,27 +29,48 @@ function ClientPreview({ tenantId, page }: ClientPreviewProps) {
   const craftStateObj = page.layout?.[0]
   const craftStateJson = craftStateObj ? JSON.stringify(craftStateObj) : null
 
-  if (!craftStateJson) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <p className="text-lg text-muted-foreground">This page is empty</p>
-          <p className="text-sm text-muted-foreground mt-2">Add components in the editor to see them here</p>
-        </div>
-      </div>
-    )
-  }
-
   // Extract design settings from page metadata
   const designSettings = (page as any).meta?.design as DesignSettings | undefined
 
   return (
-    <main>
+    <main className="min-h-screen flex flex-col">
       <DesignSystemStyles settings={designSettings} />
       <EditorThemeProvider>
-        <Editor enabled={false} resolver={resolverWithFallback}>
-          <Frame json={craftStateJson} />
-        </Editor>
+
+        {/* Header */}
+        {headerContent && (
+          <div className="w-full z-50 relative">
+            <Editor enabled={false} resolver={resolverWithFallback}>
+              <Frame json={JSON.stringify(headerContent)} />
+            </Editor>
+          </div>
+        )}
+
+        {/* Page Content */}
+        <div className="flex-1">
+          {craftStateJson ? (
+            <Editor enabled={false} resolver={resolverWithFallback}>
+              <Frame json={craftStateJson} />
+            </Editor>
+          ) : (
+            <div className="flex items-center justify-center min-h-[400px]">
+              <div className="text-center">
+                <p className="text-lg text-muted-foreground">This page is empty</p>
+                <p className="text-sm text-muted-foreground mt-2">Add components in the editor to see them here</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        {footerContent && (
+          <div className="w-full relative mt-auto">
+            <Editor enabled={false} resolver={resolverWithFallback}>
+              <Frame json={JSON.stringify(footerContent)} />
+            </Editor>
+          </div>
+        )}
+
       </EditorThemeProvider>
     </main>
   )
