@@ -9,7 +9,7 @@ declare module "next-auth/jwt" {
     role: Role
     isImpersonating?: boolean
     originalAdminId?: string
-    // originalAdminRole?: Role; // Optional: if you need to store the admin's original role specifically
+    developerMode?: boolean
   }
 }
 
@@ -21,13 +21,13 @@ declare module "next-auth" {
       role: Role
       isImpersonating?: boolean
       originalAdminId?: string
-      // originalAdminRole?: Role; // Optional
+      developerMode?: boolean
     } & DefaultSession["user"]
   }
 
   interface User extends DefaultUser {
     username?: string | null
     role: Role
+    developerMode?: boolean
   }
 }
-  

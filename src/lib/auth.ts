@@ -150,6 +150,8 @@ export const authOptions: NextAuthOptions = {
       token.picture = dbUser.image
       token.username = dbUser.username
       token.role = dbUser.role
+      // @ts-ignore
+      token.developerMode = dbUser.developerMode
 
       // ensure username exists
       if (!dbUser.username) {
@@ -176,8 +178,11 @@ export const authOptions: NextAuthOptions = {
       session.user.image = token.picture as string | null | undefined
       session.user.username = token.username as string | null | undefined
       session.user.role = token.role as Role
+      session.user.role = token.role as Role
       session.user.isImpersonating = token.isImpersonating as boolean | undefined
       session.user.originalAdminId = token.originalAdminId as string | undefined
+      // @ts-ignore
+      session.user.developerMode = token.developerMode as boolean
       return session
     },
 

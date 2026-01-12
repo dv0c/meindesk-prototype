@@ -23,6 +23,7 @@ import { AppearanceTab } from "./AppearanceTab"
 import { ProfileTab } from "./ProfileTab"
 import { AccountTab } from "./AccountTab"
 import { NotificationsTab } from "./NotificationsTab"
+import { DeveloperTab } from "./DeveloperTab"
 import { useSession } from "next-auth/react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useSidebar } from "@/components/ui/sidebar"
@@ -44,6 +45,7 @@ export function AccountSettingsDialog({ children, open, onOpenChange }: AccountS
         { id: "account", label: "Account", icon: BadgeCheck },
         { id: "appearance", label: "Appearance", icon: PaintBucket },
         { id: "notifications", label: "Notifications", icon: Bell },
+        { id: "developer", label: "Developer", icon: Laptop },
     ]
 
     const ActiveTabContent = () => {
@@ -52,6 +54,7 @@ export function AccountSettingsDialog({ children, open, onOpenChange }: AccountS
             case "account": return <AccountTab />
             case "appearance": return <AppearanceTab />
             case "notifications": return <NotificationsTab />
+            case "developer": return <DeveloperTab />
             default: return null
         }
     }

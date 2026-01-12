@@ -1,17 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { CMSModal } from "@/components/builder/cms/CMSModal"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { ArrowLeft, Monitor, Tablet, Smartphone, Eye, Undo, Redo, SidebarClose, Layers } from "lucide-react"
-import { useEditor } from "@craftjs/core"
-import Link from "next/link"
-import { CraftLayersPopup } from "./CraftLayers"
-import { TemplatesDialog } from "./TemplatesDialog"
-import { LayoutTemplate, Database } from "lucide-react"
-import { AIGeneratorDialog } from "./AIGeneratorDialog"
-import { CMSModal } from "@/components/builder/cms/CMSModal"
-import { PublishDropdown } from "./PublishDropdown"
 import {
     Select,
     SelectContent,
@@ -19,6 +10,17 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { useEditor } from "@craftjs/core"
+import { ArrowLeft, Database, Eye, Layers, LayoutTemplate, Monitor, Redo, SidebarClose, Smartphone, Tablet, Undo } from "lucide-react"
+import { useState } from "react"
+import { AIGeneratorDialog } from "./AIGeneratorDialog"
+import { CraftLayersPopup } from "./CraftLayers"
+import { PublishDropdown } from "./PublishDropdown"
+import { TemplatesDialog } from "./TemplatesDialog"
+import { RawHtmlDialog } from "@/components/builder/RawHtmlDialog"
+import { generateFullHtml } from "@/components/builder/htmlGenerator"
+import { Code } from "lucide-react"
+import { useSession } from "next-auth/react"
 
 interface CraftHeaderProps {
     pageName: string
@@ -80,6 +82,14 @@ export function CraftHeader({
     const [showLayers, setShowLayers] = useState(false)
     const [showCMS, setShowCMS] = useState(false)
     const [showTemplatesDialog, setShowTemplatesDialog] = useState(false)
+    const [showRawHtml, setShowRawHtml] = useState(false)
+    const [generatedHtml, setGeneratedHtml] = useState("")
+
+    const handleExportHtml = () => {
+        const html = generateFullHtml(null, pageName)
+        setGeneratedHtml(html)
+        setShowRawHtml(true)
+    }
 
 
 
@@ -250,6 +260,9 @@ export function CraftHeader({
                         </>
                     )}
 
+                    {/* Developer Mode: Export HTML */}
+                    <DeveloperExportButton onExport={handleExportHtml} />
+
                     <AIGeneratorDialog siteId={siteId} />
 
                     <Button
@@ -301,6 +314,30 @@ export function CraftHeader({
 
             {/* Templates Dialog (for dialog-based template selection) */}
             <TemplatesDialog open={showTemplatesDialog} onOpenChange={setShowTemplatesDialog} />
+
+            <RawHtmlDialog
+                open={showRawHtml}
+                onOpenChange={setShowRawHtml}
+                htmlContent={generatedHtml}
+            />
         </>
+    )
+}
+
+function DeveloperExportButton({ onExport }: { onExport: () => void }) {
+    const { data: session } = useSession()
+    // @ts-ignore
+    if (!session?.user?.developerMode) return null
+
+    return (
+        <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-muted-foreground hover:text-foreground"
+            onClick={onExport}
+            title="Export Raw HTML (Developer Mode)"
+        >
+            <Code className="h-4 w-4" />
+        </Button>
     )
 }

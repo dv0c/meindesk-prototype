@@ -124,7 +124,8 @@ exports.Prisma.UserScalarFieldEnum = {
   hashedPassword: 'hashedPassword',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  role: 'role'
+  role: 'role',
+  developerMode: 'developerMode'
 };
 
 exports.Prisma.AccountScalarFieldEnum = {

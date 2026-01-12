@@ -40,6 +40,8 @@ model User {
   Notification      Notification[] // Received
   sentNotifications Notification[] @relation("Sender") // Sent
 
+  developerMode Boolean @default(false)
+
   @@index([email, id])
 }
 
