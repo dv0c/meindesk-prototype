@@ -86,7 +86,7 @@ export function CraftHeader({
 
     return (
         <>
-            <header className="h-16 border-b backdrop-blur-xl bg-background/80 shadow-sm flex items-center justify-between px-6 z-30 shrink-0">
+            <header className="h-[55px] border-b backdrop-blur-xl bg-background/80 shadow-sm flex items-center justify-between px-6 z-30 shrink-0">
                 {/* Left: Page title */}
                 <div className="flex items-center gap-4">
                     <Button
