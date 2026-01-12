@@ -1,4 +1,4 @@
-import { FileIcon, FileText, FolderIcon, ImageIcon, Plus } from "lucide-react";
+import { Database, FileIcon, FileText, FolderIcon, ImageIcon, Plus } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import Link from "next/link";
@@ -129,6 +129,24 @@ const QuickActions = ({ siteId, features }: QuickActionsProps) => {
               </Button>
             </Link>
           )}
+
+          <Link className="grid cursor-pointer" href={`/dashboard/${siteId}/collections`}>
+            <Button
+              className="cursor-pointer h-auto flex-col items-start gap-2 p-4 bg-transparent"
+              variant="outline"
+            >
+              <div className="flex w-full items-center justify-between">
+                <Database className="size-5" />
+                <Plus className="size-4" />
+              </div>
+              <div className="text-left">
+                <div className="font-semibold">Manage Collections</div>
+                <div className="text-xs text-muted-foreground">
+                  View and manage your dynamic content collections
+                </div>
+              </div>
+            </Button>
+          </Link>
         </div>
       </CardContent>
     </Card>

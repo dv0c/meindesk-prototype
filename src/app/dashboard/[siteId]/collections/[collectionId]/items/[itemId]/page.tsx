@@ -15,6 +15,7 @@ import { ArrowLeft, Save, Loader2, Upload, Link as LinkIcon, Database, Terminal 
 import { Badge } from "@/components/ui/badge"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
+import MediaLibraryDialog from "@/components/MediaGallery/media-select"
 
 // Import Setup components
 import { AnimatedNoise } from "@/app/(home)/components/animated-noise"
@@ -28,6 +29,8 @@ export default function EditItemPage() {
     const [formData, setFormData] = useState<Record<string, any>>({})
     const [loading, setLoading] = useState(true)
     const [relationOptions, setRelationOptions] = useState<Record<string, any[]>>({})
+    const [isMediaDialogOpen, setIsMediaDialogOpen] = useState(false)
+    const [activeImageField, setActiveImageField] = useState<string | null>(null)
 
     useEffect(() => {
         const loadData = async () => {
@@ -61,6 +64,13 @@ export default function EditItemPage() {
 
     const handleFieldChange = (name: string, value: any) => {
         setFormData(prev => ({ ...prev, [name]: value }))
+    }
+
+    const handleMediaSelect = (items: any[]) => {
+        if (activeImageField && items.length > 0) {
+            handleFieldChange(activeImageField, items[0].url)
+        }
+        setIsMediaDialogOpen(false)
     }
 
     const toggleMultiSelectRelation = (fieldName: string, itemId: string) => {
@@ -242,9 +252,8 @@ export default function EditItemPage() {
                                     {field.type === 'image' && (
                                         <div className="border border-dashed border-foreground/20 bg-background/30 p-8 flex flex-col items-center justify-center text-muted-foreground hover:bg-foreground/5 transition-colors cursor-pointer group/image"
                                             onClick={() => {
-                                                // Mock Image Upload for MVP
-                                                const url = prompt("Enter Image URL (Mock Upload):", "https://picsum.photos/400/300")
-                                                if (url) handleFieldChange(field.name, url)
+                                                setActiveImageField(field.name)
+                                                setIsMediaDialogOpen(true)
                                             }}
                                         >
                                             {formData[field.name] ? (
@@ -314,6 +323,13 @@ export default function EditItemPage() {
                         </div>
                     </motion.div>
                 </div>
+
+                <MediaLibraryDialog
+                    siteId={params.siteId as string}
+                    isOpen={isMediaDialogOpen}
+                    onClose={() => setIsMediaDialogOpen(false)}
+                    onSelect={handleMediaSelect}
+                />
             </main>
 
             {/* Footer */}
