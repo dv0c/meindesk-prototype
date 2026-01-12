@@ -99,9 +99,32 @@ export function CraftHeader({
 
     const handleExportHtml = () => {
         // Serialize current state
-        const json = query.serialize()
-        setExportJson(json)
-        setIsExporting(true)
+        const nodes = query.getSerializedNodes()
+
+        // Safe stringify to handle potential circular references (e.g. from Context Providers in props)
+        const safeStringify = (obj: any) => {
+            const seen = new WeakSet()
+            return JSON.stringify(obj, (key, value) => {
+                if (typeof value === "object" && value !== null) {
+                    if (seen.has(value)) {
+                        return
+                    }
+                    seen.add(value)
+                }
+                return value
+            })
+        }
+
+        try {
+            const json = JSON.stringify(nodes)
+            setExportJson(json)
+            setIsExporting(true)
+        } catch (e) {
+            console.warn("Serialization cycle detected, attempting safe export:", e)
+            const json = safeStringify(nodes)
+            setExportJson(json)
+            setIsExporting(true)
+        }
     }
 
     const finalizeExport = (cleanHtml: string) => {

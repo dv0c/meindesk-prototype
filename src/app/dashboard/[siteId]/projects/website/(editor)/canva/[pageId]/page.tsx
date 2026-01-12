@@ -399,7 +399,22 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
     const handleSave = useCallback(async (statusOverride?: "DRAFT" | "PUBLISHED" | "ARCHIVED") => {
         setIsSaving(true)
         try {
-            const json = query.serialize()
+            // Serialize current state safely handling circular references
+            const nodes = query.getSerializedNodes()
+            const safeStringify = (obj: any) => {
+                const seen = new WeakSet()
+                return JSON.stringify(obj, (key, value) => {
+                    if (typeof value === "object" && value !== null) {
+                        if (seen.has(value)) {
+                            return
+                        }
+                        seen.add(value)
+                    }
+                    return value
+                })
+            }
+
+            const json = safeStringify(nodes)
             const content = JSON.parse(json)
 
             if (editorMode === "page") {
