@@ -52,3 +52,57 @@ export async function GET(
     return createErrorResponse(error);
   }
 }
+// -------------------------------------------------------
+// POST – Create a new article
+// -------------------------------------------------------
+export async function POST(
+  req: NextRequest,
+  { params }: { params: { siteId: string } }
+) {
+  try {
+    const session = await requireAuth();
+    const { siteId } = await params;
+
+    await requireSiteOwnership(siteId, session.user.id);
+
+    const body = await req.json();
+
+    // Basic validation
+    if (!body.title) return NextResponse.json({ error: "Title is required" }, { status: 400 });
+
+    const article = await db.article.create({
+      data: {
+        siteId,
+        title: body.title,
+        slug: body.slug || body.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
+        content: body.content ? JSON.parse(JSON.stringify(body.content)) : {
+          root: {
+            children: [
+              {
+                children: [],
+                direction: null,
+                format: "",
+                indent: 0,
+                type: "paragraph",
+                version: 1
+              }
+            ],
+            direction: null,
+            format: "",
+            indent: 0,
+            type: "root",
+            version: 1
+          }
+        },
+        status: body.status || "DRAFT",
+        authorId: session.user.id,
+        excerpt: body.excerpt || "",
+        cover: body.cover || "",
+      }
+    });
+
+    return NextResponse.json(article);
+  } catch (error) {
+    return createErrorResponse(error);
+  }
+}

@@ -53,7 +53,10 @@ export default function EditorPage({ params }: EditorPageProps) {
   useEffect(() => {
     if (!article || loaded) return
     setTitle(article.title || "")
-    setEditorState(article.content || "")
+    // Ensure we don't pass empty string or empty object as state
+    const content = article.content
+    const hasContent = content && Object.keys(content).length > 0 && content.root
+    setEditorState(hasContent ? content : undefined)
     setSlug(article.slug || "")
     setExcerpt(article.excerpt || "")
     setCategories(article.categories || [])

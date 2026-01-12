@@ -100,6 +100,35 @@ export function Editor({
   )
 }
 
+const FALLBACK_EDITOR_STATE = JSON.stringify({
+  root: {
+    children: [
+      {
+        children: [],
+        direction: null,
+        format: "",
+        indent: 0,
+        type: "paragraph",
+        version: 1,
+      },
+    ],
+    direction: null,
+    format: "",
+    indent: 0,
+    type: "root",
+    version: 1,
+  },
+})
+
+// Helper to check if state is valid
+const isValidState = (state: any) => {
+  if (!state) return false
+  if (typeof state === 'string') {
+    return state.includes('root') // simplistic check
+  }
+  return !!state.root
+}
+
 // Split editor with external toolbar positioning
 export function EditorProvider({
   editorState,
@@ -123,9 +152,11 @@ export function EditorProvider({
       initialConfig={{
         ...editorConfig,
         ...(editorState ? { editorState } : {}),
-        ...(editorSerializedState
-          ? { editorState: JSON.stringify(editorSerializedState) }
-          : {}),
+        editorState: editorState
+          ? undefined // handled above
+          : (isValidState(editorSerializedState) && editorSerializedState) // check if valid
+            ? JSON.stringify(editorSerializedState)
+            : FALLBACK_EDITOR_STATE,
       }}
     >
       <TooltipProvider>

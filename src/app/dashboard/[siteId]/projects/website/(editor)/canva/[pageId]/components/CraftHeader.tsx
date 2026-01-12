@@ -8,8 +8,9 @@ import { useEditor } from "@craftjs/core"
 import Link from "next/link"
 import { CraftLayersPopup } from "./CraftLayers"
 import { TemplatesDialog } from "./TemplatesDialog"
-import { LayoutTemplate } from "lucide-react"
+import { LayoutTemplate, Database } from "lucide-react"
 import { AIGeneratorDialog } from "./AIGeneratorDialog"
+import { CMSModal } from "@/components/builder/cms/CMSModal"
 import { PublishDropdown } from "./PublishDropdown"
 import {
     Select,
@@ -77,6 +78,7 @@ export function CraftHeader({
 
 
     const [showLayers, setShowLayers] = useState(false)
+    const [showCMS, setShowCMS] = useState(false)
     const [showTemplatesDialog, setShowTemplatesDialog] = useState(false)
 
 
@@ -210,6 +212,16 @@ export function CraftHeader({
                                 <LayoutTemplate className="h-4 w-4" />
                             </Button>
 
+                            <Button
+                                variant={showCMS ? "secondary" : "ghost"}
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => setShowCMS(true)}
+                                title="Open CMS"
+                            >
+                                <Database className="h-4 w-4" />
+                            </Button>
+
                             <div className="h-6 w-px bg-border/50 mx-1" />
 
                             <Button
@@ -283,6 +295,9 @@ export function CraftHeader({
 
             {/* Floating Layers Popup */}
             <CraftLayersPopup isOpen={showLayers} onClose={() => setShowLayers(false)} />
+
+            {/* CMS Modal */}
+            <CMSModal open={showCMS} onOpenChange={setShowCMS} siteId={siteId} />
 
             {/* Templates Dialog (for dialog-based template selection) */}
             <TemplatesDialog open={showTemplatesDialog} onOpenChange={setShowTemplatesDialog} />
