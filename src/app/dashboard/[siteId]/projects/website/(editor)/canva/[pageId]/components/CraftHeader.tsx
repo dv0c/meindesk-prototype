@@ -10,9 +10,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { useEditor } from "@craftjs/core"
+import { useEditor, Editor, Frame } from "@craftjs/core"
 import { ArrowLeft, Database, Eye, Layers, LayoutTemplate, Monitor, Redo, SidebarClose, Smartphone, Tablet, Undo } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { AIGeneratorDialog } from "./AIGeneratorDialog"
 import { CraftLayersPopup } from "./CraftLayers"
 import { PublishDropdown } from "./PublishDropdown"
@@ -21,6 +21,9 @@ import { RawHtmlDialog } from "@/components/builder/RawHtmlDialog"
 import { generateFullHtml } from "@/components/builder/htmlGenerator"
 import { Code } from "lucide-react"
 import { useSession } from "next-auth/react"
+import { resolverWithFallback } from "../user-components"
+import { useDesign } from "./DesignContext"
+import { ReadOnlySection } from "./ReadOnlySection"
 
 interface CraftHeaderProps {
     pageName: string
@@ -43,6 +46,8 @@ interface CraftHeaderProps {
     setShowTemplates?: (show: boolean) => void
     editorMode: "page" | "header" | "footer"
     setEditorMode: (mode: "page" | "header" | "footer") => void
+    headerContent?: any
+    footerContent?: any
 }
 
 export function CraftHeader({
@@ -66,6 +71,8 @@ export function CraftHeader({
     setShowTemplates,
     editorMode,
     setEditorMode,
+    headerContent,
+    footerContent,
 }: CraftHeaderProps) {
     const { actions, query, canUndo, canRedo, enabled, selected } = useEditor((state, query) => {
         const currentNodeId = state.events.selected?.values().next().value
@@ -85,10 +92,25 @@ export function CraftHeader({
     const [showRawHtml, setShowRawHtml] = useState(false)
     const [generatedHtml, setGeneratedHtml] = useState("")
 
+    // Clean Export State
+    const [isExporting, setIsExporting] = useState(false)
+    const [exportJson, setExportJson] = useState<string | null>(null)
+    const { getCssVariables } = useDesign()
+
     const handleExportHtml = () => {
-        const html = generateFullHtml(null, pageName)
-        setGeneratedHtml(html)
+        // Serialize current state
+        const json = query.serialize()
+        setExportJson(json)
+        setIsExporting(true)
+    }
+
+    const finalizeExport = (cleanHtml: string) => {
+        const cssVars = getCssVariables()
+        const fullHtml = generateFullHtml(null, pageName, cleanHtml, cssVars)
+        setGeneratedHtml(fullHtml)
         setShowRawHtml(true)
+        setIsExporting(false)
+        setExportJson(null)
     }
 
 
@@ -320,6 +342,29 @@ export function CraftHeader({
                 onOpenChange={setShowRawHtml}
                 htmlContent={generatedHtml}
             />
+
+            {/* Hidden Clean Export Renderer */}
+            {isExporting && exportJson && (
+                <div
+                    id="clean-export-wrapper"
+                    style={{ position: 'fixed', left: '-9999px', top: 0, width: '100%', maxWidth: '1440px', visibility: 'hidden', display: 'flex', flexDirection: 'column' }}
+                >
+                    {(editorMode === "page" && headerContent) && (
+                        <ReadOnlySection content={headerContent} />
+                    )}
+
+                    <div className="flex-1">
+                        <Editor enabled={false} resolver={resolverWithFallback}>
+                            <Frame json={exportJson} />
+                            <HtmlCapturer onCapture={finalizeExport} />
+                        </Editor>
+                    </div>
+
+                    {(editorMode === "page" && footerContent) && (
+                        <ReadOnlySection content={footerContent} />
+                    )}
+                </div>
+            )}
         </>
     )
 }
@@ -340,4 +385,18 @@ function DeveloperExportButton({ onExport }: { onExport: () => void }) {
             <Code className="h-4 w-4" />
         </Button>
     )
+}
+
+function HtmlCapturer({ onCapture }: { onCapture: (html: string) => void }) {
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            const wrapper = document.getElementById("clean-export-wrapper")
+            if (wrapper) {
+                onCapture(wrapper.innerHTML)
+            }
+        }, 800)
+        return () => clearTimeout(timer)
+    }, [onCapture])
+
+    return null
 }

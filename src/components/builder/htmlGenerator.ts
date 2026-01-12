@@ -1,43 +1,45 @@
 
-
 // Helper to construct the full HTML document
 export const generateFullHtml = (
     nodes: any,
     pageTitle: string = "Exported Page",
+    preRenderedHtml?: string,
+    preRenderedCss?: string
 ) => {
     // 1. Get Fonts
     // We look for the specific IDs we inject in EditorWithDesign
     const googleFonts = document.getElementById("design-selected-google-fonts")?.outerHTML || "";
     const fontShareFonts = document.getElementById("design-selected-fontshare-fonts")?.outerHTML || "";
 
-    // 2. Get Design Variables (CSS Tokens) using Computed Styles from the canvas
-    // This ensures we capture the resolved values of all variables, including those from active themes/classes (dark mode, modern, etc.)
-    const canvas = document.querySelector(".canvas-preview") as HTMLElement;
-    let cssVariables = "";
+    // 2. Get Design Variables (CSS Tokens)
+    let cssVariables = preRenderedCss || "";
 
-    // We get the computed style of the canvas element itself, which inherits all theme variabes
-    const computedStyle = canvas ? getComputedStyle(canvas) : getComputedStyle(document.documentElement);
-    const canvasStyle = canvas ? canvas.style : null;
+    // If no pre-rendered CSS, try to scrape (Legacy/Fallback)
+    if (!preRenderedCss) {
+        const canvas = document.querySelector(".canvas-preview") as HTMLElement;
+        const canvasStyle = canvas ? canvas.style : null;
 
-    // Helper to extract vars
-    // We prioritize the computed value as it represents the "live" look (including inherited theme classes)
-
-    // Collecting variables from .canvas-preview inline styles (User Customizations) explicitly
-    // This preserves exact definitions if they are setting specific vars
-    if (canvasStyle) {
-        for (let i = 0; i < canvasStyle.length; i++) {
-            const prop = canvasStyle[i];
-            if (prop.startsWith("--")) {
-                // For the export, we want the resolved value if possible, or the literal value
-                // Literal value is better for "settings", but resolved value is better for "visual fidelity" of themes.
-                // Let's stick to the inline value for specific overrides, it usually works fine.
-                cssVariables += `        ${prop}: ${canvasStyle.getPropertyValue(prop)};\n`;
+        // Collecting variables from .canvas-preview inline styles (User Customizations) explicitly
+        if (canvasStyle) {
+            for (let i = 0; i < canvasStyle.length; i++) {
+                const prop = canvasStyle[i];
+                if (prop.startsWith("--")) {
+                    cssVariables += `        ${prop}: ${canvasStyle.getPropertyValue(prop)};\n`;
+                }
             }
         }
     }
 
     // Collecting standard shadcn variables from Computed Styles (Theme Defaults)
-    // This catches variables that are defined in global CSS classes (like .dark or .modern)
+    // We get the computed style of the canvas element itself if possible, or root
+    let computedStyle: CSSStyleDeclaration;
+    try {
+        const canvas = document.querySelector(".canvas-preview") as HTMLElement;
+        computedStyle = canvas ? getComputedStyle(canvas) : getComputedStyle(document.documentElement);
+    } catch {
+        computedStyle = getComputedStyle(document.documentElement);
+    }
+
     const shadcnVars = [
         "--background", "--foreground",
         "--card", "--card-foreground",
@@ -52,11 +54,8 @@ export const generateFullHtml = (
     ];
 
     shadcnVars.forEach(v => {
-        // We always append standard vars with their computed values to ensure full theme resolution
-        // The last definition in :root wins, or we can just append if missing. 
-        // CSS rules: last one wins. If we added inline vars above, they might be the same.
-        // Let's just ensure we capture the *computed* value for these system tokens.
         const val = computedStyle.getPropertyValue(v);
+        // Only append if we found a value 
         if (val) {
             cssVariables += `        ${v}: ${val};\n`;
         }
@@ -64,13 +63,24 @@ export const generateFullHtml = (
 
     // 3. Get Content & Clean it
     let bodyContent = "";
-    if (canvas) {
-        // Clone to avoid modifying live DOM
-        const clone = canvas.cloneNode(true) as HTMLElement;
+    let cleanContainer: HTMLElement | null = null;
+
+    if (preRenderedHtml) {
+        // Use the clean export content
+        cleanContainer = document.createElement("div");
+        cleanContainer.innerHTML = preRenderedHtml;
+    } else {
+        // Legacy: Clone from DOM
+        const canvas = document.querySelector(".canvas-preview") as HTMLElement;
+        if (canvas) {
+            cleanContainer = canvas.cloneNode(true) as HTMLElement;
+        }
+    }
+
+    if (cleanContainer) {
+        const clone = cleanContainer; // context alias
 
         // Resolve Assets (Images/Links) to Absolute URLs
-        // The .src and .href properties return the absolute URL, while .getAttribute returns the raw value.
-        // We update the attribute to the absolute value so it works in the standalone file.
         clone.querySelectorAll("img").forEach(img => {
             if (img.src) img.setAttribute("src", img.src);
         });
@@ -83,28 +93,22 @@ export const generateFullHtml = (
         // Remove 'contenteditable'
         clone.querySelectorAll("[contenteditable]").forEach(el => el.removeAttribute("contenteditable"));
 
-        // Remove editor specific placeholders ("Drop components here")
-        // These are artifacts of the editor when containers are empty
+        // Remove editor specific placeholders
         clone.querySelectorAll("div").forEach(div => {
             if (div.textContent?.trim() === "Drop components here") {
                 div.remove();
             }
         });
 
-        // Remove dashed borders (structural indicators in editor)
+        // Remove dashed borders
         clone.querySelectorAll(".border-dashed").forEach(el => {
             el.classList.remove("border-dashed");
-            // potentially remove 'border' too if it was only for the dashed line
             if (el.classList.contains("border-gray-300/50")) {
                 el.classList.remove("border", "border-gray-300/50", "bg-gray-50/30");
             }
         });
 
-        // Remove editor-specific styles and classes from the root wrapper
-        // The root wrapper (.canvas-preview) contains hardcoded width/transform/scale for the editor UI.
-        // We want the exported page to be responsive, letting the body control the layout.
-
-        // Instead of removing all styles (which kills the background color), we only remove layout constraints
+        // Remove editor-specific styles/classes IF present (Legacy path mainly)
         clone.style.removeProperty("width");
         clone.style.removeProperty("height");
         clone.style.removeProperty("transform");
@@ -114,10 +118,8 @@ export const generateFullHtml = (
         clone.style.removeProperty("overflow-x");
         clone.style.removeProperty("transition");
 
-        // Remove typical ClassNames that might constrain layout
         clone.classList.remove("canvas-preview", "shadow-lg", "overflow-y-auto", "overflow-x-hidden");
 
-        // Remove empty class attributes from children (cleanup)
         clone.querySelectorAll("*").forEach(el => {
             if (el.getAttribute("class") === "") el.removeAttribute("class");
         });
@@ -218,6 +220,37 @@ ${cssVariables}
 </head>
 <body>
     ${bodyContent}
+    <script>
+        // Simple Interaction Script for Exported HTML
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mobile Menu Toggles
+            const toggles = document.querySelectorAll('[data-mobile-toggle]');
+            toggles.forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const targetId = toggle.getAttribute('data-target');
+                    const target = document.getElementById(targetId);
+                    if (target) {
+                        target.classList.toggle('hidden');
+                        target.classList.toggle('flex'); // Assuming flex layout for menu
+                    }
+                });
+            });
+            
+            // Dropdowns (if any use generic structure)
+            const dropdowns = document.querySelectorAll('.group');
+            dropdowns.forEach(group => {
+                // Determine if this is a click-based dropdown or hover
+                // Hover is handled by CSS (group-hover), but click might be needed for mobile
+                group.addEventListener('click', () => {
+                    // Start logic for mobile tap
+                    const submenu = group.querySelector('[data-submenu]');
+                    if (submenu) {
+                        submenu.classList.toggle('hidden');
+                    }
+                });
+            });
+        });
+    </script>
 </body>
-</html>`;
+</html>`
 };

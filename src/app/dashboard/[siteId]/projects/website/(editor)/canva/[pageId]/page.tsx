@@ -507,6 +507,8 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                     setShowTemplates={setShowTemplates}
                     editorMode={editorMode}
                     setEditorMode={setEditorMode}
+                    headerContent={headerContent}
+                    footerContent={footerContent}
                 />
 
                 {/* Main Content */}
