@@ -373,7 +373,7 @@ export function CraftHeader({
                     style={{ position: 'fixed', left: '-9999px', top: 0, width: '100%', maxWidth: '1440px', visibility: 'hidden', display: 'flex', flexDirection: 'column' }}
                 >
                     {(editorMode === "page" && headerContent) && (
-                        <ReadOnlySection content={headerContent} />
+                        <ReadOnlySection content={headerContent} interactive={true} />
                     )}
 
                     <div className="flex-1">
@@ -384,7 +384,7 @@ export function CraftHeader({
                     </div>
 
                     {(editorMode === "page" && footerContent) && (
-                        <ReadOnlySection content={footerContent} />
+                        <ReadOnlySection content={footerContent} interactive={true} />
                     )}
                 </div>
             )}
