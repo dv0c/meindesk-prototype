@@ -219,16 +219,25 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
     useEffect(() => {
         if (!canvasContainerRef.current) return
 
+        let timeoutId: NodeJS.Timeout
+
         const resizeObserver = new ResizeObserver((entries) => {
-            for (const entry of entries) {
-                const { width, height } = entry.contentRect
-                setContainerSize({ width, height })
-            }
+            // Debounce the resize update to prevent layout thrashing during sidebar transitions
+            clearTimeout(timeoutId)
+            timeoutId = setTimeout(() => {
+                for (const entry of entries) {
+                    const { width, height } = entry.contentRect
+                    setContainerSize({ width, height })
+                }
+            }, 50) // 50ms delay is enough to skip intermediate frames but feels responsive
         })
 
         resizeObserver.observe(canvasContainerRef.current)
-        return () => resizeObserver.disconnect()
-    }, [showSidebar, showTemplates])
+        return () => {
+            resizeObserver.disconnect()
+            clearTimeout(timeoutId)
+        }
+    }, []) // Empty dependency array - we only need to attach once
 
     // Calculate scale for device mode
     const getScale = () => {
@@ -504,7 +513,7 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                 <div className="flex-1 flex h-full overflow-hidden">
                     {/* Left Sidebar with animation */}
                     <div
-                        className={`transition-all duration-300 ease-in-out overflow-hidden ${showSidebar ? 'w-[380px] opacity-100' : 'w-0 opacity-0'
+                        className={`transition-[width,opacity] duration-300 ease-in-out overflow-hidden ${showSidebar ? 'w-[380px] opacity-100' : 'w-0 opacity-0'
                             }`}
                     >
                         <CraftSidebar isArticlePage={pageSlug === 'article'} editorMode={editorMode} siteId={siteId} />
@@ -568,7 +577,7 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
 
                     {/* Right Sidebar - Templates with animation */}
                     <div
-                        className={`transition-all duration-300 ease-in-out overflow-hidden ${showTemplates ? 'w-[320px] opacity-100' : 'w-0 opacity-0'
+                        className={`transition-[width,opacity] duration-300 ease-in-out overflow-hidden ${showTemplates ? 'w-[320px] opacity-100' : 'w-0 opacity-0'
                             }`}
                     >
                         <TemplatesPanel onClose={() => setShowTemplates(false)} />

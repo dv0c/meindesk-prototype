@@ -6,7 +6,7 @@ import { useEffect, useRef, useState, useCallback } from "react"
 import { createPortal } from "react-dom"
 import { CraftContextMenu } from "./CraftContextMenu"
 import { componentMap } from "../user-components"
-import { useHoverContext } from "./HoverContext"
+// import { useHoverContext } from "./HoverContext"
 
 interface RenderNodeProps {
     render: React.ReactElement
@@ -52,39 +52,9 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
         }
     })
 
-    // Hover context for parent hierarchy visualization
-    const { hoveredAncestors, setHoveredNode } = useHoverContext()
-
-    // Check if this node is an ancestor of the currently hovered node
-    const isAncestorOfHovered = hoveredAncestors.includes(id)
-
-    // Check if this is a container-type component that should show hierarchy outlines
+    // Hover context removed for performance
+    const isAncestorOfHovered = false
     const isContainerType = ["Container", "Grid", "MeindeskContainer", "CollectionContainer"].includes(displayName)
-
-    // Build ancestor chain when this node is hovered
-    const getAncestorChain = useCallback((nodeId: string): string[] => {
-        const ancestors: string[] = []
-        let currentId = nodeId
-        let safetyCounter = 0
-        const maxDepth = 50  // Prevent infinite loops
-
-        while (currentId && safetyCounter < maxDepth) {
-            const node = nodes[currentId]
-            if (!node || !node.data.parent) break
-            ancestors.push(node.data.parent)
-            currentId = node.data.parent
-            safetyCounter++
-        }
-        return ancestors
-    }, [nodes])
-
-    // Update hover context when this node is hovered
-    useEffect(() => {
-        if (isHovered && enabled) {
-            const ancestors = getAncestorChain(id)
-            setHoveredNode(id, ancestors)
-        }
-    }, [isHovered, enabled, id, getAncestorChain, setHoveredNode])
 
     const [indicatorPosition, setIndicatorPosition] = useState<{ top: number; left: number } | null>(null)
     const [resizeHandlePosition, setResizeHandlePosition] = useState<{ bottom: number; right: number } | null>(null)

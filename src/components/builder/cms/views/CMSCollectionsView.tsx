@@ -1,7 +1,28 @@
+import { useState, useEffect, useMemo } from "react"
+import { Loader2, Search, Database, MoreHorizontal, Edit, Trash } from "lucide-react"
+import { toast } from "sonner"
+import { Input } from "@/components/ui/input"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
+import { Button } from "@/components/ui/button"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { getCollections, deleteCollection } from "@/lib/actions/collection-actions"
+
 import { CreateCollectionDialog } from "../dialogs/CreateCollectionDialog"
 import { EditCollectionDialog } from "../dialogs/EditCollectionDialog"
 import { DeleteConfirmDialog } from "../dialogs/DeleteConfirmDialog"
-import { Edit } from "lucide-react"
 
 interface CMSCollectionsViewProps {
     siteId: string

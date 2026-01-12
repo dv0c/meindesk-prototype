@@ -1,3 +1,24 @@
+import { useState, useEffect, useMemo } from "react"
+import { Loader2, Search, FolderOpen, MoreHorizontal, Trash } from "lucide-react"
+import { toast } from "sonner"
+import { Input } from "@/components/ui/input"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { CreateCategoryDialog } from "../dialogs/CreateCategoryDialog"
 import { DeleteConfirmDialog } from "../dialogs/DeleteConfirmDialog"
 

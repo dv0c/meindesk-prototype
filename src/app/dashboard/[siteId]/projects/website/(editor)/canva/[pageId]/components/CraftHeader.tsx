@@ -86,7 +86,7 @@ export function CraftHeader({
 
     return (
         <>
-            <header className="h-[55px] border-b backdrop-blur-xl bg-background/80 shadow-sm flex items-center justify-between px-6 z-30 shrink-0">
+            <header className="h-[55px] border-b flex items-center justify-between px-6 z-30 shrink-0">
                 {/* Left: Page title */}
                 <div className="flex items-center gap-4">
                     <Button
@@ -150,7 +150,7 @@ export function CraftHeader({
                     <Button
                         variant={deviceMode === "desktop" ? "secondary" : "ghost"}
                         size="icon"
-                        className="h-8 w-8 rounded-full transition-all"
+                        className="h-8 w-8 rounded-full transition-colors duration-200"
                         title="Desktop View"
                         onClick={() => setDeviceMode("desktop")}
                     >
@@ -159,7 +159,7 @@ export function CraftHeader({
                     <Button
                         variant={deviceMode === "tablet" ? "secondary" : "ghost"}
                         size="icon"
-                        className="h-8 w-8 rounded-full transition-all"
+                        className="h-8 w-8 rounded-full transition-colors duration-200"
                         title="Tablet View"
                         onClick={() => setDeviceMode("tablet")}
                     >
@@ -168,7 +168,7 @@ export function CraftHeader({
                     <Button
                         variant={deviceMode === "mobile" ? "secondary" : "ghost"}
                         size="icon"
-                        className="h-8 w-8 rounded-full transition-all"
+                        className="h-8 w-8 rounded-full transition-colors duration-200"
                         title="Mobile View"
                         onClick={() => setDeviceMode("mobile")}
                     >

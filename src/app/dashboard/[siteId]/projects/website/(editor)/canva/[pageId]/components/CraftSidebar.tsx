@@ -17,9 +17,9 @@ import { useState, useEffect } from "react"
 
 // Animation variants
 const slideVariants = {
-    initial: { opacity: 0, x: -20 },
+    initial: { opacity: 0, x: -10 },
     animate: { opacity: 1, x: 0 },
-    exit: { opacity: 0, x: 20 }
+    exit: { opacity: 0, x: 10 }
 }
 
 const fadeVariants = {
@@ -29,15 +29,15 @@ const fadeVariants = {
 }
 
 const contentVariants = {
-    initial: { opacity: 0, y: 10 },
+    initial: { opacity: 0, y: 5 },
     animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -10 }
+    exit: { opacity: 0, y: -5 }
 }
 
 const headerVariants = {
-    initial: { opacity: 0, y: -10 },
+    initial: { opacity: 0, y: -5 },
     animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: 10 }
+    exit: { opacity: 0, y: 5 }
 }
 
 export function CraftSidebar({ isArticlePage = false, editorMode = "page", siteId }: { isArticlePage?: boolean; editorMode?: "page" | "header" | "footer", siteId?: string }) {
@@ -69,7 +69,7 @@ export function CraftSidebar({ isArticlePage = false, editorMode = "page", siteI
                         animate="animate"
                         exit="exit"
                         variants={slideVariants}
-                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        transition={{ duration: 0.15, ease: "easeOut" }}
                         className="flex flex-col h-full"
                     >
                         <PropertiesView
@@ -90,7 +90,7 @@ export function CraftSidebar({ isArticlePage = false, editorMode = "page", siteI
                         animate="animate"
                         exit="exit"
                         variants={slideVariants}
-                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        transition={{ duration: 0.15, ease: "easeOut" }}
                         className="flex flex-col h-full"
                     >
                         <PaletteView isArticlePage={isArticlePage} editorMode={editorMode} siteId={siteId} />
@@ -132,7 +132,7 @@ function PropertiesView({
                 variants={headerVariants}
                 initial="initial"
                 animate="animate"
-                transition={{ duration: 0.2, delay: 0.1 }}
+                transition={{ duration: 0.15, delay: 0.05 }}
             >
                 <div className="p-4 flex flex-col gap-3">
                     <div className="flex items-center justify-between">
