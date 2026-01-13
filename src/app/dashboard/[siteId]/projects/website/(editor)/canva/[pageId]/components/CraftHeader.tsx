@@ -111,6 +111,7 @@ export function CraftHeader({
     const searchParams = useSearchParams()
     const router = useRouter()
     const pathname = usePathname()
+    const { data: session } = useSession()
 
     // Initialize CMS state from URL
     const [showCMS, setShowCMS] = useState(searchParams?.get("cms") === "open")
@@ -438,12 +439,17 @@ export function CraftHeader({
                                         <LayoutTemplate className="h-4 w-4 mr-2" />
                                         <span>Templates</span>
                                     </DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuLabel>Developer</DropdownMenuLabel>
-                                    <DropdownMenuItem onClick={handleExportHtml}>
-                                        <Code className="h-4 w-4 mr-2" />
-                                        <span>Export HTML</span>
-                                    </DropdownMenuItem>
+                                    {/* @ts-ignore */}
+                                    {session?.user?.developerMode && (
+                                        <>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuLabel>Developer</DropdownMenuLabel>
+                                            <DropdownMenuItem onClick={handleExportHtml}>
+                                                <Code className="h-4 w-4 mr-2" />
+                                                <span>Export HTML</span>
+                                            </DropdownMenuItem>
+                                        </>
+                                    )}
                                 </DropdownMenuContent>
                             </DropdownMenu>
 

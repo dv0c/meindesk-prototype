@@ -42,7 +42,7 @@ export const ArticleTitle = defineBlock<ArticleTitleProps>({
                 ...blockStyle,
                 textAlign,
                 fontFamily: 'var(--design-font-heading, Georgia, serif)',
-                color: computedStyle?.color || 'var(--design-primary, inherit)',
+                color: blockStyle?.color || 'var(--design-primary, inherit)',
             },
             className: cn("text-2xl md:text-3xl lg:text-4xl font-bold leading-tight", className)
         })

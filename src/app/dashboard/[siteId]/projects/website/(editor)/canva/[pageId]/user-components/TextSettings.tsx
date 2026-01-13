@@ -8,6 +8,7 @@ import {
     PropertyColor,
     PropertySelect,
     PropertyIconButtonGroup,
+    PropertyBoxModel, // Added import
 } from "../components/PropertySection"
 
 // Interface for Text Props (matching Text.tsx)
@@ -160,70 +161,22 @@ export const TextSettings = () => {
             </PropertySection>
 
             <PropertySection title="Spacing" defaultOpen={false}>
-                <PropertyRow label="Margin Top">
-                    <PropertySlider
-                        value={marginTop || 0}
-                        onChange={(val) => updateStyle('marginTop', val)}
-                        min={0}
-                        max={100}
-                    />
-                </PropertyRow>
-                <PropertyRow label="Margin Bottom">
-                    <PropertySlider
-                        value={marginBottom || 16}
-                        onChange={(val) => updateStyle('marginBottom', val)}
-                        min={0}
-                        max={100}
-                    />
-                </PropertyRow>
-                <PropertyRow label="Margin Left">
-                    <PropertySlider
-                        value={marginLeft || 0}
-                        onChange={(val) => updateStyle('marginLeft', val)}
-                        min={0}
-                        max={100}
-                    />
-                </PropertyRow>
-                <PropertyRow label="Margin Right">
-                    <PropertySlider
-                        value={marginRight || 0}
-                        onChange={(val) => updateStyle('marginRight', val)}
-                        min={0}
-                        max={100}
-                    />
-                </PropertyRow>
-                <PropertyRow label="Padding Top">
-                    <PropertySlider
-                        value={paddingTop || 0}
-                        onChange={(val) => updateStyle('paddingTop', val)}
-                        min={0}
-                        max={100}
-                    />
-                </PropertyRow>
-                <PropertyRow label="Padding Bottom">
-                    <PropertySlider
-                        value={paddingBottom || 0}
-                        onChange={(val) => updateStyle('paddingBottom', val)}
-                        min={0}
-                        max={100}
-                    />
-                </PropertyRow>
-                <PropertyRow label="Padding Left">
-                    <PropertySlider
-                        value={paddingLeft || 0}
-                        onChange={(val) => updateStyle('paddingLeft', val)}
-                        min={0}
-                        max={100}
-                    />
-                </PropertyRow>
-                <PropertyRow label="Padding Right">
-                    <PropertySlider
-                        value={paddingRight || 0}
-                        onChange={(val) => updateStyle('paddingRight', val)}
-                        min={0}
-                        max={100}
-                    />
-                </PropertyRow>
+                <PropertyBoxModel
+                    margin={{
+                        top: marginTop || 0,
+                        right: marginRight || 0,
+                        bottom: marginBottom || 0,
+                        left: marginLeft || 0
+                    }}
+                    padding={{
+                        top: paddingTop || 0,
+                        right: paddingRight || 0,
+                        bottom: paddingBottom || 0,
+                        left: paddingLeft || 0
+                    }}
+                    onChangeMargin={(side, value) => updateStyle(`margin${side.charAt(0).toUpperCase() + side.slice(1)}`, parseInt(value) || 0)}
+                    onChangePadding={(side, value) => updateStyle(`padding${side.charAt(0).toUpperCase() + side.slice(1)}`, parseInt(value) || 0)}
+                />
             </PropertySection>
         </div>
     )

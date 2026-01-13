@@ -18,12 +18,6 @@ interface HeadingProps {
     level?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
     style?: BlockStyle
     className?: string
-    // Legacy props
-    fontSize?: number
-    fontWeight?: string
-    color?: string
-    textAlign?: "left" | "center" | "right" | "justify"
-    marginBottom?: number
 }
 
 const defaultStyles: BlockStyle = {
@@ -45,10 +39,6 @@ export const Heading = defineBlock<HeadingProps>({
         text: "Heading",
         level: "h2",
         style: defaultStyles,
-        // Legacy props for compatibility
-        fontSize: 32,
-        fontWeight: "700",
-        marginBottom: 16,
     },
 
     settings: HeadingSettings,
@@ -57,8 +47,7 @@ export const Heading = defineBlock<HeadingProps>({
         // Fluid typography logic matching defaultStyles
         let fluidFontSize = style?.fontSize
 
-        // Use legacy fontSize if present and not in style
-        const fontSizeVal = props.fontSize ?? style?.fontSize ?? 32
+        const fontSizeVal = style?.fontSize ?? 32
 
         if (typeof fontSizeVal === 'number') {
             const minFontSize = Math.max(12, fontSizeVal * 0.3)
@@ -69,10 +58,8 @@ export const Heading = defineBlock<HeadingProps>({
         const effectiveStyle: BlockStyle = {
             ...style,
             fontSize: fluidFontSize,
-            fontWeight: style?.fontWeight ?? props.fontWeight ?? `var(--design-font-weight-heading, 700)`,
-            color: style?.color ?? props.color ?? "var(--design-text-heading, inherit)",
-            textAlign: style?.textAlign ?? props.textAlign,
-            marginBottom: style?.marginBottom ?? props.marginBottom, // Keep legacy fallback for initial load if needed
+            fontWeight: style?.fontWeight ?? `var(--design-font-weight-heading, 700)`,
+            color: style?.color ?? "var(--design-text-heading, inherit)",
 
             // Design token defaults
             fontFamily: "var(--design-font-heading, inherit)",

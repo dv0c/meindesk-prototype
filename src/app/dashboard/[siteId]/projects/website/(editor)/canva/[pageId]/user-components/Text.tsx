@@ -11,12 +11,6 @@ interface TextProps {
     text?: string
     style?: BlockStyle
     className?: string
-    // Legacy props mapping
-    fontSize?: number
-    fontWeight?: string
-    color?: string
-    textAlign?: "left" | "center" | "right" | "justify"
-    lineHeight?: number
 }
 
 // Map legacy props to BlockStyle for defaultProps
@@ -68,18 +62,11 @@ export const Text = defineBlock<TextProps>({
             ? text
             : resolveCollectionTemplate(text, collectionContext?.data)
 
-        // Merge legacy props into style if present (backwards compatibility), but prefer style
-        // If settings are used, style will be updated directly.
+        // Prepare style object
         const mergedStyle: BlockStyle = {
             ...style,
-            fontSize: style?.fontSize ?? props.fontSize,
-            fontWeight: style?.fontWeight ?? props.fontWeight,
-            color: style?.color ?? props.color,
-            textAlign: style?.textAlign ?? props.textAlign,
-            lineHeight: style?.lineHeight ?? props.lineHeight,
-            // Fallback to theme font
             fontFamily: (style?.fontFamily as string) || "var(--design-font-base, inherit)",
-            color: (style?.color === "#374151" && !props.color) ? "var(--design-text-body, inherit)" : (style?.color || props.color)
+            color: (style?.color === "#374151") ? "var(--design-text-body, inherit)" : style?.color
         }
 
         // Fluid typography calculation

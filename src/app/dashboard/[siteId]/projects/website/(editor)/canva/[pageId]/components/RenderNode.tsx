@@ -505,20 +505,25 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
 
             // Sync final value to CraftJS state
             actions.setProp(id, (prop: Record<string, any>) => {
+                // Check if we should use style object (standard for new blocks)
+                const useStyle = prop.style && typeof prop.style === 'object';
+                const target = useStyle ? prop.style : prop;
+
                 if (type === "padding") {
-                    if (side === "top") prop.paddingTop = finalValue
-                    else if (side === "right") prop.paddingRight = finalValue
-                    else if (side === "bottom") prop.paddingBottom = finalValue
-                    else if (side === "left") prop.paddingLeft = finalValue
-                    // Also update base padding if it exists
-                    if (prop.padding !== undefined && side === "top") {
+                    if (side === "top") target.paddingTop = finalValue
+                    else if (side === "right") target.paddingRight = finalValue
+                    else if (side === "bottom") target.paddingBottom = finalValue
+                    else if (side === "left") target.paddingLeft = finalValue
+
+                    // Also update base padding if it exists on root and we are writing to root
+                    if (!useStyle && prop.padding !== undefined && side === "top") {
                         prop.padding = finalValue
                     }
                 } else {
-                    if (side === "top") prop.marginTop = finalValue
-                    else if (side === "right") prop.marginRight = finalValue
-                    else if (side === "bottom") prop.marginBottom = finalValue
-                    else if (side === "left") prop.marginLeft = finalValue
+                    if (side === "top") target.marginTop = finalValue
+                    else if (side === "right") target.marginRight = finalValue
+                    else if (side === "bottom") target.marginBottom = finalValue
+                    else if (side === "left") target.marginLeft = finalValue
                 }
             })
         }
