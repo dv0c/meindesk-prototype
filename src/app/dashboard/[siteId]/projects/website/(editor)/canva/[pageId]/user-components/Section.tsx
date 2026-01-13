@@ -80,7 +80,7 @@ export const Section = defineBlock<SectionProps>({
         return (
             <section className={computedClassName} style={computedStyle}>
                 {isEmpty && enabled ? (
-                    <div className="w-full h-full min-h-[inherit] flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-lg bg-gray-50/50 text-sm text-gray-400 p-8 gap-2 transition-colors hover:border-gray-300 hover:bg-gray-100/50">
+                    <div className="w-full h-full min-h-[inherit] flex-1 flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-lg bg-gray-50/50 text-sm text-gray-400 p-8 gap-2 transition-colors hover:border-gray-300 hover:bg-gray-100/50">
                         <span className="font-medium text-gray-500">Empty Section</span>
                         <span>Drop components here</span>
                     </div>

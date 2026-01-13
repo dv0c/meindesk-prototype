@@ -51,7 +51,7 @@ export const Box = defineBlock<BoxProps>({
             <div className={computedClassName} style={computedStyle}>
                 {children}
                 {enabled && childCount === 0 && (
-                    <div className="w-full h-full min-h-[20px] flex items-center justify-center text-[10px] text-gray-400 border border-dotted border-gray-300">
+                    <div className="w-full h-full min-h-[50px] flex items-center justify-center text-xs text-gray-400 border border-dotted border-gray-300 p-4 bg-gray-50/10">
                         Box
                     </div>
                 )}

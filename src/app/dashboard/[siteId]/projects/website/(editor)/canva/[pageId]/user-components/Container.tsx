@@ -89,9 +89,9 @@ export const Container = defineBlock<ContainerProps>({
 
         return (
             <CollectionItemProvider value={collectionData}>
-                <div className={computedClassName} style={computedStyle}>
+                <div className={!isEmpty && enabled ? computedClassName : ""} style={!isEmpty && enabled ? computedStyle : {}}>
                     {isEmpty && enabled ? (
-                        <div className="w-full h-full min-h-[inherit] flex items-center justify-center border border-dashed border-gray-300/50 rounded bg-gray-50/30 text-xs text-gray-400 p-4">
+                        <div className="w-full h-full min-h-[100px] flex items-center justify-center border border-dashed border-gray-300/50  bg-gray-50/30 text-xs text-gray-400 p-4">
                             Drop components here
                         </div>
                     ) : (

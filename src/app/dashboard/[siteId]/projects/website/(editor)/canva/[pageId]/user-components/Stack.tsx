@@ -73,7 +73,7 @@ export const Stack = defineBlock<StackProps>({
             <div className={computedClassName} style={computedStyle}>
                 {children}
                 {enabled && childCount === 0 && (
-                    <div className="w-full h-full min-h-[50px] flex items-center justify-center border border-dashed border-gray-300 rounded bg-gray-50/20 text-xs text-gray-400">
+                    <div className="w-full h-full min-h-[50px] flex items-center justify-center border border-dashed border-gray-300 rounded bg-gray-50/20 text-xs text-gray-400 p-4">
                         Empty Stack
                     </div>
                 )}

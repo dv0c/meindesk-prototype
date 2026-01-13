@@ -63,7 +63,7 @@ export const Grid = defineBlock<GridProps>({
                 {children}
                 {enabled && childCount === 0 && (
                     <div
-                        className="col-span-full h-full min-h-[80px] flex items-center justify-center border border-dashed border-gray-300 rounded bg-gray-50/20 text-xs text-gray-400"
+                        className="col-span-full h-full min-h-[80px] w-full flex items-center justify-center border border-dashed border-gray-300 rounded bg-gray-50/20 text-xs text-gray-400 p-4"
                         style={{ gridColumn: `1 / -1` }}
                     >
                         Empty Grid
