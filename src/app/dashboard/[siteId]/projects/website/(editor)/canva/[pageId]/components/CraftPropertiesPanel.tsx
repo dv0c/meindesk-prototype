@@ -33,12 +33,12 @@ export function CraftPropertiesPanel() {
     const SettingsComponent = node.settings
 
     return (
-        <div className="p-4 space-y-4">
+        <div className="py-4 space-y-4">
             {/* Component Name Header */}
-            <div className="pb-3 border-b">
+            {/* <div className="pb-3 border-b">
                 <h4 className="font-medium text-sm">{node.name}</h4>
                 <p className="text-xs text-muted-foreground mt-1">Component Properties</p>
-            </div>
+            </div> */}
 
             {/* Render Settings Component */}
             {SettingsComponent && node.id ? (
