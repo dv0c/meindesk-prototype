@@ -37,6 +37,7 @@ interface TextProps {
 export const TextSettings = () => {
     const {
         actions: { setProp },
+        // Read from style, fall back to root props for legacy support
         text,
         fontSize,
         fontWeight,
@@ -45,15 +46,28 @@ export const TextSettings = () => {
         lineHeight,
         marginTop,
         marginBottom,
+        marginLeft,
+        marginRight,
+        paddingTop,
+        paddingBottom,
+        paddingLeft,
+        paddingRight,
     } = useNode((node) => ({
         text: node.data.props.text,
-        fontSize: node.data.props.fontSize,
-        fontWeight: node.data.props.fontWeight,
-        color: node.data.props.color,
-        textAlign: node.data.props.textAlign,
-        lineHeight: node.data.props.lineHeight,
-        marginTop: node.data.props.marginTop,
-        marginBottom: node.data.props.marginBottom,
+        fontSize: node.data.props.style?.fontSize ?? node.data.props.fontSize,
+        fontWeight: node.data.props.style?.fontWeight ?? node.data.props.fontWeight,
+        color: node.data.props.style?.color ?? node.data.props.color,
+        textAlign: node.data.props.style?.textAlign ?? node.data.props.textAlign,
+        lineHeight: node.data.props.style?.lineHeight ?? node.data.props.lineHeight,
+        marginTop: node.data.props.style?.marginTop ?? node.data.props.marginTop,
+        marginBottom: node.data.props.style?.marginBottom ?? node.data.props.marginBottom,
+        marginLeft: node.data.props.style?.marginLeft ?? node.data.props.marginLeft,
+        marginRight: node.data.props.style?.marginRight ?? node.data.props.marginRight,
+        paddingTop: node.data.props.style?.paddingTop ?? node.data.props.paddingTop,
+        paddingBottom: node.data.props.style?.paddingBottom ?? node.data.props.paddingBottom,
+        paddingLeft: node.data.props.style?.paddingLeft ?? node.data.props.paddingLeft,
+        paddingRight: node.data.props.style?.paddingRight ?? node.data.props.paddingRight,
+        props: node.data.props,
     }))
 
     const fontWeightLabel = {
@@ -65,6 +79,15 @@ export const TextSettings = () => {
     }[fontWeight || "400"] || "Regular"
 
     const typographySummary = `${fontSize}px, ${fontWeightLabel}, ${textAlign}`
+
+    const updateStyle = (key: string, value: any) => {
+        setProp((props: any) => {
+            if (!props.style) props.style = {}
+            props.style[key] = value
+            // Optional: clear legacy prop if desired, or keep for safety
+            if (props[key] !== undefined) delete props[key]
+        })
+    }
 
     return (
         <div>
@@ -86,7 +109,7 @@ export const TextSettings = () => {
                 <PropertyRow label="Font Size">
                     <PropertySlider
                         value={fontSize || 16}
-                        onChange={(v) => setProp((props: TextProps) => (props.fontSize = v))}
+                        onChange={(v) => updateStyle('fontSize', v)}
                         min={10}
                         max={72}
                     />
@@ -94,7 +117,7 @@ export const TextSettings = () => {
                 <PropertyRow label="Font Weight">
                     <PropertySelect
                         value={fontWeight || "400"}
-                        onChange={(v) => setProp((props: TextProps) => (props.fontWeight = v))}
+                        onChange={(v) => updateStyle('fontWeight', v)}
                         options={[
                             { label: "Light", value: "300" },
                             { label: "Regular", value: "400" },
@@ -107,7 +130,7 @@ export const TextSettings = () => {
                 <PropertyRow label="Line Height">
                     <PropertySlider
                         value={Math.round((lineHeight || 1.6) * 10)}
-                        onChange={(v) => setProp((props: TextProps) => (props.lineHeight = v / 10))}
+                        onChange={(v) => updateStyle('lineHeight', v / 10)}
                         min={10}
                         max={30}
                         unit=""
@@ -116,7 +139,7 @@ export const TextSettings = () => {
                 <PropertyRow label="Text Align">
                     <PropertyIconButtonGroup
                         value={textAlign || "left"}
-                        onChange={(v) => setProp((props: TextProps) => (props.textAlign = v as TextProps["textAlign"]))}
+                        onChange={(v) => updateStyle('textAlign', v)}
                         options={[
                             { label: "Left", value: "left", icon: AlignLeft },
                             { label: "Center", value: "center", icon: AlignCenter },
@@ -131,7 +154,74 @@ export const TextSettings = () => {
                 <PropertyRow label="Color">
                     <PropertyColor
                         value={color || "#374151"}
-                        onChange={(v) => setProp((props: TextProps) => (props.color = v))}
+                        onChange={(v) => updateStyle('color', v)}
+                    />
+                </PropertyRow>
+            </PropertySection>
+
+            <PropertySection title="Spacing" defaultOpen={false}>
+                <PropertyRow label="Margin Top">
+                    <PropertySlider
+                        value={marginTop || 0}
+                        onChange={(val) => updateStyle('marginTop', val)}
+                        min={0}
+                        max={100}
+                    />
+                </PropertyRow>
+                <PropertyRow label="Margin Bottom">
+                    <PropertySlider
+                        value={marginBottom || 16}
+                        onChange={(val) => updateStyle('marginBottom', val)}
+                        min={0}
+                        max={100}
+                    />
+                </PropertyRow>
+                <PropertyRow label="Margin Left">
+                    <PropertySlider
+                        value={marginLeft || 0}
+                        onChange={(val) => updateStyle('marginLeft', val)}
+                        min={0}
+                        max={100}
+                    />
+                </PropertyRow>
+                <PropertyRow label="Margin Right">
+                    <PropertySlider
+                        value={marginRight || 0}
+                        onChange={(val) => updateStyle('marginRight', val)}
+                        min={0}
+                        max={100}
+                    />
+                </PropertyRow>
+                <PropertyRow label="Padding Top">
+                    <PropertySlider
+                        value={paddingTop || 0}
+                        onChange={(val) => updateStyle('paddingTop', val)}
+                        min={0}
+                        max={100}
+                    />
+                </PropertyRow>
+                <PropertyRow label="Padding Bottom">
+                    <PropertySlider
+                        value={paddingBottom || 0}
+                        onChange={(val) => updateStyle('paddingBottom', val)}
+                        min={0}
+                        max={100}
+                    />
+                </PropertyRow>
+                <PropertyRow label="Padding Left">
+                    <PropertySlider
+                        value={paddingLeft || 0}
+                        onChange={(val) => updateStyle('paddingLeft', val)}
+                        min={0}
+                        max={100}
+                    />
+                </PropertyRow>
+                <PropertyRow label="Padding Right">
+                    <PropertySlider
+                        value={paddingRight || 0}
+                        onChange={(val) => updateStyle('paddingRight', val)}
+                        min={0}
+                        max={100}
                     />
                 </PropertyRow>
             </PropertySection>

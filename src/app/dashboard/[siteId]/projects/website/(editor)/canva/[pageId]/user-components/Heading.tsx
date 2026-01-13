@@ -69,10 +69,10 @@ export const Heading = defineBlock<HeadingProps>({
         const effectiveStyle: BlockStyle = {
             ...style,
             fontSize: fluidFontSize,
-            fontWeight: props.fontWeight ?? style?.fontWeight ?? `var(--design-font-weight-heading, 700)`,
-            color: props.color ?? style?.color ?? "var(--design-text-heading, inherit)",
-            textAlign: props.textAlign ?? style?.textAlign,
-            marginBottom: props.marginBottom ?? style?.marginBottom,
+            fontWeight: style?.fontWeight ?? props.fontWeight ?? `var(--design-font-weight-heading, 700)`,
+            color: style?.color ?? props.color ?? "var(--design-text-heading, inherit)",
+            textAlign: style?.textAlign ?? props.textAlign,
+            marginBottom: style?.marginBottom ?? props.marginBottom, // Keep legacy fallback for initial load if needed
 
             // Design token defaults
             fontFamily: "var(--design-font-heading, inherit)",

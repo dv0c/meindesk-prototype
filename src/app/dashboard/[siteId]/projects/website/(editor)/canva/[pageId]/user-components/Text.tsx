@@ -68,21 +68,21 @@ export const Text = defineBlock<TextProps>({
             ? text
             : resolveCollectionTemplate(text, collectionContext?.data)
 
-        // Merge legacy props into style if present (backwards compatibility)
+        // Merge legacy props into style if present (backwards compatibility), but prefer style
+        // If settings are used, style will be updated directly.
         const mergedStyle: BlockStyle = {
             ...style,
-            fontSize: props.fontSize ?? style?.fontSize,
-            fontWeight: props.fontWeight ?? style?.fontWeight,
-            color: props.color ?? style?.color,
-            textAlign: props.textAlign ?? style?.textAlign,
-            lineHeight: props.lineHeight ?? style?.lineHeight,
+            fontSize: style?.fontSize ?? props.fontSize,
+            fontWeight: style?.fontWeight ?? props.fontWeight,
+            color: style?.color ?? props.color,
+            textAlign: style?.textAlign ?? props.textAlign,
+            lineHeight: style?.lineHeight ?? props.lineHeight,
             // Fallback to theme font
             fontFamily: (style?.fontFamily as string) || "var(--design-font-base, inherit)",
-            color: (style?.color === "#374151" && !props.color) ? "var(--design-text-body, inherit)" : (props.color || style?.color)
+            color: (style?.color === "#374151" && !props.color) ? "var(--design-text-body, inherit)" : (style?.color || props.color)
         }
 
-        // Fluid typography calculation (could be moved to useBlockStyles or util)
-        // Keeping logic from original file roughly
+        // Fluid typography calculation
         if (typeof mergedStyle.fontSize === 'number') {
             const fontSize = mergedStyle.fontSize
             const minFontSize = Math.max(10, fontSize * 0.3)
