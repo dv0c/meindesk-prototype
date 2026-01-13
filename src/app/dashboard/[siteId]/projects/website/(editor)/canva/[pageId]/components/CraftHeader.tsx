@@ -56,6 +56,8 @@ interface CraftHeaderProps {
     setEditorMode: (mode: "page" | "header" | "footer") => void
     headerContent?: any
     footerContent?: any
+    showLayers?: boolean
+    setShowLayers?: (show: boolean) => void
 }
 
 export function CraftHeader({
@@ -81,6 +83,8 @@ export function CraftHeader({
     setEditorMode,
     headerContent,
     footerContent,
+    showLayers,
+    setShowLayers,
 }: CraftHeaderProps) {
     const { actions, query, canUndo, canRedo, enabled, selected } = useEditor((state, query) => {
         const currentNodeId = state.events.selected?.values().next().value
@@ -94,7 +98,7 @@ export function CraftHeader({
 
 
 
-    const [showLayers, setShowLayers] = useState(false)
+    // const [showLayers, setShowLayers] = useState(false) // Removed local state
     const [showCMS, setShowCMS] = useState(false)
     const [showTemplatesDialog, setShowTemplatesDialog] = useState(false)
     const [showRawHtml, setShowRawHtml] = useState(false)
@@ -276,7 +280,7 @@ export function CraftHeader({
                                 variant={showLayers ? "secondary" : "ghost"}
                                 size="sm"
                                 className="h-8 px-2 text-xs"
-                                onClick={() => setShowLayers(!showLayers)}
+                                onClick={() => setShowLayers?.(!showLayers)}
                                 title="Toggle Layers Panel"
                             >
                                 <Layers className="h-4 w-4 mr-2" />
@@ -338,7 +342,7 @@ export function CraftHeader({
                             actions.setOptions((options) => (options.enabled = newEnabled))
                             setShowSidebar(newEnabled)
                             if (!newEnabled) {
-                                setShowLayers(false)
+                                setShowLayers?.(false)
                                 setShowTemplates?.(false)
                             }
                         }}
@@ -372,8 +376,8 @@ export function CraftHeader({
                 </div>
             </header >
 
-            {/* Floating Layers Popup */}
-            <CraftLayersPopup isOpen={showLayers} onClose={() => setShowLayers(false)} />
+            {/* Floating Layers Popup - Removed/Moved to Sidebar */}
+            {/* <CraftLayersPopup isOpen={showLayers} onClose={() => setShowLayers(false)} /> */}
 
             {/* CMS Modal */}
             <CMSModal open={showCMS} onOpenChange={setShowCMS} siteId={siteId} />

@@ -22,22 +22,16 @@ const slideVariants = {
     exit: { opacity: 0, x: 10 }
 }
 
-const fadeVariants = {
-    initial: { opacity: 0 },
-    animate: { opacity: 1 },
-    exit: { opacity: 0 }
+const headerVariants = {
+    initial: { opacity: 0, y: -5 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: 5 }
 }
 
 const contentVariants = {
     initial: { opacity: 0, y: 5 },
     animate: { opacity: 1, y: 0 },
     exit: { opacity: 0, y: -5 }
-}
-
-const headerVariants = {
-    initial: { opacity: 0, y: -5 },
-    animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: 5 }
 }
 
 export function CraftSidebar({ isArticlePage = false, editorMode = "page", siteId }: { isArticlePage?: boolean; editorMode?: "page" | "header" | "footer", siteId?: string }) {
@@ -236,6 +230,7 @@ function PropertiesView({
         </Tabs>
     )
 }
+
 
 // Palette View Component
 import { SavedComponentsPanel } from "./SavedComponentsPanel"

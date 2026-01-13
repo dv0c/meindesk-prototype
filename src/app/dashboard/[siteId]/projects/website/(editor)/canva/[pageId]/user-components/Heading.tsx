@@ -11,6 +11,7 @@ import {
     PropertySelect,
 } from "../components/PropertySection"
 import { useNode } from "@craftjs/core"
+import { HeadingSettings } from "./HeadingSettings"
 
 interface HeadingProps {
     text?: string
@@ -32,76 +33,7 @@ const defaultStyles: BlockStyle = {
     marginBottom: 16,
 }
 
-// Settings Component
-export const HeadingSettings = () => {
-    const {
-        actions: { setProp },
-        text,
-        level,
-        style,
-        fontSize,
-        fontWeight
-    } = useNode((node) => ({
-        text: node.data.props.text,
-        level: node.data.props.level,
-        style: node.data.props.style,
-        fontSize: node.data.props.fontSize ?? node.data.props.style?.fontSize,
-        fontWeight: node.data.props.fontWeight ?? node.data.props.style?.fontWeight,
-    }))
-
-    return (
-        <div>
-            <PropertySection title="Content">
-                <PropertyRow label="Level">
-                    <PropertySelect
-                        value={level || "h2"}
-                        onChange={(v) => setProp((props: HeadingProps) => (props.level = v as any))}
-                        options={[
-                            { label: "H1 - Main Title", value: "h1" },
-                            { label: "H2 - Section Title", value: "h2" },
-                            { label: "H3 - Subsection", value: "h3" },
-                            { label: "H4 - Small Heading", value: "h4" },
-                            { label: "H5 - Minor Heading", value: "h5" },
-                            { label: "H6 - Smallest", value: "h6" },
-                        ]}
-                    />
-                </PropertyRow>
-            </PropertySection>
-
-            <PropertySection title="Typography">
-                <PropertyRow label="Font Size">
-                    <PropertySlider
-                        value={parseInt(String(fontSize || 32))}
-                        onChange={(v) => setProp((props: HeadingProps) => {
-                            props.fontSize = v
-                            if (!props.style) props.style = {}
-                            props.style.fontSize = v
-                        })}
-                        min={12}
-                        max={120}
-                    />
-                </PropertyRow>
-                <PropertyRow label="Weight">
-                    <PropertySelect
-                        value={String(fontWeight) || "700"}
-                        onChange={(v) => setProp((props: HeadingProps) => {
-                            props.fontWeight = v
-                            if (!props.style) props.style = {}
-                            props.style.fontWeight = v
-                        })}
-                        options={[
-                            { label: "Regular", value: "400" },
-                            { label: "Medium", value: "500" },
-                            { label: "Semibold", value: "600" },
-                            { label: "Bold", value: "700" },
-                            { label: "Extra Bold", value: "800" },
-                        ]}
-                    />
-                </PropertyRow>
-            </PropertySection>
-        </div>
-    )
-}
+// Local settings removed in favor of HeadingSettings.tsx
 
 export const Heading = defineBlock<HeadingProps>({
     name: "Heading",

@@ -15,6 +15,7 @@ import { OnboardingTutorial } from "./components/OnboardingTutorial"
 import { RenderNode } from "./components/RenderNode"
 import { SEOProvider, useSEO } from "./components/seo"
 import { TemplatesPanel } from "./components/TemplatesPanel"
+import { RightSidebar } from "./components/RightSidebar"
 import { Container, resolverWithFallback } from "./user-components"
 import { ArticleProvider } from "./user-components/article"
 
@@ -34,6 +35,7 @@ export default function CraftJSEditorPage({ params }: { params: { siteId: string
     const [isSaving, setIsSaving] = useState(false)
     const [showSidebar, setShowSidebar] = useState(true)
     const [showTemplates, setShowTemplates] = useState(false)
+    const [showLayers, setShowLayers] = useState(false)
     const [deviceMode, setDeviceMode] = useState<"desktop" | "tablet" | "mobile">("desktop")
 
     // Fixed device widths
@@ -86,6 +88,8 @@ export default function CraftJSEditorPage({ params }: { params: { siteId: string
                             setShowSidebar={setShowSidebar}
                             showTemplates={showTemplates}
                             setShowTemplates={setShowTemplates}
+                            showLayers={showLayers}
+                            setShowLayers={setShowLayers}
                             siteId={siteId}
                             pageId={pageId}
                             getCanvasWidth={getCanvasWidth}
@@ -99,7 +103,7 @@ export default function CraftJSEditorPage({ params }: { params: { siteId: string
 }
 
 // Separate component to access design context and CraftJS editor
-function EditorWithDesign({ resolver, pageName, setPageName, pageStatus, setPageStatus, isLocked, setIsLocked, deviceMode, setDeviceMode, isSaving, setIsSaving, showSidebar, setShowSidebar, showTemplates, setShowTemplates, siteId, pageId, getCanvasWidth, getDevicePixelWidth }: any) {
+function EditorWithDesign({ resolver, pageName, setPageName, pageStatus, setPageStatus, isLocked, setIsLocked, deviceMode, setDeviceMode, isSaving, setIsSaving, showSidebar, setShowSidebar, showTemplates, setShowTemplates, showLayers, setShowLayers, siteId, pageId, getCanvasWidth, getDevicePixelWidth }: any) {
     const { getCssVariables, settings } = useDesign()
 
     // Helper to detect Fontshare fonts
@@ -176,6 +180,8 @@ function EditorWithDesign({ resolver, pageName, setPageName, pageStatus, setPage
                     setShowSidebar={setShowSidebar}
                     showTemplates={showTemplates}
                     setShowTemplates={setShowTemplates}
+                    showLayers={showLayers}
+                    setShowLayers={setShowLayers}
                     siteId={siteId}
                     pageId={pageId}
                     getCanvasWidth={getCanvasWidth}
@@ -188,7 +194,7 @@ function EditorWithDesign({ resolver, pageName, setPageName, pageStatus, setPage
 }
 
 // Inner component that has access to useEditor
-function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLocked, setIsLocked, deviceMode, setDeviceMode, isSaving, setIsSaving, showSidebar, setShowSidebar, showTemplates, setShowTemplates, siteId, pageId, getCanvasWidth, getDevicePixelWidth, getCssVariables }: any) {
+function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLocked, setIsLocked, deviceMode, setDeviceMode, isSaving, setIsSaving, showSidebar, setShowSidebar, showTemplates, setShowTemplates, showLayers, setShowLayers, siteId, pageId, getCanvasWidth, getDevicePixelWidth, getCssVariables }: any) {
     const { query, actions, enabled } = useEditor((state) => ({
         enabled: state.options.enabled
     }))
@@ -520,6 +526,8 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                     pageSlug={pageSlug}
                     showTemplates={showTemplates}
                     setShowTemplates={setShowTemplates}
+                    showLayers={showLayers}
+                    setShowLayers={setShowLayers}
                     editorMode={editorMode}
                     setEditorMode={setEditorMode}
                     headerContent={headerContent}
@@ -592,12 +600,17 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                         </div>
                     </div>
 
-                    {/* Right Sidebar - Templates with animation */}
+                    {/* Right Sidebar - Layers & Templates */}
                     <div
-                        className={`transition-[width,opacity] duration-300 ease-in-out overflow-hidden ${showTemplates ? 'w-[320px] opacity-100' : 'w-0 opacity-0'
+                        className={`transition-[width,opacity] duration-300 ease-in-out overflow-hidden z-20 ${(showTemplates || showLayers) ? 'w-[320px] opacity-100' : 'w-0 opacity-0'
                             }`}
                     >
-                        <TemplatesPanel onClose={() => setShowTemplates(false)} />
+                        <RightSidebar
+                            showTemplates={showTemplates}
+                            setShowTemplates={setShowTemplates}
+                            showLayers={showLayers}
+                            setShowLayers={setShowLayers}
+                        />
                     </div>
                 </div>
             </div>
