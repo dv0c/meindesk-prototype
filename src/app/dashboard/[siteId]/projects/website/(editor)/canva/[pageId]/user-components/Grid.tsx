@@ -26,6 +26,12 @@ const defaultStyles: BlockStyle = {
     backgroundColor: "transparent",
 }
 
+import {
+    PropertySection,
+    PropertyRow,
+    PropertySlider
+} from "../components/PropertySection"
+
 // Grid Settings Component
 const GridSettings = () => {
     const { actions: { setProp }, columns, rows, gap } = useNode((node) => ({
@@ -36,60 +42,44 @@ const GridSettings = () => {
 
     return (
         <div className="space-y-4 pt-2">
-            <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                    <label className="text-xs font-medium text-gray-700">Columns</label>
-                    <span className="text-xs text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">{columns}</span>
-                </div>
-                <input
-                    type="range"
-                    min={1}
-                    max={12}
-                    step={1}
-                    value={columns || 2}
-                    onChange={(e) => setProp((props: any) => props.columns = parseInt(e.target.value))}
-                    className="w-full"
-                />
-            </div>
+            <PropertySection title="Grid Layout" defaultOpen={true}>
+                <PropertyRow label="Columns" description="Number of vertical columns">
+                    <PropertySlider
+                        value={columns || 2}
+                        min={1}
+                        max={12}
+                        step={1}
+                        onChange={(val) => setProp((props: any) => props.columns = val)}
+                        unit=""
+                    />
+                </PropertyRow>
 
-            <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                    <label className="text-xs font-medium text-gray-700">Rows</label>
-                    <span className="text-xs text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">{rows || 'Auto'}</span>
-                </div>
-                <input
-                    type="range"
-                    min={0}
-                    max={12}
-                    step={1}
-                    value={rows || 0}
-                    onChange={(e) => setProp((props: any) => props.rows = parseInt(e.target.value))}
-                    className="w-full"
-                />
-                <p className="text-[10px] text-gray-400">Set to 0 for auto rows</p>
-            </div>
+                <PropertyRow label="Rows" description="Number of horizontal rows (0 for auto)">
+                    <PropertySlider
+                        value={rows || 0}
+                        min={0}
+                        max={12}
+                        step={1}
+                        onChange={(val) => setProp((props: any) => props.rows = val)}
+                        unit=""
+                    />
+                </PropertyRow>
 
-            <div className="space-y-3 pt-2 border-t">
-                <div className="flex items-center justify-between">
-                    <label className="text-xs font-medium text-gray-700">Gap</label>
-                    <span className="text-xs text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">{gap}px</span>
-                </div>
-                <input
-                    type="range"
-                    min={0}
-                    max={100}
-                    step={1}
-                    value={parseInt(gap) || 0}
-                    onChange={(e) => setProp((props: any) => {
-                        props.style.gap = parseInt(e.target.value)
-                    })}
-                    className="w-full"
-                />
-            </div>
+                <PropertyRow label="Gap" description="Spacing between items">
+                    <PropertySlider
+                        value={parseInt(gap) || 0}
+                        min={0}
+                        max={100}
+                        step={1}
+                        onChange={(val) => setProp((props: any) => {
+                            if (!props.style) props.style = {}
+                            props.style.gap = val
+                        })}
+                    />
+                </PropertyRow>
+            </PropertySection>
 
-            <div className="pt-2 border-t">
-                <UniversalStyleTab />
-            </div>
+            <UniversalStyleTab />
         </div>
     )
 }

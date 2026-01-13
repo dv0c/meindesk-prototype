@@ -63,22 +63,52 @@ export const UniversalStyleTab = () => {
         opacity, position, zIndex, backgroundImage
     } = style
 
+    // Helper to parse CSS unit values
+    const parseUnit = (val: string | number | undefined): { value: number, unit: string } => {
+        if (!val) return { value: 0, unit: 'px' }
+        if (val === 'auto') return { value: 0, unit: 'auto' }
+        if (typeof val === 'number') return { value: val, unit: 'px' }
+
+        const match = val.toString().match(/^([\d.]+)(.*)$/)
+        if (match) {
+            return { value: parseFloat(match[1]), unit: match[2] || 'px' }
+        }
+        return { value: 0, unit: 'px' }
+    }
+
+    const { value: widthVal, unit: widthUnit } = parseUnit(width)
+    const { value: heightVal, unit: heightUnit } = parseUnit(height)
+
+    const handleDimensionChange = (property: string, value: number, unit: string) => {
+        if (unit === 'auto') {
+            setStyle(property, 'auto')
+        } else {
+            setStyle(property, `${value}${unit}`)
+        }
+    }
+
     return (
         <div className="space-y-4">
             {/* Dimensions */}
             <PropertySection title="Dimensions" summary={`${width || 'Auto'} x ${height || 'Auto'}`}>
                 <PropertyRow label="Width">
-                    <PropertyInput
-                        value={width || ""}
-                        onChange={(v) => setStyle('width', v)}
-                        placeholder="auto, 100%, 50px"
+                    <PropertySliderWithUnit
+                        value={widthVal}
+                        unit={widthUnit}
+                        onChange={(v, u) => handleDimensionChange('width', v, u)}
+                        units={["px", "%", "vw", "rem", "auto"]}
+                        min={0}
+                        max={widthUnit === 'px' ? 1440 : 100}
                     />
                 </PropertyRow>
                 <PropertyRow label="Height">
-                    <PropertyInput
-                        value={height || ""}
-                        onChange={(v) => setStyle('height', v)}
-                        placeholder="auto, 100%, 500px"
+                    <PropertySliderWithUnit
+                        value={heightVal}
+                        unit={heightUnit}
+                        onChange={(v, u) => handleDimensionChange('height', v, u)}
+                        units={["px", "%", "vh", "rem", "auto"]}
+                        min={0}
+                        max={heightUnit === 'px' ? 1000 : 100}
                     />
                 </PropertyRow>
                 <div className="grid grid-cols-2 gap-2">

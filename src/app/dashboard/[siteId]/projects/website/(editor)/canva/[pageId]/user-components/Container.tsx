@@ -75,10 +75,13 @@ export const Container = defineBlock<ContainerProps>({
             className
         })
 
+        // Create a mutable copy of the style to allow modifications
+        const finalStyle = { ...computedStyle }
+
         if (style?.backgroundImage) {
             const resolvedBg = resolveCollectionTemplate(style.backgroundImage, collectionData.data)
             if (resolvedBg) {
-                computedStyle.backgroundImage = `url(${resolvedBg})`
+                finalStyle.backgroundImage = `url(${resolvedBg})`
             }
         }
 
@@ -89,7 +92,7 @@ export const Container = defineBlock<ContainerProps>({
 
         return (
             <CollectionItemProvider value={collectionData}>
-                <div className={computedClassName} style={computedStyle}>
+                <div className={computedClassName} style={finalStyle}>
                     {children}
                     {enabled && React.Children.count(children) === 0 && (
                         <div

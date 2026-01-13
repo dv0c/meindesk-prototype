@@ -25,8 +25,6 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                 moveable: node.data.custom?.moveable !== false,
                 deletable: node.data.custom?.deletable !== false,
                 parent: node.data.parent,
-                isResizable: node.data.custom?.resizable === true ||
-                    ["Container", "Image", "Spacer", "Grid"].includes(node.data.displayName || node.data.name || ""),
                 connectors: node.related.connectors,
             }
         }
@@ -57,7 +55,6 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
     const isContainerType = ["Container", "Grid", "MeindeskContainer", "CollectionContainer"].includes(displayName)
 
     const [indicatorPosition, setIndicatorPosition] = useState<{ top: number; left: number } | null>(null)
-    const [resizeHandlePosition, setResizeHandlePosition] = useState<{ bottom: number; right: number } | null>(null)
     const [boxModel, setBoxModel] = useState<{
         rect: DOMRect
         margin: { top: number; right: number; bottom: number; left: number }
@@ -150,7 +147,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
     useEffect(() => {
         if (!dom || !enabled || (!isActive && !isHovered && !isParentOfSelected)) {
             setIndicatorPosition(null)
-            setResizeHandlePosition(null)
+
             setBoxModel(null)
             return
         }
@@ -161,14 +158,6 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                 top: rect.top - 24,
                 left: rect.left,
             })
-            if (isActive && isResizable) {
-                setResizeHandlePosition({
-                    bottom: window.innerHeight - rect.bottom - 4,
-                    right: window.innerWidth - rect.right - 4,
-                })
-            } else {
-                setResizeHandlePosition(null)
-            }
 
             // Get computed styles for margin and padding (only when selected or parent of selected)
             if (isActive || isParentOfSelected) {
@@ -203,7 +192,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
             window.removeEventListener("scroll", updatePositions, true)
             window.removeEventListener("resize", updatePositions)
         }
-    }, [dom, isActive, isHovered, enabled, isResizable, isParentOfSelected])
+    }, [dom, isActive, isHovered, enabled, isParentOfSelected])
 
     // Apply outline styles - including parent hierarchy visualization
     useEffect(() => {
@@ -251,171 +240,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
         }
     }
 
-    const handleResizeMouseDown = (e: React.MouseEvent) => {
-        if (!dom) return
-        e.stopPropagation()
-        e.preventDefault()
 
-        const startX = e.clientX
-        const startY = e.clientY
-        const startWidth = dom.offsetWidth
-        const startHeight = dom.offsetHeight
-
-        // Store original styles
-        const originalTransition = dom.style.transition
-        const originalWidth = dom.style.width
-        const originalMinWidth = dom.style.minWidth
-        const originalMaxWidth = dom.style.maxWidth
-        const originalHeight = dom.style.height
-        const originalMinHeight = dom.style.minHeight
-
-        dom.style.transition = "none"
-
-        let finalWidth = startWidth
-        let finalHeight = startHeight
-
-        // Pre-calculate parent width once
-        const parentEl = dom.parentElement
-        let parentWidth = window.innerWidth
-        if (parentEl) {
-            const parentRect = parentEl.getBoundingClientRect()
-            const parentStyle = window.getComputedStyle(parentEl)
-            const pLeft = parseFloat(parentStyle.paddingLeft) || 0
-            const pRight = parseFloat(parentStyle.paddingRight) || 0
-            const bLeft = parseFloat(parentStyle.borderLeftWidth) || 0
-            const bRight = parseFloat(parentStyle.borderRightWidth) || 0
-            // Content width = BorderBox - Padding - Border
-            parentWidth = parentRect.width - pLeft - pRight - bLeft - bRight
-        }
-
-        const handleMouseMove = (moveEvent: MouseEvent) => {
-            const deltaX = moveEvent.clientX - startX
-            const deltaY = moveEvent.clientY - startY
-
-            let newWidth = Math.max(50, startWidth + deltaX)
-            let newHeight = Math.max(20, startHeight + deltaY)
-
-            // Constraint: Don't go higher than parent width
-            newWidth = Math.min(newWidth, parentWidth)
-
-            // Calculate percentage
-            let widthPercent = (newWidth / parentWidth) * 100
-            if (widthPercent > 100) widthPercent = 100
-
-            // Snapping Logic
-            // Snap to common grid percentages: 25%, 33.33%, 50%, 66.66%, 75%, 100%
-            const snapPoints = [25, 33.33, 50, 66.66, 75, 100]
-            const snapThreshold = 3 // 3% snapping range
-
-            let snapped = false
-            for (const point of snapPoints) {
-                if (Math.abs(widthPercent - point) < snapThreshold) {
-                    widthPercent = point
-                    snapped = true
-                    break
-                }
-            }
-
-            // If snapped, recalculate pixel width for display fidelity
-            // if not snapped, we just use the raw percentage
-            if (snapped) {
-                newWidth = (widthPercent / 100) * parentWidth
-            }
-
-            finalWidth = newWidth
-            finalHeight = newHeight
-
-            // Update DOM directly for smooth feedback
-            dom.style.width = `${widthPercent}%`
-            dom.style.minWidth = `${widthPercent}%`
-            dom.style.maxWidth = `${widthPercent}%` // Force max-width to follow incase it was set
-
-            // Height logic - usually PX based unless explicit requirement
-            dom.style.minHeight = `${finalHeight}px`
-            dom.style.height = `${finalHeight}px`
-
-            // Update resize handle position
-            const rect = dom.getBoundingClientRect()
-            setResizeHandlePosition({
-                bottom: window.innerHeight - rect.bottom - 4,
-                right: window.innerWidth - rect.right - 4,
-            })
-        }
-
-        const handleMouseUp = () => {
-            document.removeEventListener("mousemove", handleMouseMove)
-            document.removeEventListener("mouseup", handleMouseUp)
-            document.body.style.cursor = ""
-
-            // Restore original transition
-            dom.style.transition = originalTransition
-
-            // Clear the temporary inline styles so CraftJS can take over
-            dom.style.minWidth = originalMinWidth
-            dom.style.height = originalHeight
-            dom.style.maxWidth = originalMaxWidth
-
-            const finalPercent = (finalWidth / parentWidth) * 100
-
-            // Re-apply snapping logic for the final save to be clean
-            const snapPoints = [25, 33.33, 50, 66.66, 75, 100]
-            // We can be a bit more aggressive on save-snap to clean up numbers
-            let savePercent = finalPercent
-            for (const point of snapPoints) {
-                if (Math.abs(savePercent - point) < 2) {
-                    savePercent = point
-                    break
-                }
-            }
-
-            // Sync final values to CraftJS state
-            actions.setProp(id, (prop: Record<string, any>) => {
-                const hasStyle = prop.style && typeof prop.style === 'object'
-
-                // Allow resizing for generic components if explicitly enabled or specific types
-                const shouldResizeWidth = prop.width !== undefined ||
-                    ["Container", "Grid", "Section", "Image"].includes(name);
-
-                if (shouldResizeWidth) {
-                    const val = `${parseFloat(savePercent.toFixed(2))}%`
-
-                    if (hasStyle) {
-                        prop.style.width = val
-                        // Clear fixed widths if switching to fluid
-                        // prop.style.maxWidth = val; 
-                    } else {
-                        prop.width = val
-                    }
-
-                    // Specific fix: If resizing a Container/Section that was "Centered", 
-                    // dragging it manually should probably switch it to custom width/fluid behavior
-                    if (prop.previewLayout === 'centered' && Math.abs(savePercent - 100) > 1) {
-                        // If user resizes a centered container, we might want to keep it centered but change max-width?
-                        // OR, we assume manual resize overrides the preset.
-                        // For now, let's just update width.
-                        if (hasStyle) prop.style.maxWidth = '100%' // Reset constraints if making it custom
-                    }
-                }
-
-                if (prop.height !== undefined || name === "Spacer" || prop.style?.height !== undefined) {
-                    const val = `${Math.round(finalHeight)}px`
-                    if (hasStyle) prop.style.height = val
-                    else prop.height = val
-                }
-
-                // Also update minHeight if present
-                if (prop.minHeight !== undefined || prop.style?.minHeight !== undefined) {
-                    const val = `${Math.round(finalHeight)}px`
-                    if (hasStyle) prop.style.minHeight = val
-                    else prop.minHeight = val
-                }
-            })
-        }
-
-        document.addEventListener("mousemove", handleMouseMove)
-        document.addEventListener("mouseup", handleMouseUp)
-        document.body.style.cursor = "se-resize"
-    }
 
     // Handler for dragging padding/margin edges
     const createSpacingDragHandler = (
@@ -637,26 +462,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                 document.body
             )}
 
-            {/* Render resize handle as a portal */}
-            {enabled && resizeHandlePosition && isActive && isResizable && typeof window !== "undefined" && createPortal(
-                <div
-                    onMouseDown={handleResizeMouseDown}
-                    style={{
-                        position: "fixed",
-                        bottom: resizeHandlePosition.bottom,
-                        right: resizeHandlePosition.right,
-                        width: 10,
-                        height: 10,
-                        background: "#2680eb",
-                        border: "2px solid white",
-                        borderRadius: 2,
-                        cursor: "se-resize",
-                        zIndex: 5,
-                        boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
-                    }}
-                />,
-                document.body
-            )}
+
 
             {/* Render margin overlays (orange) - draggable */}
             {enabled && boxModel && (isActive || isParentOfSelected) && typeof window !== "undefined" && createPortal(
