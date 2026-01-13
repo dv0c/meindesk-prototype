@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react"
-import { Loader2, Search, Database, MoreHorizontal, Edit, Trash } from "lucide-react"
+import { Loader2, Search, Database, MoreHorizontal, Edit, Trash, Plus } from "lucide-react"
 import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -23,6 +23,7 @@ import { getCollections, deleteCollection } from "@/lib/actions/collection-actio
 import { CreateCollectionDialog } from "../dialogs/CreateCollectionDialog"
 import { EditCollectionDialog } from "../dialogs/EditCollectionDialog"
 import { DeleteConfirmDialog } from "../dialogs/DeleteConfirmDialog"
+import { CMSCreateCollection } from "./CMSCreateCollection"
 
 interface CMSCollectionsViewProps {
     siteId: string
@@ -36,6 +37,9 @@ export function CMSCollectionsView({ siteId }: CMSCollectionsViewProps) {
     // Dialog states
     const [editCollection, setEditCollection] = useState<any>(null)
     const [deleteCollectionId, setDeleteCollectionId] = useState<string | null>(null)
+
+    // Mode: list, create, edit
+    const [mode, setMode] = useState<"list" | "create" | "edit">("list")
 
     const fetchCollections = async () => {
         try {
@@ -86,29 +90,62 @@ export function CMSCollectionsView({ siteId }: CMSCollectionsViewProps) {
         return <div className="flex items-center justify-center h-full"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
     }
 
+    const handleSuccess = () => {
+        fetchCollections()
+        setMode("list")
+        setEditCollection(null)
+    }
+
+    if (mode === "create") {
+        return (
+            <CMSCreateCollection
+                siteId={siteId}
+                onBack={() => setMode("list")}
+                onSuccess={handleSuccess}
+            />
+        )
+    }
+
+    if (mode === "edit" && editCollection) {
+        return (
+            <CMSCreateCollection
+                siteId={siteId}
+                initialData={editCollection}
+                onBack={() => {
+                    setMode("list")
+                    setEditCollection(null)
+                }}
+                onSuccess={handleSuccess}
+            />
+        )
+    }
+
     return (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full bg-background dark:bg-zinc-950">
             <div className="p-4 border-b flex items-center justify-between bg-background/95 backdrop-blur">
                 <div className="flex items-center gap-4 flex-1">
                     <div className="relative max-w-sm w-full">
                         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
                             placeholder="Search collections..."
-                            className="pl-9"
+                            className="pl-9 bg-muted/40 border-muted"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
                 </div>
-                <CreateCollectionDialog siteId={siteId} onSuccess={fetchCollections} />
+                <Button onClick={() => setMode("create")}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    New Collection
+                </Button>
             </div>
 
             <ScrollArea className="flex-1">
                 <div className="p-4">
-                    <div className="rounded-md border">
+                    <div className="rounded-md border bg-background/50">
                         <Table>
                             <TableHeader>
-                                <TableRow>
+                                <TableRow className="hover:bg-transparent">
                                     <TableHead className="w-[50px]"></TableHead>
                                     <TableHead>Name</TableHead>
                                     <TableHead>Slug</TableHead>
@@ -125,7 +162,10 @@ export function CMSCollectionsView({ siteId }: CMSCollectionsViewProps) {
                                     </TableRow>
                                 ) : (
                                     filteredCollections.map((col: any) => (
-                                        <TableRow key={col.id} className="group">
+                                        <TableRow key={col.id} className="group hover:bg-muted/30 cursor-pointer" onClick={() => {
+                                            setEditCollection(col)
+                                            setMode("edit")
+                                        }}>
                                             <TableCell>
                                                 <Database className="h-4 w-4 text-muted-foreground" />
                                             </TableCell>
@@ -135,23 +175,17 @@ export function CMSCollectionsView({ siteId }: CMSCollectionsViewProps) {
                                                 {(col.fields as any[])?.length || 0} fields
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <MoreHorizontal className="h-4 w-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem onClick={() => setEditCollection(col)}>
-                                                            <Edit className="h-4 w-4 mr-2" />
-                                                            Edit
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem className="text-destructive" onClick={() => setDeleteCollectionId(col.id)}>
-                                                            <Trash className="h-4 w-4 mr-2" />
-                                                            Delete
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
+                                                <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => {
+                                                        setEditCollection(col)
+                                                        setMode("edit")
+                                                    }}>
+                                                        <Edit className="h-4 w-4 text-muted-foreground" />
+                                                    </Button>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity hover:text-destructive hover:bg-destructive/10" onClick={() => setDeleteCollectionId(col.id)}>
+                                                        <Trash className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
                                             </TableCell>
                                         </TableRow>
                                     ))
@@ -161,16 +195,6 @@ export function CMSCollectionsView({ siteId }: CMSCollectionsViewProps) {
                     </div>
                 </div>
             </ScrollArea>
-
-            {/* Edit Dialog */}
-            {editCollection && (
-                <EditCollectionDialog
-                    open={!!editCollection}
-                    onOpenChange={(open) => !open && setEditCollection(null)}
-                    collection={editCollection}
-                    onSuccess={fetchCollections}
-                />
-            )}
 
             {/* Delete Confirmation */}
             <DeleteConfirmDialog

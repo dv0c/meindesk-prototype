@@ -71,8 +71,6 @@ import { TIGNavbar } from './themes/TimeIsGolden/TIGNavbar'
 import { TIGSingleArticle } from './themes/TimeIsGolden/TIGSingleArticle'
 
 // New Blocks
-import { Stack } from './Stack'
-import { Box as BoxBlock } from './Box'
 import { Icon } from './Icon'
 import { Video } from './Video'
 import { Form } from './Form'
@@ -209,23 +207,7 @@ export const componentRegistry: ComponentRegistration[] = [
         icon: <Box className="h-5 w-5" />,
     },
 
-    // Utility Components
-    {
-        name: 'Stack',
-        component: Stack,
-        category: 'Layout',
-        description: 'Flexbox layout stack',
-        icon: <Box className="h-5 w-5" />,
-        isContainer: true
-    },
-    {
-        name: 'Box',
-        component: BoxBlock,
-        category: 'Layout', // Moved to Layout or Utility? User said Utility but it's often Layout
-        description: 'Primitive box',
-        icon: <Box className="h-5 w-5" />,
-        isContainer: true
-    },
+
     {
         name: 'Icon',
         component: Icon,
@@ -510,6 +492,6 @@ export {
     // Time is Golden
     TIGNavbar, TIGSingleArticle, UpdatesCarousel,
     // New Blocks
-    Stack, BoxBlock as Box, Icon as IconBlock, Video, Form, Tabs, Accordion
+    Icon as IconBlock, Video, Form, Tabs, Accordion
 }
 
