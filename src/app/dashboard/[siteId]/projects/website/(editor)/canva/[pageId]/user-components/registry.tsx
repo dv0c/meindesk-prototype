@@ -70,6 +70,15 @@ import { TIGHero } from './themes/TimeIsGolden/TIGHero'
 import { TIGNavbar } from './themes/TimeIsGolden/TIGNavbar'
 import { TIGSingleArticle } from './themes/TimeIsGolden/TIGSingleArticle'
 
+// New Blocks
+import { Stack } from './Stack'
+import { Box as BoxBlock } from './Box'
+import { Icon } from './Icon'
+import { Video } from './Video'
+import { Form } from './Form'
+import { Tabs } from './Tabs'
+import { Accordion } from './Accordion'
+
 /**
  * Component metadata interface
  */
@@ -170,6 +179,59 @@ export const componentRegistry: ComponentRegistration[] = [
         description: 'Search block with overlay',
         icon: <SearchIcon className="h-5 w-5" />,
         settings: SearchSettings,
+    },
+    {
+        name: 'Form',
+        component: Form,
+        category: 'Interactive',
+        description: 'Form builder',
+        icon: <Box className="h-5 w-5" />, // Todo: use specific icon
+    },
+    {
+        name: 'Video',
+        component: Video,
+        category: 'Media',
+        description: 'Video embed',
+        icon: <Box className="h-5 w-5" />,
+    },
+    {
+        name: 'Tabs',
+        component: Tabs,
+        category: 'Interactive',
+        description: 'Tabbed content',
+        icon: <Box className="h-5 w-5" />,
+    },
+    {
+        name: 'Accordion',
+        component: Accordion,
+        category: 'Interactive',
+        description: 'Collapsible content',
+        icon: <Box className="h-5 w-5" />,
+    },
+
+    // Utility Components
+    {
+        name: 'Stack',
+        component: Stack,
+        category: 'Layout',
+        description: 'Flexbox layout stack',
+        icon: <Box className="h-5 w-5" />,
+        isContainer: true
+    },
+    {
+        name: 'Box',
+        component: BoxBlock,
+        category: 'Layout', // Moved to Layout or Utility? User said Utility but it's often Layout
+        description: 'Primitive box',
+        icon: <Box className="h-5 w-5" />,
+        isContainer: true
+    },
+    {
+        name: 'Icon',
+        component: Icon,
+        category: 'Media', // Or Utility
+        description: 'Vector Icon',
+        icon: <Box className="h-5 w-5" />,
     },
 
     // Media components
@@ -446,6 +508,8 @@ export {
     SpacerSettings, Text, TIGArticleGrid,
     TIGFooter, TIGHero,
     // Time is Golden
-    TIGNavbar, TIGSingleArticle, UpdatesCarousel
+    TIGNavbar, TIGSingleArticle, UpdatesCarousel,
+    // New Blocks
+    Stack, BoxBlock as Box, Icon as IconBlock, Video, Form, Tabs, Accordion
 }
 

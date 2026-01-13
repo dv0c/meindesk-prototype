@@ -740,6 +740,7 @@ interface PropertyBoxModelProps {
 export function PropertyBoxModel({ margin, padding, onChangeMargin, onChangePadding }: PropertyBoxModelProps) {
     return (
         <div className="flex justify-center text-[10px] select-none">
+            {/* ... simplified for existing code ... */}
             {/* Margin Box (Outer) */}
             <div className="relative bg-[#F9CC9D]/80 dark:bg-[#F9CC9D]/40 border border-[#F9CC9D] border-dashed rounded p-6 flex flex-col items-center justify-center gap-1 group/margin">
                 <span className="absolute top-1 left-2 text-[9px] text-muted-foreground/50 uppercase tracking-tighter mix-blend-multiply dark:mix-blend-lighten">Margin</span>
@@ -767,5 +768,21 @@ export function PropertyBoxModel({ margin, padding, onChangeMargin, onChangePadd
                 </div>
             </div>
         </div>
+    )
+}
+
+export interface PropertySwitchProps {
+    value: boolean
+    onChange: (checked: boolean) => void
+    className?: string
+}
+
+export function PropertySwitch({ value, onChange, className }: PropertySwitchProps) {
+    return (
+        <Switch
+            checked={value}
+            onCheckedChange={onChange}
+            className={className}
+        />
     )
 }

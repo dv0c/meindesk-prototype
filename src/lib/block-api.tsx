@@ -66,6 +66,15 @@ export interface BlockStyle {
     left?: string | number
     zIndex?: number
 
+    // Grid Child Props
+    gridColumn?: string
+    gridRow?: string
+    justifySelf?: 'auto' | 'start' | 'end' | 'center' | 'stretch'
+    alignSelf?: 'auto' | 'start' | 'end' | 'center' | 'stretch' | 'baseline'
+
+    // Media
+    objectFit?: 'contain' | 'cover' | 'fill' | 'none' | 'scale-down'
+
     // Any other CSS properties
     [key: string]: any
 }
@@ -199,6 +208,15 @@ export function useBlockStyles(props: { style?: BlockStyle, className?: string }
         if (style.bottom !== undefined) css.bottom = px(style.bottom)
         if (style.left !== undefined) css.left = px(style.left)
         if (style.zIndex !== undefined) css.zIndex = style.zIndex
+
+        // Grid Child Props
+        if (style.gridColumn) css.gridColumn = style.gridColumn
+        if (style.gridRow) css.gridRow = style.gridRow
+        if (style.justifySelf) css.justifySelf = style.justifySelf
+        if (style.alignSelf) css.alignSelf = style.alignSelf
+
+        // Media
+        if (style.objectFit) css.objectFit = style.objectFit as any
 
         return { ...css, ...style } // Merge any unhandled keys
     }, [style])
