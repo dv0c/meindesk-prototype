@@ -231,6 +231,41 @@ export function CraftHeader({
         return () => window.removeEventListener("popstate", handlePopState)
     }, [isDirty])
 
+    // Keyboard Shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Save: Ctrl + S
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+                e.preventDefault()
+                if (!isSaving) {
+                    onSave()
+                }
+            }
+
+            // Undo: Ctrl + Z
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey) {
+                e.preventDefault()
+                if (canUndo) {
+                    actions.history.undo()
+                }
+            }
+
+            // Redo: Ctrl + Y  OR  Ctrl + Shift + Z
+            if (
+                ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') ||
+                ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && e.shiftKey)
+            ) {
+                e.preventDefault()
+                if (canRedo) {
+                    actions.history.redo()
+                }
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+        return () => window.removeEventListener('keydown', handleKeyDown)
+    }, [onSave, isSaving, actions, canUndo, canRedo])
+
     const handleBack = () => {
         if (isDirty) {
             setShowUnsavedDialog(true)

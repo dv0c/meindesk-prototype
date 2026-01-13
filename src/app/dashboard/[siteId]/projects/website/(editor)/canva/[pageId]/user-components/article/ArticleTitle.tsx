@@ -4,6 +4,7 @@ import React from "react"
 import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
 import { useArticle } from "./ArticleContext"
 import { cn } from "@/lib/utils"
+import { ArticleTitleSettings } from "./ArticleTitleSettings"
 
 export interface ArticleTitleProps {
     textAlign?: "left" | "center" | "right"
@@ -21,28 +22,20 @@ export const ArticleTitle = defineBlock<ArticleTitleProps>({
         blockStyle: {},
     },
 
-    settingsConfig: {
-        textAlign: {
-            label: "Alignment",
-            type: "select",
-            section: "Style",
-            options: [
-                { label: "Left", value: "left" },
-                { label: "Center", value: "center" },
-                { label: "Right", value: "right" },
-            ],
-        },
-    },
+    settings: ArticleTitleSettings,
 
-    render: ({ textAlign = "center", className = "", blockStyle }) => {
+    render: ({ textAlign, className = "", blockStyle }) => {
         const { article, loading, error, isEditor } = useArticle()
 
         const { style: computedStyle, className: computedClassName } = useBlockStyles({
             style: {
                 ...blockStyle,
-                textAlign,
+                // Apply specific overrides if present in blockStyle, or fallback to defaults
+                textAlign: blockStyle?.textAlign || textAlign || 'center',
                 fontFamily: 'var(--design-font-heading, Georgia, serif)',
                 color: blockStyle?.color || 'var(--design-primary, inherit)',
+                fontSize: blockStyle?.fontSize,
+                fontWeight: blockStyle?.fontWeight,
             },
             className: cn("text-2xl md:text-3xl lg:text-4xl font-bold leading-tight", className)
         })
