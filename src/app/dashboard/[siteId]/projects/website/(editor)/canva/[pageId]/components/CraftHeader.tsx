@@ -141,7 +141,7 @@ export function CraftHeader({
     const { getCssVariables } = useDesign()
 
     const [showUnsavedDialog, setShowUnsavedDialog] = useState(false)
-    const lastSavedState = useRef<string | null>(null)
+    const [savedState, setSavedState] = useState<string | null>(null)
     const prevIsSaving = useRef(isSaving)
 
     // Navigation Protection Refs
@@ -165,20 +165,30 @@ export function CraftHeader({
     // Calculate Dirty State
     const nodes = query.getSerializedNodes()
     const currentStringState = safeStringify(nodes)
-    const isDirty = !!lastSavedState.current && currentStringState !== lastSavedState.current
 
-    // Initialize saved state on load (once nodes are available)
+    // Logic update: If we can't undo (history empty), we must be at a clean state.
+    // Ideally, we treat this as "no changes made".
+    // Also, align savedState with current state when !canUndo.
+    useEffect(() => {
+        if (!canUndo && nodes && Object.keys(nodes).length > 0) {
+            setSavedState(safeStringify(nodes))
+        }
+    }, [canUndo, nodes]) // Depend on canUndo so "undo to start" resets dirty state
+
+    // Initialize saved state on load (once nodes are available) if not set
     useEffect(() => {
         const nodes = query.getSerializedNodes()
-        if (!lastSavedState.current && nodes && Object.keys(nodes).length > 0) {
-            lastSavedState.current = safeStringify(nodes)
+        if (!savedState && nodes && Object.keys(nodes).length > 0) {
+            setSavedState(safeStringify(nodes))
         }
-    }, [query])
+    }, [query, savedState])
+
+    const isDirty = !!savedState && currentStringState !== savedState
 
     // Update saved state when save completes
     useEffect(() => {
         if (prevIsSaving.current && !isSaving) {
-            lastSavedState.current = safeStringify(query.getSerializedNodes())
+            setSavedState(safeStringify(query.getSerializedNodes()))
             // If we were trapped, untrap since we are clean
             if (isTrapped.current) {
                 isTrapped.current = false
