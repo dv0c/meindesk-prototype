@@ -2,7 +2,23 @@
 
 import React from "react"
 import { useEditor, useNode } from "@craftjs/core"
-import { Plus } from "lucide-react"
+import {
+    Plus,
+    ArrowDown,
+    ArrowRight,
+    AlignStartVertical,
+    AlignCenterVertical,
+    AlignEndVertical,
+    StretchVertical,
+    AlignStartHorizontal,
+    AlignCenterHorizontal,
+    AlignEndHorizontal,
+    BetweenHorizontalStart,
+    BetweenHorizontalEnd,
+    WrapText,
+    ArrowRightLeft,
+    MonitorStop
+} from "lucide-react"
 import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
 import { useCollectionData } from "@/hooks/useCollectionData"
 import { CollectionItemProvider } from "./collections/CollectionItemContext"
@@ -17,7 +33,8 @@ import {
     PropertyShadowSelect,
     PropertyInput,
     PropertyToggle,
-    PropertySliderWithUnit
+    PropertySliderWithUnit,
+    PropertyIconButtonGroup
 } from "../components/PropertySection"
 
 // Container Props Interface
@@ -86,50 +103,50 @@ const ContainerSettings = () => {
         <div className="space-y-4 pt-2">
             <PropertySection title="Layout" defaultOpen={true}>
                 <PropertyRow label="Direction">
-                    <PropertySelect
+                    <PropertyIconButtonGroup
                         value={style.flexDirection || "column"}
                         options={[
-                            { label: "Column", value: "column" },
-                            { label: "Row", value: "row" },
+                            { label: "Column", value: "column", icon: ArrowDown },
+                            { label: "Row", value: "row", icon: ArrowRight },
                         ]}
                         onChange={(val) => handleLayoutChange('flexDirection', val)}
                     />
                 </PropertyRow>
 
                 <PropertyRow label="Alignment">
-                    <PropertySelect
+                    <PropertyIconButtonGroup
                         value={style.alignItems || "flex-start"}
                         options={[
-                            { label: "Start", value: "flex-start" },
-                            { label: "Center", value: "center" },
-                            { label: "End", value: "flex-end" },
-                            { label: "Stretch", value: "stretch" },
+                            { label: "Start", value: "flex-start", icon: AlignStartHorizontal },
+                            { label: "Center", value: "center", icon: AlignCenterHorizontal },
+                            { label: "End", value: "flex-end", icon: AlignEndHorizontal },
+                            { label: "Stretch", value: "stretch", icon: StretchVertical },
                         ]}
                         onChange={(val) => handleLayoutChange('alignItems', val)}
                     />
                 </PropertyRow>
 
                 <PropertyRow label="Justify">
-                    <PropertySelect
+                    <PropertyIconButtonGroup
                         value={style.justifyContent || "flex-start"}
                         options={[
-                            { label: "Start", value: "flex-start" },
-                            { label: "Center", value: "center" },
-                            { label: "End", value: "flex-end" },
-                            { label: "Space Between", value: "space-between" },
-                            { label: "Space Around", value: "space-around" },
+                            { label: "Start", value: "flex-start", icon: AlignStartVertical },
+                            { label: "Center", value: "center", icon: AlignCenterVertical },
+                            { label: "End", value: "flex-end", icon: AlignEndVertical },
+                            { label: "Space Between", value: "space-between", icon: BetweenHorizontalStart },
+                            { label: "Space Around", value: "space-around", icon: BetweenHorizontalEnd },
                         ]}
                         onChange={(val) => handleLayoutChange('justifyContent', val)}
                     />
                 </PropertyRow>
 
                 <PropertyRow label="Wrap">
-                    <PropertySelect
+                    <PropertyIconButtonGroup
                         value={style.flexWrap || "nowrap"}
                         options={[
-                            { label: "No Wrap", value: "nowrap" },
-                            { label: "Wrap", value: "wrap" },
-                            { label: "Wrap Reverse", value: "wrap-reverse" },
+                            { label: "No Wrap", value: "nowrap", icon: MonitorStop },
+                            { label: "Wrap", value: "wrap", icon: WrapText },
+                            { label: "Reverse", value: "wrap-reverse", icon: ArrowRightLeft },
                         ]}
                         onChange={(val) => handleLayoutChange('flexWrap', val)}
                     />
