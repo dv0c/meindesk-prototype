@@ -14,7 +14,7 @@ interface RenderNodeProps {
 
 export const RenderNode = ({ render }: RenderNodeProps) => {
     const { id } = useNode()
-    const { isActive, isHovered, dom, name, moveable, deletable, parent, isResizable, connectors, displayName } = useNode(
+    const { isActive, isHovered, dom, name, moveable, deletable, parent, connectors, displayName } = useNode(
         (node) => {
             return {
                 isActive: node.events.selected,
@@ -125,8 +125,14 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
 
         const handleDeleteNode = (e: CustomEvent) => {
             // Allow deletion unless this IS the ROOT node itself
-            if (e.detail.nodeId === id && deletable && id !== 'ROOT') {
-                actions.delete(id)
+            if (e.detail.nodeId === id && deletable) {
+                try {
+                    if (!query.node(id).isRoot()) {
+                        actions.delete(id)
+                    }
+                } catch (err) {
+                    console.error("Failed to delete node:", err)
+                }
             }
         }
 
@@ -235,8 +241,14 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
 
     const handleDelete = () => {
         // Allow deletion unless this IS the ROOT node itself
-        if (deletable && id !== 'ROOT') {
-            actions.delete(id)
+        if (deletable) {
+            try {
+                if (!query.node(id).isRoot()) {
+                    actions.delete(id)
+                }
+            } catch (err) {
+                console.error("Failed to delete node:", err)
+            }
         }
     }
 

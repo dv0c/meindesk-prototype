@@ -299,10 +299,11 @@ export function CraftHeader({
             // We are at [Prev, Current, Trap]
             // We want [Prev]
             // So go -2
-            history.go(-2)
+            router.push('/dashboard/' + siteId + '/projects/website/pages')
         } else {
             // Just normal back
-            history.back()
+            router.push('/dashboard/' + siteId + '/projects/website/pages')
+
         }
     }
 
