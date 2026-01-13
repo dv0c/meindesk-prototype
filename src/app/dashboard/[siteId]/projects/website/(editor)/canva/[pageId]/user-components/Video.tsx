@@ -4,7 +4,7 @@ import React from "react"
 import { useNode } from "@craftjs/core"
 import { Video as VideoIcon } from "lucide-react"
 import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
-import { UniversalStyleTab } from "@/components/editor/UniversalStyleTab"
+
 import {
     PropertySection,
     PropertyRow,
@@ -88,7 +88,7 @@ const VideoSettings = () => {
                     />
                 </PropertyRow>
             </PropertySection>
-            <UniversalStyleTab />
+
         </div>
     )
 }

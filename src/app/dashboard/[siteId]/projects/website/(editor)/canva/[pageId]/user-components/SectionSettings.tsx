@@ -3,6 +3,12 @@
 import React from "react"
 import { useNode } from "@craftjs/core"
 import {
+    PropertySection,
+    PropertyRow,
+    PropertySelect
+} from "../components/PropertySection"
+
+import {
     Layout,
     Maximize,
     Minimize,
@@ -60,8 +66,8 @@ export const SectionSettings = () => {
                     <button
                         onClick={() => setPreset('full')}
                         className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg border text-xs transition-all ${currentLayout === 'full'
-                                ? 'border-primary bg-primary/5 text-primary'
-                                : 'border-border hover:border-gray-400 hover:bg-gray-50 text-gray-600'
+                            ? 'border-primary bg-primary/5 text-primary'
+                            : 'border-border hover:border-gray-400 hover:bg-gray-50 text-gray-600'
                             }`}
                         title="Full Width"
                     >
@@ -71,8 +77,8 @@ export const SectionSettings = () => {
                     <button
                         onClick={() => setPreset('centered')}
                         className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg border text-xs transition-all ${currentLayout === 'centered'
-                                ? 'border-primary bg-primary/5 text-primary'
-                                : 'border-border hover:border-gray-400 hover:bg-gray-50 text-gray-600'
+                            ? 'border-primary bg-primary/5 text-primary'
+                            : 'border-border hover:border-gray-400 hover:bg-gray-50 text-gray-600'
                             }`}
                         title="Centered (Max Width)"
                     >
@@ -82,8 +88,8 @@ export const SectionSettings = () => {
                     <button
                         onClick={() => setPreset('fixed')}
                         className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg border text-xs transition-all ${currentLayout === 'fixed'
-                                ? 'border-primary bg-primary/5 text-primary'
-                                : 'border-border hover:border-gray-400 hover:bg-gray-50 text-gray-600'
+                            ? 'border-primary bg-primary/5 text-primary'
+                            : 'border-border hover:border-gray-400 hover:bg-gray-50 text-gray-600'
                             }`}
                         title="Fixed Width"
                     >

@@ -133,6 +133,35 @@ export function PropertyInput({
     )
 }
 
+interface PropertyTextAreaProps {
+    value: string
+    onChange: (value: string) => void
+    placeholder?: string
+    rows?: number
+    className?: string
+}
+
+export function PropertyTextArea({
+    value,
+    onChange,
+    placeholder,
+    rows = 3,
+    className,
+}: PropertyTextAreaProps) {
+    return (
+        <textarea
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={placeholder}
+            rows={rows}
+            className={cn(
+                "w-full px-3 py-2 text-sm border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 resize-y",
+                className
+            )}
+        />
+    )
+}
+
 interface PropertySliderProps {
     value: number
     onChange: (value: number) => void

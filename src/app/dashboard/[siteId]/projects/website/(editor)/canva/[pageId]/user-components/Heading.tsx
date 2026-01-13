@@ -59,7 +59,7 @@ export const Heading = defineBlock<HeadingProps>({
             ...style,
             fontSize: fluidFontSize,
             fontWeight: style?.fontWeight ?? `var(--design-font-weight-heading, 700)`,
-            color: style?.color ?? "var(--design-text-heading, inherit)",
+            color: style?.color ?? "var(--design-neutral, inherit)",
 
             // Design token defaults
             fontFamily: "var(--design-font-heading, inherit)",

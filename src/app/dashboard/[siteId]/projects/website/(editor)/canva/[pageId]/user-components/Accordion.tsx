@@ -4,7 +4,6 @@ import React, { useState } from "react"
 import { useNode } from "@craftjs/core"
 import { List } from "lucide-react"
 import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
-import { UniversalStyleTab } from "@/components/editor/UniversalStyleTab"
 import { ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -96,7 +95,7 @@ const AccordionSettings = () => {
                     <Button onClick={addItem} size="sm" variant="outline">+ Add Item</Button>
                 </div>
             </PropertySection>
-            <UniversalStyleTab />
+
         </div>
     )
 }

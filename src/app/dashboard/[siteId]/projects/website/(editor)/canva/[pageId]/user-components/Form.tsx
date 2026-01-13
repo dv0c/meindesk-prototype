@@ -4,7 +4,7 @@ import React from "react"
 import { useNode } from "@craftjs/core"
 import { FileInput } from "lucide-react"
 import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
-import { UniversalStyleTab } from "@/components/editor/UniversalStyleTab"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -107,7 +107,7 @@ const FormSettings = () => {
                 </div>
                 {/* Field list editor would go here */}
             </PropertySection>
-            <UniversalStyleTab />
+
         </div>
     )
 }

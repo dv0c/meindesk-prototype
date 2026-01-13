@@ -7,7 +7,7 @@ import {
     PropertySelect,
     PropertySlider,
 } from "./PropertySection"
-import { UniversalStyleTab } from "@/components/editor/UniversalStyleTab"
+
 
 // Font options - matching DesignPanel
 const fontOptions = [
@@ -99,9 +99,7 @@ export const GlobalStylesPanel = () => {
             </PropertySection>
 
             {/* Universal Styles (Dimensions, Layout, Spacing, Decoration, Position) */}
-            <NodeProvider id={id}>
-                <UniversalStyleTab />
-            </NodeProvider>
+
         </div>
     )
 }

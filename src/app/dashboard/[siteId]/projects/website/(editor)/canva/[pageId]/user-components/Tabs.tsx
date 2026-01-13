@@ -4,7 +4,6 @@ import React, { useState } from "react"
 import { useNode } from "@craftjs/core"
 import { CreditCard } from "lucide-react"
 import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
-import { UniversalStyleTab } from "@/components/editor/UniversalStyleTab"
 import { cn } from "@/lib/utils"
 // Use existing UI components if available, otherwise build simple ones
 import { Button } from "@/components/ui/button"
@@ -109,7 +108,7 @@ const TabsSettings = () => {
                     <Button onClick={addTab} size="sm" variant="outline">+ Add Tab</Button>
                 </div>
             </PropertySection>
-            <UniversalStyleTab />
+
         </div>
     )
 }

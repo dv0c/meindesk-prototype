@@ -4,7 +4,7 @@ import React from "react"
 import { useNode } from "@craftjs/core"
 import * as LucideIcons from "lucide-react"
 import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
-import { UniversalStyleTab } from "@/components/editor/UniversalStyleTab"
+
 import {
     PropertySection,
     PropertyRow,
@@ -66,7 +66,7 @@ const IconSettings = () => {
                     />
                 </PropertyRow>
             </PropertySection>
-            <UniversalStyleTab />
+
         </div>
     )
 }

@@ -4,7 +4,7 @@ import React from "react"
 import { useEditor } from "@craftjs/core"
 import { Box as BoxIcon } from "lucide-react"
 import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
-import { UniversalStyleTab } from "@/components/editor/UniversalStyleTab"
+
 
 export interface BoxProps {
     children?: React.ReactNode
@@ -33,7 +33,7 @@ export const Box = defineBlock<BoxProps>({
         style: defaultStyles
     },
 
-    settings: UniversalStyleTab,
+    // settings: UniversalStyleTab,
 
     render: ({ children, style, className, theme }) => {
         const { enabled } = useEditor((state) => ({

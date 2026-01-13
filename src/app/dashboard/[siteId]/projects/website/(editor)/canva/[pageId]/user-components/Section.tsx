@@ -3,7 +3,6 @@
 import React from "react"
 import { useEditor, useNode } from "@craftjs/core"
 import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
-import { UniversalStyleTab } from "@/components/editor/UniversalStyleTab"
 import { SectionSettings } from "./SectionSettings"
 export { SectionSettings }
 

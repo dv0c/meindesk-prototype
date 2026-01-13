@@ -4,7 +4,7 @@ import React from "react"
 import { useEditor } from "@craftjs/core"
 import { Layers } from "lucide-react"
 import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
-import { UniversalStyleTab } from "@/components/editor/UniversalStyleTab"
+
 
 export interface StackProps {
     children?: React.ReactNode
@@ -45,7 +45,7 @@ export const Stack = defineBlock<StackProps>({
         gap: 16
     },
 
-    settings: UniversalStyleTab,
+    // settings: UniversalStyleTab,
 
     render: ({ children, style, className, direction, wrap, alignItems, justifyContent, gap, theme }) => {
         const { enabled } = useEditor((state) => ({

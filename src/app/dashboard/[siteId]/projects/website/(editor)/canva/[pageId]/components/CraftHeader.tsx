@@ -150,16 +150,21 @@ export function CraftHeader({
 
     // Safe stringify helper to handle circular references in props (e.g. Context Providers)
     const safeStringify = (obj: any) => {
-        const seen = new WeakSet()
-        return JSON.stringify(obj, (key, value) => {
-            if (typeof value === "object" && value !== null) {
-                if (seen.has(value)) {
-                    return
+        try {
+            const seen = new WeakSet()
+            return JSON.stringify(obj, (key, value) => {
+                if (typeof value === "object" && value !== null) {
+                    if (seen.has(value)) {
+                        return
+                    }
+                    seen.add(value)
                 }
-                seen.add(value)
-            }
-            return value
-        })
+                return value
+            })
+        } catch (e) {
+            console.warn("safeStringify failed:", e)
+            return "ERROR_STRINGIFY"
+        }
     }
 
     // Calculate Dirty State
