@@ -61,15 +61,19 @@ export const Grid = defineBlock<GridProps>({
         const isEmpty = childCount === 0
 
         return (
-            <div className={isEmpty && enabled ? "" : computedClassName} style={isEmpty && enabled ? {} : computedStyle}>
-                {children}
-                {enabled && isEmpty && (
-                    <div
-                        className="col-span-full h-full min-h-[80px] w-full flex items-center justify-center border border-dashed border-gray-300/50 bg-gray-50/20 text-xs text-gray-400 p-4"
-                        style={{ gridColumn: `1 / -1` }}
-                    >
-                        Empty Grid
-                    </div>
+            <div className={computedClassName} style={computedStyle}>
+                {isEmpty && enabled ? (
+                    Array.from({ length: columns }).map((_, i) => (
+                        <div
+                            key={i}
+                            className="w-full h-full min-h-[50px] border-r border-dashed border-gray-300 last:border-r-0 first:border-l first:border-l-transparent"
+                            style={{
+                                borderColor: 'rgba(0,0,0,0.1)'
+                            }}
+                        />
+                    ))
+                ) : (
+                    children
                 )}
             </div>
         )
