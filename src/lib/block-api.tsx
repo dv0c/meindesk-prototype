@@ -275,6 +275,7 @@ export function defineBlock<P extends object>(config: BlockConfig<P>): BlockAPI<
         props: config.defaultProps || {},
         rules: {
             canDrag: () => true,
+            canMoveIn: () => config.childrenAllowed === true,
             ...config.rules,
             ...(config.childrenAllowed !== undefined || config.parentTypesAllowed !== undefined ? {
                 // Future reinforcement of rules
