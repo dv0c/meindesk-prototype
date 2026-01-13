@@ -89,11 +89,11 @@ export const Container = defineBlock<ContainerProps>({
 
         return (
             <CollectionItemProvider value={collectionData}>
-                <div className={isEmpty && enabled ? "" : computedClassName} style={isEmpty && enabled ? {} : computedStyle}>
+                <div className={computedClassName} style={computedStyle}>
                     {children}
                     {enabled && React.Children.count(children) === 0 && (
                         <div
-                            className="col-span-full h-full min-h-[80px] w-full flex items-center justify-center border border-dashed border-gray-300/50 bg-gray-50/20 text-xs text-gray-400 p-4"
+                            className="col-span-full h-full w-full flex items-center justify-center border border-dashed border-gray-300/50 bg-gray-50/20 text-xs text-gray-400 p-4"
                             style={{ gridColumn: `1 / -1` }}
                         >
                             Empty Container

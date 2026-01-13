@@ -28,6 +28,8 @@ import { TemplatesDialog } from "./TemplatesDialog"
 import { RawHtmlDialog } from "@/components/builder/RawHtmlDialog"
 import { generateFullHtml } from "@/components/builder/htmlGenerator"
 import { Code } from "lucide-react"
+import { useSearchParams, useRouter, usePathname } from "next/navigation"
+
 import { useSession } from "next-auth/react"
 import { resolverWithFallback } from "../user-components"
 import { useDesign } from "./DesignContext"
@@ -106,10 +108,28 @@ export function CraftHeader({
         }
     })
 
+    const searchParams = useSearchParams()
+    const router = useRouter()
+    const pathname = usePathname()
 
+    // Initialize CMS state from URL
+    const [showCMS, setShowCMS] = useState(searchParams?.get("cms") === "open")
 
-    // const [showLayers, setShowLayers] = useState(false) // Removed local state
-    const [showCMS, setShowCMS] = useState(false)
+    // Sync CMS state to URL
+    useEffect(() => {
+        const params = new URLSearchParams(searchParams?.toString())
+        if (showCMS) {
+            params.set("cms", "open")
+        } else {
+            params.delete("cms")
+        }
+
+        // Use history.replaceState to update URL without triggering Next.js navigation/re-renders
+        // This ensures the Editor state is preserved and prevents "Unsaved Changes" checks from firing
+        const newUrl = `${window.location.pathname}?${params.toString()}`
+        window.history.replaceState(null, "", newUrl)
+    }, [showCMS]) // Only depend on showCMS changing
+
     const [showTemplatesDialog, setShowTemplatesDialog] = useState(false)
     const [showRawHtml, setShowRawHtml] = useState(false)
     const [generatedHtml, setGeneratedHtml] = useState("")
@@ -127,23 +147,37 @@ export function CraftHeader({
     const shouldBlockNavigation = useRef(true)
     const isTrapped = useRef(false)
 
+    // Safe stringify helper to handle circular references in props (e.g. Context Providers)
+    const safeStringify = (obj: any) => {
+        const seen = new WeakSet()
+        return JSON.stringify(obj, (key, value) => {
+            if (typeof value === "object" && value !== null) {
+                if (seen.has(value)) {
+                    return
+                }
+                seen.add(value)
+            }
+            return value
+        })
+    }
+
     // Calculate Dirty State
     const nodes = query.getSerializedNodes()
-    const currentStringState = JSON.stringify(nodes)
+    const currentStringState = safeStringify(nodes)
     const isDirty = !!lastSavedState.current && currentStringState !== lastSavedState.current
 
     // Initialize saved state on load (once nodes are available)
     useEffect(() => {
         const nodes = query.getSerializedNodes()
         if (!lastSavedState.current && nodes && Object.keys(nodes).length > 0) {
-            lastSavedState.current = JSON.stringify(nodes)
+            lastSavedState.current = safeStringify(nodes)
         }
     }, [query])
 
     // Update saved state when save completes
     useEffect(() => {
         if (prevIsSaving.current && !isSaving) {
-            lastSavedState.current = JSON.stringify(query.getSerializedNodes())
+            lastSavedState.current = safeStringify(query.getSerializedNodes())
             // If we were trapped, untrap since we are clean
             if (isTrapped.current) {
                 isTrapped.current = false
@@ -204,26 +238,31 @@ export function CraftHeader({
         }
     }
 
+    const handleDiscard = () => {
+        // Disable the blocker
+        shouldBlockNavigation.current = false
+        setShowUnsavedDialog(false)
+
+        // If we heavily manipulated history (trap), we need to undo the trap AND go back
+        if (isTrapped.current) {
+            // We are at [Prev, Current, Trap]
+            // We want [Prev]
+            // So go -2
+            history.go(-2)
+        } else {
+            // Just normal back
+            history.back()
+        }
+    }
+
     const handleExportHtml = () => {
         // Serialize current state
         const nodes = query.getSerializedNodes()
 
-        // Safe stringify to handle potential circular references (e.g. from Context Providers in props)
-        const safeStringify = (obj: any) => {
-            const seen = new WeakSet()
-            return JSON.stringify(obj, (key, value) => {
-                if (typeof value === "object" && value !== null) {
-                    if (seen.has(value)) {
-                        return
-                    }
-                    seen.add(value)
-                }
-                return value
-            })
-        }
+
 
         try {
-            const json = JSON.stringify(nodes)
+            const json = safeStringify(nodes)
             setExportJson(json)
             setIsExporting(true)
         } catch (e) {
@@ -533,7 +572,7 @@ export function CraftHeader({
                         <AlertDialogCancel onClick={() => setShowUnsavedDialog(false)} className="rounded-none h-8 text-[10px] font-mono uppercase bg-transparent border-zinc-700 text-zinc-400 hover:bg-zinc-800 hover:text-white mt-0">
                             Stay & Save
                         </AlertDialogCancel>
-                        <AlertDialogAction onClick={() => history.back()} className="rounded-none h-8 text-[10px] font-mono uppercase bg-rose-600 hover:bg-rose-700 text-white border-none">
+                        <AlertDialogAction onClick={handleDiscard} className="rounded-none h-8 text-[10px] font-mono uppercase bg-rose-600 hover:bg-rose-700 text-white border-none">
                             Discard & Leave
                         </AlertDialogAction>
                     </AlertDialogFooter>

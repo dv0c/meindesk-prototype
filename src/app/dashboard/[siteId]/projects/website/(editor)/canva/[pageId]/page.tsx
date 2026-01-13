@@ -22,6 +22,7 @@ import { ArticleProvider } from "./user-components/article"
 
 import { EditorThemeProvider } from "./components/ThemeContext"
 import { ReadOnlySection } from "./components/ReadOnlySection"
+import { CraftCanvas } from "./components/CraftCanvas"
 
 // Resolver for all user components - now using resolverWithFallback from registry
 // This automatically handles missing components (e.g., from uninstalled themes)
@@ -577,19 +578,7 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
 
                                 <div className="flex-1 relative z-10">
                                     <ArticleProvider>
-                                        <Frame>
-                                            <Element
-                                                is={Container}
-                                                canvas
-                                                minHeight="100vh"
-                                                height="100vh"
-                                                flexDirection="column"
-                                                alignItems="stretch"
-                                                custom={{ displayName: "App", isDeletable: false }}
-                                            >
-                                                {/* Components will be added here */}
-                                            </Element>
-                                        </Frame>
+                                        <CraftCanvas />
                                     </ArticleProvider>
                                 </div>
 

@@ -7,7 +7,7 @@ import { Plus } from "lucide-react"
 export function CraftCanvas() {
     return (
         <div
-            className="canvas-interactive-area relative min-h-full transition-all duration-300 overflow-auto"
+            className="canvas-interactive-area h-full relative min-h-full transition-all duration-300 overflow-auto"
             style={{
                 backgroundImage:
                     "radial-gradient(circle at 1px 1px, rgba(0,0,0,0.1) 1px, transparent 0)",
@@ -25,7 +25,7 @@ export function CraftCanvas() {
                         paddingLeft: 20,
                         width: "100%",
                         height: "100%",
-                        minHeight: "100vh",
+                        minHeight: "804px",
                         backgroundColor: "transparent",
                     }}
                     custom={{ displayName: "App", isDeletable: false, isApp: true }}

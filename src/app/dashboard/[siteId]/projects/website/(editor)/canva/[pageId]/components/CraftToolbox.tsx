@@ -30,6 +30,11 @@ export function CraftToolbox({ isArticlePage = false }: { isArticlePage?: boolea
             return false
         }
 
+        // Restrict SingleArticle to only valid "article" slug page
+        if (c.name === "SingleArticle" && !isArticlePage) {
+            return false
+        }
+
         // Then check if component is available (from installed themes)
         return isComponentAvailable(c.name)
     })
