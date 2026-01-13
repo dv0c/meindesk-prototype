@@ -57,6 +57,18 @@ export function ThemePanel() {
                         onChange={(v) => updateTheme({ textColor: v })}
                     />
                 </PropertyRow>
+                <PropertyRow label="Heading Color">
+                    <PropertyColor
+                        value={theme.headingColor || theme.neutral}
+                        onChange={(v) => updateTheme({ headingColor: v })}
+                    />
+                </PropertyRow>
+                <PropertyRow label="Paragraph Color">
+                    <PropertyColor
+                        value={theme.textColor || theme.neutral}
+                        onChange={(v) => updateTheme({ textColor: v })}
+                    />
+                </PropertyRow>
                 <PropertyRow label="Accent">
                     <PropertyColor
                         value={theme.accentColor}

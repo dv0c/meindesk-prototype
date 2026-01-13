@@ -38,13 +38,13 @@ export const ThemeHero = defineBlock({
                         propName="title"
                         value={title}
                         as="h1"
-                        className="text-5xl md:text-7xl font-bold tracking-tight text-[var(--theme-text)]"
+                        className="text-5xl md:text-7xl font-bold tracking-tight text-[var(--design-text-heading,inherit)]"
                     />
                     <EditableText
                         propName="subtitle"
                         value={subtitle}
                         as="p"
-                        className="text-xl md:text-2xl text-[var(--theme-muted)] max-w-2xl"
+                        className="text-xl md:text-2xl text-[var(--design-text-body,inherit)] max-w-2xl opacity-80"
                     />
 
                     <button className="px-8 py-4 bg-[var(--theme-primary)] text-[var(--theme-background)] rounded-full font-medium text-lg hover:opacity-90 transition-opacity mt-4">

@@ -7,6 +7,9 @@ export const runtime = "nodejs"
 // -------------------------------------------------------
 // GET – Fetch all articles for a specific site by ID (with optional limit)
 // -------------------------------------------------------
+// -------------------------------------------------------
+// GET – Fetch all articles for a specific site by ID (with optional limit)
+// -------------------------------------------------------
 export async function GET(
   req: NextRequest,
   { params }: { params: { tenantId: string } }
@@ -17,8 +20,15 @@ export async function GET(
   const limit = limitParam ? parseInt(limitParam, 10) : 10 // default to 10 results
   try {
     const articles = await db.article.findMany({
-      where: { siteId:tenantId },
-      include: {
+      where: { siteId: tenantId },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        excerpt: true,
+        cover: true,
+        createdAt: true,
+        categories: true,
         author: {
           select: {
             id: true,
@@ -33,7 +43,7 @@ export async function GET(
     })
 
     if (!articles.length) {
-      return NextResponse.json({ error: "No articles found" }, { status: 404 })
+      return NextResponse.json([])
     }
 
     return NextResponse.json(articles)

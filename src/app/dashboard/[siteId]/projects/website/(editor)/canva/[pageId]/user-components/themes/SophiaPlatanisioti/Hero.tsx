@@ -65,7 +65,7 @@ const HeroBase = React.forwardRef<HTMLDivElement, HeroProps>(({
                                         propName="heading1"
                                         value={heading1}
                                         as="h2"
-                                        className="text-[#7f2e2d] text-[120%] font-serif font-bold"
+                                        className="text-[var(--design-text-heading,#7f2e2d)] text-[120%] font-serif font-bold"
                                     />
                                 )}
                                 {heading2 && (
@@ -73,7 +73,7 @@ const HeroBase = React.forwardRef<HTMLDivElement, HeroProps>(({
                                         propName="heading2"
                                         value={heading2}
                                         as="h2"
-                                        className="text-[#7f2e2d] text-[120%] font-serif font-bold"
+                                        className="text-[var(--design-text-heading,#7f2e2d)] text-[120%] font-serif font-bold"
                                     />
                                 )}
                             </div>

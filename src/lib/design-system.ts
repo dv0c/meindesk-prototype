@@ -25,6 +25,10 @@ export interface DesignSettings {
     // Theme selection
     selectedTheme: string | null
     selectedPalette: string | null
+
+    // Typography Colors
+    headingColor: string
+    textColor: string
 }
 
 export const defaultSettings: DesignSettings = {
@@ -36,6 +40,8 @@ export const defaultSettings: DesignSettings = {
     baseFont: "Inter",
     headingFont: "Inter",
     headingWeight: "Medium",
+    headingColor: "#1a1b20",
+    textColor: "#374151",
     buttonShape: "rounded",
     buttonStyle: "filled",
     buttonSize: "md",
@@ -52,17 +58,37 @@ export const getDesignCssVariables = (settings: DesignSettings) => {
             : "9999px"
 
     return `
-        --primary: ${settings.primary};
-        --primary-foreground: #ffffff;
+        /* Base Colors */
         --background: ${settings.background};
         --foreground: ${settings.neutral};
+        
+        /* UI Element Colors (derived from base/secondary) */
+        --card: ${settings.background};
+        --card-foreground: ${settings.neutral};
+        --popover: ${settings.background};
+        --popover-foreground: ${settings.neutral};
+        --primary: ${settings.primary};
+        --primary-foreground: #ffffff;
+        --secondary: ${settings.secondary};
+        --secondary-foreground: ${settings.neutral};
         --muted: ${settings.secondary};
         --muted-foreground: ${settings.neutral}aa;
-        --border: ${settings.secondary};
+        --accent: ${settings.tertiary};
+        --accent-foreground: ${settings.neutral};
+        --destructive: #ef4444;
+        --destructive-foreground: #ffffff;
         
+        /* Borders & Inputs */
+        --border: ${settings.secondary};
+        --input: ${settings.secondary};
+        --ring: ${settings.primary};
+        --radius: ${settings.buttonShape === "square" ? "0px" : settings.buttonShape === "soft" ? "0.5rem" : settings.buttonShape === "pill" ? "9999px" : "0.5rem"};
+
+        /* Typography */
         --font-sans: ${settings.baseFont}, sans-serif;
         --font-serif: ${settings.headingFont}, serif;
 
+        /* Design System Specific Tokens */
         --design-primary: ${settings.primary};
         --design-secondary: ${settings.secondary};
         --design-background: ${settings.background};
@@ -71,6 +97,8 @@ export const getDesignCssVariables = (settings: DesignSettings) => {
         --design-font-base: ${settings.baseFont}, sans-serif;
         --design-font-heading: ${settings.headingFont}, sans-serif;
         --design-font-weight-heading: ${settings.headingWeight === "Bold" ? "700" : settings.headingWeight === "SemiBold" ? "600" : settings.headingWeight === "Medium" ? "500" : "400"};
+        --design-text-heading: ${settings.headingColor || settings.neutral};
+        --design-text-body: ${settings.textColor || settings.neutral};
         --design-button-radius: ${borderRadius};
         --design-button-style: ${settings.buttonStyle};
     `

@@ -70,7 +70,7 @@ export const Heading = defineBlock<HeadingProps>({
             ...style,
             fontSize: fluidFontSize,
             fontWeight: props.fontWeight ?? style?.fontWeight ?? `var(--design-font-weight-heading, 700)`,
-            color: props.color ?? style?.color ?? "var(--design-neutral, inherit)",
+            color: props.color ?? style?.color ?? "var(--design-text-heading, inherit)",
             textAlign: props.textAlign ?? style?.textAlign,
             marginBottom: props.marginBottom ?? style?.marginBottom,
 

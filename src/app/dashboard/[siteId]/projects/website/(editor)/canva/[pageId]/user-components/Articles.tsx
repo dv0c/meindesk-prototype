@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useEditor } from "@craftjs/core"
 import { useTeam } from "@/hooks/useTeam"
 import axios from "axios"
 import Link from "next/link"
@@ -87,9 +88,41 @@ export const Articles = defineBlock<ArticlesProps>({
         const { team, loading: teamLoading } = useTeam(undefined, 'tenant')
 
         const { style: computedStyle, className: computedClassName } = useBlockStyles({
-            style: blockStyle,
+            style: {
+                ...blockStyle,
+                // Assign CSS variables for children to inherit
+                "--design-font-heading": "var(--design-font-heading, inherit)",
+                "--design-font-base": "var(--design-font-base, inherit)",
+            } as any,
             className
         })
+
+        // Check if we're in the editor
+        const { isEditor } = useEditor((state) => ({ isEditor: state.options.enabled }))
+
+        // Wrapper component to handle editor mode interaction
+        const ArticleWrapper = ({
+            href,
+            className,
+            children
+        }: {
+            href: string
+            className?: string
+            children: React.ReactNode
+        }) => {
+            if (isEditor) {
+                return (
+                    <div className={className}>
+                        {children}
+                    </div>
+                )
+            }
+            return (
+                <Link href={href} className={className}>
+                    {children}
+                </Link>
+            )
+        }
 
         useEffect(() => {
             if (!team?.id) return
@@ -113,6 +146,17 @@ export const Articles = defineBlock<ArticlesProps>({
             loadArticles()
             return () => controller.abort()
         }, [team?.id, limit])
+
+        // Design tokens - explicitly set directly on elements (CSS variable inheritance can be tricky in some contexts)
+        const headingFont = {
+            fontFamily: "var(--design-font-heading, inherit)",
+            color: "var(--design-text-heading, inherit) !important"
+        } as React.CSSProperties
+
+        const bodyFont = {
+            fontFamily: "var(--design-font-base, inherit)",
+            color: "var(--design-text-body, inherit) !important"
+        } as React.CSSProperties
 
         // Loading skeletons
         if (loading || teamLoading) {
@@ -213,10 +257,10 @@ export const Articles = defineBlock<ArticlesProps>({
             return (
                 <Card className={computedClassName} style={computedStyle}>
                     <CardHeader>
-                        <CardTitle>{title}</CardTitle>
-                        <CardDescription>No articles found</CardDescription>
+                        <CardTitle style={headingFont}>{title}</CardTitle>
+                        <CardDescription style={bodyFont}>No articles found</CardDescription>
                     </CardHeader>
-                    <CardContent className="text-sm text-muted-foreground py-8 text-center">
+                    <CardContent className="text-sm text-muted-foreground py-8 text-center" style={bodyFont}>
                         Nothing to read here yet.
                     </CardContent>
                 </Card>
@@ -229,18 +273,18 @@ export const Articles = defineBlock<ArticlesProps>({
                 {style === "boxed" && (
                     <Card>
                         <CardHeader>
-                            <CardTitle>{title}</CardTitle>
-                            <CardDescription>
+                            <CardTitle style={headingFont}>{title}</CardTitle>
+                            <CardDescription style={bodyFont}>
                                 Showing {articles.length} article{articles.length > 1 ? "s" : ""}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
                                 {articles.map((article) => (
-                                    <Link
+                                    <ArticleWrapper
                                         href={`/article/${article.slug}`}
                                         key={article.id}
-                                        className="border-b pb-4 last:border-0 last:pb-0 flex flex-col sm:flex-row gap-3"
+                                        className="border-b pb-4 last:border-0 last:pb-0 flex flex-col sm:flex-row gap-3 cursor-pointer"
                                     >
                                         {thumbnail && article.cover && (
                                             <div className="w-full sm:w-32 h-24 rounded-md overflow-hidden bg-muted">
@@ -252,17 +296,17 @@ export const Articles = defineBlock<ArticlesProps>({
                                             </div>
                                         )}
                                         <div className="flex-1">
-                                            <h3 className="font-semibold text-lg mb-1">{article.title}</h3>
-                                            <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
+                                            <h3 className="font-semibold text-lg mb-1" style={headingFont}>{article.title}</h3>
+                                            <p className="text-sm text-muted-foreground mb-2 line-clamp-2" style={bodyFont}>
                                                 {article.excerpt}
                                             </p>
-                                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                            <div className="flex items-center gap-2 text-xs text-muted-foreground" style={bodyFont}>
                                                 <span>{article.author?.name || "Anonymous"}</span>
                                                 <span>•</span>
                                                 <span>{new Date(article.createdAt).toLocaleDateString()}</span>
                                             </div>
                                         </div>
-                                    </Link>
+                                    </ArticleWrapper>
                                 ))}
                             </div>
                         </CardContent>
@@ -273,10 +317,10 @@ export const Articles = defineBlock<ArticlesProps>({
                 {style === "simple" && (
                     <div className="space-y-4">
                         {articles.map((article) => (
-                            <Link
+                            <ArticleWrapper
                                 href={`/article/${article.slug}`}
                                 key={article.id}
-                                className="border-b pb-4 last:border-0 last:pb-0 flex flex-col sm:flex-row gap-3"
+                                className="border-b pb-4 last:border-0 last:pb-0 flex flex-col sm:flex-row gap-3 cursor-pointer"
                             >
                                 {thumbnail && article.cover && (
                                     <div className="w-full sm:w-32 h-24 rounded-md overflow-hidden bg-muted">
@@ -288,17 +332,17 @@ export const Articles = defineBlock<ArticlesProps>({
                                     </div>
                                 )}
                                 <div className="flex-1">
-                                    <h3 className="font-semibold text-lg mb-1">{article.title}</h3>
-                                    <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
+                                    <h3 className="font-semibold text-lg mb-1" style={headingFont}>{article.title}</h3>
+                                    <p className="text-sm text-muted-foreground mb-2 line-clamp-2" style={bodyFont}>
                                         {article.excerpt}
                                     </p>
-                                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                    <div className="flex items-center gap-2 text-xs text-muted-foreground" style={bodyFont}>
                                         <span>{article.author?.name || "Anonymous"}</span>
                                         <span>•</span>
                                         <span>{new Date(article.createdAt).toLocaleDateString()}</span>
                                     </div>
                                 </div>
-                            </Link>
+                            </ArticleWrapper>
                         ))}
                     </div>
                 )}
@@ -307,10 +351,10 @@ export const Articles = defineBlock<ArticlesProps>({
                 {style === "minimal" && (
                     <div className="space-y-4">
                         {articles.map((article) => (
-                            <Link
+                            <ArticleWrapper
                                 href={`/article/${article.slug}`}
                                 key={article.id}
-                                className="border-b pb-4 last:border-0 last:pb-0 flex flex-col sm:flex-row gap-3"
+                                className="border-b pb-4 last:border-0 last:pb-0 flex flex-col sm:flex-row gap-3 cursor-pointer"
                             >
                                 {thumbnail && article.cover && (
                                     <div className="w-full sm:w-80 h-64 overflow-hidden bg-muted">
@@ -322,17 +366,17 @@ export const Articles = defineBlock<ArticlesProps>({
                                     </div>
                                 )}
                                 <div className="flex-1">
-                                    <h3 className="font-semibold text-2xl max-w-xl mb-1">{article.title}</h3>
-                                    <p className="text-sm text-muted-foreground mb-2 max-w-xl line-clamp-2">
+                                    <h3 className="font-semibold text-2xl max-w-xl mb-1" style={headingFont}>{article.title}</h3>
+                                    <p className="text-sm text-muted-foreground mb-2 max-w-xl line-clamp-2" style={bodyFont}>
                                         {article.excerpt}
                                     </p>
-                                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                    <div className="flex items-center gap-2 text-xs text-muted-foreground" style={bodyFont}>
                                         <span>{article.author?.name || "Anonymous"}</span>
                                         <span>•</span>
                                         <span>{new Date(article.createdAt).toLocaleDateString()}</span>
                                     </div>
                                 </div>
-                            </Link>
+                            </ArticleWrapper>
                         ))}
                     </div>
                 )}
@@ -341,10 +385,10 @@ export const Articles = defineBlock<ArticlesProps>({
                 {style === "magazine" && (
                     <div className="space-y-0">
                         {articles.map((article) => (
-                            <Link
+                            <ArticleWrapper
                                 href={`/article/${article.slug}`}
                                 key={article.id}
-                                className="group border-b border-border py-8 flex items-center gap-6 hover:bg-muted/50 transition-colors"
+                                className="group border-b border-border py-8 flex items-center gap-6 hover:bg-muted/50 transition-colors cursor-pointer"
                             >
                                 {/* Vertical Category Label */}
                                 <div className="hidden md:flex items-center justify-center min-w-[80px]">
@@ -352,7 +396,8 @@ export const Articles = defineBlock<ArticlesProps>({
                                         className="text-xs font-bold tracking-wider uppercase text-muted-foreground"
                                         style={{
                                             writingMode: 'vertical-rl',
-                                            textOrientation: 'mixed'
+                                            textOrientation: 'mixed',
+                                            ...bodyFont
                                         }}
                                     >
                                         {article.categories?.[0] || category}
@@ -361,10 +406,10 @@ export const Articles = defineBlock<ArticlesProps>({
 
                                 {/* Content */}
                                 <div className="flex-1 min-w-0">
-                                    <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-3 group-hover:text-primary transition-colors">
+                                    <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-3 group-hover:text-primary transition-colors" style={headingFont}>
                                         {article.title}
                                     </h2>
-                                    <div className="flex items-center gap-3 text-sm">
+                                    <div className="flex items-center gap-3 text-sm" style={bodyFont}>
                                         <span className="text-emerald-500 font-semibold uppercase tracking-wide">
                                             {article.author?.name || "Anonymous"}
                                         </span>
@@ -387,7 +432,7 @@ export const Articles = defineBlock<ArticlesProps>({
                                         />
                                     </div>
                                 )}
-                            </Link>
+                            </ArticleWrapper>
                         ))}
                     </div>
                 )}

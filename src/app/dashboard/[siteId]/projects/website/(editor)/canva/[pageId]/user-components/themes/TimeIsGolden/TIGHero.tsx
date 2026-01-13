@@ -49,7 +49,7 @@ export const TIGHero = ({ ...props }) => {
                         text="Discover stories, collections, and ideas that matter."
                         fontSize={20}
                         textAlign="center"
-                        color="#6b7280"
+                        color="var(--design-text-body, #6b7280)"
                     />
 
                     <Element

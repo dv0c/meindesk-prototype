@@ -78,7 +78,7 @@ export const Text = defineBlock<TextProps>({
             lineHeight: props.lineHeight ?? style?.lineHeight,
             // Fallback to theme font
             fontFamily: (style?.fontFamily as string) || "var(--design-font-base, inherit)",
-            color: (style?.color === "#374151" && !props.color) ? "var(--design-neutral, #374151)" : (props.color || style?.color)
+            color: (style?.color === "#374151" && !props.color) ? "var(--design-text-body, inherit)" : (props.color || style?.color)
         }
 
         // Fluid typography calculation (could be moved to useBlockStyles or util)
