@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useEditor, Editor, Frame } from "@craftjs/core"
 import { ArrowLeft, Database, Eye, Layers, LayoutTemplate, Monitor, Redo, SidebarClose, Smartphone, Tablet, Undo } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { AIGeneratorDialog } from "./AIGeneratorDialog"
 import { CraftLayersPopup } from "./CraftLayers"
 import { PublishDropdown } from "./PublishDropdown"
@@ -32,6 +32,16 @@ import { useSession } from "next-auth/react"
 import { resolverWithFallback } from "../user-components"
 import { useDesign } from "./DesignContext"
 import { ReadOnlySection } from "./ReadOnlySection"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 interface CraftHeaderProps {
     pageName: string
@@ -109,6 +119,91 @@ export function CraftHeader({
     const [exportJson, setExportJson] = useState<string | null>(null)
     const { getCssVariables } = useDesign()
 
+    const [showUnsavedDialog, setShowUnsavedDialog] = useState(false)
+    const lastSavedState = useRef<string | null>(null)
+    const prevIsSaving = useRef(isSaving)
+
+    // Navigation Protection Refs
+    const shouldBlockNavigation = useRef(true)
+    const isTrapped = useRef(false)
+
+    // Calculate Dirty State
+    const nodes = query.getSerializedNodes()
+    const currentStringState = JSON.stringify(nodes)
+    const isDirty = !!lastSavedState.current && currentStringState !== lastSavedState.current
+
+    // Initialize saved state on load (once nodes are available)
+    useEffect(() => {
+        const nodes = query.getSerializedNodes()
+        if (!lastSavedState.current && nodes && Object.keys(nodes).length > 0) {
+            lastSavedState.current = JSON.stringify(nodes)
+        }
+    }, [query])
+
+    // Update saved state when save completes
+    useEffect(() => {
+        if (prevIsSaving.current && !isSaving) {
+            lastSavedState.current = JSON.stringify(query.getSerializedNodes())
+            // If we were trapped, untrap since we are clean
+            if (isTrapped.current) {
+                isTrapped.current = false
+                history.back() // Remove the trap state
+            }
+        }
+        prevIsSaving.current = isSaving
+    }, [isSaving, query])
+
+    // Reactive Trap Effect: Push state when becoming dirty
+    useEffect(() => {
+        if (isDirty && !isTrapped.current) {
+            history.pushState(null, "", window.location.href)
+            isTrapped.current = true
+        }
+    }, [isDirty])
+
+    // Browser Warning (Tab Close / Refresh)
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (isDirty) {
+                e.preventDefault()
+                e.returnValue = "" // Legacy chrome
+            }
+        }
+        window.addEventListener("beforeunload", handleBeforeUnload)
+        return () => window.removeEventListener("beforeunload", handleBeforeUnload)
+    }, [isDirty])
+
+    // Browser Back Button Interception (Popstate)
+    useEffect(() => {
+        const handlePopState = (event: PopStateEvent) => {
+            if (!shouldBlockNavigation.current) return
+
+            // If we were trapped, and popstate fired, it means user clicked back
+            if (isTrapped.current) {
+                // The trap was popped. We are now at 'real' state.
+                isTrapped.current = false
+
+                if (isDirty) {
+                    // Re-trap and warn
+                    history.pushState(null, "", window.location.href)
+                    isTrapped.current = true
+                    setShowUnsavedDialog(true)
+                }
+            }
+        }
+
+        window.addEventListener("popstate", handlePopState)
+        return () => window.removeEventListener("popstate", handlePopState)
+    }, [isDirty])
+
+    const handleBack = () => {
+        if (isDirty) {
+            setShowUnsavedDialog(true)
+        } else {
+            history.back()
+        }
+    }
+
     const handleExportHtml = () => {
         // Serialize current state
         const nodes = query.getSerializedNodes()
@@ -157,7 +252,7 @@ export function CraftHeader({
                 {/* Left: Page title */}
                 <div className="flex items-center gap-4">
                     <Button
-                        onClick={() => history.back()}
+                        onClick={handleBack}
                         variant="ghost"
                         size="icon"
                         className="h-9 w-9 rounded-full hover:bg-muted transition-colors"
@@ -413,6 +508,37 @@ export function CraftHeader({
                     )}
                 </div>
             )}
+
+            <AlertDialog open={showUnsavedDialog} onOpenChange={setShowUnsavedDialog}>
+                <AlertDialogContent className="border-zinc-800 bg-zinc-950 p-0 overflow-hidden sm:max-w-md">
+                    <div className="p-6 space-y-4">
+                        <AlertDialogHeader>
+                            <AlertDialogTitle className="font-mono text-lg uppercase tracking-widest text-white">
+                                Unsaved Changes
+                            </AlertDialogTitle>
+                            <AlertDialogDescription className="font-mono text-xs text-zinc-400">
+                                You have unsaved changes. Going back will discard them permanently.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+
+                        <div className="bg-rose-950/20 border border-rose-900/30 p-4 flex items-center gap-3">
+                            <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                            <span className="font-mono text-xs text-rose-500">
+                                Warning: Progress will be lost.
+                            </span>
+                        </div>
+                    </div>
+
+                    <AlertDialogFooter className="p-4 bg-zinc-900/50 border-t border-zinc-900 flex-row gap-2 justify-end">
+                        <AlertDialogCancel onClick={() => setShowUnsavedDialog(false)} className="rounded-none h-8 text-[10px] font-mono uppercase bg-transparent border-zinc-700 text-zinc-400 hover:bg-zinc-800 hover:text-white mt-0">
+                            Stay & Save
+                        </AlertDialogCancel>
+                        <AlertDialogAction onClick={() => history.back()} className="rounded-none h-8 text-[10px] font-mono uppercase bg-rose-600 hover:bg-rose-700 text-white border-none">
+                            Discard & Leave
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </>
     )
 }

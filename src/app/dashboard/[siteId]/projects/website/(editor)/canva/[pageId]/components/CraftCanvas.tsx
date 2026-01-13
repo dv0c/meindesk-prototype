@@ -18,12 +18,17 @@ export function CraftCanvas() {
                 <Element
                     is={Container}
                     canvas
-                    padding={20}
-                    height={"100vh"}
-                    backgroundColor="transparent"
-                    minHeight={400}
-                    className="min-h-full"
-                    custom={{ displayName: "App", isDeletable: false }}
+                    style={{
+                        paddingTop: 20,
+                        paddingRight: 20,
+                        paddingBottom: 20,
+                        paddingLeft: 20,
+                        width: "100%",
+                        height: "100%",
+                        minHeight: "100vh",
+                        backgroundColor: "transparent",
+                    }}
+                    custom={{ displayName: "App", isDeletable: false, isApp: true }}
                 >
                     {/* Empty state is handled by Container rendering */}
                 </Element>
