@@ -48,7 +48,7 @@ export const Box = defineBlock<BoxProps>({
         const childCount = React.Children.count(children)
 
         return (
-            <div className={computedClassName} style={computedStyle}>
+            <div className={childCount === 0 && enabled ? "" : computedClassName} style={childCount === 0 && enabled ? {} : computedStyle}>
                 {children}
                 {enabled && childCount === 0 && (
                     <div className="w-full h-full min-h-[50px] flex items-center justify-center text-xs text-gray-400 border border-dotted border-gray-300 p-4 bg-gray-50/10">

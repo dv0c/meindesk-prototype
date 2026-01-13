@@ -70,10 +70,10 @@ export const Stack = defineBlock<StackProps>({
         const childCount = React.Children.count(children)
 
         return (
-            <div className={computedClassName} style={computedStyle}>
+            <div className={childCount === 0 && enabled ? "" : computedClassName} style={childCount === 0 && enabled ? {} : computedStyle}>
                 {children}
                 {enabled && childCount === 0 && (
-                    <div className="w-full h-full min-h-[50px] flex items-center justify-center border border-dashed border-gray-300 rounded bg-gray-50/20 text-xs text-gray-400 p-4">
+                    <div className="w-full h-full min-h-[50px] flex items-center justify-center border border-dashed border-gray-300 rounded-none bg-gray-50/20 text-xs text-gray-400 p-4">
                         Empty Stack
                     </div>
                 )}

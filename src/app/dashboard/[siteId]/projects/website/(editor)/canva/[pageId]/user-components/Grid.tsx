@@ -58,12 +58,14 @@ export const Grid = defineBlock<GridProps>({
 
         const childCount = React.Children.count(children)
 
+        const isEmpty = childCount === 0
+
         return (
-            <div className={computedClassName} style={computedStyle}>
+            <div className={isEmpty && enabled ? "" : computedClassName} style={isEmpty && enabled ? {} : computedStyle}>
                 {children}
-                {enabled && childCount === 0 && (
+                {enabled && isEmpty && (
                     <div
-                        className="col-span-full h-full min-h-[80px] w-full flex items-center justify-center border border-dashed border-gray-300 rounded bg-gray-50/20 text-xs text-gray-400 p-4"
+                        className="col-span-full h-full min-h-[80px] w-full flex items-center justify-center border border-dashed border-gray-300/50 bg-gray-50/20 text-xs text-gray-400 p-4"
                         style={{ gridColumn: `1 / -1` }}
                     >
                         Empty Grid
