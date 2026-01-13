@@ -30,9 +30,12 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
         }
     )
 
-    const { actions, enabled, isParentOfSelected, query, nodes } = useEditor((state) => {
+    const { actions, enabled, isParentOfSelected, isAncestorOfHovered, query, nodes } = useEditor((state, query) => {
         const selected = state.events.selected
+        const hovered = state.events.hovered
         let isParent = false
+        let isAncestor = false
+
         if (selected.size > 0) {
             const selectedId = selected.values().next().value
             if (selectedId) {
@@ -43,15 +46,26 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
             }
         }
 
+        if (hovered.size > 0) {
+            const hoveredId = hovered.values().next().value
+            if (hoveredId && hoveredId !== id) {
+                const ancestors = query.node(hoveredId).ancestors()
+                if (ancestors.includes(id)) {
+                    isAncestor = true
+                }
+            }
+        }
+
         return {
             enabled: state.options.enabled,
             isParentOfSelected: isParent,
+            isAncestorOfHovered: isAncestor,
             nodes: state.nodes,
         }
     })
 
     // Hover context removed for performance
-    const isAncestorOfHovered = false
+    // const isAncestorOfHovered = false // Removing this local override
     const isContainerType = ["Container", "Grid", "MeindeskContainer", "CollectionContainer"].includes(displayName)
 
     const [indicatorPosition, setIndicatorPosition] = useState<{ top: number; left: number } | null>(null)
