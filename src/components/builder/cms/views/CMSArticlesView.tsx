@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useArticle } from "@/hooks/use-article"
 import { useTeam } from "@/hooks/useTeam"
+import { useMediaQuery } from "@/hooks/use-media-query"
 import { MoreHorizontal, Plus, Search, Trash } from "lucide-react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -48,6 +49,16 @@ export function CMSArticlesView({ siteId }: CMSArticlesViewProps) {
             return matchesSearch
         })
     }, [articles, searchQuery])
+
+    const isDesktop = useMediaQuery("(min-width: 768px)")
+
+    const handleArticleClick = (articleId: string) => {
+        if (isDesktop) {
+            setSelectedArticleId(articleId)
+        } else {
+            router.push(`/dashboard/${team?.id}/projects/website/articles/${articleId}/editor`)
+        }
+    }
 
     const handleCreateArticle = async () => {
         if (!team) return
@@ -121,7 +132,7 @@ export function CMSArticlesView({ siteId }: CMSArticlesViewProps) {
                                 {filteredArticles.map((article: any) => (
                                     <div
                                         key={article.id}
-                                        onClick={() => setSelectedArticleId(article.id)}
+                                        onClick={() => handleArticleClick(article.id)}
                                         className={`group flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors border ${selectedArticleId === article.id ? 'bg-primary/5 border-primary/20' : 'hover:bg-muted border-transparent'}`}
                                     >
                                         <div className="h-10 w-10 relative shrink-0 overflow-hidden rounded-md bg-muted border">
