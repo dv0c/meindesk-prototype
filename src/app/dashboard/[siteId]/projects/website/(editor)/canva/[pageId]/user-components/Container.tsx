@@ -55,7 +55,7 @@ export const Container = defineBlock<ContainerProps>({
         useSlugFromUrl: false
     },
 
-    settings: UniversalStyleTab,
+    // settings: UniversalStyleTab,
 
     render: ({ children, style, className, collectionId, itemId, useSlugFromUrl, theme }) => {
         const { enabled } = useEditor((state) => ({

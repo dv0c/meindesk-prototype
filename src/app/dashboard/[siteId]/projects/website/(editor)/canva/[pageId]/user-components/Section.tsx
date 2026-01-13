@@ -55,16 +55,7 @@ export const Section = defineBlock<SectionProps>({
 
     // Combined settings: Layout presets + Universal styles
     // Combined settings: Layout presets + Universal styles
-    settings: (props) => (
-        <div className="flex flex-col gap-4">
-            {/* We manually insert our custom layout settings at the top */}
-            <div className="p-4 border-b">
-                <SectionSettings />
-            </div>
-            {/* Then we render the standard style tab */}
-            <UniversalStyleTab {...props} />
-        </div>
-    ),
+    settings: SectionSettings,
 
     render: ({ children, style, className }) => {
         const { enabled } = useEditor((state) => ({

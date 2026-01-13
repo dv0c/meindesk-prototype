@@ -111,8 +111,15 @@ function PropertiesView({
     onBack: () => void
     onDelete: () => void
 }) {
+    const [activeTab, setActiveTab] = useState("content")
+
     return (
-        <div className="flex flex-col h-full">
+        <Tabs
+            key={selected || 'selected'}
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="flex flex-col h-full"
+        >
             {/* Header with glassmorphism effect */}
             <motion.div
                 className="sticky top-0 z-10 backdrop-blur-xl bg-background/80 border-b"
@@ -161,23 +168,66 @@ function PropertiesView({
                             </motion.div>
                         )}
                     </div>
+
+                    <TabsList className="w-full grid grid-cols-2 gap-1 bg-muted/50 p-1 h-auto rounded-lg">
+                        <TabsTrigger
+                            value="content"
+                            className={cn(
+                                "relative flex items-center gap-1 px-2 py-2 rounded-md transition-all duration-200",
+                                "data-[state=active]:bg-background data-[state=active]:shadow-sm",
+                                "hover:bg-background/50"
+                            )}
+                        >
+                            <Palette className="w-3.5 h-3.5 mr-2" />
+                            <span className="font-medium text-xs">Content</span>
+                        </TabsTrigger>
+                        <TabsTrigger
+                            value="styles"
+                            className={cn(
+                                "relative flex items-center gap-1 px-2 py-2 rounded-md transition-all duration-200",
+                                "data-[state=active]:bg-background data-[state=active]:shadow-sm",
+                                "hover:bg-background/50"
+                            )}
+                        >
+                            <Palette className="w-3.5 h-3.5 mr-2" />
+                            <span className="font-medium text-xs">Styles</span>
+                        </TabsTrigger>
+                    </TabsList>
                 </div>
             </motion.div>
 
             {/* Scrollable properties with animated content */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar">
-                <motion.div
-                    key="content-tab"
-                    variants={contentVariants}
-                    initial="initial"
-                    animate="animate"
-                    exit="exit"
-                    transition={{ duration: 0.15 }}
-                >
-                    <CraftPropertiesPanel />
-                </motion.div>
+            <div className="flex-1 overflow-hidden flex flex-col">
+                <AnimatePresence mode="wait">
+                    <TabsContent value="content" className="flex-1 overflow-y-auto mt-0" asChild>
+                        <motion.div
+                            key="content-tab"
+                            variants={contentVariants}
+                            initial="initial"
+                            animate="animate"
+                            exit="exit"
+                            transition={{ duration: 0.15 }}
+                        >
+                            <CraftPropertiesPanel />
+                        </motion.div>
+                    </TabsContent>
+                </AnimatePresence>
+                <AnimatePresence mode="wait">
+                    <TabsContent value="styles" className="flex-1 overflow-y-auto mt-0 px-4 py-2" asChild>
+                        <motion.div
+                            key="styles-tab"
+                            variants={contentVariants}
+                            initial="initial"
+                            animate="animate"
+                            exit="exit"
+                            transition={{ duration: 0.15 }}
+                        >
+                            <GlobalStylesPanel />
+                        </motion.div>
+                    </TabsContent>
+                </AnimatePresence>
             </div>
-        </div>
+        </Tabs>
     )
 }
 

@@ -211,7 +211,7 @@ function ColorsPanel({ onBack, design, setDesign }: {
                     <PopoverTrigger asChild>
                         <button
                             className="flex-1 p-3 rounded-lg text-left text-white hover:ring-1 hover:ring-primary"
-                            style={{ backgroundColor: design.neutral }}
+                            style={{ backgroundColor: design.neutral, color: design.background === "#ffffff" ? "#e5e7eb" : design.background }}
                         >
                             <span className="text-xs opacity-70">Neutral</span>
                             <div className="text-sm font-mono">{design.neutral}</div>

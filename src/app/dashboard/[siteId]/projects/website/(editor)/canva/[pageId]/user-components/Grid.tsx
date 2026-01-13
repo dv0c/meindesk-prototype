@@ -79,7 +79,6 @@ const GridSettings = () => {
                 </PropertyRow>
             </PropertySection>
 
-            <UniversalStyleTab />
         </div>
     )
 }
