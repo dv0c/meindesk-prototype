@@ -57,6 +57,10 @@ export interface BlockStyle {
     flexDirection?: 'row' | 'column' | 'row-reverse' | 'column-reverse'
     alignItems?: 'flex-start' | 'center' | 'flex-end' | 'stretch' | 'baseline'
     justifyContent?: 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around'
+    flexWrap?: 'nowrap' | 'wrap' | 'wrap-reverse'
+    flexGrow?: number
+    flexShrink?: number
+    flexBasis?: string | number
 
     // Position
     position?: 'static' | 'relative' | 'absolute' | 'fixed' | 'sticky'
@@ -200,6 +204,10 @@ export function useBlockStyles(props: { style?: BlockStyle, className?: string }
         if (style.flexDirection) css.flexDirection = style.flexDirection
         if (style.alignItems) css.alignItems = style.alignItems
         if (style.justifyContent) css.justifyContent = style.justifyContent
+        if (style.flexWrap) css.flexWrap = style.flexWrap
+        if (style.flexGrow !== undefined) css.flexGrow = style.flexGrow
+        if (style.flexShrink !== undefined) css.flexShrink = style.flexShrink
+        if (style.flexBasis !== undefined) css.flexBasis = px(style.flexBasis)
 
         // Position
         if (style.position) css.position = style.position

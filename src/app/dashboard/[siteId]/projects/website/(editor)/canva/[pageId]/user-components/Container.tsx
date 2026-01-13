@@ -123,6 +123,18 @@ const ContainerSettings = () => {
                     />
                 </PropertyRow>
 
+                <PropertyRow label="Wrap">
+                    <PropertySelect
+                        value={style.flexWrap || "nowrap"}
+                        options={[
+                            { label: "No Wrap", value: "nowrap" },
+                            { label: "Wrap", value: "wrap" },
+                            { label: "Wrap Reverse", value: "wrap-reverse" },
+                        ]}
+                        onChange={(val) => handleLayoutChange('flexWrap', val)}
+                    />
+                </PropertyRow>
+
                 <PropertyRow label="Gap">
                     <PropertySlider
                         value={parseInt(style.gap) || 0}
