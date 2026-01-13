@@ -10,6 +10,14 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { useEditor, Editor, Frame } from "@craftjs/core"
 import { ArrowLeft, Database, Eye, Layers, LayoutTemplate, Monitor, Redo, SidebarClose, Smartphone, Tablet, Undo } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -236,16 +244,73 @@ export function CraftHeader({
                 <div className="flex items-center gap-2">
                     {enabled && (
                         <>
-                            {/* Layers Toggle */}
+                            {/* Undo/Redo Group */}
+                            <div className="flex items-center bg-muted/30 rounded-sm border p-0.5">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7 rounded-xs"
+                                    onClick={() => actions.history.undo()}
+                                    disabled={!canUndo}
+                                    title="Undo (Ctrl+Z)"
+                                >
+                                    <Undo className="h-3.5 w-3.5" />
+                                </Button>
+                                <div className="w-px h-4 bg-border/50" />
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7 rounded-xs"
+                                    onClick={() => actions.history.redo()}
+                                    disabled={!canRedo}
+                                    title="Redo (Ctrl+Y)"
+                                >
+                                    <Redo className="h-3.5 w-3.5" />
+                                </Button>
+                            </div>
+
+                            <div className="h-6 w-px bg-border/50 mx-1" />
+
+                            {/* View & Data Tools */}
                             <Button
                                 variant={showLayers ? "secondary" : "ghost"}
-                                size="icon"
-                                className="h-8 w-8"
+                                size="sm"
+                                className="h-8 px-2 text-xs"
                                 onClick={() => setShowLayers(!showLayers)}
                                 title="Toggle Layers Panel"
                             >
-                                <Layers className="h-4 w-4" />
+                                <Layers className="h-4 w-4 mr-2" />
+                                Layers
                             </Button>
+
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="sm" className="h-8 gap-2 text-xs px-2">
+                                        <Database className="h-4 w-4" />
+                                        Tools
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-48">
+                                    <DropdownMenuLabel>Data & Assets</DropdownMenuLabel>
+                                    <DropdownMenuItem onClick={() => setShowCMS(true)}>
+                                        <Database className="h-4 w-4 mr-2" />
+                                        <span>CMS Database</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => setShowTemplates?.(!showTemplates)}>
+                                        <LayoutTemplate className="h-4 w-4 mr-2" />
+                                        <span>Templates</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuLabel>Developer</DropdownMenuLabel>
+                                    <DropdownMenuItem onClick={handleExportHtml}>
+                                        <Code className="h-4 w-4 mr-2" />
+                                        <span>Export HTML</span>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+
+                            {/* AI & Sidebar */}
+                            <AIGeneratorDialog siteId={siteId} />
 
                             <Button
                                 variant={showSidebar ? "secondary" : "ghost"}
@@ -257,61 +322,16 @@ export function CraftHeader({
                                 <SidebarClose className="h-4 w-4" />
                             </Button>
 
-                            <Button
-                                variant={showTemplates ? "secondary" : "ghost"}
-                                size="icon"
-                                className="h-8 w-8"
-                                onClick={() => setShowTemplates?.(!showTemplates)}
-                                title="Toggle Sections Panel"
-                            >
-                                <LayoutTemplate className="h-4 w-4" />
-                            </Button>
-
-                            <Button
-                                variant={showCMS ? "secondary" : "ghost"}
-                                size="icon"
-                                className="h-8 w-8"
-                                onClick={() => setShowCMS(true)}
-                                title="Open CMS"
-                            >
-                                <Database className="h-4 w-4" />
-                            </Button>
-
-                            <div className="h-6 w-px bg-border/50 mx-1" />
-
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8"
-                                onClick={() => actions.history.undo()}
-                                disabled={!canUndo}
-                                title="Undo (Ctrl+Z)"
-                            >
-                                <Undo className="h-4 w-4" />
-                            </Button>
-
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8"
-                                onClick={() => actions.history.redo()}
-                                disabled={!canRedo}
-                                title="Redo (Ctrl+Y)"
-                            >
-                                <Redo className="h-4 w-4" />
-                            </Button>
-
                             <div className="h-6 w-px bg-border/50 mx-1" />
                         </>
                     )}
 
-                    {/* Developer Mode: Export HTML */}
-                    <DeveloperExportButton onExport={handleExportHtml} />
-
-                    <AIGeneratorDialog siteId={siteId} />
+                    {!enabled && (
+                        <div className="h-6 w-px bg-border/50 mx-1" />
+                    )}
 
                     <Button
-                        variant={!enabled ? "default" : "outline"}
+                        variant={!enabled ? "default" : "secondary"}
                         size="sm"
                         onClick={() => {
                             const newEnabled = !enabled
@@ -322,8 +342,9 @@ export function CraftHeader({
                                 setShowTemplates?.(false)
                             }
                         }}
+                        className="h-8 text-xs font-medium"
                     >
-                        <Eye className="h-4 w-4 mr-2" />
+                        <Eye className="h-3.5 w-3.5 mr-2" />
                         {!enabled ? "Exit Preview" : "Preview"}
                     </Button>
 
@@ -343,7 +364,7 @@ export function CraftHeader({
                         <Button
                             onClick={onSave}
                             disabled={isSaving}
-                            className="bg-primary hover:bg-primary/90 min-w-[100px]"
+                            className="bg-primary hover:bg-primary/90 min-w-[100px] h-8 text-xs"
                         >
                             {isSaving ? "Saving..." : `Save ${editorMode === "header" ? "Header" : "Footer"}`}
                         </Button>
