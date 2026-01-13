@@ -2,8 +2,7 @@
 
 import React from "react"
 import { useEditor, useNode } from "@craftjs/core"
-import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
-import { useEditorContent } from "@/hooks/useEditorContent"
+import { defineBlock } from "@/lib/block-api"
 import { cn } from "@/lib/utils"
 import { EditableText, EditableImage } from "@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/lib/withCraftComponent"
 import { LayoutTemplate } from "lucide-react"
@@ -11,63 +10,62 @@ import {
     PropertySection,
     PropertyRow,
     PropertyInput,
-    PropertySelect,
     PropertyTextArea,
     PropertySlider
 } from "../../../components/PropertySection"
 
 export interface HeroProps {
-    content?: string
-    thumbnail?: string
-    heading1?: string
-    heading2?: string
-    contentFont?: string
+    headline?: string
+    subtext?: string
+    buttonText?: string
+    image1?: string
+    image2?: string
+    image3?: string
+    image4?: string
     paddingTop?: number
     paddingBottom?: number
-    paddingLeft?: number
-    paddingRight?: number
     className?: string
 }
 
 const defaultProps: HeroProps = {
-    content: '<p>Welcome to our story. This is a place to share your journey.</p>',
-    thumbnail: 'https://images.unsplash.com/photo-1544967082-d9d3f02b1bd0?q=80&w=800',
-    heading1: 'The First Chapter',
-    heading2: 'A New Beginning',
-    contentFont: 'font-sans',
-    paddingTop: 40,
-    paddingBottom: 40,
-    paddingLeft: 20,
-    paddingRight: 20
+    headline: "I’m a short heading for this section.",
+    subtext: "Nam commodo suscipit quam. Fusce ac felis sit amet ligula pharetra condimentum.",
+    buttonText: "Button Text",
+    image1: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&q=80",
+    image2: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80",
+    image3: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80",
+    image4: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&q=80",
+    paddingTop: 80,
+    paddingBottom: 80,
 }
 
 const HeroSettings = () => {
     const {
         actions: { setProp },
-        content,
-        thumbnail,
-        heading1,
-        heading2,
-        contentFont,
+        headline,
+        subtext,
+        buttonText,
+        image1,
+        image2,
+        image3,
+        image4,
         paddingTop,
         paddingBottom,
-        paddingLeft,
-        paddingRight
     } = useNode((node) => ({
-        content: node.data.props.content,
-        thumbnail: node.data.props.thumbnail,
-        heading1: node.data.props.heading1,
-        heading2: node.data.props.heading2,
-        contentFont: node.data.props.contentFont,
+        headline: node.data.props.headline,
+        subtext: node.data.props.subtext,
+        buttonText: node.data.props.buttonText,
+        image1: node.data.props.image1,
+        image2: node.data.props.image2,
+        image3: node.data.props.image3,
+        image4: node.data.props.image4,
         paddingTop: node.data.props.paddingTop,
         paddingBottom: node.data.props.paddingBottom,
-        paddingLeft: node.data.props.paddingLeft,
-        paddingRight: node.data.props.paddingRight
     }))
 
     return (
         <div className="space-y-4 pt-2">
-            <PropertySection title="Layout & Spacing" defaultOpen={true}>
+            <PropertySection title="Spacing" defaultOpen={true}>
                 <PropertyRow label="Padding Top">
                     <PropertySlider
                         value={paddingTop || 0}
@@ -84,58 +82,37 @@ const HeroSettings = () => {
                         onChange={(val) => setProp((props: any) => props.paddingBottom = val)}
                     />
                 </PropertyRow>
-                <PropertyRow label="Padding Left">
-                    <PropertySlider
-                        value={paddingLeft || 0}
-                        min={0}
-                        max={200}
-                        onChange={(val) => setProp((props: any) => props.paddingLeft = val)}
-                    />
-                </PropertyRow>
-                <PropertyRow label="Padding Right">
-                    <PropertySlider
-                        value={paddingRight || 0}
-                        min={0}
-                        max={200}
-                        onChange={(val) => setProp((props: any) => props.paddingRight = val)}
-                    />
-                </PropertyRow>
             </PropertySection>
 
             <PropertySection title="Content" defaultOpen={true}>
-                <PropertyRow label="Top Heading">
+                <PropertyRow label="Button Text">
                     <PropertyInput
-                        value={heading1 || ""}
-                        onChange={(val) => setProp((props: any) => props.heading1 = val)}
+                        value={buttonText || ""}
+                        onChange={(val) => setProp((props: any) => props.buttonText = val)}
                     />
                 </PropertyRow>
-                <PropertyRow label="Bottom Heading">
+                <PropertyRow label="Image 1">
                     <PropertyInput
-                        value={heading2 || ""}
-                        onChange={(val) => setProp((props: any) => props.heading2 = val)}
+                        value={image1 || ""}
+                        onChange={(val) => setProp((props: any) => props.image1 = val)}
                     />
                 </PropertyRow>
-                <PropertyRow label="Thumbnail URL">
+                <PropertyRow label="Image 2">
                     <PropertyInput
-                        value={thumbnail || ""}
-                        onChange={(val) => setProp((props: any) => props.thumbnail = val)}
+                        value={image2 || ""}
+                        onChange={(val) => setProp((props: any) => props.image2 = val)}
                     />
                 </PropertyRow>
-                <PropertyRow label="Content Font">
-                    <PropertySelect
-                        value={contentFont || 'font-sans'}
-                        options={[
-                            { label: 'Sans', value: 'font-sans' },
-                            { label: 'Serif', value: 'font-serif' },
-                        ]}
-                        onChange={(val) => setProp((props: any) => props.contentFont = val)}
+                <PropertyRow label="Image 3">
+                    <PropertyInput
+                        value={image3 || ""}
+                        onChange={(val) => setProp((props: any) => props.image3 = val)}
                     />
                 </PropertyRow>
-                <PropertyRow label="Body Content">
-                    <PropertyTextArea
-                        value={content || ""}
-                        onChange={(val) => setProp((props: any) => props.content = val)}
-                        rows={5}
+                <PropertyRow label="Image 4">
+                    <PropertyInput
+                        value={image4 || ""}
+                        onChange={(val) => setProp((props: any) => props.image4 = val)}
                     />
                 </PropertyRow>
             </PropertySection>
@@ -145,84 +122,113 @@ const HeroSettings = () => {
 
 export const Hero = defineBlock<HeroProps>({
     name: "Hero",
-    category: "Sophia Platanisioti", // Group under theme name
+    category: "Sophia Platanisioti",
     icon: <LayoutTemplate className="w-4 h-4" />,
-    description: "Theme Hero Section",
+    description: "Masonry Layout Hero",
     defaultProps,
     settings: HeroSettings,
-    childrenAllowed: true,
-
     render: ({
-        content = defaultProps.content,
-        thumbnail = defaultProps.thumbnail,
-        heading1 = defaultProps.heading1,
-        heading2 = defaultProps.heading2,
-        contentFont = defaultProps.contentFont,
+        headline = defaultProps.headline,
+        subtext = defaultProps.subtext,
+        buttonText = defaultProps.buttonText,
+        image1 = defaultProps.image1,
+        image2 = defaultProps.image2,
+        image3 = defaultProps.image3,
+        image4 = defaultProps.image4,
         paddingTop = defaultProps.paddingTop,
         paddingBottom = defaultProps.paddingBottom,
-        paddingLeft = defaultProps.paddingLeft,
-        paddingRight = defaultProps.paddingRight,
         className
     }) => {
-        const { enabled } = useEditor((state) => ({ enabled: state.options.enabled }))
-        const htmlContent = useEditorContent(content)
-
-        // Construct style object from individual props
-        const style: React.CSSProperties = {
-            paddingTop: paddingTop,
-            paddingBottom: paddingBottom,
-            paddingLeft: paddingLeft,
-            paddingRight: paddingRight,
-        }
-
         return (
             <div
-                className={cn("w-full transition-colors", className)}
-                style={style}
+                className={cn("w-full bg-[#FAF3E0]", className)}
+                style={{ paddingTop, paddingBottom }}
             >
-                <div className="max-w-210 mx-auto">
-                    <div className="text-[18px] space-y-5 text-muted-foreground">
-                        {thumbnail && (
-                            <EditableImage
-                                propName="thumbnail"
-                                src={thumbnail}
-                                alt="Hero Image"
-                                width={380}
-                                height={460}
-                                className="float-left mr-8 mb-5 object-cover max-w-full sm:max-w-[380px]"
-                            />
-                        )}
+                <div className="max-w-7xl mx-auto px-6 md:px-12">
+                    <div className="flex flex-col md:flex-row items-center gap-12 lg:gap-20">
+                        {/* Left Content */}
+                        <div className="w-full md:w-1/2 space-y-8">
+                            <div className="space-y-6">
+                                <EditableText
+                                    propName="headline"
+                                    value={headline}
+                                    as="h1"
+                                    className="text-4xl md:text-5xl lg:text-7xl font-bold tracking-tight text-gray-900 leading-[1.1]"
+                                />
+                                <EditableText
+                                    propName="subtext"
+                                    value={subtext}
+                                    as="p"
+                                    className="text-lg md:text-xl text-gray-700 leading-relaxed max-w-lg"
+                                />
+                            </div>
+                            <div>
+                                <EditableText
+                                    propName="buttonText"
+                                    value={buttonText}
+                                    as="button"
+                                    className="bg-black text-white px-8 py-3 rounded-md font-medium hover:bg-gray-800 transition-colors inline-block"
+                                />
+                            </div>
+                        </div>
 
-                        {htmlContent && (
-                            <div
-                                className={cn(`prose-sm ${contentFont} homepage prose-p:pt-0 prose-p:leading-snug max-w-full text-muted-foreground prose-headings:text-primary prose-a:text-primary`)}
-                                dangerouslySetInnerHTML={{ __html: htmlContent }}
-                            />
-                        )}
-
-                        {(heading1 || heading2) && (
-                            <div className="clear-both pt-8">
-                                <hr className="border-black/30 mb-10" />
-                                <div className="text-center space-y-3 pb-20">
-                                    {heading1 && (
-                                        <EditableText
-                                            propName="heading1"
-                                            value={heading1}
-                                            as="h2"
-                                            className="text-[var(--design-text-heading,#7f2e2d)] text-[120%] font-serif font-bold"
-                                        />
+                        {/* Right Masonry Grid */}
+                        <div className="w-full md:w-1/2">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-4 pt-8"> {/* Offset first column */}
+                                    {image1 && (
+                                        <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-sm">
+                                            <EditableImage
+                                                propName="image1"
+                                                src={image1}
+                                                alt="Gallery 1"
+                                                className="object-cover w-full h-full"
+                                                width={400}
+                                                height={500}
+                                            />
+                                        </div>
                                     )}
-                                    {heading2 && (
-                                        <EditableText
-                                            propName="heading2"
-                                            value={heading2}
-                                            as="h2"
-                                            className="text-[var(--design-text-heading,#7f2e2d)] text-[120%] font-serif font-bold"
-                                        />
+                                    {image3 && (
+                                        <div className="relative aspect-[4/5] rounded-2xl overflow-hidden shadow-sm">
+                                            <EditableImage
+                                                propName="image3"
+                                                src={image3}
+                                                alt="Gallery 3"
+                                                className="object-cover w-full h-full"
+                                                width={400}
+                                                height={500}
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="space-y-4">
+                                    {image2 && (
+                                        <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-sm">
+                                            <EditableImage
+                                                propName="image2"
+                                                src={image2}
+                                                alt="Gallery 2"
+                                                className="object-cover w-full h-full"
+                                                width={400}
+                                                height={300}
+                                            />
+                                        </div>
+                                    )}
+                                    {image4 && (
+                                        <div className="relative aspect-[3/5] rounded-2xl overflow-hidden shadow-sm">
+                                            <EditableImage
+                                                propName="image4"
+                                                src={image4}
+                                                alt="Gallery 4"
+                                                className="object-cover w-full h-full"
+                                                width={400}
+                                                height={600}
+                                            />
+                                        </div>
                                     )}
                                 </div>
                             </div>
-                        )}
+                        </div>
                     </div>
                 </div>
             </div>

@@ -1,19 +1,17 @@
 "use client"
 
-import { useArticle } from "@/hooks/use-article"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Badge } from "@/components/ui/badge"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Loader2, Plus, Search, MoreHorizontal, Edit, Trash, Copy, Eye } from "lucide-react"
-import { useEffect, useState, useMemo } from "react"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
-import Image from "next/image"
-import { useTeam } from "@/hooks/useTeam"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { useArticle } from "@/hooks/use-article"
+import { useTeam } from "@/hooks/useTeam"
+import { MoreHorizontal, Plus, Search, Trash } from "lucide-react"
+import Image from "next/image"
+import { useRouter } from "next/navigation"
+import { useEffect, useMemo, useState } from "react"
+import { toast } from "sonner"
+import ArticleEditor from "../ArticleEditor"; // Check if this exists, otherwise fallback to flex
 import { DeleteConfirmDialog } from "../dialogs/DeleteConfirmDialog"
 
 interface CMSArticlesViewProps {
@@ -34,7 +32,7 @@ export function CMSArticlesView({ siteId }: CMSArticlesViewProps) {
 
     // Local state for search/filter
     const [searchQuery, setSearchQuery] = useState("")
-    const [selectedArticles, setSelectedArticles] = useState<Set<string>>(new Set())
+    const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null)
     const [deleteId, setDeleteId] = useState<string | null>(null)
 
     useEffect(() => {
@@ -54,13 +52,6 @@ export function CMSArticlesView({ siteId }: CMSArticlesViewProps) {
     const handleCreateArticle = async () => {
         if (!team) return
         try {
-            // We can use the existing CreateArticleButton logic or redirect.
-            // For now, let's create a temp blank article or repurpose the existing endpoint if we want "New Article" 
-            // to happen instantly. 
-            // Usually it's better to show a dialog or just use the existing flow.
-            // Given the requirement "without moving out of the builder", 
-            // we should probably hit the API to create one and then refresh.
-
             const res = await fetch(`/api/team/${team.id}/articles`, {
                 method: 'POST',
                 body: JSON.stringify({
@@ -72,8 +63,10 @@ export function CMSArticlesView({ siteId }: CMSArticlesViewProps) {
             })
 
             if (res.ok) {
+                const newArticle = await res.json()
                 toast.success("Article created")
-                getArticles(team.id)
+                await getArticles(team.id)
+                setSelectedArticleId(newArticle.id) // Select the new article immediately
             } else {
                 toast.error("Failed to create article")
             }
@@ -88,123 +81,107 @@ export function CMSArticlesView({ siteId }: CMSArticlesViewProps) {
         await deleteArticle(team.id, deleteId)
         toast.success("Article deleted")
         setDeleteId(null)
+        if (selectedArticleId === deleteId) {
+            setSelectedArticleId(null)
+        }
     }
 
-    const handleEdit = (articleId: string) => {
-        // Redirect to the article editor full page
-        if (!team) return
-        // We probably want to open this in a new tab if we want to "keep" the builder state, 
-        // OR navigating away means we lose builder state?
-        // User said: "editting article will open the real builder we already have"
-        // If they navigate away, they lose builder context unless we persist it.
-        // Assuming standard link navigation is fine.
-        router.push(`/dashboard/${team.id}/projects/website/articles/${articleId}/editor`)
-    }
-
-    if (loading && !articles?.length) {
-        return <div className="flex items-center justify-center h-full"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
-    }
+    // Toggle logic for the "drawer" effect
+    const isEditorOpen = !!selectedArticleId
 
     return (
-        <div className="flex flex-col h-full">
-            <div className="p-4 border-b flex items-center justify-between bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                <div className="flex items-center gap-4 flex-1">
-                    <div className="relative max-w-sm w-full">
-                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input
-                            placeholder="Search articles..."
-                            className="pl-9"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
+        <div className="flex h-full w-full overflow-hidden">
+            {/* List View - Hidden on mobile if editor is open, or use responsive toggle */}
+            <div className={`flex flex-col border-r bg-background transition-all duration-300 ${isEditorOpen ? 'w-[400px] hidden md:flex' : 'w-full'}`}>
+                <div className="p-4 border-b flex items-center justify-between bg-background/95 backdrop-blur z-10">
+                    <div className="flex items-center gap-4 flex-1">
+                        <div className="relative w-full">
+                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                placeholder="Search articles..."
+                                className="pl-9"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                        </div>
                     </div>
+                    <Button size="icon" variant="ghost" className="ml-2" onClick={handleCreateArticle}>
+                        <Plus className="h-4 w-4" />
+                    </Button>
                 </div>
-                <Button onClick={handleCreateArticle}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    New Article
-                </Button>
-            </div>
 
-            <ScrollArea className="flex-1">
-                <div className="p-4">
-                    <div className="rounded-md border">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[50px]"></TableHead>
-                                    <TableHead>Article</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Created</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {filteredArticles.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                                            No articles found.
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    filteredArticles.map((article: any) => (
-                                        <TableRow key={article.id} className="group">
-                                            <TableCell>
-                                                <div className="h-10 w-10 relative overflow-hidden rounded-md bg-muted">
-                                                    {article.cover && (
-                                                        <Image
-                                                            src={article.cover}
-                                                            alt={article.title}
-                                                            fill
-                                                            className="object-cover"
-                                                        />
-                                                    )}
+                <ScrollArea className="flex-1">
+                    <div className="p-2">
+                        {filteredArticles.length === 0 ? (
+                            <div className="h-24 flex items-center justify-center text-muted-foreground text-sm">
+                                No articles found.
+                            </div>
+                        ) : (
+                            <div className="space-y-1">
+                                {filteredArticles.map((article: any) => (
+                                    <div
+                                        key={article.id}
+                                        onClick={() => setSelectedArticleId(article.id)}
+                                        className={`group flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors border ${selectedArticleId === article.id ? 'bg-primary/5 border-primary/20' : 'hover:bg-muted border-transparent'}`}
+                                    >
+                                        <div className="h-10 w-10 relative shrink-0 overflow-hidden rounded-md bg-muted border">
+                                            {article.cover ? (
+                                                <Image
+                                                    src={article.cover}
+                                                    alt={article.title}
+                                                    fill
+                                                    className="object-cover"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center bg-secondary/50">
+                                                    <span className="text-[10px] text-muted-foreground">Img</span>
                                                 </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="flex flex-col">
-                                                    <span className="font-medium truncate max-w-[300px]">{article.title}</span>
-                                                    <span className="text-xs text-muted-foreground truncate max-w-[300px]">{article.slug}</span>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Badge variant={statusColors[article.status] as any || "default"}>
+                                            )}
+                                        </div>
+                                        <div className="flex flex-col min-w-0 flex-1">
+                                            <div className="flex items-center justify-between">
+                                                <span className="font-medium text-sm truncate">{article.title || "Untitled"}</span>
+                                                <Badge variant={statusColors[article.status] as any || "default"} className="text-[10px] px-1.5 h-5">
                                                     {article.status}
                                                 </Badge>
-                                            </TableCell>
-                                            <TableCell className="text-muted-foreground text-sm">
-                                                {new Date(article.createdAt).toLocaleDateString()}
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <MoreHorizontal className="h-4 w-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem onClick={() => handleEdit(article.id)}>
-                                                            <Edit className="h-4 w-4 mr-2" />
-                                                            Edit
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={() => window.open(`${team?.url}/article/${article.slug}`, '_blank')}>
-                                                            <Eye className="h-4 w-4 mr-2" />
-                                                            View Live
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem className="text-destructive" onClick={() => setDeleteId(article.id)}>
-                                                            <Trash className="h-4 w-4 mr-2" />
-                                                            Delete
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
+                                            </div>
+                                            <div className="flex items-center justify-between mt-0.5">
+                                                <span className="text-xs text-muted-foreground truncate" title={article.slug}>{article.slug}</span>
+                                                <span className="text-[10px] text-muted-foreground">{new Date(article.createdAt).toLocaleDateString()}</span>
+                                            </div>
+                                        </div>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity -mr-1"
+                                            onClick={(e) => {
+                                                e.stopPropagation()
+                                                setDeleteId(article.id)
+                                            }}
+                                        >
+                                            <Trash className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
+                </ScrollArea>
+            </div>
+
+            {/* Editor Area */}
+            {selectedArticleId ? (
+                <div className="flex-1 h-full bg-background relative flex flex-col min-w-0 animate-in fade-in zoom-in-95 duration-200">
+                    <ArticleEditor
+                        articleId={selectedArticleId}
+                        siteId={siteId}
+                        onClose={() => setSelectedArticleId(null)}
+                    />
                 </div>
-            </ScrollArea>
+            ) : (
+                null
+            )}
+
             <DeleteConfirmDialog
                 open={!!deleteId}
                 onOpenChange={(open) => !open && setDeleteId(null)}
