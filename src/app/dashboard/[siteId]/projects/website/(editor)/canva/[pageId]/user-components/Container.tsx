@@ -41,7 +41,7 @@ const defaultStyles: BlockStyle = {
     minHeight: 100,
     width: "100%",
     height: "auto",
-    display: "block",
+    display: "flex", // Changed from block to flex to support layout controls
     flexDirection: "column",
     alignItems: "flex-start",
     justifyContent: "flex-start",
@@ -74,6 +74,14 @@ const ContainerSettings = () => {
         })
     }
 
+    const handleLayoutChange = (key: string, value: any) => {
+        setProp((props: any) => {
+            if (!props.style) props.style = {}
+            props.style[key] = value
+            props.style.display = "flex" // Enforce flex display when layout controls are used
+        })
+    }
+
     return (
         <div className="space-y-4 pt-2">
             <PropertySection title="Layout" defaultOpen={true}>
@@ -84,7 +92,7 @@ const ContainerSettings = () => {
                             { label: "Column", value: "column" },
                             { label: "Row", value: "row" },
                         ]}
-                        onChange={(val) => handleStyleChange('flexDirection', val)}
+                        onChange={(val) => handleLayoutChange('flexDirection', val)}
                     />
                 </PropertyRow>
 
@@ -97,7 +105,7 @@ const ContainerSettings = () => {
                             { label: "End", value: "flex-end" },
                             { label: "Stretch", value: "stretch" },
                         ]}
-                        onChange={(val) => handleStyleChange('alignItems', val)}
+                        onChange={(val) => handleLayoutChange('alignItems', val)}
                     />
                 </PropertyRow>
 
@@ -111,7 +119,7 @@ const ContainerSettings = () => {
                             { label: "Space Between", value: "space-between" },
                             { label: "Space Around", value: "space-around" },
                         ]}
-                        onChange={(val) => handleStyleChange('justifyContent', val)}
+                        onChange={(val) => handleLayoutChange('justifyContent', val)}
                     />
                 </PropertyRow>
 
@@ -120,7 +128,7 @@ const ContainerSettings = () => {
                         value={parseInt(style.gap) || 0}
                         min={0}
                         max={100}
-                        onChange={(val) => handleStyleChange('gap', val)}
+                        onChange={(val) => handleLayoutChange('gap', val)}
                     />
                 </PropertyRow>
 
