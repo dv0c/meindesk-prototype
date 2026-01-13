@@ -9,6 +9,7 @@ import {
     PropertySelect,
     PropertyIconButtonGroup,
     PropertyBoxModel, // Added import
+    PropertySliderWithUnit
 } from "../components/PropertySection"
 
 // Interface for Text Props (matching Text.tsx)
@@ -40,6 +41,11 @@ export const TextSettings = () => {
         actions: { setProp },
         // Read from style, fall back to root props for legacy support
         text,
+        width,
+        height,
+        maxWidth,
+        maxHeight,
+        minHeight,
         fontSize,
         fontWeight,
         color,
@@ -55,6 +61,11 @@ export const TextSettings = () => {
         paddingRight,
     } = useNode((node) => ({
         text: node.data.props.text,
+        width: node.data.props.style?.width ?? node.data.props.width,
+        height: node.data.props.style?.height ?? node.data.props.height,
+        maxWidth: node.data.props.style?.maxWidth ?? node.data.props.maxWidth,
+        maxHeight: node.data.props.style?.maxHeight ?? node.data.props.maxHeight,
+        minHeight: node.data.props.style?.minHeight ?? node.data.props.minHeight,
         fontSize: node.data.props.style?.fontSize ?? node.data.props.fontSize,
         fontWeight: node.data.props.style?.fontWeight ?? node.data.props.fontWeight,
         color: node.data.props.style?.color ?? node.data.props.color,
@@ -177,6 +188,59 @@ export const TextSettings = () => {
                     onChangeMargin={(side, value) => updateStyle(`margin${side.charAt(0).toUpperCase() + side.slice(1)}`, parseInt(value) || 0)}
                     onChangePadding={(side, value) => updateStyle(`padding${side.charAt(0).toUpperCase() + side.slice(1)}`, parseInt(value) || 0)}
                 />
+            </PropertySection>
+
+            <PropertySection title="Dimensions" defaultOpen={false}>
+                <PropertyRow label="Width">
+                    <PropertySliderWithUnit
+                        value={parseInt(width) || 0}
+                        unit={width?.toString().replace(/[0-9.]/g, '') || 'percent'}
+                        onChange={(val, unit) => updateStyle('width', `${val}${unit}`)}
+                        min={0}
+                        max={100}
+                        units={['px', '%', 'vw', 'rem', 'auto']}
+                    />
+                </PropertyRow>
+                <PropertyRow label="Height">
+                    <PropertySliderWithUnit
+                        value={parseInt(height) || 0}
+                        unit={height?.toString().replace(/[0-9.]/g, '') || 'auto'}
+                        onChange={(val, unit) => updateStyle('height', `${val}${unit}`)}
+                        min={0}
+                        max={100}
+                        units={['px', '%', 'vh', 'rem', 'auto']}
+                    />
+                </PropertyRow>
+                <PropertyRow label="Min Height">
+                    <PropertySliderWithUnit
+                        value={parseInt(minHeight) || 0}
+                        unit={minHeight?.toString().replace(/[0-9.]/g, '') || 'px'}
+                        onChange={(val, unit) => updateStyle('minHeight', `${val}${unit}`)}
+                        min={0}
+                        max={100}
+                        units={['px', '%', 'vh', 'rem']}
+                    />
+                </PropertyRow>
+                <PropertyRow label="Max Width">
+                    <PropertySliderWithUnit
+                        value={parseInt(maxWidth) || 0}
+                        unit={maxWidth?.toString().replace(/[0-9.]/g, '') || 'none'}
+                        onChange={(val, unit) => updateStyle('maxWidth', `${val}${unit}`)}
+                        min={0}
+                        max={100}
+                        units={['px', '%', 'vw', 'rem', 'none']}
+                    />
+                </PropertyRow>
+                <PropertyRow label="Max Height">
+                    <PropertySliderWithUnit
+                        value={parseInt(maxHeight) || 0}
+                        unit={maxHeight?.toString().replace(/[0-9.]/g, '') || 'none'}
+                        onChange={(val, unit) => updateStyle('maxHeight', `${val}${unit}`)}
+                        min={0}
+                        max={100}
+                        units={['px', '%', 'vh', 'rem', 'none']}
+                    />
+                </PropertyRow>
             </PropertySection>
         </div>
     )

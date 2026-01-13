@@ -9,6 +9,7 @@ import {
     PropertyRow,
     PropertySlider,
     PropertySelect,
+    PropertySliderWithUnit
 } from "../components/PropertySection"
 import { useNode } from "@craftjs/core"
 import { HeadingSettings } from "./HeadingSettings"
@@ -18,6 +19,11 @@ interface HeadingProps {
     level?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
     style?: BlockStyle
     className?: string
+    width?: string | number
+    height?: string | number
+    maxWidth?: string | number
+    maxHeight?: string | number
+    minHeight?: string | number
 }
 
 const defaultStyles: BlockStyle = {
@@ -43,7 +49,7 @@ export const Heading = defineBlock<HeadingProps>({
 
     settings: HeadingSettings,
 
-    render: ({ text, level = "h2", style, className, theme, ...props }) => {
+    render: ({ text, level = "h2", style, className, theme, width, height, maxWidth, maxHeight, minHeight, ...props }) => {
         // Fluid typography logic matching defaultStyles
         let fluidFontSize = style?.fontSize
 
@@ -57,6 +63,11 @@ export const Heading = defineBlock<HeadingProps>({
 
         const effectiveStyle: BlockStyle = {
             ...style,
+            width: width ?? style?.width,
+            height: height ?? style?.height,
+            maxWidth: maxWidth ?? style?.maxWidth,
+            maxHeight: maxHeight ?? style?.maxHeight,
+            minHeight: minHeight ?? style?.minHeight,
             fontSize: fluidFontSize,
             fontWeight: style?.fontWeight ?? `var(--design-font-weight-heading, 700)`,
             color: style?.color ?? "var(--design-neutral, inherit)",

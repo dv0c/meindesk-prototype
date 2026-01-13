@@ -15,7 +15,9 @@ import {
     PropertyColor,
     PropertySelect,
     PropertyShadowSelect,
-    PropertyInput
+    PropertyInput,
+    PropertyToggle,
+    PropertySliderWithUnit
 } from "../components/PropertySection"
 
 // Container Props Interface
@@ -142,6 +144,72 @@ const ContainerSettings = () => {
                     onChangeMargin={(side, value) => handleBoxModelChange('margin', side, value)}
                     onChangePadding={(side, value) => handleBoxModelChange('padding', side, value)}
                 />
+            </PropertySection>
+
+            <PropertySection title="Dimensions" defaultOpen={false}>
+                <PropertyRow>
+                    <PropertyToggle
+                        label="Center Content (Auto Margin)"
+                        value={style.marginLeft === 'auto' && style.marginRight === 'auto'}
+                        onChange={(checked) => {
+                            setProp((props: any) => {
+                                if (!props.style) props.style = {}
+                                props.style.marginLeft = checked ? 'auto' : 0
+                                props.style.marginRight = checked ? 'auto' : 0
+                            })
+                        }}
+                    />
+                </PropertyRow>
+                <PropertyRow label="Width">
+                    <PropertySliderWithUnit
+                        value={parseInt(style.width) || 0}
+                        unit={style.width?.toString().replace(/[0-9.]/g, '') || 'px'}
+                        onChange={(val, unit) => handleStyleChange('width', `${val}${unit}`)}
+                        min={0}
+                        max={100}
+                        units={['px', '%', 'vw', 'rem', 'auto']}
+                    />
+                </PropertyRow>
+                <PropertyRow label="Height">
+                    <PropertySliderWithUnit
+                        value={parseInt(style.height) || 0}
+                        unit={style.height?.toString().replace(/[0-9.]/g, '') || 'px'}
+                        onChange={(val, unit) => handleStyleChange('height', `${val}${unit}`)}
+                        min={0}
+                        max={100}
+                        units={['px', '%', 'vh', 'rem', 'auto']}
+                    />
+                </PropertyRow>
+                <PropertyRow label="Min Height">
+                    <PropertySliderWithUnit
+                        value={parseInt(style.minHeight) || 0}
+                        unit={style.minHeight?.toString().replace(/[0-9.]/g, '') || 'px'}
+                        onChange={(val, unit) => handleStyleChange('minHeight', `${val}${unit}`)}
+                        min={0}
+                        max={100}
+                        units={['px', '%', 'vh', 'rem']}
+                    />
+                </PropertyRow>
+                <PropertyRow label="Max Width">
+                    <PropertySliderWithUnit
+                        value={parseInt(style.maxWidth) || 0}
+                        unit={style.maxWidth?.toString().replace(/[0-9.]/g, '') || 'px'}
+                        onChange={(val, unit) => handleStyleChange('maxWidth', `${val}${unit}`)}
+                        min={0}
+                        max={100}
+                        units={['px', '%', 'vw', 'rem', 'none']}
+                    />
+                </PropertyRow>
+                <PropertyRow label="Max Height">
+                    <PropertySliderWithUnit
+                        value={parseInt(style.maxHeight) || 0}
+                        unit={style.maxHeight?.toString().replace(/[0-9.]/g, '') || 'px'}
+                        onChange={(val, unit) => handleStyleChange('maxHeight', `${val}${unit}`)}
+                        min={0}
+                        max={100}
+                        units={['px', '%', 'vh', 'rem', 'none']}
+                    />
+                </PropertyRow>
             </PropertySection>
 
             <PropertySection title="Decoration" defaultOpen={false}>
