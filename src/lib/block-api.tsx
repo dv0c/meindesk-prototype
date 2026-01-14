@@ -152,13 +152,38 @@ export interface BlockAPI<P = any> extends React.FC<P> {
 
 import { cn } from "@/lib/utils"
 
-export function useBlockStyles(props: { style?: BlockStyle, className?: string, responsive?: { hiddenOn?: string[] }, isEditing?: boolean, deviceMode?: DeviceMode | null }) {
-    const { style = {}, className, responsive, isEditing, deviceMode } = props
+import { generateResponsiveCss } from "./responsive-utils"
 
-    // deviceContext removed, using prop directly
+export function useBlockStyles(props: {
+    style?: BlockStyle,
+    mobileStyle?: BlockStyle,
+    tabletStyle?: BlockStyle,
+    className?: string,
+    responsive?: { hiddenOn?: string[] },
+    isEditing?: boolean,
+    deviceMode?: DeviceMode | null,
+    nodeId?: string
+}) {
+    const { style = {}, mobileStyle, tabletStyle, className, responsive, isEditing, deviceMode, nodeId } = props
+
+    // Select the active style based on device mode (For Editor WYSIWYG)
+    const activeStyle = React.useMemo(() => {
+        if (!isEditing || !deviceMode) return style
+
+        if (deviceMode === 'mobile' && mobileStyle) {
+            // Merge mobile style on top of desktop style (or just use mobile style if complete override?)
+            // Usually responsive styles are overrides. Let's merge.
+            return { ...style, ...mobileStyle }
+        }
+        if (deviceMode === 'tablet' && tabletStyle) {
+            return { ...style, ...tabletStyle }
+        }
+        return style
+    }, [style, mobileStyle, tabletStyle, isEditing, deviceMode])
 
     const computedStyle: React.CSSProperties = React.useMemo(() => {
         const css: React.CSSProperties = {}
+        const sourceStyle = activeStyle
 
         // Helper to add 'px' if number, pass string if string
         const px = (val: string | number | undefined) => {
@@ -168,74 +193,74 @@ export function useBlockStyles(props: { style?: BlockStyle, className?: string, 
 
         // Map core style props to CSS
         // Dimensions
-        if (style.width !== undefined) css.width = px(style.width)
-        if (style.height !== undefined) css.height = px(style.height)
-        if (style.minWidth !== undefined) css.minWidth = px(style.minWidth)
-        if (style.minHeight !== undefined) css.minHeight = px(style.minHeight)
-        if (style.maxWidth !== undefined) css.maxWidth = px(style.maxWidth)
-        if (style.maxHeight !== undefined) css.maxHeight = px(style.maxHeight)
+        if (sourceStyle.width !== undefined) css.width = px(sourceStyle.width)
+        if (sourceStyle.height !== undefined) css.height = px(sourceStyle.height)
+        if (sourceStyle.minWidth !== undefined) css.minWidth = px(sourceStyle.minWidth)
+        if (sourceStyle.minHeight !== undefined) css.minHeight = px(sourceStyle.minHeight)
+        if (sourceStyle.maxWidth !== undefined) css.maxWidth = px(sourceStyle.maxWidth)
+        if (sourceStyle.maxHeight !== undefined) css.maxHeight = px(sourceStyle.maxHeight)
 
         // Spacing
-        if (style.marginTop !== undefined) css.marginTop = px(style.marginTop)
-        if (style.marginRight !== undefined) css.marginRight = px(style.marginRight)
-        if (style.marginBottom !== undefined) css.marginBottom = px(style.marginBottom)
-        if (style.marginLeft !== undefined) css.marginLeft = px(style.marginLeft)
+        if (sourceStyle.marginTop !== undefined) css.marginTop = px(sourceStyle.marginTop)
+        if (sourceStyle.marginRight !== undefined) css.marginRight = px(sourceStyle.marginRight)
+        if (sourceStyle.marginBottom !== undefined) css.marginBottom = px(sourceStyle.marginBottom)
+        if (sourceStyle.marginLeft !== undefined) css.marginLeft = px(sourceStyle.marginLeft)
 
-        if (style.paddingTop !== undefined) css.paddingTop = px(style.paddingTop)
-        if (style.paddingRight !== undefined) css.paddingRight = px(style.paddingRight)
-        if (style.paddingBottom !== undefined) css.paddingBottom = px(style.paddingBottom)
-        if (style.paddingLeft !== undefined) css.paddingLeft = px(style.paddingLeft)
-        if (style.gap !== undefined) css.gap = px(style.gap)
+        if (sourceStyle.paddingTop !== undefined) css.paddingTop = px(sourceStyle.paddingTop)
+        if (sourceStyle.paddingRight !== undefined) css.paddingRight = px(sourceStyle.paddingRight)
+        if (sourceStyle.paddingBottom !== undefined) css.paddingBottom = px(sourceStyle.paddingBottom)
+        if (sourceStyle.paddingLeft !== undefined) css.paddingLeft = px(sourceStyle.paddingLeft)
+        if (sourceStyle.gap !== undefined) css.gap = px(sourceStyle.gap)
 
         // Decoration
-        if (style.backgroundColor) css.backgroundColor = style.backgroundColor
-        if (style.backgroundImage) css.backgroundImage = style.backgroundImage
-        if (style.backgroundSize) css.backgroundSize = style.backgroundSize
-        if (style.backgroundPosition) css.backgroundPosition = style.backgroundPosition
-        if (style.backgroundRepeat) css.backgroundRepeat = style.backgroundRepeat as any
+        if (sourceStyle.backgroundColor) css.backgroundColor = sourceStyle.backgroundColor
+        if (sourceStyle.backgroundImage) css.backgroundImage = sourceStyle.backgroundImage
+        if (sourceStyle.backgroundSize) css.backgroundSize = sourceStyle.backgroundSize
+        if (sourceStyle.backgroundPosition) css.backgroundPosition = sourceStyle.backgroundPosition
+        if (sourceStyle.backgroundRepeat) css.backgroundRepeat = sourceStyle.backgroundRepeat as any
 
-        if (style.borderWidth !== undefined) css.borderWidth = px(style.borderWidth)
-        if (style.borderColor) css.borderColor = style.borderColor
-        if (style.borderStyle) css.borderStyle = style.borderStyle
-        if (style.borderRadius !== undefined) css.borderRadius = px(style.borderRadius)
-        if (style.boxShadow) css.boxShadow = style.boxShadow
-        if (style.opacity !== undefined) css.opacity = style.opacity
+        if (sourceStyle.borderWidth !== undefined) css.borderWidth = px(sourceStyle.borderWidth)
+        if (sourceStyle.borderColor) css.borderColor = sourceStyle.borderColor
+        if (sourceStyle.borderStyle) css.borderStyle = sourceStyle.borderStyle
+        if (sourceStyle.borderRadius !== undefined) css.borderRadius = px(sourceStyle.borderRadius)
+        if (sourceStyle.boxShadow) css.boxShadow = sourceStyle.boxShadow
+        if (sourceStyle.opacity !== undefined) css.opacity = sourceStyle.opacity
 
         // Typography
-        if (style.color) css.color = style.color
-        if (style.fontSize !== undefined) css.fontSize = px(style.fontSize)
-        if (style.fontWeight) css.fontWeight = style.fontWeight
-        if (style.textAlign) css.textAlign = style.textAlign
+        if (sourceStyle.color) css.color = sourceStyle.color
+        if (sourceStyle.fontSize !== undefined) css.fontSize = px(sourceStyle.fontSize)
+        if (sourceStyle.fontWeight) css.fontWeight = sourceStyle.fontWeight
+        if (sourceStyle.textAlign) css.textAlign = sourceStyle.textAlign
 
         // Layout
-        if (style.display) css.display = style.display
-        if (style.flexDirection) css.flexDirection = style.flexDirection
-        if (style.alignItems) css.alignItems = style.alignItems
-        if (style.justifyContent) css.justifyContent = style.justifyContent
-        if (style.flexWrap) css.flexWrap = style.flexWrap
-        if (style.flexGrow !== undefined) css.flexGrow = style.flexGrow
-        if (style.flexShrink !== undefined) css.flexShrink = style.flexShrink
-        if (style.flexBasis !== undefined) css.flexBasis = px(style.flexBasis)
+        if (sourceStyle.display) css.display = sourceStyle.display
+        if (sourceStyle.flexDirection) css.flexDirection = sourceStyle.flexDirection
+        if (sourceStyle.alignItems) css.alignItems = sourceStyle.alignItems
+        if (sourceStyle.justifyContent) css.justifyContent = sourceStyle.justifyContent
+        if (sourceStyle.flexWrap) css.flexWrap = sourceStyle.flexWrap
+        if (sourceStyle.flexGrow !== undefined) css.flexGrow = sourceStyle.flexGrow
+        if (sourceStyle.flexShrink !== undefined) css.flexShrink = sourceStyle.flexShrink
+        if (sourceStyle.flexBasis !== undefined) css.flexBasis = px(sourceStyle.flexBasis)
 
         // Position
-        if (style.position) css.position = style.position
-        if (style.top !== undefined) css.top = px(style.top)
-        if (style.right !== undefined) css.right = px(style.right)
-        if (style.bottom !== undefined) css.bottom = px(style.bottom)
-        if (style.left !== undefined) css.left = px(style.left)
-        if (style.zIndex !== undefined) css.zIndex = style.zIndex
+        if (sourceStyle.position) css.position = sourceStyle.position
+        if (sourceStyle.top !== undefined) css.top = px(sourceStyle.top)
+        if (sourceStyle.right !== undefined) css.right = px(sourceStyle.right)
+        if (sourceStyle.bottom !== undefined) css.bottom = px(sourceStyle.bottom)
+        if (sourceStyle.left !== undefined) css.left = px(sourceStyle.left)
+        if (sourceStyle.zIndex !== undefined) css.zIndex = sourceStyle.zIndex
 
         // Grid Child Props
-        if (style.gridColumn) css.gridColumn = style.gridColumn
-        if (style.gridRow) css.gridRow = style.gridRow
-        if (style.justifySelf) css.justifySelf = style.justifySelf
-        if (style.alignSelf) css.alignSelf = style.alignSelf
+        if (sourceStyle.gridColumn) css.gridColumn = sourceStyle.gridColumn
+        if (sourceStyle.gridRow) css.gridRow = sourceStyle.gridRow
+        if (sourceStyle.justifySelf) css.justifySelf = sourceStyle.justifySelf
+        if (sourceStyle.alignSelf) css.alignSelf = sourceStyle.alignSelf
 
         // Media
-        if (style.objectFit) css.objectFit = style.objectFit as any
+        if (sourceStyle.objectFit) css.objectFit = sourceStyle.objectFit as any
 
-        return { ...css, ...style } // Merge any unhandled keys
-    }, [style])
+        return { ...css, ...sourceStyle } // Merge any unhandled keys
+    }, [activeStyle])
 
     // Generate Responsive Visibility Classes
     const responsiveClasses = React.useMemo(() => {
@@ -281,7 +306,22 @@ export function useBlockStyles(props: { style?: BlockStyle, className?: string, 
         return {}
     }, [deviceMode, responsive, isEditing])
 
-    return { style: { ...computedStyle, ...viewModeOverride }, className: cn(className, responsiveClasses) }
+    // Generated CSS for Runtime (if not editing or if we want to preview real media queries)
+    // Actually, in Editor we rely on inline style switching (activeStyle).
+    // In Runtime (published), we need the <style> block.
+    // We can return the CSS string if nodeId is provided.
+    const generatedCss = React.useMemo(() => {
+        if (!nodeId) return null
+        return generateResponsiveCss(nodeId, style, tabletStyle, mobileStyle)
+    }, [nodeId, style, tabletStyle, mobileStyle])
+
+    const uniqueClassName = nodeId ? `c-${nodeId}` : ''
+
+    return {
+        style: { ...computedStyle, ...viewModeOverride },
+        className: cn(className, responsiveClasses, uniqueClassName),
+        css: generatedCss
+    }
 }
 
 // --- Main API Function ---

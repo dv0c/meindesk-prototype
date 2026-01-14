@@ -27,6 +27,11 @@ export function SafelistClasses() {
             <div className="lg:outline-dashed" />
             <div className="lg:outline-1" />
             <div className="lg:outline-rose-400" />
+
+            {/* Layout Auto-Stacking */}
+            <div className="flex-col" />
+            <div className="md:flex-row" />
+            <div className="flex" />
         </div>
     )
 }

@@ -19,6 +19,7 @@ import {
     ArrowRightLeft,
     MonitorStop
 } from "lucide-react"
+import { cn } from "@/lib/utils"
 import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
 import { useCollectionData } from "@/hooks/useCollectionData"
 import { CollectionItemProvider } from "./collections/CollectionItemContext"
@@ -45,6 +46,7 @@ export interface ContainerProps {
     responsive?: {
         hiddenOn?: string[]
     }
+    stackOnMobile?: boolean // New prop for auto-stacking
 
     // Collection Data Props
     collectionId?: string
@@ -74,9 +76,10 @@ const defaultStyles: BlockStyle = {
 }
 
 const ContainerSettings = () => {
-    const { actions: { setProp }, style, collectionId } = useNode((node) => ({
+    const { actions: { setProp }, style, collectionId, stackOnMobile } = useNode((node) => ({
         style: node.data.props.style || {},
-        collectionId: node.data.props.collectionId
+        collectionId: node.data.props.collectionId,
+        stackOnMobile: node.data.props.stackOnMobile
     }))
 
     const handleStyleChange = (key: string, value: any) => {
@@ -102,6 +105,12 @@ const ContainerSettings = () => {
         })
     }
 
+    const handleStackOnMobileChange = (checked: boolean) => {
+        setProp((props: any) => {
+            props.stackOnMobile = checked
+        })
+    }
+
     return (
         <div className="space-y-4 pt-2">
             <PropertySection title="Layout" defaultOpen={true}>
@@ -115,6 +124,16 @@ const ContainerSettings = () => {
                         onChange={(val) => handleLayoutChange('flexDirection', val)}
                     />
                 </PropertyRow>
+
+                {style.flexDirection === "row" && (
+                    <PropertyRow label="Mobile Stack">
+                        <PropertyToggle
+                            label="Stack on Mobile"
+                            value={stackOnMobile !== false} // Default to true if undefined
+                            onChange={handleStackOnMobileChange}
+                        />
+                    </PropertyRow>
+                )}
 
                 <PropertyRow label="Alignment">
                     <PropertyIconButtonGroup
@@ -347,12 +366,13 @@ export const Container = defineBlock<ContainerProps>({
         collectionId: "",
         itemId: "",
         useSlugFromUrl: false,
-        responsive: { hiddenOn: [] }
+        responsive: { hiddenOn: [] },
+        stackOnMobile: true
     },
 
     settings: ContainerSettings,
 
-    render: ({ children, style, className, collectionId, itemId, useSlugFromUrl, theme, isEditing, responsive, deviceMode }) => {
+    render: ({ children, style, className, collectionId, itemId, useSlugFromUrl, theme, isEditing, responsive, deviceMode, stackOnMobile }) => {
         const { enabled } = useEditor((state) => ({
             enabled: state.options.enabled
         }))
@@ -364,10 +384,28 @@ export const Container = defineBlock<ContainerProps>({
             useSlugFromUrl
         })
 
+        // -- AUTO-RESPONSIVE LOGIC --
+        // Check if we should auto-stack on mobile
+        let effectiveStyle = { ...style }
+        let autoResponsiveClasses = ""
+
+        const isRow = effectiveStyle.flexDirection === 'row'
+        const shouldStack = stackOnMobile !== false // Default true
+
+        if (isRow && shouldStack) {
+            // Remove inline style so class can take over
+            delete effectiveStyle.flexDirection
+
+            // Add responsive classes:
+            // Mobile: flex-col (stack)
+            // Desktop: flex-row (original)
+            autoResponsiveClasses = "flex flex-col md:flex-row"
+        }
+
         // Compute Styles
         const { style: computedStyle, className: computedClassName } = useBlockStyles({
-            style,
-            className,
+            style: effectiveStyle,
+            className: cn(className, autoResponsiveClasses),
             responsive,
             isEditing,
             deviceMode
