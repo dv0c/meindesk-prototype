@@ -83,7 +83,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
 
     // Hover context removed for performance
     // const isAncestorOfHovered = false // Removing this local override
-    const isContainerType = ["Container", "Grid", "MeindeskContainer", "CollectionContainer"].includes(displayName)
+    const isContainerType = ["Container", "Grid", "MeindeskContainer", "CollectionContainer", "Box", "Section", "Stack"].includes(displayName)
 
     // Strict Hover check
     const isHoveredStrict = isHovered && !activeChildHovered
@@ -258,9 +258,9 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                 // Hovered element - solid blue outline
                 dom.style.outline = "2px solid #2680eb"
                 dom.style.outlineOffset = "-1px"
-            } else if (isAncestorOfHovered && isContainerType) {
-                // Parent container of hovered element - dashed lighter outline
-                dom.style.outline = "1px dashed rgba(38, 128, 235, 0.6)"
+            } else if ((isAncestorOfHovered || activeChildHovered) && isContainerType) {
+                // Parent container of hovered element (or bubble target) - dashed lighter outline
+                dom.style.outline = "1px dashed rgba(38, 128, 235, 1)"
                 dom.style.outlineOffset = "-1px"
             } else {
                 dom.style.outline = "none"
@@ -272,13 +272,13 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
         return () => {
             if (dom) {
                 // Only clear if we're not being hovered/active anymore
-                if (!isActive && !isHoveredStrict && !isAncestorOfHovered) {
+                if (!isActive && !isHoveredStrict && !isAncestorOfHovered && !activeChildHovered) {
                     dom.style.outline = "none"
                     dom.style.outlineOffset = "0"
                 }
             }
         }
-    }, [dom, isActive, isHoveredStrict, enabled, isAncestorOfHovered, isContainerType])
+    }, [dom, isActive, isHoveredStrict, enabled, isAncestorOfHovered, isContainerType, activeChildHovered])
 
     const handleSelectParent = () => {
         if (parent) {
