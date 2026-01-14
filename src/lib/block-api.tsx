@@ -238,8 +238,10 @@ export function defineBlock<P extends object>(config: BlockConfig<P>): BlockAPI<
     const Component: React.FC<P> = (props) => {
         const { theme } = useEditorTheme()
 
-        const Render = config.render
-        const rendered = <Render {...props} theme={theme} />
+        // Call render function directly to expose the underlying element to BlockWrapper
+        // This effectively "inlines" the user's component logic into this wrapper,
+        // allowing us to inject refs into the returned generic HTML element (e.g. div).
+        const rendered = config.render({ ...props, theme })
 
         // Internal BlockWrapper integration
         return (

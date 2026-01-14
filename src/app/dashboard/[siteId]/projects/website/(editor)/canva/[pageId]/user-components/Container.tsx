@@ -382,19 +382,19 @@ export const Container = defineBlock<ContainerProps>({
         // Let's use generic placeholder for now to be safe and clean.
 
         return (
-            <CollectionItemProvider value={collectionData}>
-                <div className={computedClassName} style={finalStyle}>
+            <div className={computedClassName} style={finalStyle}>
+                <CollectionItemProvider value={collectionData}>
                     {children}
-                    {enabled && React.Children.count(children) === 0 && (
-                        <div
-                            className="col-span-full h-full w-full flex items-center justify-center border border-dashed border-gray-300/50 bg-gray-50/20 text-xs text-gray-400 p-4"
-                            style={{ gridColumn: `1 / -1` }}
-                        >
-                            Empty Container
-                        </div>
-                    )}
-                </div>
-            </CollectionItemProvider>
+                </CollectionItemProvider>
+                {enabled && React.Children.count(children) === 0 && (
+                    <div
+                        className="col-span-full h-full w-full flex items-center justify-center border border-dashed border-gray-300/50 bg-gray-50/20 text-xs text-gray-400 p-4"
+                        style={{ gridColumn: `1 / -1` }}
+                    >
+                        Empty Container
+                    </div>
+                )}
+            </div>
         )
     },
 

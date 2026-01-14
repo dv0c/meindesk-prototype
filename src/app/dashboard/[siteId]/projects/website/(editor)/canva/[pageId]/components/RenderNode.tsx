@@ -30,7 +30,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
         }
     )
 
-    const { actions, enabled, isParentOfSelected, isAncestorOfHovered, query, nodes } = useEditor((state, query) => {
+    const { actions, enabled, isParentOfSelected, isAncestorOfHovered, query, nodes, activeChildHovered } = useEditor((state, query) => {
         const selected = state.events.selected
         const hovered = state.events.hovered
         let isParent = false
@@ -56,17 +56,37 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
             }
         }
 
+        // Strict Hover Logic: Check if any child is hovered
+        const nodeData = state.nodes[id]
+        const childNodes = nodeData?.data?.nodes || []
+
+        const isIdHovered = (checkId: string) => {
+            if (!hovered) return false
+            if (hovered instanceof Set) return hovered.has(checkId)
+            if (Array.isArray(hovered)) return hovered.includes(checkId)
+            return (hovered as any)[checkId] === true
+        }
+
+        let hasActiveChild = false
+        if (childNodes.length > 0) {
+            hasActiveChild = childNodes.some(childId => isIdHovered(childId))
+        }
+
         return {
             enabled: state.options.enabled,
             isParentOfSelected: isParent,
             isAncestorOfHovered: isAncestor,
             nodes: state.nodes,
+            activeChildHovered: hasActiveChild
         }
     })
 
     // Hover context removed for performance
     // const isAncestorOfHovered = false // Removing this local override
     const isContainerType = ["Container", "Grid", "MeindeskContainer", "CollectionContainer"].includes(displayName)
+
+    // Strict Hover check
+    const isHoveredStrict = isHovered && !activeChildHovered
 
     const [indicatorPosition, setIndicatorPosition] = useState<{ top: number; left: number } | null>(null)
     const [boxModel, setBoxModel] = useState<{
@@ -165,9 +185,10 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
 
     // Update positions when element changes or scrolls
     useEffect(() => {
-        if (!dom || !enabled || (!isActive && !isHovered && !isParentOfSelected)) {
+        // We only track position if active, strictly hovered, or parent of selected
+        // AND validation checks
+        if (!dom || !enabled || (!isActive && !isHoveredStrict && !isParentOfSelected)) {
             setIndicatorPosition(null)
-
             setBoxModel(null)
             return
         }
@@ -179,8 +200,8 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                 left: rect.left,
             })
 
-            // Get computed styles for margin and padding (only when selected or parent of selected)
-            if (isActive || isParentOfSelected) {
+            // Get computed styles for margin and padding (only when selected)
+            if (isActive) {
                 const computed = window.getComputedStyle(dom)
                 setBoxModel({
                     rect,
@@ -204,15 +225,27 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
 
         updatePositions()
 
-        // Update on scroll and resize
-        window.addEventListener("scroll", updatePositions, true)
+        // Robust Tracking: Scroll + Resize + ResizeObserver + rAF
+        window.addEventListener("scroll", updatePositions, true) // Capture
         window.addEventListener("resize", updatePositions)
+
+        const resizeObserver = new ResizeObserver(() => updatePositions())
+        resizeObserver.observe(dom)
+
+        let rAF: number
+        const loop = () => {
+            updatePositions()
+            rAF = requestAnimationFrame(loop)
+        }
+        loop() // Always loop when relevant state is active for instant/snappy feeling
 
         return () => {
             window.removeEventListener("scroll", updatePositions, true)
             window.removeEventListener("resize", updatePositions)
+            resizeObserver.disconnect()
+            cancelAnimationFrame(rAF)
         }
-    }, [dom, isActive, isHovered, enabled, isParentOfSelected])
+    }, [dom, isActive, isHoveredStrict, enabled, isParentOfSelected])
 
     // Apply outline styles - including parent hierarchy visualization
     useEffect(() => {
@@ -221,7 +254,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
                 // Selected element - solid blue outline
                 dom.style.outline = "2px solid #2680eb"
                 dom.style.outlineOffset = "-1px"
-            } else if (isHovered) {
+            } else if (isHoveredStrict) { // Use strict hover
                 // Hovered element - solid blue outline
                 dom.style.outline = "2px solid #2680eb"
                 dom.style.outlineOffset = "-1px"
@@ -239,13 +272,13 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
         return () => {
             if (dom) {
                 // Only clear if we're not being hovered/active anymore
-                if (!isActive && !isHovered && !isAncestorOfHovered) {
+                if (!isActive && !isHoveredStrict && !isAncestorOfHovered) {
                     dom.style.outline = "none"
                     dom.style.outlineOffset = "0"
                 }
             }
         }
-    }, [dom, isActive, isHovered, enabled, isAncestorOfHovered, isContainerType])
+    }, [dom, isActive, isHoveredStrict, enabled, isAncestorOfHovered, isContainerType])
 
     const handleSelectParent = () => {
         if (parent) {
@@ -415,7 +448,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
             {renderWithContextMenu}
 
             {/* Render indicator as a portal outside the component DOM */}
-            {enabled && indicatorPosition && (isHovered || isActive) && typeof window !== "undefined" && createPortal(
+            {enabled && indicatorPosition && (isHoveredStrict || isActive) && typeof window !== "undefined" && createPortal(
                 <div
                     style={{
                         position: "fixed",
@@ -491,7 +524,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
 
 
             {/* Render margin overlays (orange) - draggable */}
-            {enabled && boxModel && (isActive || isParentOfSelected) && typeof window !== "undefined" && createPortal(
+            {enabled && boxModel && isActive && typeof window !== "undefined" && createPortal(
                 <>
                     {/* Margin Top */}
                     {boxModel.margin.top >= 0 && (
@@ -562,7 +595,7 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
             )}
 
             {/* Render padding overlays (green) - draggable */}
-            {enabled && boxModel && (isActive || isParentOfSelected) && typeof window !== "undefined" && createPortal(
+            {enabled && boxModel && isActive && typeof window !== "undefined" && createPortal(
                 <>
                     {/* Padding Top */}
                     {boxModel.padding.top >= 0 && (
