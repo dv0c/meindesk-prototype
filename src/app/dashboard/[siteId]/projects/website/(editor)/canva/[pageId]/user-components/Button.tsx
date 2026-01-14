@@ -6,10 +6,12 @@ import { resolveCollectionTemplate } from "@/lib/collection-utils"
 import { useCollectionItem } from "./collections/CollectionItemContext"
 import { Square, MousePointerClick } from "lucide-react"
 
+import { cn } from "@/lib/utils"
+
 export interface ButtonProps {
     text?: string
     url?: string
-    variant?: "primary" | "secondary" | "outline" | "ghost"
+    variant?: "primary" | "secondary" | "outline" | "ghost" | "link"
     size?: "sm" | "md" | "lg"
     fullWidth?: boolean
     blockStyle?: BlockStyle
@@ -58,6 +60,7 @@ export const Button = defineBlock<ButtonProps>({
                 { label: "Primary (Solid)", value: "primary" },
                 { label: "Secondary (Muted)", value: "secondary" },
                 { label: "Outline (Border)", value: "outline" },
+                { label: "Link", value: "link" },
                 { label: "Ghost (Transparent)", value: "ghost" },
             ],
         },
@@ -85,12 +88,14 @@ export const Button = defineBlock<ButtonProps>({
         size = "md",
         fullWidth = false,
         blockStyle = {},
-        className
+        className,
+        isEditing
     }) => {
         const collectionContext = useCollectionItem()
         const resolvedText = resolveCollectionTemplate(text, collectionContext?.data)
 
-        // Variant styles map (could act as overrides or defaults)
+        // Variant styles map for CSS Properties (inline)
+        // Note: We avoid setting background colors for variants that need hover effects (handled by classes)
         const getVariantStyles = (): Partial<BlockStyle> => {
             switch (variant) {
                 case "primary":
@@ -107,24 +112,50 @@ export const Button = defineBlock<ButtonProps>({
                     }
                 case "outline":
                     return {
-                        backgroundColor: 'transparent',
+                        // Let class handle bg
                         color: 'currentColor',
                         borderWidth: 1,
                         borderColor: 'var(--border, #e4e4e7)',
                     }
                 case "ghost":
                     return {
-                        backgroundColor: 'transparent',
+                        // Let class handle bg
                         color: 'currentColor',
                         borderWidth: 0,
+                    }
+                case "link":
+                    return {
+                        // Let class handle bg
+                        color: 'var(--primary, #000000)', // Links usually primary color
+                        borderWidth: 0,
+                        paddingTop: 0,
+                        paddingBottom: 0,
+                        paddingLeft: 0,
+                        paddingRight: 0,
                     }
                 default:
                     return {}
             }
         }
 
+        const getVariantClasses = () => {
+            switch (variant) {
+                case 'outline':
+                    return "bg-transparent hover:bg-accent hover:text-accent-foreground transition-colors"
+                case 'ghost':
+                    return "bg-transparent hover:bg-accent hover:text-accent-foreground transition-colors"
+                case 'link':
+                    return "text-primary underline-offset-4 hover:underline !p-0 h-auto"
+                default:
+                    return ""
+            }
+        }
+
         // Size overrides if not manually set in blockStyle
         const getSizeStyles = (): Partial<BlockStyle> => {
+            // Link variant usually ignores standard button sizes padding
+            if (variant === 'link') return {}
+
             switch (size) {
                 case "sm":
                     return { fontSize: 12, paddingTop: 8, paddingBottom: 8, paddingLeft: 16, paddingRight: 16 }
@@ -154,15 +185,22 @@ export const Button = defineBlock<ButtonProps>({
         })
 
         const handleClick = (e: React.MouseEvent) => {
-            // In editor, links are disabled by the wrapper usually, or we can prevent default
-            // e.preventDefault()
-            // Logic for real navigation would be handled differently on the published site
+            // Prevent navigation in editor
+            if (isEditing) {
+                e.preventDefault()
+                return
+            }
+
+            // Also prevent default if url is just #
+            if (url === '#' || !url) {
+                e.preventDefault()
+            }
         }
 
         return (
             <a
                 href={url}
-                className={computedClassName}
+                className={cn(computedClassName, getVariantClasses())}
                 style={computedStyle}
                 onClick={handleClick}
             >

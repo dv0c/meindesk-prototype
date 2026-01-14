@@ -61,10 +61,11 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
         const childNodes = nodeData?.data?.nodes || []
 
         const isIdHovered = (checkId: string) => {
-            if (!hovered) return false
-            if (hovered instanceof Set) return hovered.has(checkId)
-            if (Array.isArray(hovered)) return hovered.includes(checkId)
-            return (hovered as any)[checkId] === true
+            const h = hovered as any
+            if (!h) return false
+            if (h instanceof Set) return h.has(checkId)
+            if (Array.isArray(h)) return h.includes(checkId)
+            return h[checkId] === true
         }
 
         let hasActiveChild = false

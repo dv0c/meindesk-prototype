@@ -104,8 +104,8 @@ export interface BlockConfig<P> {
     >
 
     // The component to render
-    // Injected props: theme
-    render: (props: P & { theme: EditorTheme }) => React.ReactElement
+    // Injected props: theme, isEditing
+    render: (props: P & { theme: EditorTheme; isEditing?: boolean }) => React.ReactElement
 
     // Craft.js specific rules
     rules?: {
@@ -241,7 +241,7 @@ export function defineBlock<P extends object>(config: BlockConfig<P>): BlockAPI<
         // Call render function directly to expose the underlying element to BlockWrapper
         // This effectively "inlines" the user's component logic into this wrapper,
         // allowing us to inject refs into the returned generic HTML element (e.g. div).
-        const rendered = config.render({ ...props, theme })
+        const rendered = config.render({ ...props, theme, isEditing: true })
 
         // Internal BlockWrapper integration
         return (
@@ -256,7 +256,7 @@ export function defineBlock<P extends object>(config: BlockConfig<P>): BlockAPI<
         const { theme } = useEditorTheme()
         const Render = config.render
         // Render directly without BlockWrapper
-        return <Render {...props} theme={theme} />
+        return <Render {...props} theme={theme} isEditing={false} />
     }
 
     // Attach Craft.js static properties
