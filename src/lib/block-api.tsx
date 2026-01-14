@@ -270,15 +270,15 @@ export function useBlockStyles(props: {
 
         // Mobile (< 768px in standard Tailwind, or 'max-md' usually means < 768px)
         if (isHidden('mobile')) {
-            classes.push(isEditing ? 'max-md:opacity-25 max-md:outline-dashed max-md:outline-1 max-md:outline-rose-400' : 'max-md:hidden')
+            classes.push(isEditing ? 'max-md:opacity-25 max-md:outline-dashed max-md:outline-1 max-md:outline-rose-400' : '!max-md:hidden')
         }
         // Tablet (768px - 1024px)
         if (isHidden('tablet')) {
-            classes.push(isEditing ? 'md:max-lg:opacity-25 md:max-lg:outline-dashed md:max-lg:outline-1 md:max-lg:outline-rose-400' : 'md:max-lg:hidden')
+            classes.push(isEditing ? 'md:max-lg:opacity-25 md:max-lg:outline-dashed md:max-lg:outline-1 md:max-lg:outline-rose-400' : '!md:max-lg:hidden')
         }
         // Desktop (>= 1024px)
         if (isHidden('desktop')) {
-            classes.push(isEditing ? 'lg:opacity-25 lg:outline-dashed lg:outline-1 lg:outline-rose-400' : 'lg:hidden')
+            classes.push(isEditing ? 'lg:opacity-25 lg:outline-dashed lg:outline-1 lg:outline-rose-400' : '!lg:hidden')
         }
 
         return classes.join(" ")
@@ -312,8 +312,8 @@ export function useBlockStyles(props: {
     // We can return the CSS string if nodeId is provided.
     const generatedCss = React.useMemo(() => {
         if (!nodeId) return null
-        return generateResponsiveCss(nodeId, style, tabletStyle, mobileStyle)
-    }, [nodeId, style, tabletStyle, mobileStyle])
+        return generateResponsiveCss(nodeId, style, tabletStyle, mobileStyle, responsive)
+    }, [nodeId, style, tabletStyle, mobileStyle, responsive])
 
     const uniqueClassName = nodeId ? `c-${nodeId}` : ''
 

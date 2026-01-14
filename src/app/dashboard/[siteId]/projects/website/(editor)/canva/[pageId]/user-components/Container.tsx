@@ -37,11 +37,14 @@ import {
     PropertySliderWithUnit,
     PropertyIconButtonGroup
 } from "../components/PropertySection"
+import { useDevice } from "../components/DeviceContext"
 
 // Container Props Interface
 export interface ContainerProps {
     children?: React.ReactNode
     style?: BlockStyle
+    mobileStyle?: BlockStyle
+    tabletStyle?: BlockStyle
     className?: string
     responsive?: {
         hiddenOn?: string[]
@@ -76,32 +79,84 @@ const defaultStyles: BlockStyle = {
 }
 
 const ContainerSettings = () => {
-    const { actions: { setProp }, style, collectionId, stackOnMobile } = useNode((node) => ({
+    const { actions: { setProp }, style: desktopStyle, mobileStyle, tabletStyle, collectionId, stackOnMobile } = useNode((node) => ({
         style: node.data.props.style || {},
+        mobileStyle: node.data.props.mobileStyle || {},
+        tabletStyle: node.data.props.tabletStyle || {},
         collectionId: node.data.props.collectionId,
         stackOnMobile: node.data.props.stackOnMobile
     }))
 
+    const device = useDevice()
+    const deviceMode = device?.deviceMode || 'desktop'
+
+    // determine active props based on device mode
+    const isMobile = deviceMode === 'mobile'
+    const isTablet = deviceMode === 'tablet'
+
+    // Access active values
+    const getActiveStyle = (key: string) => {
+        if (isMobile) return mobileStyle[key] ?? tabletStyle[key] ?? desktopStyle[key]
+        if (isTablet) return tabletStyle[key] ?? desktopStyle[key]
+        return desktopStyle[key]
+    }
+
     const handleStyleChange = (key: string, value: any) => {
         setProp((props: any) => {
-            if (!props.style) props.style = {}
-            props.style[key] = value
+            let target = props.style
+            if (isMobile) {
+                if (!props.mobileStyle) props.mobileStyle = {}
+                target = props.mobileStyle
+            } else if (isTablet) {
+                if (!props.tabletStyle) props.tabletStyle = {}
+                target = props.tabletStyle
+            } else {
+                if (!props.style) props.style = {}
+                target = props.style
+            }
+            target[key] = value
         })
     }
 
     const handleBoxModelChange = (type: 'margin' | 'padding', side: string, value: string) => {
+        const intVal = parseInt(value) || 0
         setProp((props: any) => {
-            if (!props.style) props.style = {}
+            let target = props.style
+            if (isMobile) {
+                if (!props.mobileStyle) props.mobileStyle = {}
+                target = props.mobileStyle
+            } else if (isTablet) {
+                if (!props.tabletStyle) props.tabletStyle = {}
+                target = props.tabletStyle
+            } else {
+                if (!props.style) props.style = {}
+                target = props.style
+            }
+
             const key = `${type}${side.charAt(0).toUpperCase() + side.slice(1)}`
-            props.style[key] = parseInt(value) || 0
+            target[key] = intVal
         })
     }
 
     const handleLayoutChange = (key: string, value: any) => {
         setProp((props: any) => {
-            if (!props.style) props.style = {}
-            props.style[key] = value
-            props.style.display = "flex" // Enforce flex display when layout controls are used
+            let target = props.style
+            if (isMobile) {
+                if (!props.mobileStyle) props.mobileStyle = {}
+                target = props.mobileStyle
+            } else if (isTablet) {
+                if (!props.tabletStyle) props.tabletStyle = {}
+                target = props.tabletStyle
+            } else {
+                if (!props.style) props.style = {}
+                target = props.style
+            }
+
+            target[key] = value
+            // We only enforce display:flex if it's the desktop style or if we need to override
+            if (!isMobile && !isTablet) {
+                target.display = "flex"
+            }
         })
     }
 
@@ -111,12 +166,54 @@ const ContainerSettings = () => {
         })
     }
 
+    // Use getActiveStyle for values in controls
+    const currentStyle = {
+        flexDirection: getActiveStyle('flexDirection'),
+        alignItems: getActiveStyle('alignItems'),
+        justifyContent: getActiveStyle('justifyContent'),
+        flexWrap: getActiveStyle('flexWrap'),
+        gap: getActiveStyle('gap'),
+
+        // Spacing
+        marginTop: getActiveStyle('marginTop'),
+        marginRight: getActiveStyle('marginRight'),
+        marginBottom: getActiveStyle('marginBottom'),
+        marginLeft: getActiveStyle('marginLeft'),
+
+        paddingTop: getActiveStyle('paddingTop'),
+        paddingRight: getActiveStyle('paddingRight'),
+        paddingBottom: getActiveStyle('paddingBottom'),
+        paddingLeft: getActiveStyle('paddingLeft'),
+
+        // Dimensions
+        width: getActiveStyle('width'),
+        height: getActiveStyle('height'),
+        minHeight: getActiveStyle('minHeight'),
+        maxWidth: getActiveStyle('maxWidth'),
+        maxHeight: getActiveStyle('maxHeight'),
+
+        // Decoration
+        backgroundColor: getActiveStyle('backgroundColor'),
+        borderWidth: getActiveStyle('borderWidth'),
+        borderColor: getActiveStyle('borderColor'),
+        borderRadius: getActiveStyle('borderRadius'),
+        boxShadow: getActiveStyle('boxShadow'),
+
+        // Position
+        position: getActiveStyle('position'),
+        zIndex: getActiveStyle('zIndex'),
+        top: getActiveStyle('top'),
+        right: getActiveStyle('right'),
+        bottom: getActiveStyle('bottom'),
+        left: getActiveStyle('left'),
+    }
+
     return (
         <div className="space-y-4 pt-2">
             <PropertySection title="Layout" defaultOpen={true}>
                 <PropertyRow label="Direction">
                     <PropertyIconButtonGroup
-                        value={style.flexDirection || "column"}
+                        value={currentStyle.flexDirection || "column"}
                         options={[
                             { label: "Column", value: "column", icon: ArrowDown },
                             { label: "Row", value: "row", icon: ArrowRight },
@@ -125,7 +222,7 @@ const ContainerSettings = () => {
                     />
                 </PropertyRow>
 
-                {style.flexDirection === "row" && (
+                {!isMobile && !isTablet && currentStyle.flexDirection === "row" && (
                     <PropertyRow label="Mobile Stack">
                         <PropertyToggle
                             label="Stack on Mobile"
@@ -137,7 +234,7 @@ const ContainerSettings = () => {
 
                 <PropertyRow label="Alignment">
                     <PropertyIconButtonGroup
-                        value={style.alignItems || "flex-start"}
+                        value={currentStyle.alignItems || "flex-start"}
                         options={[
                             { label: "Start", value: "flex-start", icon: AlignStartHorizontal },
                             { label: "Center", value: "center", icon: AlignCenterHorizontal },
@@ -150,7 +247,7 @@ const ContainerSettings = () => {
 
                 <PropertyRow label="Justify">
                     <PropertyIconButtonGroup
-                        value={style.justifyContent || "flex-start"}
+                        value={currentStyle.justifyContent || "flex-start"}
                         options={[
                             { label: "Start", value: "flex-start", icon: AlignStartVertical },
                             { label: "Center", value: "center", icon: AlignCenterVertical },
@@ -164,7 +261,7 @@ const ContainerSettings = () => {
 
                 <PropertyRow label="Wrap">
                     <PropertyIconButtonGroup
-                        value={style.flexWrap || "nowrap"}
+                        value={currentStyle.flexWrap || "nowrap"}
                         options={[
                             { label: "No Wrap", value: "nowrap", icon: MonitorStop },
                             { label: "Wrap", value: "wrap", icon: WrapText },
@@ -176,7 +273,7 @@ const ContainerSettings = () => {
 
                 <PropertyRow label="Gap">
                     <PropertySlider
-                        value={parseInt(style.gap) || 0}
+                        value={parseInt(currentStyle.gap) || 0}
                         min={0}
                         max={100}
                         onChange={(val) => handleLayoutChange('gap', val)}
@@ -189,16 +286,16 @@ const ContainerSettings = () => {
             <PropertySection title="Spacing" defaultOpen={false}>
                 <PropertyBoxModel
                     margin={{
-                        top: style.marginTop || 0,
-                        right: style.marginRight || 0,
-                        bottom: style.marginBottom || 0,
-                        left: style.marginLeft || 0
+                        top: currentStyle.marginTop || 0,
+                        right: currentStyle.marginRight || 0,
+                        bottom: currentStyle.marginBottom || 0,
+                        left: currentStyle.marginLeft || 0
                     }}
                     padding={{
-                        top: style.paddingTop || 0,
-                        right: style.paddingRight || 0,
-                        bottom: style.paddingBottom || 0,
-                        left: style.paddingLeft || 0
+                        top: currentStyle.paddingTop || 0,
+                        right: currentStyle.paddingRight || 0,
+                        bottom: currentStyle.paddingBottom || 0,
+                        left: currentStyle.paddingLeft || 0
                     }}
                     onChangeMargin={(side, value) => handleBoxModelChange('margin', side, value)}
                     onChangePadding={(side, value) => handleBoxModelChange('padding', side, value)}
@@ -209,20 +306,17 @@ const ContainerSettings = () => {
                 <PropertyRow>
                     <PropertyToggle
                         label="Center Content (Auto Margin)"
-                        value={style.marginLeft === 'auto' && style.marginRight === 'auto'}
+                        value={currentStyle.marginLeft === 'auto' && currentStyle.marginRight === 'auto'}
                         onChange={(checked) => {
-                            setProp((props: any) => {
-                                if (!props.style) props.style = {}
-                                props.style.marginLeft = checked ? 'auto' : 0
-                                props.style.marginRight = checked ? 'auto' : 0
-                            })
+                            handleLayoutChange('marginLeft', checked ? 'auto' : 0)
+                            handleLayoutChange('marginRight', checked ? 'auto' : 0)
                         }}
                     />
                 </PropertyRow>
                 <PropertyRow label="Width">
                     <PropertySliderWithUnit
-                        value={parseInt(style.width) || 0}
-                        unit={style.width?.toString().replace(/[0-9.]/g, '') || 'px'}
+                        value={parseInt(currentStyle.width) || 0}
+                        unit={currentStyle.width?.toString().replace(/[0-9.]/g, '') || 'px'}
                         onChange={(val, unit) => handleStyleChange('width', `${val}${unit}`)}
                         min={0}
                         max={100}
@@ -231,8 +325,8 @@ const ContainerSettings = () => {
                 </PropertyRow>
                 <PropertyRow label="Height">
                     <PropertySliderWithUnit
-                        value={parseInt(style.height) || 0}
-                        unit={style.height?.toString().replace(/[0-9.]/g, '') || 'px'}
+                        value={parseInt(currentStyle.height) || 0}
+                        unit={currentStyle.height?.toString().replace(/[0-9.]/g, '') || 'px'}
                         onChange={(val, unit) => handleStyleChange('height', `${val}${unit}`)}
                         min={0}
                         max={100}
@@ -241,8 +335,8 @@ const ContainerSettings = () => {
                 </PropertyRow>
                 <PropertyRow label="Min Height">
                     <PropertySliderWithUnit
-                        value={parseInt(style.minHeight) || 0}
-                        unit={style.minHeight?.toString().replace(/[0-9.]/g, '') || 'px'}
+                        value={parseInt(currentStyle.minHeight) || 0}
+                        unit={currentStyle.minHeight?.toString().replace(/[0-9.]/g, '') || 'px'}
                         onChange={(val, unit) => handleStyleChange('minHeight', `${val}${unit}`)}
                         min={0}
                         max={100}
@@ -251,8 +345,8 @@ const ContainerSettings = () => {
                 </PropertyRow>
                 <PropertyRow label="Max Width">
                     <PropertySliderWithUnit
-                        value={parseInt(style.maxWidth) || 0}
-                        unit={style.maxWidth?.toString().replace(/[0-9.]/g, '') || 'px'}
+                        value={parseInt(currentStyle.maxWidth) || 0}
+                        unit={currentStyle.maxWidth?.toString().replace(/[0-9.]/g, '') || 'px'}
                         onChange={(val, unit) => handleStyleChange('maxWidth', `${val}${unit}`)}
                         min={0}
                         max={100}
@@ -261,8 +355,8 @@ const ContainerSettings = () => {
                 </PropertyRow>
                 <PropertyRow label="Max Height">
                     <PropertySliderWithUnit
-                        value={parseInt(style.maxHeight) || 0}
-                        unit={style.maxHeight?.toString().replace(/[0-9.]/g, '') || 'px'}
+                        value={parseInt(currentStyle.maxHeight) || 0}
+                        unit={currentStyle.maxHeight?.toString().replace(/[0-9.]/g, '') || 'px'}
                         onChange={(val, unit) => handleStyleChange('maxHeight', `${val}${unit}`)}
                         min={0}
                         max={100}
@@ -274,14 +368,14 @@ const ContainerSettings = () => {
             <PropertySection title="Decoration" defaultOpen={false}>
                 <PropertyRow label="Background">
                     <PropertyColor
-                        value={style.backgroundColor || "transparent"}
+                        value={currentStyle.backgroundColor || "transparent"}
                         onChange={(val) => handleStyleChange('backgroundColor', val)}
                     />
                 </PropertyRow>
 
                 <PropertyRow label="Border Width">
                     <PropertySlider
-                        value={style.borderWidth || 0}
+                        value={currentStyle.borderWidth || 0}
                         min={0}
                         max={20}
                         onChange={(val) => handleStyleChange('borderWidth', val)}
@@ -290,14 +384,14 @@ const ContainerSettings = () => {
 
                 <PropertyRow label="Border Color">
                     <PropertyColor
-                        value={style.borderColor || "transparent"}
+                        value={currentStyle.borderColor || "transparent"}
                         onChange={(val) => handleStyleChange('borderColor', val)}
                     />
                 </PropertyRow>
 
                 <PropertyRow label="Corner Radius">
                     <PropertySlider
-                        value={style.borderRadius || 0}
+                        value={currentStyle.borderRadius || 0}
                         min={0}
                         max={100}
                         onChange={(val) => handleStyleChange('borderRadius', val)}
@@ -306,7 +400,7 @@ const ContainerSettings = () => {
 
                 <PropertyRow label="Shadow">
                     <PropertyShadowSelect
-                        value={style.boxShadow || "none"}
+                        value={currentStyle.boxShadow || "none"}
                         onChange={(val) => handleStyleChange('boxShadow', val)}
                     />
                 </PropertyRow>
@@ -315,7 +409,7 @@ const ContainerSettings = () => {
             <PropertySection title="Position" defaultOpen={false}>
                 <PropertyRow label="Type">
                     <PropertySelect
-                        value={style.position || "relative"}
+                        value={currentStyle.position || "relative"}
                         options={[
                             { label: "Relative", value: "relative" },
                             { label: "Absolute", value: "absolute" },
@@ -329,24 +423,24 @@ const ContainerSettings = () => {
                 <PropertyRow label="Z-Index">
                     <PropertyInput
                         type="number"
-                        value={style.zIndex || 0}
+                        value={currentStyle.zIndex || 0}
                         onChange={(val) => handleStyleChange('zIndex', parseInt(val) || 0)}
                     />
                 </PropertyRow>
 
-                {style.position === 'absolute' && (
+                {currentStyle.position === 'absolute' && (
                     <div className="grid grid-cols-2 gap-2 pt-2">
                         <PropertyRow label="Top">
-                            <PropertyInput value={style.top || ''} onChange={(val) => handleStyleChange('top', val)} placeholder="auto" />
+                            <PropertyInput value={currentStyle.top || ''} onChange={(val) => handleStyleChange('top', val)} placeholder="auto" />
                         </PropertyRow>
                         <PropertyRow label="Right">
-                            <PropertyInput value={style.right || ''} onChange={(val) => handleStyleChange('right', val)} placeholder="auto" />
+                            <PropertyInput value={currentStyle.right || ''} onChange={(val) => handleStyleChange('right', val)} placeholder="auto" />
                         </PropertyRow>
                         <PropertyRow label="Bottom">
-                            <PropertyInput value={style.bottom || ''} onChange={(val) => handleStyleChange('bottom', val)} placeholder="auto" />
+                            <PropertyInput value={currentStyle.bottom || ''} onChange={(val) => handleStyleChange('bottom', val)} placeholder="auto" />
                         </PropertyRow>
                         <PropertyRow label="Left">
-                            <PropertyInput value={style.left || ''} onChange={(val) => handleStyleChange('left', val)} placeholder="auto" />
+                            <PropertyInput value={currentStyle.left || ''} onChange={(val) => handleStyleChange('left', val)} placeholder="auto" />
                         </PropertyRow>
                     </div>
                 )}
@@ -363,6 +457,8 @@ export const Container = defineBlock<ContainerProps>({
 
     defaultProps: {
         style: defaultStyles,
+        mobileStyle: {},
+        tabletStyle: {},
         collectionId: "",
         itemId: "",
         useSlugFromUrl: false,
@@ -372,10 +468,11 @@ export const Container = defineBlock<ContainerProps>({
 
     settings: ContainerSettings,
 
-    render: ({ children, style, className, collectionId, itemId, useSlugFromUrl, theme, isEditing, responsive, deviceMode, stackOnMobile }) => {
+    render: ({ children, style, mobileStyle, tabletStyle, className, collectionId, itemId, useSlugFromUrl, theme, isEditing, responsive, deviceMode, stackOnMobile }) => {
         const { enabled } = useEditor((state) => ({
             enabled: state.options.enabled
         }))
+        const { id } = useNode() // Get the node ID for unique class generation
 
         // Fetch Collection Data
         const collectionData = useCollectionData({
@@ -392,7 +489,10 @@ export const Container = defineBlock<ContainerProps>({
         const isRow = effectiveStyle.flexDirection === 'row'
         const shouldStack = stackOnMobile !== false // Default true
 
-        if (isRow && shouldStack) {
+        // NOTE: If stackOnMobile is true, it essentially enforces a mobile override manually.
+        // We'll keep this logic but it might conflict if user sets custom mobile styles.
+        // Let's make it smarter: only apply if mobileStyle doesn't already override direction.
+        if (isRow && shouldStack && !mobileStyle?.flexDirection) {
             // Remove inline style so class can take over
             delete effectiveStyle.flexDirection
 
@@ -403,12 +503,15 @@ export const Container = defineBlock<ContainerProps>({
         }
 
         // Compute Styles
-        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+        const { style: computedStyle, className: computedClassName, css } = useBlockStyles({
             style: effectiveStyle,
+            mobileStyle,
+            tabletStyle,
             className: cn(className, autoResponsiveClasses),
             responsive,
             isEditing,
-            deviceMode
+            deviceMode,
+            nodeId: id
         })
 
         // Create a mutable copy of the style to allow modifications
@@ -429,6 +532,7 @@ export const Container = defineBlock<ContainerProps>({
 
         return (
             <div className={computedClassName} style={finalStyle}>
+                {css && <style>{css}</style>}
                 <CollectionItemProvider value={collectionData}>
                     {children}
                 </CollectionItemProvider>
