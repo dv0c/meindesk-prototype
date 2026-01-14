@@ -27,6 +27,7 @@ interface ImageProps {
     borderRadius?: number
     className?: string
     style?: BlockStyle
+    responsive?: { hiddenOn?: string[] }
 }
 
 const defaultStyles: BlockStyle = {
@@ -209,12 +210,13 @@ export const Image = defineBlock<ImageProps>({
         height: "auto",
         objectFit: "cover",
         borderRadius: 0,
-        style: defaultStyles
+        style: defaultStyles,
+        responsive: { hiddenOn: [] }
     },
 
     settings: ImageSettings,
 
-    render: ({ src, alt, width, height, objectFit, borderRadius, className, style, theme }) => {
+    render: ({ src, alt, width, height, objectFit, borderRadius, className, style, theme, isEditing, responsive, deviceMode }) => {
         const collectionContext = useCollectionItem()
         const resolvedSrc = resolveCollectionTemplate(src, collectionContext?.data)
         const displaySrc = resolvedSrc || src
@@ -232,7 +234,10 @@ export const Image = defineBlock<ImageProps>({
 
         const { style: computedStyle, className: computedClassName } = useBlockStyles({
             style: effectiveStyle,
-            className
+            className,
+            responsive,
+            isEditing,
+            deviceMode
         })
 
         return (

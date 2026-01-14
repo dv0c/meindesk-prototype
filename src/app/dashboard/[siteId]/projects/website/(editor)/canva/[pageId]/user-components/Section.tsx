@@ -11,6 +11,7 @@ export interface SectionProps {
     style?: BlockStyle
     className?: string
     previewLayout?: 'full' | 'centered' | 'fixed'
+    responsive?: { hiddenOn?: string[] }
 }
 
 const defaultStyles: BlockStyle = {
@@ -49,21 +50,25 @@ export const Section = defineBlock<SectionProps>({
 
     defaultProps: {
         style: defaultStyles,
-        previewLayout: 'full'
+        previewLayout: 'full',
+        responsive: { hiddenOn: [] }
     },
 
     // Combined settings: Layout presets + Universal styles
     // Combined settings: Layout presets + Universal styles
     settings: SectionSettings,
 
-    render: ({ children, style, className }) => {
+    render: ({ children, style, className, isEditing, responsive, deviceMode }) => {
         const { enabled } = useEditor((state) => ({
             enabled: state.options.enabled
         }))
 
         const { style: computedStyle, className: computedClassName } = useBlockStyles({
             style,
-            className
+            className,
+            responsive,
+            isEditing,
+            deviceMode
         })
 
         const isEmpty = !children || (Array.isArray(children) && children.length === 0) || (React.Children.count(children) === 0)

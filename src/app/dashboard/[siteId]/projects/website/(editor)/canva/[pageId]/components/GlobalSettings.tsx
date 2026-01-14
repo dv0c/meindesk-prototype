@@ -6,6 +6,7 @@ import {
     PropertyRow,
     PropertySelect,
     PropertySlider,
+    PropertyToggle,
 } from "./PropertySection"
 
 
@@ -99,6 +100,68 @@ export const GlobalStylesPanel = () => {
             </PropertySection>
 
             {/* Universal Styles (Dimensions, Layout, Spacing, Decoration, Position) */}
+
+            {/* Responsive Settings */}
+            <PropertySection title="Responsive" defaultOpen={false}>
+                <PropertyRow label="Visibility">
+                    <div className="flex flex-col gap-2 pt-2">
+                        <PropertyToggle
+                            label="Hide on Desktop"
+                            value={currentProps.responsive?.hiddenOn?.includes('desktop') || false}
+                            onChange={(checked) => {
+                                actions.setProp(id, (props: any) => {
+                                    if (!props.responsive) props.responsive = { hiddenOn: [] }
+                                    if (!props.responsive.hiddenOn) props.responsive.hiddenOn = []
+
+                                    if (checked) {
+                                        if (!props.responsive.hiddenOn.includes('desktop')) {
+                                            props.responsive.hiddenOn.push('desktop')
+                                        }
+                                    } else {
+                                        props.responsive.hiddenOn = props.responsive.hiddenOn.filter((b: string) => b !== 'desktop')
+                                    }
+                                })
+                            }}
+                        />
+                        <PropertyToggle
+                            label="Hide on Tablet"
+                            value={currentProps.responsive?.hiddenOn?.includes('tablet') || false}
+                            onChange={(checked) => {
+                                actions.setProp(id, (props: any) => {
+                                    if (!props.responsive) props.responsive = { hiddenOn: [] }
+                                    if (!props.responsive.hiddenOn) props.responsive.hiddenOn = []
+
+                                    if (checked) {
+                                        if (!props.responsive.hiddenOn.includes('tablet')) {
+                                            props.responsive.hiddenOn.push('tablet')
+                                        }
+                                    } else {
+                                        props.responsive.hiddenOn = props.responsive.hiddenOn.filter((b: string) => b !== 'tablet')
+                                    }
+                                })
+                            }}
+                        />
+                        <PropertyToggle
+                            label="Hide on Mobile"
+                            value={currentProps.responsive?.hiddenOn?.includes('mobile') || false}
+                            onChange={(checked) => {
+                                actions.setProp(id, (props: any) => {
+                                    if (!props.responsive) props.responsive = { hiddenOn: [] }
+                                    if (!props.responsive.hiddenOn) props.responsive.hiddenOn = []
+
+                                    if (checked) {
+                                        if (!props.responsive.hiddenOn.includes('mobile')) {
+                                            props.responsive.hiddenOn.push('mobile')
+                                        }
+                                    } else {
+                                        props.responsive.hiddenOn = props.responsive.hiddenOn.filter((b: string) => b !== 'mobile')
+                                    }
+                                })
+                            }}
+                        />
+                    </div>
+                </PropertyRow>
+            </PropertySection>
 
         </div>
     )

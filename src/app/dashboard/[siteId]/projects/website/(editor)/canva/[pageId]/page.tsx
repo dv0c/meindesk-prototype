@@ -23,6 +23,7 @@ import { ArticleProvider } from "./user-components/article"
 import { EditorThemeProvider } from "./components/ThemeContext"
 import { ReadOnlySection } from "./components/ReadOnlySection"
 import { CraftCanvas } from "./components/CraftCanvas"
+import { DeviceProvider } from "./components/DeviceContext"
 
 // Resolver for all user components - now using resolverWithFallback from registry
 // This automatically handles missing components (e.g., from uninstalled themes)
@@ -165,31 +166,33 @@ function EditorWithDesign({ resolver, pageName, setPageName, pageStatus, setPage
 
     return (
         <HoverProvider>
-            <Editor resolver={resolver} onRender={RenderNode}>
-                <EditorContent
-                    pageName={pageName}
-                    setPageName={setPageName}
-                    pageStatus={pageStatus}
-                    setPageStatus={setPageStatus}
-                    isLocked={isLocked}
-                    setIsLocked={setIsLocked}
-                    deviceMode={deviceMode}
-                    setDeviceMode={setDeviceMode}
-                    isSaving={isSaving}
-                    setIsSaving={setIsSaving}
-                    showSidebar={showSidebar}
-                    setShowSidebar={setShowSidebar}
-                    showTemplates={showTemplates}
-                    setShowTemplates={setShowTemplates}
-                    showLayers={showLayers}
-                    setShowLayers={setShowLayers}
-                    siteId={siteId}
-                    pageId={pageId}
-                    getCanvasWidth={getCanvasWidth}
-                    getDevicePixelWidth={getDevicePixelWidth}
-                    getCssVariables={getCssVariables}
-                />
-            </Editor>
+            <DeviceProvider deviceMode={deviceMode}>
+                <Editor resolver={resolver} onRender={RenderNode}>
+                    <EditorContent
+                        pageName={pageName}
+                        setPageName={setPageName}
+                        pageStatus={pageStatus}
+                        setPageStatus={setPageStatus}
+                        isLocked={isLocked}
+                        setIsLocked={setIsLocked}
+                        deviceMode={deviceMode}
+                        setDeviceMode={setDeviceMode}
+                        isSaving={isSaving}
+                        setIsSaving={setIsSaving}
+                        showSidebar={showSidebar}
+                        setShowSidebar={setShowSidebar}
+                        showTemplates={showTemplates}
+                        setShowTemplates={setShowTemplates}
+                        showLayers={showLayers}
+                        setShowLayers={setShowLayers}
+                        siteId={siteId}
+                        pageId={pageId}
+                        getCanvasWidth={getCanvasWidth}
+                        getDevicePixelWidth={getDevicePixelWidth}
+                        getCssVariables={getCssVariables}
+                    />
+                </Editor>
+            </DeviceProvider>
         </HoverProvider>
     )
 }

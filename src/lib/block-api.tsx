@@ -1,6 +1,9 @@
 import React from "react"
+import { useEditor } from "@craftjs/core"
 // @ts-ignore - Importing from deep app path as requested
 import { useEditorTheme, type EditorTheme } from "@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ThemeContext"
+// @ts-ignore
+import { useDevice, type DeviceMode } from "@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/DeviceContext"
 import { BlockWrapper } from "@/components/editor/BlockWrapper"
 // @ts-ignore
 import { GlobalStylesPanel } from "@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/GlobalSettings"
@@ -105,7 +108,8 @@ export interface BlockConfig<P> {
 
     // The component to render
     // Injected props: theme, isEditing
-    render: (props: P & { theme: EditorTheme; isEditing?: boolean }) => React.ReactElement
+    // Injected props: theme, isEditing, deviceMode
+    render: (props: P & { theme: EditorTheme; isEditing?: boolean; deviceMode?: DeviceMode | null }) => React.ReactElement
 
     // Craft.js specific rules
     rules?: {
@@ -146,8 +150,12 @@ export interface BlockAPI<P = any> extends React.FC<P> {
 
 // --- Hook for Style Generation ---
 
-export function useBlockStyles(props: { style?: BlockStyle, className?: string }) {
-    const { style = {}, className } = props
+import { cn } from "@/lib/utils"
+
+export function useBlockStyles(props: { style?: BlockStyle, className?: string, responsive?: { hiddenOn?: string[] }, isEditing?: boolean, deviceMode?: DeviceMode | null }) {
+    const { style = {}, className, responsive, isEditing, deviceMode } = props
+
+    // deviceContext removed, using prop directly
 
     const computedStyle: React.CSSProperties = React.useMemo(() => {
         const css: React.CSSProperties = {}
@@ -229,7 +237,51 @@ export function useBlockStyles(props: { style?: BlockStyle, className?: string }
         return { ...css, ...style } // Merge any unhandled keys
     }, [style])
 
-    return { style: computedStyle, className }
+    // Generate Responsive Visibility Classes
+    const responsiveClasses = React.useMemo(() => {
+        if (!responsive?.hiddenOn || responsive.hiddenOn.length === 0) return ""
+        const classes: string[] = []
+        const isHidden = (bp: string) => responsive.hiddenOn?.includes(bp)
+
+        // Mobile (< 768px in standard Tailwind, or 'max-md' usually means < 768px)
+        if (isHidden('mobile')) {
+            classes.push(isEditing ? 'max-md:opacity-25 max-md:outline-dashed max-md:outline-1 max-md:outline-rose-400' : 'max-md:hidden')
+        }
+        // Tablet (768px - 1024px)
+        if (isHidden('tablet')) {
+            classes.push(isEditing ? 'md:max-lg:opacity-25 md:max-lg:outline-dashed md:max-lg:outline-1 md:max-lg:outline-rose-400' : 'md:max-lg:hidden')
+        }
+        // Desktop (>= 1024px)
+        if (isHidden('desktop')) {
+            classes.push(isEditing ? 'lg:opacity-25 lg:outline-dashed lg:outline-1 lg:outline-rose-400' : 'lg:hidden')
+        }
+
+        return classes.join(" ")
+    }, [responsive, isEditing])
+
+    // View Mode Visibility Override (for Editor/Preview simulation)
+    const viewModeOverride = React.useMemo(() => {
+        if (!deviceMode || !responsive?.hiddenOn) return {}
+
+        if (responsive.hiddenOn.includes(deviceMode)) {
+            if (isEditing) {
+                // Editor Mode: Visual cue (Simulated)
+                return {
+                    opacity: 0.25,
+                    outline: '1px dashed #fb7185', // rose-400
+                    outlineOffset: -1
+                }
+            } else {
+                // Preview Mode: Truly hidden (Simulated)
+                return {
+                    display: 'none'
+                }
+            }
+        }
+        return {}
+    }, [deviceMode, responsive, isEditing])
+
+    return { style: { ...computedStyle, ...viewModeOverride }, className: cn(className, responsiveClasses) }
 }
 
 // --- Main API Function ---
@@ -237,11 +289,13 @@ export function useBlockStyles(props: { style?: BlockStyle, className?: string }
 export function defineBlock<P extends object>(config: BlockConfig<P>): BlockAPI<P> {
     const Component: React.FC<P> = (props) => {
         const { theme } = useEditorTheme()
+        const { enabled } = useEditor((state) => ({ enabled: state.options.enabled }))
+        const deviceContext = useDevice()
 
         // Call render function directly to expose the underlying element to BlockWrapper
         // This effectively "inlines" the user's component logic into this wrapper,
         // allowing us to inject refs into the returned generic HTML element (e.g. div).
-        const rendered = config.render({ ...props, theme, isEditing: true })
+        const rendered = config.render({ ...props, theme, isEditing: enabled, deviceMode: deviceContext?.deviceMode })
 
         // Internal BlockWrapper integration
         return (
@@ -254,9 +308,10 @@ export function defineBlock<P extends object>(config: BlockConfig<P>): BlockAPI<
     // 2. Runtime Component (unwrapped, safe for SSR)
     const RuntimeComponent: React.FC<P> = (props) => {
         const { theme } = useEditorTheme()
+        const deviceContext = useDevice()
         const Render = config.render
         // Render directly without BlockWrapper
-        return <Render {...props} theme={theme} isEditing={false} />
+        return <Render {...props} theme={theme} isEditing={false} deviceMode={deviceContext?.deviceMode} />
     }
 
     // Attach Craft.js static properties

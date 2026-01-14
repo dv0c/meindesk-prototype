@@ -42,6 +42,9 @@ export interface ContainerProps {
     children?: React.ReactNode
     style?: BlockStyle
     className?: string
+    responsive?: {
+        hiddenOn?: string[]
+    }
 
     // Collection Data Props
     collectionId?: string
@@ -343,12 +346,13 @@ export const Container = defineBlock<ContainerProps>({
         style: defaultStyles,
         collectionId: "",
         itemId: "",
-        useSlugFromUrl: false
+        useSlugFromUrl: false,
+        responsive: { hiddenOn: [] }
     },
 
     settings: ContainerSettings,
 
-    render: ({ children, style, className, collectionId, itemId, useSlugFromUrl, theme }) => {
+    render: ({ children, style, className, collectionId, itemId, useSlugFromUrl, theme, isEditing, responsive, deviceMode }) => {
         const { enabled } = useEditor((state) => ({
             enabled: state.options.enabled
         }))
@@ -363,7 +367,10 @@ export const Container = defineBlock<ContainerProps>({
         // Compute Styles
         const { style: computedStyle, className: computedClassName } = useBlockStyles({
             style,
-            className
+            className,
+            responsive,
+            isEditing,
+            deviceMode
         })
 
         // Create a mutable copy of the style to allow modifications
@@ -374,6 +381,7 @@ export const Container = defineBlock<ContainerProps>({
             if (resolvedBg) {
                 finalStyle.backgroundImage = `url(${resolvedBg})`
             }
+
         }
 
         const isEmpty = !children || (Array.isArray(children) && children.length === 0) || (React.Children.count(children) === 0)

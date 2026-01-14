@@ -11,6 +11,7 @@ interface TextProps {
     text?: string
     style?: BlockStyle
     className?: string
+    responsive?: { hiddenOn?: string[] }
 }
 
 // Map legacy props to BlockStyle for defaultProps
@@ -34,12 +35,13 @@ export const Text = defineBlock<TextProps>({
 
     defaultProps: {
         text: "This is a paragraph of text. Click to edit.",
-        style: defaultStyles
+        style: defaultStyles,
+        responsive: { hiddenOn: [] }
     },
 
     settings: TextSettings,
 
-    render: ({ text, style, className, theme, ...props }) => {
+    render: ({ text, style, className, theme, isEditing: isEditorEnv, responsive, deviceMode, ...props }) => {
         const {
             selected,
             id,
@@ -54,11 +56,11 @@ export const Text = defineBlock<TextProps>({
         }))
         const collectionContext = useCollectionItem()
 
-        const [isEditing, setIsEditing] = useState(false)
+        const [isInlineEditing, setIsInlineEditing] = useState(false)
         const contentRef = useRef<HTMLParagraphElement>(null)
 
         // Resolve variables in text
-        const displayText = (isEditing)
+        const displayText = (isInlineEditing)
             ? text
             : resolveCollectionTemplate(text, collectionContext?.data)
 
@@ -80,18 +82,21 @@ export const Text = defineBlock<TextProps>({
         const { style: computedStyle, className: computedClassName } = useBlockStyles({
             style: {
                 ...mergedStyle,
-                outline: isEditing ? "none" : undefined,
-                cursor: isEditing ? "text" : (enabled ? "default" : "auto"),
-                whiteSpace: isEditing ? "pre-wrap" : undefined,
+                outline: isInlineEditing ? "none" : undefined,
+                cursor: isInlineEditing ? "text" : (enabled ? "default" : "auto"),
+                whiteSpace: isInlineEditing ? "pre-wrap" : undefined,
             },
-            className
+            className,
+            responsive,
+            isEditing: isEditorEnv,
+            deviceMode
         })
 
         // Double-click to enter edit mode
         const handleDoubleClick = useCallback((e: React.MouseEvent) => {
             e.stopPropagation()
             if (enabled && selected) {
-                setIsEditing(true)
+                setIsInlineEditing(true)
             }
         }, [enabled, selected])
 
@@ -103,7 +108,7 @@ export const Text = defineBlock<TextProps>({
         }, [selected, editorActions, id])
 
         const handleBlur = useCallback(() => {
-            setIsEditing(false)
+            setIsInlineEditing(false)
             if (contentRef.current) {
                 const newText = contentRef.current.innerText.trim()
                 if (newText) {
@@ -116,7 +121,7 @@ export const Text = defineBlock<TextProps>({
 
         const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
             if (e.key === "Escape") {
-                setIsEditing(false)
+                setIsInlineEditing(false)
                 if (contentRef.current) {
                     contentRef.current.innerText = text || ""
                 }
@@ -125,7 +130,7 @@ export const Text = defineBlock<TextProps>({
 
         // Handle focus effect for editing
         useEffect(() => {
-            if (isEditing && contentRef.current) {
+            if (isInlineEditing && contentRef.current) {
                 contentRef.current.focus()
                 const range = document.createRange()
                 range.selectNodeContents(contentRef.current)
@@ -134,21 +139,21 @@ export const Text = defineBlock<TextProps>({
                 selection?.removeAllRanges()
                 selection?.addRange(range)
             }
-        }, [isEditing])
+        }, [isInlineEditing])
 
         // Sync editing state
         useEffect(() => {
-            if (!selected && isEditing) {
-                setIsEditing(false)
+            if (!selected && isInlineEditing) {
+                setIsInlineEditing(false)
             }
-        }, [selected, isEditing])
+        }, [selected, isInlineEditing])
 
         return (
             <p
                 ref={contentRef}
                 className={computedClassName}
                 style={computedStyle}
-                contentEditable={isEditing}
+                contentEditable={isInlineEditing}
                 suppressContentEditableWarning
                 onClick={handleClick}
                 onDoubleClick={handleDoubleClick}

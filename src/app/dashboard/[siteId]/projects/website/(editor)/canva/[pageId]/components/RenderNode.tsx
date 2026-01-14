@@ -171,16 +171,43 @@ export const RenderNode = ({ render }: RenderNodeProps) => {
             }
         }
 
+        const handleWrap = (e: CustomEvent) => {
+            if (e.detail.nodeId === id && parent) {
+                try {
+                    // Create a new Container Element
+                    // We use the string "Container" as it is registered in the resolver
+                    const containerNode = query.createNode(React.createElement(componentMap["Container"]))
+
+                    const parentNode = query.node(parent).get()
+                    const childNodes = parentNode.data.nodes || []
+                    const currentIndex = childNodes.indexOf(id)
+
+                    // Add Container to parent at the specific index
+                    actions.add(containerNode, parent, currentIndex)
+
+                    // Move the current node into the new Container
+                    actions.move(id, containerNode.id, 0)
+
+                    // Select the new container
+                    setTimeout(() => actions.selectNode(containerNode.id), 100)
+                } catch (err) {
+                    console.error("Error wrapping node:", err)
+                }
+            }
+        }
+
         window.addEventListener('craftjs-duplicate', handleDuplicate as EventListener)
         window.addEventListener('craftjs-moveup', handleMoveUp as EventListener)
         window.addEventListener('craftjs-movedown', handleMoveDown as EventListener)
         window.addEventListener('craftjs-delete', handleDeleteNode as EventListener)
+        window.addEventListener('craftjs-wrap', handleWrap as EventListener)
 
         return () => {
             window.removeEventListener('craftjs-duplicate', handleDuplicate as EventListener)
             window.removeEventListener('craftjs-moveup', handleMoveUp as EventListener)
             window.removeEventListener('craftjs-movedown', handleMoveDown as EventListener)
             window.removeEventListener('craftjs-delete', handleDeleteNode as EventListener)
+            window.removeEventListener('craftjs-wrap', handleWrap as EventListener)
         }
     }, [id, parent, actions, query])
 

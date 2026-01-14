@@ -16,6 +16,9 @@ export interface ButtonProps {
     fullWidth?: boolean
     blockStyle?: BlockStyle
     className?: string
+    responsive?: {
+        hiddenOn?: string[]
+    }
 }
 
 export const Button = defineBlock<ButtonProps>({
@@ -39,6 +42,7 @@ export const Button = defineBlock<ButtonProps>({
             fontWeight: 500,
             textAlign: "center",
         },
+        responsive: { hiddenOn: [] }
     },
 
     settingsConfig: {
@@ -89,7 +93,9 @@ export const Button = defineBlock<ButtonProps>({
         fullWidth = false,
         blockStyle = {},
         className,
-        isEditing
+        isEditing,
+        responsive,
+        deviceMode
     }) => {
         const collectionContext = useCollectionItem()
         const resolvedText = resolveCollectionTemplate(text, collectionContext?.data)
@@ -181,7 +187,10 @@ export const Button = defineBlock<ButtonProps>({
                 // Then merge user overrides (blockStyle)
                 ...blockStyle,
             },
-            className: className
+            className: className,
+            responsive,
+            isEditing,
+            deviceMode
         })
 
         const handleClick = (e: React.MouseEvent) => {

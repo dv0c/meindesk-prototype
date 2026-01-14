@@ -24,6 +24,7 @@ interface HeadingProps {
     maxWidth?: string | number
     maxHeight?: string | number
     minHeight?: string | number
+    responsive?: { hiddenOn?: string[] }
 }
 
 const defaultStyles: BlockStyle = {
@@ -45,11 +46,12 @@ export const Heading = defineBlock<HeadingProps>({
         text: "Heading",
         level: "h2",
         style: defaultStyles,
+        responsive: { hiddenOn: [] }
     },
 
     settings: HeadingSettings,
 
-    render: ({ text, level = "h2", style, className, theme, width, height, maxWidth, maxHeight, minHeight, ...props }) => {
+    render: ({ text, level = "h2", style, className, theme, width, height, maxWidth, maxHeight, minHeight, isEditing, responsive, deviceMode, ...props }) => {
         // Fluid typography logic matching defaultStyles
         let fluidFontSize = style?.fontSize
 
@@ -78,7 +80,10 @@ export const Heading = defineBlock<HeadingProps>({
 
         const { style: computedStyle, className: computedClassName } = useBlockStyles({
             style: effectiveStyle,
-            className
+            className,
+            responsive,
+            isEditing,
+            deviceMode
         })
 
         return (

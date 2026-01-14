@@ -125,6 +125,22 @@ export function CraftContextMenu({ x, y, nodeId, onClose, isTopLevel = false }: 
                     {/* Divider */}
                     <div className="border-t border-border/50 my-1.5" />
 
+                    {/* Wrap in Container */}
+                    <ContextMenuItem
+                        icon={<Settings className="h-4 w-4 text-purple-600 dark:text-purple-400" />}
+                        label="Wrap in Container"
+                        onClick={() => {
+                            const event = new CustomEvent('craftjs-wrap', { detail: { nodeId } })
+                            window.dispatchEvent(event)
+                            onClose()
+                        }}
+                        bgColor="bg-purple-500/10"
+                        hoverBgColor="bg-purple-500/20"
+                    />
+
+                    {/* Divider */}
+                    <div className="border-t border-border/50 my-1.5" />
+
                     {/* Delete - show for all nodes except ROOT itself */}
                     {!isTopLevel && (
                         <ContextMenuItem
