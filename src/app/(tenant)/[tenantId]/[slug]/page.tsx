@@ -1,10 +1,10 @@
 // app/(tenant)/[tenantId]/[slug]/page.tsx
 
-import { notFound } from "next/navigation"
+import { getCachedSiteDetails } from "@/lib/actions/helpers/cached-tenant"
 import { db } from "@/lib/db"
 import type { PageData } from "@/lib/types"
-import { isValidObjectId, getCachedSiteDetails } from "@/lib/actions/helpers/cached-tenant"
-import ClientPreview from "../ClientPreview" // adjust path if needed
+import { notFound } from "next/navigation"
+import ClientPreview from "../ClientPreview"; // adjust path if needed
 
 import { Metadata } from "next"
 
