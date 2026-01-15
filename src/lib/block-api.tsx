@@ -269,16 +269,16 @@ export function useBlockStyles(props: {
         const isHidden = (bp: string) => responsive.hiddenOn?.includes(bp)
 
         // Mobile (< 768px in standard Tailwind, or 'max-md' usually means < 768px)
-        if (isHidden('mobile')) {
-            classes.push(isEditing ? 'max-md:opacity-25 max-md:outline-dashed max-md:outline-1 max-md:outline-rose-400' : '!max-md:hidden')
+        if (isHidden('mobile') && isEditing) {
+            classes.push('max-md:opacity-25 max-md:outline-dashed max-md:outline-1 max-md:outline-rose-400')
         }
         // Tablet (768px - 1024px)
-        if (isHidden('tablet')) {
-            classes.push(isEditing ? 'md:max-lg:opacity-25 md:max-lg:outline-dashed md:max-lg:outline-1 md:max-lg:outline-rose-400' : '!md:max-lg:hidden')
+        if (isHidden('tablet') && isEditing) {
+            classes.push('md:max-lg:opacity-25 md:max-lg:outline-dashed md:max-lg:outline-1 md:max-lg:outline-rose-400')
         }
         // Desktop (>= 1024px)
-        if (isHidden('desktop')) {
-            classes.push(isEditing ? 'lg:opacity-25 lg:outline-dashed lg:outline-1 lg:outline-rose-400' : '!lg:hidden')
+        if (isHidden('desktop') && isEditing) {
+            classes.push('lg:opacity-25 lg:outline-dashed lg:outline-1 lg:outline-rose-400')
         }
 
         return classes.join(" ")

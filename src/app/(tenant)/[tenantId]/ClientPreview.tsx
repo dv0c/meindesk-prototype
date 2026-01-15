@@ -27,10 +27,63 @@ function ClientPreview({ tenantId, page, headerContent, footerContent }: ClientP
 
   // CraftJS stores layout as [craftState] where craftState is the serialized editor state
   const craftStateObj = page.layout?.[0]
+
+  // Sanitize the Page ROOT node to ensure it's never hidden (prevents White Screen issues)
+  const pageRoot = craftStateObj?.nodes?.ROOT || craftStateObj?.ROOT
+  if (pageRoot?.props?.responsive?.hiddenOn) {
+    pageRoot.props.responsive.hiddenOn = []
+  }
+
   const craftStateJson = craftStateObj ? JSON.stringify(craftStateObj) : null
 
   // Extract design settings from page metadata
   const designSettings = (page as any).meta?.design as DesignSettings | undefined
+
+  // Helper to namespace Root IDs to prevent CSS collisions
+  const namespaceRootId = (content: any, newRootId: string) => {
+    // Check if content itself is the nodes map (standard CraftJS serialization)
+    // Structure: { "ROOT": { ... }, "node-1": { ... } }
+    if (!content || !content.ROOT) return content
+
+    const nodes = JSON.parse(JSON.stringify(content)) // Deep clone the whole map
+    const rootNode = nodes.ROOT
+
+    // 1. Rename ROOT key to newRootId
+    nodes[newRootId] = { ...rootNode, id: newRootId }
+    delete nodes.ROOT
+
+    // 2. Update children to point to new parent ID
+    // Children of Root need to know their parent changed from "ROOT" to newRootId
+    if (rootNode.nodes && rootNode.nodes.length > 0) {
+      rootNode.nodes.forEach((childId: string) => {
+        if (nodes[childId]) {
+          nodes[childId].parent = newRootId
+        }
+      })
+    }
+
+    // 3. Update linked nodes parents if any
+    if (rootNode.linkedNodes) {
+      Object.values(rootNode.linkedNodes).forEach((linkedId: any) => {
+        if (nodes[linkedId]) {
+          nodes[linkedId].parent = newRootId
+        }
+      })
+    }
+
+    // 4. Update parent pointers of any node that explicitly points to ROOT (sanity check)
+    Object.keys(nodes).forEach(key => {
+      if (nodes[key].parent === "ROOT") {
+        nodes[key].parent = newRootId
+      }
+    })
+
+    return nodes
+  }
+
+  // Pre-process Header/Footer to have unique Root IDs
+  const processedHeader = headerContent ? namespaceRootId(headerContent, "HEADER_ROOT") : null
+  const processedFooter = footerContent ? namespaceRootId(footerContent, "FOOTER_ROOT") : null
 
   return (
     <main className="min-h-screen flex flex-col">
@@ -38,10 +91,10 @@ function ClientPreview({ tenantId, page, headerContent, footerContent }: ClientP
       <EditorThemeProvider>
 
         {/* Header */}
-        {headerContent && (
+        {processedHeader && (
           <div className="w-full z-50 relative">
             <Editor enabled={false} resolver={resolverWithFallback}>
-              <Frame json={JSON.stringify(headerContent)} />
+              <Frame json={JSON.stringify(processedHeader)} />
             </Editor>
           </div>
         )}
@@ -63,10 +116,10 @@ function ClientPreview({ tenantId, page, headerContent, footerContent }: ClientP
         </div>
 
         {/* Footer */}
-        {footerContent && (
+        {processedFooter && (
           <div className="w-full relative mt-auto">
             <Editor enabled={false} resolver={resolverWithFallback}>
-              <Frame json={JSON.stringify(footerContent)} />
+              <Frame json={JSON.stringify(processedFooter)} />
             </Editor>
           </div>
         )}
