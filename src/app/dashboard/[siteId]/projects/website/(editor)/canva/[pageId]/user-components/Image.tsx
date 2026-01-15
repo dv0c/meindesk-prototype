@@ -7,6 +7,7 @@ import MediaLibraryDialog, { MediaItem } from "@/components/MediaGallery/media-s
 import { Button } from "@/components/ui/button"
 import { ImageIcon } from "lucide-react"
 import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
+import { motion, AnimatePresence } from "framer-motion"
 import { useCollectionItem } from "./collections/CollectionItemContext"
 import { resolveCollectionTemplate } from "@/lib/collection-utils"
 import {
@@ -221,12 +222,32 @@ export const Image = defineBlock<ImageProps>({
         const resolvedSrc = resolveCollectionTemplate(src, collectionContext?.data)
         const displaySrc = resolvedSrc || src
 
+        const [isLoading, setIsLoading] = useState(true)
+        const imageRef = React.useRef<HTMLImageElement>(null)
+
+        // Reset loading state when src changes
+        React.useEffect(() => {
+            setIsLoading(true)
+        }, [displaySrc])
+
+        // Check if image is already loaded (for cached images)
+        React.useEffect(() => {
+            if (imageRef.current?.complete) {
+                if (imageRef.current.naturalWidth > 0) {
+                    setIsLoading(false)
+                }
+            }
+        }, [displaySrc])
+
         // Merge props into style for consistency with useBlockStyles
         const effectiveStyle = {
             ...style,
             width,
             height,
-            objectFit,
+            objectFit, // This will be applied to the container, but we might want it on the image only? 
+            // Actually, useBlockStyles maps objectFit. 
+            // However, for the container -> image structure, we usually want the container to handle size/layout 
+            // and the image to fill it.
             borderRadius: borderRadius ? `${borderRadius}px` : undefined,
             // Force block display usually
             display: style?.display || "block"
@@ -240,13 +261,50 @@ export const Image = defineBlock<ImageProps>({
             deviceMode
         })
 
+        // We need the container to have relative position for the absolute placeholder
+        const containerStyle = {
+            ...computedStyle,
+            position: (computedStyle.position === 'absolute' || computedStyle.position === 'fixed') ? computedStyle.position : 'relative',
+            overflow: 'hidden', // Needed for borderRadius to clip the image/placeholder
+        }
+
         return (
-            <img
-                src={displaySrc}
-                alt={alt}
+            <motion.div
                 className={computedClassName}
-                style={computedStyle}
-            />
+                style={containerStyle}
+                initial={false}
+            >
+                <AnimatePresence mode="popLayout">
+                    {isLoading && (
+                        <motion.div
+                            key="placeholder"
+                            initial={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.5 }}
+                            className="absolute inset-0 bg-muted/20 backdrop-blur-md flex items-center justify-center z-10"
+                        >
+                            <ImageIcon className="w-8 h-8 text-muted-foreground/20 animate-pulse" />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                <motion.img
+                    ref={imageRef}
+                    src={displaySrc}
+                    alt={alt}
+                    className="w-full h-full"
+                    style={{
+                        objectFit: objectFit as any,
+                        width: '100%',
+                        height: '100%'
+                    }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: isLoading ? 0 : 1 }}
+                    transition={{ duration: 0.5 }}
+                    onLoad={() => setIsLoading(false)}
+                    onError={() => setIsLoading(false)}
+                />
+            </motion.div>
         )
     },
 
