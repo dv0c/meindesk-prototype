@@ -114,32 +114,19 @@ export function generateResponsiveCss(
 
     let css = ''
     const className = `c-${nodeId}`
+    const isRoot = nodeId === 'ROOT'
 
     // Desktop (Default / Base)
-    // We assume desktop is the base style.
-    // However, if we want to be strictly specific about overrides:
-    if (responsive?.hiddenOn?.includes('desktop')) {
+    if (responsive?.hiddenOn?.includes('desktop') && !isRoot) {
         css += `@media (min-width: 1024px) { .${className} { display: none !important; } }\n`
     } else if (desktopStyle) {
-        // We usually don't wrap desktop styles in a media query if they are the "default".
-        // BUT, if we want to ensure they don't leak into mobile if mobile overwrites them?
-        // Standard approach: Base styles are mobile-first or desktop-first.
-        // Given the code structure, Desktop seems to be the "Default".
-        // So we apply them without query? Or min-width: 1024px?
-        // If we apply without query, they apply everywhere.
-        // Then tablet/mobile overrides them. This is "Desktop First" logic IF the overrides work.
-        // Let's stick to base styles (no media query) for desktop for now, as that's standard
-        // unless we want to strictly isolate them.
-        // Re-reading previous logic: it was applying base styles via inline styles usually?
-        // Actually `useBlockStyles` applies base style to the `style` prop of the React element.
-        // So we ONLY need to generate CSS for the RESPONSIVE overrides (Tablet/Mobile).
-        // AND for Desktop specific overrides if we were doing mobile-first.
-        // Here, we successfully apply tablet/mobile overrides via media queries.
+        // Base styles (no media query) usually applied via inline style prop, 
+        // but if we ever needed desktop-specific override, it would go here.
+        // For now, we rely on inline styles for base.
     }
 
     // Tablet (768px - 1023.98px)
-    // This range ensures no overlap with 1024px desktop start.
-    if (responsive?.hiddenOn?.includes('tablet')) {
+    if (responsive?.hiddenOn?.includes('tablet') && !isRoot) {
         css += `@media (min-width: 768px) and (max-width: 1023.98px) { .${className} { display: none !important; } }\n`
     } else if (tabletStyle) {
         const rules = styleToCss(tabletStyle)
@@ -149,8 +136,7 @@ export function generateResponsiveCss(
     }
 
     // Mobile (< 768px)
-    // Using 767.98px to be safe against subpixel rounding issues.
-    if (responsive?.hiddenOn?.includes('mobile')) {
+    if (responsive?.hiddenOn?.includes('mobile') && !isRoot) {
         css += `@media (max-width: 767.98px) { .${className} { display: none !important; } }\n`
     } else if (mobileStyle) {
         const rules = styleToCss(mobileStyle)
