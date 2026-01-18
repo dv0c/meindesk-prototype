@@ -79,6 +79,7 @@ export async function getCachedSiteDetails(siteId: string) {
                         settings: true,
                         home_Id: true, // Need this to find home page
                         url: true, // For analytics tracking
+                        userId: true,
                     },
                 });
 
@@ -142,6 +143,7 @@ export async function getCachedSiteDetails(siteId: string) {
                 settings: true,
                 home_Id: true,
                 url: true,
+                userId: true,
             },
         });
 
