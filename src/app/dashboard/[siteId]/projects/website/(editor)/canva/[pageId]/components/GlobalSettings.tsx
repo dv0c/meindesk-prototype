@@ -42,7 +42,7 @@ const fontOptions = [
     { label: "Fira Code", value: "Fira Code" },
 ]
 
-export const GlobalStylesPanel = () => {
+export const GlobalStylesPanel = ({ exclude = [] }: { exclude?: string[] }) => {
     const { id, currentProps, actions } = useEditor((state) => {
         const [selectedId] = state.events.selected
         if (!selectedId) return { id: null, currentProps: null }
@@ -80,24 +80,26 @@ export const GlobalStylesPanel = () => {
     return (
         <div className="space-y-6">
             {/* Typography Section (Global) */}
-            <PropertySection title="Typography" defaultOpen={false}>
-                <PropertyRow label="Font Family">
-                    <PropertySelect
-                        value={fontFamily || "Inter"}
-                        onChange={(val) => updateProp('fontFamily', val)}
-                        options={fontOptions}
-                    />
-                </PropertyRow>
-                <PropertyRow label="Font Size">
-                    <PropertySlider
-                        value={parseInt(fontSize || 16)}
-                        onChange={(val) => updateProp('fontSize', val)}
-                        min={8}
-                        max={120}
-                        unit="px"
-                    />
-                </PropertyRow>
-            </PropertySection>
+            {!exclude.includes('typography') && (
+                <PropertySection title="Typography" defaultOpen={false}>
+                    <PropertyRow label="Font Family">
+                        <PropertySelect
+                            value={fontFamily || "Inter"}
+                            onChange={(val) => updateProp('fontFamily', val)}
+                            options={fontOptions}
+                        />
+                    </PropertyRow>
+                    <PropertyRow label="Font Size">
+                        <PropertySlider
+                            value={parseInt(fontSize || 16)}
+                            onChange={(val) => updateProp('fontSize', val)}
+                            min={8}
+                            max={120}
+                            unit="px"
+                        />
+                    </PropertyRow>
+                </PropertySection>
+            )}
 
             {/* Universal Styles (Dimensions, Layout, Spacing, Decoration, Position) */}
 

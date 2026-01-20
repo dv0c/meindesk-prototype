@@ -1,17 +1,17 @@
 "use client"
 
-import React from "react"
-import { useNode } from "@craftjs/core"
+import { useEditorContent } from "@/hooks/useEditorContent"
 import { defineBlock } from "@/lib/block-api"
 import { cn } from "@/lib/utils"
-import { useEditorContent } from "@/hooks/useEditorContent"
+import { useNode } from "@craftjs/core"
 import { LayoutTemplate } from "lucide-react"
 import {
-    PropertySection,
-    PropertyRow,
     PropertyInput,
     PropertyRichText,
-    PropertySelect
+    PropertyRow,
+    PropertySection,
+    PropertySelect,
+    PropertySlider
 } from "../../../components/PropertySection"
 
 // -----------------------------------------------------------------------------
@@ -23,7 +23,7 @@ export interface HeroProps {
     thumbnail?: string
     heading1?: string
     heading2?: string
-    contentFont?: string
+    fontFamily?: string
     className?: string
 }
 
@@ -32,7 +32,7 @@ const defaultProps: HeroProps = {
     thumbnail: 'https://images.unsplash.com/photo-1764377849133-635add556929?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     heading1: 'The First Chapter',
     heading2: 'A New Beginning',
-    contentFont: 'font-sans',
+    fontFamily: 'font-sans',
 }
 
 // -----------------------------------------------------------------------------
@@ -46,28 +46,32 @@ const HeroSettings = () => {
         thumbnail,
         heading1,
         heading2,
-        contentFont,
+        fontFamily,
     } = useNode((node) => ({
         content: node.data.props.content,
         thumbnail: node.data.props.thumbnail,
         heading1: node.data.props.heading1,
         heading2: node.data.props.heading2,
-        contentFont: node.data.props.contentFont,
+        fontFamily: node.data.props.fontFamily,
     }))
 
     return (
         <div className="space-y-4 pt-2">
-            <PropertySection title="Content" defaultOpen={true}>
-                <PropertyRow label="Font Style">
+            <PropertySection title="Typography">
+                <PropertyRow label="Font Family">
                     <PropertySelect
-                        value={contentFont || "font-sans"}
-                        onChange={(val) => setProp((props: any) => props.contentFont = val)}
+                        value={fontFamily || "font-sans"}
+                        onChange={(val) => setProp((props: any) => props.fontFamily = val)}
                         options={[
-                            { label: 'Sans', value: 'font-sans' },
                             { label: 'Serif', value: 'font-serif' },
+                            { label: 'Sans', value: 'font-sans' },
                         ]}
                     />
                 </PropertyRow>
+
+            </PropertySection>
+
+            <PropertySection title="Content" defaultOpen={true}>
 
                 <PropertyRichText
                     label="Main Content"
@@ -109,7 +113,7 @@ export const HeroView = ({
     thumbnail = defaultProps.thumbnail,
     heading1 = defaultProps.heading1,
     heading2 = defaultProps.heading2,
-    contentFont = defaultProps.contentFont,
+    fontFamily = defaultProps.fontFamily,
     className,
 }: HeroProps) => {
     const htmlContent = useEditorContent(content)
@@ -117,12 +121,14 @@ export const HeroView = ({
     return (
         <div className={cn("w-full transition-colors", className)}>
             <div className="max-w-[52.5rem] mx-auto">
-                <div className="text-[18px] space-y-5 text-muted-foreground">
+                <div
+                    className={cn("text-muted-foreground space-y-5", fontFamily)}
+                >
                     {thumbnail && (
                         <img
                             width={380}
                             height={460}
-                            className="float-left mr-8 mb-5 object-cover max-w-full sm:max-w-[380px] rounded-md"
+                            className="w-full sm:w-auto mb-5 rounded-md object-cover sm:float-left sm:mr-8 sm:max-w-[380px]"
                             alt="Hero Image"
                             src={thumbnail}
                         />
@@ -130,7 +136,8 @@ export const HeroView = ({
 
                     {htmlContent && (
                         <div
-                            className={cn(`prose-sm ${contentFont} homepage prose-p:pt-0 prose-p:leading-snug max-w-full text-muted-foreground prose-headings:text-primary prose-a:text-primary`)}
+                            className={cn(`prose-sm homepage prose-p:pt-0 prose-p:leading-snug max-w-full text-muted-foreground prose-headings:text-primary prose-a:text-primary`)}
+                            style={{ fontFamily: 'inherit', fontSize: 'inherit' }}
                             dangerouslySetInnerHTML={{ __html: htmlContent }}
                         />
                     )}
@@ -169,5 +176,5 @@ export const Hero = defineBlock<HeroProps>({
     description: "About Me section with bio, split layout and quote",
     defaultProps,
     settings: HeroSettings,
-    render: HeroView
+    render: HeroView,
 })

@@ -39,55 +39,18 @@ function ClientPreview({ tenantId, page, headerContent, footerContent }: ClientP
   // Extract design settings from page metadata
   const designSettings = (page as any).meta?.design as DesignSettings | undefined
 
-  // Helper to namespace Root IDs to prevent CSS collisions
-  const namespaceRootId = (content: any, newRootId: string) => {
-    // Check if content itself is the nodes map (standard CraftJS serialization)
-    // Structure: { "ROOT": { ... }, "node-1": { ... } }
-    if (!content || !content.ROOT) return content
 
-    const nodes = JSON.parse(JSON.stringify(content)) // Deep clone the whole map
-    const rootNode = nodes.ROOT
 
-    // 1. Rename ROOT key to newRootId
-    nodes[newRootId] = { ...rootNode, id: newRootId }
-    delete nodes.ROOT
-
-    // 2. Update children to point to new parent ID
-    // Children of Root need to know their parent changed from "ROOT" to newRootId
-    if (rootNode.nodes && rootNode.nodes.length > 0) {
-      rootNode.nodes.forEach((childId: string) => {
-        if (nodes[childId]) {
-          nodes[childId].parent = newRootId
-        }
-      })
-    }
-
-    // 3. Update linked nodes parents if any
-    if (rootNode.linkedNodes) {
-      Object.values(rootNode.linkedNodes).forEach((linkedId: any) => {
-        if (nodes[linkedId]) {
-          nodes[linkedId].parent = newRootId
-        }
-      })
-    }
-
-    // 4. Update parent pointers of any node that explicitly points to ROOT (sanity check)
-    Object.keys(nodes).forEach(key => {
-      if (nodes[key].parent === "ROOT") {
-        nodes[key].parent = newRootId
-      }
-    })
-
-    return nodes
-  }
-
-  // Pre-process Header/Footer to have unique Root IDs
-  const processedHeader = headerContent ? namespaceRootId(headerContent, "HEADER_ROOT") : null
-  const processedFooter = footerContent ? namespaceRootId(footerContent, "FOOTER_ROOT") : null
+  // Pre-process Header/Footer
+  // Note: We used to namespace IDs here, but since each section is in its own Editor instance,
+  // we can safely use the standard ROOT node. Renaming it likely breaks CraftJS which expects "ROOT".
+  const processedHeader = headerContent
+  const processedFooter = footerContent
 
   return (
     <main className="min-h-screen flex flex-col">
       <DesignSystemStyles settings={designSettings} />
+
       <EditorThemeProvider>
 
         {/* Header */}

@@ -123,6 +123,11 @@ export interface BlockConfig<P> {
     childrenAllowed?: boolean
     parentTypesAllowed?: string[]
 
+    // Global Settings Configuration
+    globalSettings?: {
+        exclude?: Array<'typography' | 'responsive' | string>
+    }
+
     // Custom settings component
     settings?: React.ComponentType<any>
     settingsConfig?: SettingsConfig
@@ -369,7 +374,7 @@ export function defineBlock<P extends object>(config: BlockConfig<P>): BlockAPI<
             <div className="space-y-6">
                 {Settings && <Settings />}
                 <div className="pt-4 border-t">
-                    <GlobalStylesPanel />
+                    <GlobalStylesPanel exclude={config.globalSettings?.exclude} />
                 </div>
             </div>
         )
