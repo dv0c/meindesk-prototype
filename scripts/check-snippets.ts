@@ -1,5 +1,6 @@
 
-import { PrismaClient } from '@prisma/client'
+// @ts-nocheck
+const { PrismaClient } = require('@prisma/client')
 
 const db = new PrismaClient()
 
