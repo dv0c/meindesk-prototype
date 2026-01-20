@@ -7,10 +7,8 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
 import { Code, Trash2 } from "lucide-react"
-import { Editor } from "@/components/blocks/editor-x/editor"
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { $generateHtmlFromNodes } from '@lexical/html'
-import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
+// import { Editor } from "@/components/blocks/editor-x/editor" // Removed old editor usage
+import { BlockContentEditor } from "./BlockContentEditor"
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 
 interface PropertySectionProps {
@@ -658,17 +656,25 @@ export function PropertyRichText({ value, onChange, label, description }: Proper
                         >
                             Clear
                         </Button>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="h-7 text-xs"
-                            onClick={() => setOpen(true)}
-                            title="Edit in Rich Text Editor"
-                        >
-                            <Code className="h-3 w-3 mr-1" />
-                            Edit in Editor
-                        </Button>
+                        <BlockContentEditor
+                            content={htmlContent}
+                            onChange={(val) => {
+                                // BlockContentEditor gives us generic HTML updates immediately
+                                onChange(val)
+                            }}
+                            title={`Edit ${label || "Content"}`}
+                            trigger={
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-7 text-xs"
+                                >
+                                    <Code className="h-3 w-3 mr-1" />
+                                    Edit in Editor
+                                </Button>
+                            }
+                        />
                     </div>
                 </div>
                 {htmlContent ? (
@@ -684,55 +690,6 @@ export function PropertyRichText({ value, onChange, label, description }: Proper
                 )}
 
             </div>
-
-            <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className="max-w-[95vw]! overflow-auto w-[95vw] h-[95vh] max-h-[95vh] flex flex-col p-0">
-                    <DialogHeader className="px-6 pt-6 pb-4 border-b">
-                        <DialogTitle className="text-xl">Edit {label || "Content"}</DialogTitle>
-                    </DialogHeader>
-
-                    <div className="flex-1 overflow-auto px-6 relative flex flex-col">
-                        <Editor
-                            editorSerializedState={(() => {
-                                try {
-                                    if (value && value.trim().startsWith('{')) {
-                                        const parsed = JSON.parse(value)
-                                        if (parsed.editorState) {
-                                            return parsed.editorState
-                                        }
-                                        return parsed
-                                    }
-                                    return undefined
-                                } catch (e) {
-                                    return undefined
-                                }
-                            })()}
-                            onEditorReady={setEditorInstance}
-                            onChange={(editorState) => {
-                                if (!editorInstance) return;
-
-                                editorState.read(() => {
-                                    const html = $generateHtmlFromNodes(editorInstance, null)
-                                    const payload = JSON.stringify({
-                                        html: html,
-                                        editorState: editorState.toJSON()
-                                    })
-                                    setPendingState(payload)
-                                })
-                            }}
-                        />
-                    </div>
-
-                    <DialogFooter className="px-6 py-4 border-t bg-muted/30">
-                        <Button variant="outline" onClick={() => setOpen(false)}>
-                            Cancel
-                        </Button>
-                        <Button onClick={handleSave}>
-                            Save
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
         </div>
     )
 }

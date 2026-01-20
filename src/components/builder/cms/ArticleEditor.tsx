@@ -16,6 +16,31 @@ import { ArrowLeft, ChevronDown, PanelRight, Save, X, Maximize2, ExternalLink } 
 import { toast } from "sonner"
 import Link from "next/link"
 
+import { $generateNodesFromDOM } from "@lexical/html"
+import { $getRoot, $insertNodes } from "lexical"
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext"
+
+function HtmlLoaderPlugin({ html }: { html: string }) {
+    const [editor] = useLexicalComposerContext()
+    const loadedRef = useRef(false)
+
+    useEffect(() => {
+        if (!html || loadedRef.current) return
+
+        editor.update(() => {
+            const parser = new DOMParser()
+            const dom = parser.parseFromString(html, "text/html")
+            const nodes = $generateNodesFromDOM(editor, dom)
+            const root = $getRoot()
+            root.clear()
+            $insertNodes(nodes)
+            loadedRef.current = true
+        })
+    }, [editor, html])
+
+    return null
+}
+
 interface ArticleEditorProps {
     articleId: string
     siteId: string
@@ -55,12 +80,13 @@ export default function ArticleEditor({ articleId, siteId, onClose }: ArticleEdi
         const content = article.content
         const hasContent = content && Object.keys(content).length > 0 && content.root
         setEditorState(hasContent ? content : undefined)
+        setHtml(article.html || "") // Ensure html is set from article
         setSlug(article.slug || "")
         setExcerpt(article.excerpt || "")
         setCategories(article.categories || [])
         setLoaded(true)
         setThumbnail(article.cover || "")
-    }, [article, loaded, articleId]) // Added articleId to dep to ensure reset on switch
+    }, [article, loaded, articleId])
 
     // Auto-resize title on load and when title changes
     useEffect(() => {
@@ -106,6 +132,8 @@ export default function ArticleEditor({ articleId, siteId, onClose }: ArticleEdi
         const excerptChanged = excerpt !== (article.excerpt || "")
         const thumbnailChanged = thumbnail !== (article.cover || "")
         const categoriesChanged = JSON.stringify(categories) !== JSON.stringify(article.categories || [])
+        // If html is loaded from article.html but editorState was empty, contentChanged might be tricky.
+        // But usually saving will update both.
         return titleChanged || contentChanged || slugChanged || excerptChanged || thumbnailChanged || categoriesChanged
     }, [title, editorState, slug, excerpt, article, thumbnail, categories])
 
@@ -125,6 +153,9 @@ export default function ArticleEditor({ articleId, siteId, onClose }: ArticleEdi
             onSerializedChange={(value) => setEditorState(value)}
             onHtmlChange={(value) => setHtml(value)}
         >
+            {!editorState && article.html && (
+                <HtmlLoaderPlugin html={article.html} />
+            )}
             <div className="h-full flex flex-col bg-background">
                 {/* Header */}
                 <header className="sticky top-0 z-50 h-12 shrink-0 flex items-center justify-between px-4 border-b bg-background">

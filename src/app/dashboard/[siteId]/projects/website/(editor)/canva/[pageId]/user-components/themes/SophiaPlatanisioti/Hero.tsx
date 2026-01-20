@@ -13,7 +13,6 @@ import {
     PropertySelect,
     PropertySlider
 } from "../../../components/PropertySection"
-
 // -----------------------------------------------------------------------------
 // Props
 // -----------------------------------------------------------------------------
@@ -68,7 +67,6 @@ const HeroSettings = () => {
                         ]}
                     />
                 </PropertyRow>
-
             </PropertySection>
 
             <PropertySection title="Content" defaultOpen={true}>
@@ -86,19 +84,20 @@ const HeroSettings = () => {
                     />
                 </PropertyRow>
 
-                <PropertyRow label="Top Heading">
+                <PropertyRow label="Heading 1">
                     <PropertyInput
                         value={heading1 || ""}
                         onChange={(val) => setProp((props: any) => props.heading1 = val)}
                     />
                 </PropertyRow>
 
-                <PropertyRow label="Bottom Heading">
+                <PropertyRow label="Heading 2">
                     <PropertyInput
                         value={heading2 || ""}
                         onChange={(val) => setProp((props: any) => props.heading2 = val)}
                     />
                 </PropertyRow>
+
             </PropertySection>
         </div>
     )
