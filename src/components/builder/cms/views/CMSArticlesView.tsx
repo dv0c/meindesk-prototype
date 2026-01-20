@@ -12,8 +12,9 @@ import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
-import ArticleEditor from "../ArticleEditor"; // Check if this exists, otherwise fallback to flex
+import ArticleEditor from "../ArticleEditor";
 import { DeleteConfirmDialog } from "../dialogs/DeleteConfirmDialog"
+import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet"
 
 interface CMSArticlesViewProps {
     siteId: string
@@ -97,13 +98,10 @@ export function CMSArticlesView({ siteId }: CMSArticlesViewProps) {
         }
     }
 
-    // Toggle logic for the "drawer" effect
-    const isEditorOpen = !!selectedArticleId
-
     return (
         <div className="flex h-full w-full overflow-hidden">
-            {/* List View - Hidden on mobile if editor is open, or use responsive toggle */}
-            <div className={`flex flex-col border-r bg-background transition-all duration-300 ${isEditorOpen ? 'w-[400px] hidden md:flex' : 'w-full'}`}>
+            {/* List View - Always full width now, editor opens as sheet */}
+            <div className="flex flex-col h-full w-full bg-background">
                 <div className="p-4 border-b flex items-center justify-between bg-background/95 backdrop-blur z-10">
                     <div className="flex items-center gap-4 flex-1">
                         <div className="relative w-full">
@@ -152,7 +150,7 @@ export function CMSArticlesView({ siteId }: CMSArticlesViewProps) {
                                         <div className="flex flex-col min-w-0 flex-1">
                                             <div className="flex items-center justify-between">
                                                 <span className="font-medium text-sm truncate">{article.title || "Untitled"}</span>
-                                                <Badge variant={statusColors[article.status] as any || "default"} className="text-[10px] px-1.5 h-5">
+                                                <Badge variant={(statusColors[article.status as keyof typeof statusColors] || "default") as any} className="text-[10px] px-1.5 h-5">
                                                     {article.status}
                                                 </Badge>
                                             </div>
@@ -180,18 +178,25 @@ export function CMSArticlesView({ siteId }: CMSArticlesViewProps) {
                 </ScrollArea>
             </div>
 
-            {/* Editor Area */}
-            {selectedArticleId ? (
-                <div className="flex-1 h-full bg-background relative flex flex-col min-w-0 animate-in fade-in zoom-in-95 duration-200">
-                    <ArticleEditor
-                        articleId={selectedArticleId}
-                        siteId={siteId}
-                        onClose={() => setSelectedArticleId(null)}
-                    />
-                </div>
-            ) : (
-                null
-            )}
+            <Sheet open={!!selectedArticleId} onOpenChange={(open) => !open && setSelectedArticleId(null)}>
+                <SheetContent
+                    side="right"
+                    className="w-full sm:max-w-[calc(100vw-40px)] md:max-w-7xl p-0 gap-0 overflow-hidden flex flex-col bg-background z-[150] border-l"
+                >
+                    <SheetTitle className="sr-only">Article Editor</SheetTitle>
+                    <SheetDescription className="sr-only">Edit article content</SheetDescription>
+
+                    {selectedArticleId && (
+                        <div className="flex-1 h-full bg-background relative flex flex-col min-w-0">
+                            <ArticleEditor
+                                articleId={selectedArticleId}
+                                siteId={siteId}
+                                onClose={() => setSelectedArticleId(null)}
+                            />
+                        </div>
+                    )}
+                </SheetContent>
+            </Sheet>
 
             <DeleteConfirmDialog
                 open={!!deleteId}
