@@ -26,7 +26,7 @@ import { NotificationsTab } from "./NotificationsTab"
 import { DeveloperTab } from "./DeveloperTab"
 import { useSession } from "next-auth/react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useSidebar } from "@/components/ui/sidebar"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 interface AccountSettingsDialogProps {
     open?: boolean;
@@ -37,7 +37,7 @@ interface AccountSettingsDialogProps {
 export function AccountSettingsDialog({ children, open, onOpenChange }: AccountSettingsDialogProps) {
     const [activeTab, setActiveTab] = useState("profile")
     const { data: session } = useSession()
-    const { isMobile } = useSidebar()
+    const isMobile = useIsMobile()
     const user = session?.user
 
     const tabs = [

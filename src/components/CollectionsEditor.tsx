@@ -31,7 +31,7 @@ import {
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
-interface CMSCreateCollectionProps {
+interface CollectionsEditorProps {
     siteId: string
     onBack: () => void
     onSuccess: () => void
@@ -49,7 +49,7 @@ const FIELD_TYPES = [
     { type: "relation", label: "Reference", icon: Database },
 ]
 
-export function CMSCreateCollection({ siteId, onBack, onSuccess, initialData }: CMSCreateCollectionProps) {
+export function CollectionsEditor({ siteId, onBack, onSuccess, initialData }: CollectionsEditorProps) {
     const [name, setName] = useState(initialData?.name || "")
     const [slug, setSlug] = useState(initialData?.slug || "")
     const [description, setDescription] = useState(initialData?.description || "")
@@ -187,9 +187,9 @@ export function CMSCreateCollection({ siteId, onBack, onSuccess, initialData }: 
     }
 
     return (
-        <div className="flex h-screen bg-background dark:bg-zinc-950 overflow-hidden">
+        <div className="flex h-screen bg-background dark:bg-zinc-950 overflow-hidden w-full absolute top-0 left-0 z-50">
             {/* Left Sidebar: Settings */}
-            <div className="w-[500px] flex flex-col border-r border-border/40 h-full max-h-screen">
+            <div className="w-[500px] flex flex-col border-r border-border/40 h-full max-h-screen bg-background">
                 {/* Header */}
                 <div className="h-14 border-b border-border/40 flex items-center justify-between px-4 bg-background/50 backdrop-blur-sm z-10 shrink-0">
                     <div className="flex items-center gap-2">

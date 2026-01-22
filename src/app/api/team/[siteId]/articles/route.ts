@@ -35,6 +35,7 @@ export async function GET(
         status: true,
         siteId: true,
         authorId: true,
+        categories: true,
         author: {
           select: {
             id: true,
@@ -47,7 +48,41 @@ export async function GET(
       ...(parsedLimit > 0 ? { take: parsedLimit } : {}), // no limit if 0
     })
 
-    return NextResponse.json(articles);
+    // NEW: Fetch all categories referenced by these articles
+    // 1. Collect all unique category IDs
+    // @ts-ignore
+    const allCategoryIds = Array.from(new Set(articles.flatMap((a) => a.categories)))
+
+    // 2. Fetch the actual Category objects
+    const categoriesList = await db.category.findMany({
+      where: {
+        id: { in: allCategoryIds as string[] },
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+      },
+    })
+
+    // 3. Create a lookup map for faster access
+    const categoryMap = new Map(categoriesList.map((c) => [c.id, c]))
+
+    // 4. Attach the full category objects to each article
+    const enrichedArticles = articles.map((article) => {
+      // @ts-ignore
+      const fullCategories = article.categories
+        // @ts-ignore
+        .map((catId) => categoryMap.get(catId))
+        .filter(Boolean) // Filter out any undefineds if a category was deleted
+
+      return {
+        ...article,
+        categories: fullCategories,
+      }
+    })
+
+    return NextResponse.json(enrichedArticles);
   } catch (error) {
     return createErrorResponse(error);
   }

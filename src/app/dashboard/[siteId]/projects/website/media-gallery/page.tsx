@@ -5,9 +5,7 @@ export const metadata = {
 }
 
 const page = () => {
-  return <div className="px-5">
-    <MediaGalleryClient />
-  </div>
+  return <MediaGalleryClient />
 }
 
 export default page

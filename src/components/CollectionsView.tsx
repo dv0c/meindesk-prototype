@@ -1,5 +1,7 @@
+"use client"
+
 import { useState, useEffect, useMemo } from "react"
-import { Loader2, Search, Database, MoreHorizontal, Edit, Trash, Plus } from "lucide-react"
+import { Loader2, Search, Database, Edit, Trash, Plus } from "lucide-react"
 import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -12,24 +14,16 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { getCollections, deleteCollection } from "@/lib/actions/collection-actions"
 
-import { CreateCollectionDialog } from "../dialogs/CreateCollectionDialog"
-import { EditCollectionDialog } from "../dialogs/EditCollectionDialog"
-import { DeleteConfirmDialog } from "../dialogs/DeleteConfirmDialog"
-import { CMSCreateCollection } from "./CMSCreateCollection"
+import { DeleteConfirmDialog } from "./builder/cms/dialogs/DeleteConfirmDialog"
+import { CollectionsEditor } from "./CollectionsEditor"
 
-interface CMSCollectionsViewProps {
+interface CollectionsViewProps {
     siteId: string
 }
 
-export function CMSCollectionsView({ siteId }: CMSCollectionsViewProps) {
+export function CollectionsView({ siteId }: CollectionsViewProps) {
     const [collections, setCollections] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState("")
@@ -86,10 +80,6 @@ export function CMSCollectionsView({ siteId }: CMSCollectionsViewProps) {
         }
     }
 
-    if (loading && !collections.length) {
-        return <div className="flex items-center justify-center h-full"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
-    }
-
     const handleSuccess = () => {
         fetchCollections()
         setMode("list")
@@ -98,7 +88,7 @@ export function CMSCollectionsView({ siteId }: CMSCollectionsViewProps) {
 
     if (mode === "create") {
         return (
-            <CMSCreateCollection
+            <CollectionsEditor
                 siteId={siteId}
                 onBack={() => setMode("list")}
                 onSuccess={handleSuccess}
@@ -108,7 +98,7 @@ export function CMSCollectionsView({ siteId }: CMSCollectionsViewProps) {
 
     if (mode === "edit" && editCollection) {
         return (
-            <CMSCreateCollection
+            <CollectionsEditor
                 siteId={siteId}
                 initialData={editCollection}
                 onBack={() => {
@@ -120,32 +110,36 @@ export function CMSCollectionsView({ siteId }: CMSCollectionsViewProps) {
         )
     }
 
+    if (loading && !collections.length) {
+        return <div className="flex items-center justify-center h-full w-full"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
+    }
+
     return (
         <div className="flex flex-col h-full bg-background dark:bg-zinc-950">
-            <div className="p-4 border-b flex items-center justify-between bg-background/95 backdrop-blur">
+            <div className="px-6 py-4 border-b flex items-center justify-between bg-background/95 backdrop-blur z-10">
                 <div className="flex items-center gap-4 flex-1">
                     <div className="relative max-w-sm w-full">
-                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                             placeholder="Search collections..."
-                            className="pl-9 bg-muted/40 border-muted"
+                            className="pl-9 bg-background h-9"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
                 </div>
-                <Button onClick={() => setMode("create")}>
+                <Button onClick={() => setMode("create")} className="h-9">
                     <Plus className="h-4 w-4 mr-2" />
                     New Collection
                 </Button>
             </div>
 
             <ScrollArea className="flex-1">
-                <div className="p-4">
-                    <div className="rounded-md border bg-background/50">
+                <div className="p-6">
+                    <div className="rounded-md border bg-background">
                         <Table>
-                            <TableHeader>
-                                <TableRow className="hover:bg-transparent">
+                            <TableHeader className="bg-muted/40">
+                                <TableRow className="hover:bg-transparent border-b">
                                     <TableHead className="w-[50px]"></TableHead>
                                     <TableHead>Name</TableHead>
                                     <TableHead>Slug</TableHead>
@@ -162,7 +156,7 @@ export function CMSCollectionsView({ siteId }: CMSCollectionsViewProps) {
                                     </TableRow>
                                 ) : (
                                     filteredCollections.map((col: any) => (
-                                        <TableRow key={col.id} className="group hover:bg-muted/30 cursor-pointer" onClick={() => {
+                                        <TableRow key={col.id} className="group hover:bg-muted/40 cursor-pointer border-b last:border-0" onClick={() => {
                                             setEditCollection(col)
                                             setMode("edit")
                                         }}>
@@ -170,8 +164,8 @@ export function CMSCollectionsView({ siteId }: CMSCollectionsViewProps) {
                                                 <Database className="h-4 w-4 text-muted-foreground" />
                                             </TableCell>
                                             <TableCell className="font-medium">{col.name}</TableCell>
-                                            <TableCell className="text-muted-foreground text-sm">{col.slug}</TableCell>
-                                            <TableCell className="text-sm">
+                                            <TableCell className="text-muted-foreground text-sm font-mono">{col.slug}</TableCell>
+                                            <TableCell className="text-sm text-muted-foreground">
                                                 {(col.fields as any[])?.length || 0} fields
                                             </TableCell>
                                             <TableCell className="text-right">
@@ -207,4 +201,3 @@ export function CMSCollectionsView({ siteId }: CMSCollectionsViewProps) {
         </div>
     )
 }
-

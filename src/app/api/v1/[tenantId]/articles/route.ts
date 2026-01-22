@@ -46,7 +46,38 @@ export async function GET(
       return NextResponse.json([])
     }
 
-    return NextResponse.json(articles)
+    // NEW: Fetch all categories referenced by these articles
+    // 1. Collect all unique category IDs
+    const allCategoryIds = Array.from(new Set(articles.flatMap((a) => a.categories)))
+
+    // 2. Fetch the actual Category objects
+    const categoriesList = await db.category.findMany({
+      where: {
+        id: { in: allCategoryIds },
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+      },
+    })
+
+    // 3. Create a lookup map for faster access
+    const categoryMap = new Map(categoriesList.map((c) => [c.id, c]))
+
+    // 4. Attach the full category objects to each article
+    const enrichedArticles = articles.map((article) => {
+      const fullCategories = article.categories
+        .map((catId) => categoryMap.get(catId))
+        .filter(Boolean) // Filter out any undefineds if a category was deleted
+
+      return {
+        ...article,
+        categories: fullCategories,
+      }
+    })
+
+    return NextResponse.json(enrichedArticles)
   } catch (error) {
     console.error("Error fetching articles:", error)
     return NextResponse.json(

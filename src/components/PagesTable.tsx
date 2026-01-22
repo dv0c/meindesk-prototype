@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { MoreHorizontal, Edit, Eye, Trash, Copy, Search, ChevronLeft, ChevronRight, Lock } from "lucide-react"
+import { MoreHorizontal, Edit, Eye, Trash, Copy, Search, ChevronLeft, ChevronRight, Lock, Loader2, File } from "lucide-react"
 
 import {
   Table,
@@ -29,6 +29,7 @@ import { useTeam } from "@/hooks/useTeam"
 import { Skeleton } from "./ui/skeleton"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "./ui/alert-dialog"
 import { usePages } from "@/hooks/use-pages"
+import { cn } from "@/lib/utils"
 
 const statusColors: Record<string, string> = {
   PUBLISHED: "default",
@@ -48,7 +49,7 @@ export function PagesTable() {
   const { pages, getPages, deletePage, loading } = usePages()
 
   const [deleteTarget, setDeleteTarget] = useState<any>(null)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isDialogOpenn, setIsDialogOpen] = useState(false)
 
   useEffect(() => {
     if (team) getPages(team.id)
@@ -108,107 +109,63 @@ export function PagesTable() {
   }
 
   if (loading) return (
-    <div className="space-y-4 w-full">
-      {/* Search and Filter Skeleton */}
-      <div className="flex items-center gap-3">
-        <div className="relative flex-1 max-w-sm">
-          <Skeleton className="h-9 w-full" />
-        </div>
-        <Skeleton className="h-9 w-[140px]" />
-      </div>
-
-      {/* Table Skeleton */}
-      <div className="rounded-lg border border-border bg-card overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-transparent border-border">
-              <TableHead className="h-10"><Skeleton className="h-3 w-12" /></TableHead>
-              <TableHead className="h-10"><Skeleton className="h-3 w-8" /></TableHead>
-              <TableHead className="h-10"><Skeleton className="h-3 w-12" /></TableHead>
-              <TableHead className="h-10"><Skeleton className="h-3 w-16" /></TableHead>
-              <TableHead className="h-10"><Skeleton className="h-3 w-16" /></TableHead>
-              <TableHead className="h-10"><Skeleton className="h-3 w-14" /></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {Array.from({ length: 5 }).map((_, idx) => (
-              <TableRow key={idx} className="border-border">
-                <TableCell className="py-3">
-                  <Skeleton className="h-4 w-32" />
-                </TableCell>
-                <TableCell className="py-3">
-                  <Skeleton className="h-3 w-24" />
-                </TableCell>
-                <TableCell className="py-3">
-                  <Skeleton className="h-5 w-16 rounded-full" />
-                </TableCell>
-                <TableCell className="py-3">
-                  <Skeleton className="h-3 w-20" />
-                </TableCell>
-                <TableCell className="py-3">
-                  <Skeleton className="h-3 w-20" />
-                </TableCell>
-                <TableCell className="py-3 text-right">
-                  <Skeleton className="h-8 w-8 ml-auto" />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+    <div className="flex items-center justify-center h-64 w-full">
+      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
     </div>
   )
 
   return (
     <>
       <div className="space-y-4 w-full">
-        <div className="flex items-center gap-3">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search pages..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-9 bg-background border-border"
-            />
-          </div>
-          <Select
-            value={statusFilter}
-            onValueChange={(value) => {
-              setStatusFilter(value)
-              setCurrentPage(1)
-            }}
-          >
-            <SelectTrigger className="w-[140px] h-9">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">All Status</SelectItem>
-              <SelectItem value="PUBLISHED">Published</SelectItem>
-              <SelectItem value="DRAFT">Draft</SelectItem>
-              <SelectItem value="ARCHIVED">Archived</SelectItem>
-            </SelectContent>
+        {/* Toolbar */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <Tabs defaultValue="pages" value={activeTab} onValueChange={setActiveTab} className="w-auto">
+            <TabsList className="grid w-full grid-cols-2 h-9 p-1 bg-muted/50">
+              <TabsTrigger value="pages" className="text-xs">Pages</TabsTrigger>
+              <TabsTrigger value="templates" className="text-xs">Templates</TabsTrigger>
+            </TabsList>
+          </Tabs>
 
-          </Select>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="relative flex-1 sm:w-64">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search pages..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9 h-9 bg-background"
+              />
+            </div>
+            <Select
+              value={statusFilter}
+              onValueChange={(value) => {
+                setStatusFilter(value)
+                setCurrentPage(1)
+              }}
+            >
+              <SelectTrigger className="w-[130px] h-9 text-xs">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Status</SelectItem>
+                <SelectItem value="PUBLISHED">Published</SelectItem>
+                <SelectItem value="DRAFT">Draft</SelectItem>
+                <SelectItem value="ARCHIVED">Archived</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        <Tabs defaultValue="pages" onValueChange={setActiveTab} className="w-full">
-          <TabsList>
-            <TabsTrigger value="pages">Pages</TabsTrigger>
-            <TabsTrigger value="templates">Templates</TabsTrigger>
-          </TabsList>
-        </Tabs>
-
-        <div className="rounded-lg border border-border bg-card overflow-hidden">
+        <div className="rounded-md border bg-background text-sm shadow-sm overflow-hidden">
           <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-transparent border-border">
-                <TableHead className="h-10 text-xs font-medium text-muted-foreground">Title</TableHead>
-                <TableHead className="h-10 text-xs font-medium text-muted-foreground">Slug</TableHead>
-                <TableHead className="h-10 text-xs font-medium text-muted-foreground">Status</TableHead>
-                <TableHead className="h-10 text-xs font-medium text-muted-foreground">Created</TableHead>
-                <TableHead className="h-10 text-xs font-medium text-muted-foreground">Updated</TableHead>
-                <TableHead className="h-10 text-xs font-medium text-muted-foreground text-right w-[60px]">Actions</TableHead>
+            <TableHeader className="bg-muted/40">
+              <TableRow className="hover:bg-transparent border-b">
+                <TableHead className="h-10 text-xs font-medium w-[300px]">Page</TableHead>
+                <TableHead className="h-10 text-xs font-medium">Slug</TableHead>
+                <TableHead className="h-10 text-xs font-medium">Status</TableHead>
+                <TableHead className="h-10 text-xs font-medium">Created</TableHead>
+                <TableHead className="h-10 text-xs font-medium">Updated</TableHead>
+                <TableHead className="h-10 text-xs font-medium text-right w-[60px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -223,69 +180,76 @@ export function PagesTable() {
                 paginatedPages.map((page: any) => (
                   <TableRow
                     key={page.id}
-                    className="border-border cursor-pointer hover:bg-muted/50 transition-colors"
+                    className="group border-b last:border-0 cursor-pointer hover:bg-muted/40 transition-colors"
                     onClick={(e) => {
                       const target = e.target as HTMLElement
                       if (target.closest("button") || target.closest("[role='menu']")) return
                       router.push(`/dashboard/${team?.id}/projects/website/canva/${page.id}/`)
                     }}
                   >
-                    <TableCell className="font-medium py-3 text-sm">
-                      <div className="flex items-center gap-2">
-                        {page.locked && (
-                          <Lock className="h-4 w-4 mr-2 text-muted-foreground" />
-                        )}
-                        {page.title}
+                    <TableCell className="font-medium py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-md bg-muted/50 flex items-center justify-center border">
+                          <File className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="truncate max-w-[200px] text-foreground font-medium flex items-center gap-1.5">
+                            {page.locked && <Lock className="h-3 w-3 text-muted-foreground" />}
+                            {page.title || "Untitled Page"}
+                          </span>
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell className="font-mono text-xs text-muted-foreground py-3">{page.slug}</TableCell>
                     <TableCell className="py-3">
-                      <Badge variant={statusColors[page.status] as any} className="text-xs">
+                      <Badge variant={statusColors[page.status] as any} className="h-5 px-2 text-[10px] font-medium rounded-full">
                         {page.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground py-3">
+                    <TableCell className="text-xs text-muted-foreground py-3">
                       {new Date(page.createdAt).toLocaleDateString()}
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground py-3">
+                    <TableCell className="text-xs text-muted-foreground py-3">
                       {new Date(page.updatedAt).toLocaleDateString()}
                     </TableCell>
 
                     <TableCell className="text-right py-3" onClick={(e) => e.stopPropagation()}>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() =>
-                              router.push(`/dashboard/${team?.id}/projects/website/canva/${page.id}/`)
-                            }
-                          >
-                            <Edit className="h-4 w-4 mr-2" /> Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() =>
-                              router.push(`${team?.url}/pages/${page.slug}`)
-                            }
-                          >
-                            <Eye className="h-4 w-4 mr-2" /> View
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDuplicate(page)}>
-                            <Copy className="h-4 w-4 mr-2" /> Duplicate
-                          </DropdownMenuItem>
-                          {!page.locked && (
+                      <div className="flex items-center justify-end">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
                             <DropdownMenuItem
-                              onClick={() => confirmDelete(page)}
-                              className="text-destructive focus:text-destructive"
+                              onClick={() =>
+                                router.push(`/dashboard/${team?.id}/projects/website/canva/${page.id}/`)
+                              }
                             >
-                              <Trash className="h-4 w-4 mr-2" /> Delete
+                              <Edit className="h-4 w-4 mr-2" /> Edit Page
                             </DropdownMenuItem>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                router.push(`${team?.url}/pages/${page.slug}`)
+                              }
+                            >
+                              <Eye className="h-4 w-4 mr-2" /> View Live
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDuplicate(page)}>
+                              <Copy className="h-4 w-4 mr-2" /> Duplicate
+                            </DropdownMenuItem>
+                            {!page.locked && (
+                              <DropdownMenuItem
+                                onClick={() => confirmDelete(page)}
+                                className="text-destructive focus:text-destructive"
+                              >
+                                <Trash className="h-4 w-4 mr-2" /> Delete
+                              </DropdownMenuItem>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
@@ -295,9 +259,9 @@ export function PagesTable() {
         </div>
 
         {filteredPages.length > 0 && (
-          <div className="flex items-center justify-between px-2">
-            <div className="text-sm text-muted-foreground">
-              Showing {startIndex + 1} to {Math.min(endIndex, filteredPages.length)} of {filteredPages.length} pages
+          <div className="flex items-center justify-between px-2 pt-2">
+            <div className="text-xs text-muted-foreground">
+              Showing {startIndex + 1}-{Math.min(endIndex, filteredPages.length)} of {filteredPages.length}
             </div>
             <div className="flex items-center gap-2">
               <Button
@@ -305,21 +269,18 @@ export function PagesTable() {
                 size="sm"
                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
-                className="h-8"
+                className="h-8 w-8 p-0"
               >
-                <ChevronLeft className="h-4 w-4" /> Previous
+                <ChevronLeft className="h-4 w-4" />
               </Button>
-              <div className="text-sm text-muted-foreground">
-                Page {currentPage} of {totalPages}
-              </div>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
-                className="h-8"
+                className="h-8 w-8 p-0"
               >
-                Next <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -327,7 +288,7 @@ export function PagesTable() {
       </div >
 
       {/* Delete confirmation dialog */}
-      < AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} >
+      < AlertDialog open={isDialogOpenn} onOpenChange={setIsDialogOpen} >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this page?</AlertDialogTitle>

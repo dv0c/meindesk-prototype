@@ -1,21 +1,9 @@
 "use client"
 
-import { Copy, Edit, Eye, MoreHorizontal, Trash, Trash2 } from 'lucide-react'
-import Image from "next/image"
-import { useRouter } from 'next/navigation'
-import { useEffect, useMemo, useState } from "react"
-
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import {
     Table,
     TableBody,
@@ -24,12 +12,19 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { ChevronLeft, ChevronRight, Search } from 'lucide-react'
-import { toast } from "sonner"
-
 import { useArticle } from "@/hooks/use-article"
 import { useTeam } from "@/hooks/useTeam"
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "./ui/alert-dialog"
+import { useMediaQuery } from "@/hooks/use-media-query"
+import { MoreHorizontal, Plus, Search, Loader2, FileText, Trash, Edit, Copy } from "lucide-react"
+import Image from "next/image"
+import { useRouter, useParams } from "next/navigation"
+import { useEffect, useMemo, useState } from "react"
+import { toast } from "sonner"
+import ArticleEditor from "@/components/builder/cms/ArticleEditor";
+import { DeleteConfirmDialog } from "./builder/cms/dialogs/DeleteConfirmDialog"
+import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { cn } from "@/lib/utils"
 
 const statusColors = {
     PUBLISHED: "default",
@@ -38,19 +33,22 @@ const statusColors = {
     DELETED: "outline",
 }
 
-const ITEMS_PER_PAGE = 10
+interface ArticleTableProps {
+    siteId?: string;
+}
 
-export function ArticleTable() {
+export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
     const router = useRouter()
-    const team = useTeam().team
-    const [searchQuery, setSearchQuery] = useState("")
-    const [statusFilter, setStatusFilter] = useState("ALL")
-    const [currentPage, setCurrentPage] = useState(1)
+    const params = useParams()
+    const siteId = propSiteId || (params.siteId as string)
     const { articles, getArticles, deleteArticle, loading } = useArticle()
+    const { team } = useTeam()
 
-    const [selectedArticles, setSelectedArticles] = useState<Set<string>>(new Set())
-    const [deleteTarget, setDeleteTarget] = useState<any>(null)
-    const [isDialogOpen, setIsDialogOpen] = useState(false)
+    // Local state for search/filter
+    const [searchQuery, setSearchQuery] = useState("")
+    const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null)
+    const [deleteId, setDeleteId] = useState<string | null>(null)
+    const [isCreating, setIsCreating] = useState(false)
 
     useEffect(() => {
         if (team) getArticles(team.id)
@@ -62,401 +60,205 @@ export function ArticleTable() {
             const matchesSearch =
                 article.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 article.slug?.toLowerCase().includes(searchQuery.toLowerCase())
-            const matchesStatus = statusFilter === "ALL" || article.status === statusFilter
-            return matchesSearch && matchesStatus
+            return matchesSearch
         })
-    }, [articles, searchQuery, statusFilter])
+    }, [articles, searchQuery])
 
-    const totalPages = Math.ceil(filteredArticles.length / ITEMS_PER_PAGE)
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
-    const endIndex = startIndex + ITEMS_PER_PAGE
-    const paginatedArticles = filteredArticles.slice(startIndex, endIndex)
+    const isDesktop = useMediaQuery("(min-width: 768px)")
 
-    const toggleArticleSelection = (articleId: string) => {
-        const newSelected = new Set(selectedArticles)
-        if (newSelected.has(articleId)) {
-            newSelected.delete(articleId)
+    const handleArticleClick = (articleId: string) => {
+        if (isDesktop) {
+            setSelectedArticleId(articleId)
         } else {
-            newSelected.add(articleId)
-        }
-        setSelectedArticles(newSelected)
-    }
-
-    const toggleSelectAll = () => {
-        const allIds = new Set(paginatedArticles.map((a: any) => a.id))
-        if (selectedArticles.size === paginatedArticles.length && paginatedArticles.length > 0) {
-            setSelectedArticles(new Set())
-        } else {
-            setSelectedArticles(allIds)
+            router.push(`/dashboard/${team?.id}/projects/website/articles/${articleId}/editor`)
         }
     }
 
-    const confirmDelete = (article: any) => {
-        setDeleteTarget(article)
-        setIsDialogOpen(true)
-    }
-
-    const handleDeleteConfirm = async () => {
-        if (!team || !deleteTarget) return toast.error("Team or article missing.")
+    const handleCreateArticle = async () => {
+        if (!team) return
+        setIsCreating(true)
         try {
-            await deleteArticle(team.id, deleteTarget.id)
-            toast.success("Article deleted successfully.")
-        } catch (error) {
-            toast.error("Failed to delete article.")
-        }
-        setIsDialogOpen(false)
-        setDeleteTarget(null)
-    }
-
-    const handleBulkDelete = async () => {
-        if (selectedArticles.size === 0) return toast.error("No articles selected.")
-        if (!team) return toast.error("Team not found.")
-
-        setDeleteTarget({ title: `${selectedArticles.size} article(s)`, isBulk: true })
-        setIsDialogOpen(true)
-    }
-
-    const handleDeleteBulkConfirm = async () => {
-        if (!team) return toast.error("Team not found.")
-
-        const selectedIds = Array.from(selectedArticles)
-        const articleCount = selectedIds.length
-
-        try {
-            for (const articleId of selectedIds) {
-                await deleteArticle(team.id, articleId)
-            }
-            toast.success(`Deleted ${articleCount} article(s).`)
-            setSelectedArticles(new Set())
-        } catch (error) {
-            toast.error("Failed to delete some articles.")
-        }
-        setIsDialogOpen(false)
-        setDeleteTarget(null)
-    }
-
-    const handleBulkDuplicate = async () => {
-        if (selectedArticles.size === 0) return toast.error("No articles selected.")
-        if (!team?.id) return toast.error("Team not found.")
-
-        try {
-            for (const articleId of selectedArticles) {
-                const article = articles.find((a: any) => a.id === articleId)
-                if (!article) continue
-
-                const data = {
-                    ...article,
-                    title: `${article.title} (Copy)`,
-                    slug: `${article.slug}-copy-${Date.now()}`,
-                }
-                await fetch(`/api/team/${team?.id}/articles`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(data),
+            const res = await fetch(`/api/team/${team.id}/articles`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    title: 'Untitled Article',
+                    slug: `untitled-article-${Date.now()}`,
+                    content: {},
+                    status: 'DRAFT'
                 })
+            })
+
+            if (res.ok) {
+                const newArticle = await res.json()
+                toast.success("Article created")
+                await getArticles(team.id)
+                setSelectedArticleId(newArticle.id) // Select the new article immediately
+            } else {
+                toast.error("Failed to create article")
             }
-            toast.success(`Duplicated ${selectedArticles.size} article(s).`)
-            getArticles(team.id)
-            setSelectedArticles(new Set())
-        } catch (error) {
-            toast.error("Failed to duplicate articles.")
+
+        } catch (e) {
+            toast.error("Error creating article")
+        } finally {
+            setIsCreating(false)
         }
     }
 
-    const handleDuplicate = async (article: any) => {
-        if (!team?.id) return toast.error("Team not found.")
-        const data = {
-            ...article,
-            title: `${article.title} (Copy)`,
-            slug: `${article.slug}-copy-${Date.now()}`,
+    const handleDelete = async () => {
+        if (!team || !deleteId) return
+        await deleteArticle(team.id, deleteId)
+        toast.success("Article deleted")
+        setDeleteId(null)
+        if (selectedArticleId === deleteId) {
+            setSelectedArticleId(null)
         }
-        await fetch(`/api/team/${team?.id}/articles`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-        })
-        toast.success("Article duplicated.")
         getArticles(team.id)
     }
 
-    const isAllSelected = selectedArticles.size === paginatedArticles.length && paginatedArticles.length > 0
-
     return (
-        <>
-            <div className="space-y-4 w-full">
-                <div className="flex items-center gap-3">
-                    <div className="relative flex-1 max-w-sm">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <div className="flex h-full w-full flex-col bg-background/50">
+            {/* Toolbar */}
+            <div className="flex items-center justify-between px-6 py-4 border-b bg-background/95 backdrop-blur z-10">
+                <div className="flex items-center gap-4 flex-1">
+                    <div className="relative w-full max-w-sm">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                             placeholder="Search articles..."
+                            className="pl-9 h-9"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-9 h-9 bg-background border-border"
                         />
                     </div>
-                    <Select
-                        value={statusFilter}
-                        onValueChange={(value) => {
-                            setStatusFilter(value)
-                            setCurrentPage(1)
-                        }}
-                    >
-                        <SelectTrigger className="w-[140px] h-9">
-                            <SelectValue placeholder="Filter by status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="ALL">All Status</SelectItem>
-                            <SelectItem value="PUBLISHED">Published</SelectItem>
-                            <SelectItem value="DRAFT">Draft</SelectItem>
-                            <SelectItem value="BANNED">Banned</SelectItem>
-                            <SelectItem value="DELETED">Deleted</SelectItem>
-                        </SelectContent>
-                    </Select>
                 </div>
-
-                {selectedArticles.size > 0 && (
-                    <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-lg border border-border bg-muted/50 animate-in slide-in-from-top-2 duration-300">
-                        <div className="text-sm font-medium">
-                            {selectedArticles.size} article(s) selected
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={handleBulkDuplicate}
-                                className="h-8"
-                            >
-                                <Copy className="h-4 w-4 mr-2" /> Duplicate
-                            </Button>
-                            <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={handleBulkDelete}
-                                className="h-8"
-                            >
-                                <Trash2 className="h-4 w-4 mr-2" /> Delete
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setSelectedArticles(new Set())}
-                                className="h-8"
-                            >
-                                Clear
-                            </Button>
-                        </div>
-                    </div>
-                )}
-
-
-                <div className="rounded-lg border border-border bg-card overflow-hidden">
-                    <Table>
-                        <TableHeader>
-                            <TableRow className="hover:bg-transparent border-border">
-                                <TableHead className="h-10 text-xs font-medium text-muted-foreground w-[50px]">
-                                    <Checkbox
-                                        checked={isAllSelected}
-                                        onCheckedChange={toggleSelectAll}
-                                        aria-label="Select all articles"
-                                    />
-                                </TableHead>
-                                <TableHead className="h-10 text-xs font-medium text-muted-foreground w-[80px]">
-                                    Thumbnail
-                                </TableHead>
-                                <TableHead className="h-10 text-xs font-medium text-muted-foreground">Title</TableHead>
-                                <TableHead className="h-10 text-xs font-medium text-muted-foreground">Slug</TableHead>
-                                <TableHead className="h-10 text-xs font-medium text-muted-foreground">Status</TableHead>
-                                <TableHead className="h-10 text-xs font-medium text-muted-foreground">Created</TableHead>
-                                <TableHead className="h-10 text-xs font-medium text-muted-foreground">Updated</TableHead>
-                                <TableHead className="h-10 text-xs font-medium text-muted-foreground text-right w-[60px]">
-                                    Actions
-                                </TableHead>
-                            </TableRow>
-                        </TableHeader>
-
-                        <TableBody>
-                            {loading ? (
-                                // Skeleton loading state
-                                Array.from({ length: 5 }).map((_, idx) => (
-                                    <TableRow key={idx} className="border-border">
-                                        <TableCell className="py-3">
-                                            <div className="h-4 w-4 bg-muted animate-pulse rounded" />
-                                        </TableCell>
-                                        <TableCell className="py-3">
-                                            <div className="w-14 h-14 bg-muted animate-pulse rounded-md" />
-                                        </TableCell>
-                                        <TableCell className="py-3">
-                                            <div className="h-4 w-32 bg-muted animate-pulse rounded" />
-                                        </TableCell>
-                                        <TableCell className="py-3">
-                                            <div className="h-3 w-24 bg-muted animate-pulse rounded" />
-                                        </TableCell>
-                                        <TableCell className="py-3">
-                                            <div className="h-5 w-16 bg-muted animate-pulse rounded-full" />
-                                        </TableCell>
-                                        <TableCell className="py-3">
-                                            <div className="h-3 w-20 bg-muted animate-pulse rounded" />
-                                        </TableCell>
-                                        <TableCell className="py-3">
-                                            <div className="h-3 w-20 bg-muted animate-pulse rounded" />
-                                        </TableCell>
-                                        <TableCell className="py-3 text-right">
-                                            <div className="h-8 w-8 bg-muted animate-pulse rounded ml-auto" />
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                            ) : paginatedArticles.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
-                                        No articles found.
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                paginatedArticles.map((article: any) => (
-                                    <TableRow
-                                        key={article.id}
-                                        className={`border-border cursor-pointer transition-all duration-200 ${selectedArticles.has(article.id) ? 'bg-muted/50' : 'hover:bg-muted/30'}`}
-                                        onClick={(e) => {
-                                            const target = e.target as HTMLElement
-                                            if (target.closest("button") || target.closest("[role='menu']") || target.closest("[role='checkbox']")) return
-                                            router.push(`/dashboard/${team?.id}/projects/website/articles/${article.id}/editor`)
-                                        }}
-                                    >
-                                        <TableCell className="py-3" onClick={(e) => e.stopPropagation()}>
-                                            <Checkbox
-                                                checked={selectedArticles.has(article.id)}
-                                                onCheckedChange={() => toggleArticleSelection(article.id)}
-                                                aria-label={`Select ${article.title}`}
-                                            />
-                                        </TableCell>
-
-                                        <TableCell className="py-3">
-                                            <div className="w-14 h-14 rounded-md overflow-hidden bg-muted flex items-center justify-center">
-                                                {article.cover ? (
-                                                    <Image
-                                                        src={article.cover || "/placeholder.svg"}
-                                                        alt={article.title}
-                                                        width={56}
-                                                        height={56}
-                                                        className="object-cover w-full h-full"
-                                                    />
-                                                ) : (
-                                                    <div className="text-xs text-muted-foreground">No image</div>
-                                                )}
-                                            </div>
-                                        </TableCell>
-
-                                        <TableCell className="font-medium py-3 overflow-hidden max-w-md text-sm">
-                                            {article.title}
-                                        </TableCell>
-                                        <TableCell className="font-mono text-xs text-muted-foreground max-w-md overflow-hidden py-3">{article.slug}</TableCell>
-                                        <TableCell className="py-3">
-                                            <Badge variant={statusColors[article.status]} className="text-xs">
-                                                {article.status}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell className="text-sm text-muted-foreground py-3">
-                                            {new Date(article.createdAt).toLocaleDateString()}
-                                        </TableCell>
-                                        <TableCell className="text-sm text-muted-foreground py-3">
-                                            {new Date(article.updateAt).toLocaleDateString()}
-                                        </TableCell>
-
-                                        <TableCell
-                                            className="text-right py-3"
-                                            onClick={(e) => e.stopPropagation()}
-                                        >
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem
-                                                        onClick={() =>
-                                                            router.push(`/dashboard/${team?.id}/projects/website/articles/${article.id}/editor`)
-                                                        }
-                                                    >
-                                                        <Edit className="h-4 w-4 mr-2" /> Edit
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem
-                                                        onClick={() =>
-                                                            router.push(`${team?.url}/article/${article.slug}`)
-                                                        }
-                                                    >
-                                                        <Eye className="h-4 w-4 mr-2" /> View
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => handleDuplicate(article)}>
-                                                        <Copy className="h-4 w-4 mr-2" /> Duplicate
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem
-                                                        onClick={() => confirmDelete(article)}
-                                                        className="text-destructive focus:text-destructive"
-                                                    >
-                                                        <Trash className="h-4 w-4 mr-2" /> Delete
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                            )}
-                        </TableBody>
-                    </Table>
-                </div>
-
-                {filteredArticles.length > 0 && (
-                    <div className="flex items-center justify-between px-2">
-                        <div className="text-sm text-muted-foreground">
-                            Showing {startIndex + 1} to {Math.min(endIndex, filteredArticles.length)} of {filteredArticles.length} articles
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                                disabled={currentPage === 1}
-                                className="h-8"
-                            >
-                                <ChevronLeft className="h-4 w-4" /> Previous
-                            </Button>
-                            <div className="text-sm text-muted-foreground">
-                                Page {currentPage} of {totalPages}
-                            </div>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                                disabled={currentPage === totalPages}
-                                className="h-8"
-                            >
-                                Next <ChevronRight className="h-4 w-4" />
-                            </Button>
-                        </div>
-                    </div>
-                )}
+                <Button size="sm" onClick={handleCreateArticle} disabled={isCreating} className="h-9">
+                    {isCreating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
+                    Create Article
+                </Button>
             </div>
-            {/* Delete confirmation dialog */}
-            <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Delete {deleteTarget?.isBulk ? 'these articles' : 'this article'}?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This action cannot be undone. {deleteTarget?.isBulk ? `${deleteTarget?.title}` : `The article <strong>${deleteTarget?.title}</strong>`} will be permanently deleted.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setIsDialogOpen(false)}>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={deleteTarget?.isBulk ? handleDeleteBulkConfirm : handleDeleteConfirm}
-                            className="bg-destructive text-white hover:bg-destructive/90"
-                        >
-                            Delete
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-        </>
+
+            <ScrollArea className="flex-1">
+                <div className="p-6">
+                    <div className="rounded-md border bg-background text-sm shadow-sm overflow-hidden">
+                        <Table>
+                            <TableHeader className="bg-muted/40">
+                                <TableRow>
+                                    <TableHead className="w-[400px]">Article</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Date</TableHead>
+                                    <TableHead className="text-right">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {loading && articles.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={4} className="h-24 text-center">
+                                            <div className="flex justify-center items-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+                                        </TableCell>
+                                    </TableRow>
+                                ) : filteredArticles.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                                            No articles found.
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    filteredArticles.map((article: any) => (
+                                        <TableRow
+                                            key={article.id}
+                                            onClick={() => handleArticleClick(article.id)}
+                                            className={cn(
+                                                "cursor-pointer transition-colors hover:bg-muted/40",
+                                                selectedArticleId === article.id && "bg-muted/40 border-l-2 border-l-primary"
+                                            )}
+                                        >
+                                            <TableCell className="font-medium">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="h-9 w-9 relative shrink-0 overflow-hidden rounded-md border bg-muted flex items-center justify-center text-muted-foreground">
+                                                        {article.cover ? (
+                                                            <Image
+                                                                src={article.cover}
+                                                                alt={article.title}
+                                                                fill
+                                                                className="object-cover"
+                                                            />
+                                                        ) : (
+                                                            <FileText className="h-4 w-4" />
+                                                        )}
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <span className="truncate max-w-[200px] font-medium text-foreground">{article.title || "Untitled"}</span>
+                                                        <span className="text-xs text-muted-foreground truncate max-w-[200px]">{article.slug}</span>
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge variant={(statusColors[article.status as keyof typeof statusColors] || "default") as any} className="h-5 px-2 text-[10px] font-medium rounded-full">
+                                                    {article.status}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell className="text-muted-foreground">
+                                                {new Date(article.createdAt).toLocaleDateString()}
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex items-center justify-end" onClick={(e) => e.stopPropagation()}>
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
+                                                                <MoreHorizontal className="h-4 w-4" />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end">
+                                                            <DropdownMenuItem onClick={() => handleArticleClick(article.id)}>
+                                                                <Edit className="mr-2 h-3.5 w-3.5" />
+                                                                Edit
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem
+                                                                onClick={() => setDeleteId(article.id)}
+                                                                className="text-destructive focus:text-destructive"
+                                                            >
+                                                                <Trash className="mr-2 h-3.5 w-3.5" />
+                                                                Delete
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
+                </div>
+            </ScrollArea>
+
+            <Sheet open={!!selectedArticleId} onOpenChange={(open) => !open && setSelectedArticleId(null)}>
+                <SheetContent
+                    side="right"
+                    className="w-full sm:max-w-[calc(100vw-40px)] md:max-w-7xl p-0 gap-0 overflow-hidden flex flex-col bg-background z-[150] border-l shadow-2xl"
+                    style={{ transition: "transform 0.3s cubic-bezier(0.32, 0.72, 0, 1)" }}
+                >
+                    <SheetTitle className="sr-only">Article Editor</SheetTitle>
+                    <SheetDescription className="sr-only">Edit article content</SheetDescription>
+
+                    {selectedArticleId && (
+                        <div className="flex-1 h-full bg-background relative flex flex-col min-w-0">
+                            <ArticleEditor
+                                articleId={selectedArticleId}
+                                siteId={siteId || (team?.id as string)}
+                                onClose={() => setSelectedArticleId(null)}
+                            />
+                        </div>
+                    )}
+                </SheetContent>
+            </Sheet>
+
+            <DeleteConfirmDialog
+                open={!!deleteId}
+                onOpenChange={(open) => !open && setDeleteId(null)}
+                onConfirm={handleDelete}
+                title="Delete Article"
+            />
+        </div>
     )
 }

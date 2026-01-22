@@ -11,20 +11,14 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Site } from "@prisma/client";
+import { cn } from "@/lib/utils";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 export const DeleteWebsite = ({ siteId }: { siteId: string }) => {
   const router = useRouter();
+
   const handleDelete = async () => {
     await axios.delete(`/api/team/${siteId}`).then(() => {
       toast.success("Website deleted successfully!");
@@ -33,40 +27,39 @@ export const DeleteWebsite = ({ siteId }: { siteId: string }) => {
   };
 
   return (
-    <div className="max-w-3xl pl-5 w-full">
-      <div className="grid gap-6">
-        <Card className="border-dashed pb-0 overflow-hidden border-2 border-red-500/30">
-          <CardHeader>
-            <CardTitle>Delete your website</CardTitle>
-            <CardDescription className="pb-10">
-              Once you delete your website, it will be permanently removed from
-              our servers.
-            </CardDescription>
-          </CardHeader>
-          <CardFooter className="border-t px-6 py-4 bg-red-800/20">
-            <AlertDialog>
-              <AlertDialogTrigger asChild className=" text-left">
-                <Button className="cursor-pointer" variant={"destructive"}>Delete</Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete
-                    your website.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
-                  <AlertDialogAction className="cursor-pointer" onClick={handleDelete}>
-                    Delete
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </CardFooter>
-        </Card>
+    <div className="max-w-4xl w-full">
+      <div className="rounded-lg border border-red-500/20 bg-background overflow-hidden">
+        <div className="p-6">
+          <h3 className="text-lg font-medium leading-none tracking-tight mb-2 text-red-500">Delete Project</h3>
+          <p className="text-sm text-muted-foreground mb-6 max-w-2xl">
+            The project will be permanently deleted, including all of its deployments and domains. This action is irreversible and can not be undone.
+          </p>
+        </div>
+        <div className="flex items-center justify-between p-4 px-6 bg-red-500/10 border-t border-red-500/20 rounded-b-lg">
+          <div className="text-sm text-red-600/80 font-medium">
+          </div>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" className="bg-red-600 hover:bg-red-700">Delete</Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete Project</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to delete this project? This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
     </div>
   );
 };
+

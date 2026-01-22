@@ -3,11 +3,11 @@
 import { useState } from "react"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { CMSSidebar, CMSView } from "./CMSSidebar"
-// Views will be imported here
-import { CMSArticlesView } from "./views/CMSArticlesView"
-import { CMSCategoriesView } from "./views/CMSCategoriesView"
-import { CMSCollectionsView } from "./views/CMSCollectionsView"
-import { CMSMediaGalleryView } from "./views/CMSMediaGalleryView"
+// Views imports
+import { ArticleTable } from "@/components/ArticlesTable"
+import { CategoriesTable } from "@/components/CategoriesTable"
+import { CollectionsView } from "@/components/CollectionsView"
+import { MediaGalleryClient } from "@/components/MediaGallery/media-gallery-client"
 
 interface CMSModalProps {
     open: boolean
@@ -21,13 +21,13 @@ export function CMSModal({ open, onOpenChange, siteId }: CMSModalProps) {
     const renderContent = () => {
         switch (activeView) {
             case "articles":
-                return <CMSArticlesView siteId={siteId} />
+                return <ArticleTable siteId={siteId} />
             case "media":
-                return <CMSMediaGalleryView siteId={siteId} />
+                return <MediaGalleryClient />
             case "categories":
-                return <CMSCategoriesView siteId={siteId} />
+                return <CategoriesTable siteId={siteId} />
             case "collections":
-                return <CMSCollectionsView siteId={siteId} />
+                return <CollectionsView siteId={siteId} />
             default:
                 return null
         }
@@ -35,7 +35,7 @@ export function CMSModal({ open, onOpenChange, siteId }: CMSModalProps) {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="min-w-screen w-full h-screen p-0 gap-0 overflow-hidden flex bg-background focus:outline-none z-[101]" showClose={false}>
+            <DialogContent className="min-w-screen w-full h-screen p-0 gap-0 overflow-hidden flex bg-background focus:outline-none z-[101]">
                 <CMSSidebar
                     activeView={activeView}
                     setActiveView={setActiveView}

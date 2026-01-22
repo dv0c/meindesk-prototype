@@ -5,6 +5,8 @@ import axios from "axios"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { RefreshCw, Trash2, Globe, CheckCircle2, AlertCircle, Plus } from "lucide-react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -12,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import type { Site } from "@prisma/client"
 
 import { usePages } from "@/hooks/use-pages"
+import { cn } from "@/lib/utils"
 
 interface Page {
     id: string
@@ -24,13 +27,12 @@ const WebsiteSettings = ({ site }: { site: Site }) => {
 
     // --- State ---
     const [name, setName] = useState(site.title)
-    const [url, setUrl] = useState(site.url || "")
     const [homePageId, setHomePageId] = useState<string | null>(null)
     const [isNameLoading, setNameLoading] = useState(false)
-    const [isUrlLoading, setUrlLoading] = useState(false)
     const [isHomePageLoading, setHomePageLoading] = useState(false)
     const [nameError, setNameError] = useState("")
-    const [urlError, setUrlError] = useState("")
+    const [domainStatus, setDomainStatus] = useState<any>(null)
+    const [domainVerificationLoading, setDomainVerificationLoading] = useState(false)
 
     const { pages, getPages, loading: pagesLoading } = usePages()
 
@@ -42,9 +44,27 @@ const WebsiteSettings = ({ site }: { site: Site }) => {
         })
     }, [site.id, getPages])
 
+    // --- Check Domain Status on Mount/Change ---
+    useEffect(() => {
+        if (site.url && site.url !== `${site.subdomain}.meindesk.gr` && !site.url.includes("localhost")) {
+            checkDomainStatus(site.url)
+        }
+    }, [site.url])
+
+    const checkDomainStatus = async (domain: string) => {
+        setDomainVerificationLoading(true)
+        try {
+            const res = await axios.get(`/api/site/${site.id}/domains?domain=${domain}`)
+            setDomainStatus(res.data)
+        } catch (error) {
+            console.error("Failed to check domain", error)
+        } finally {
+            setDomainVerificationLoading(false)
+        }
+    }
+
     // --- Handlers ---
-    const handleNameSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
+    const handleNameSubmit = async () => {
         setNameError("")
         setNameLoading(true)
 
@@ -55,10 +75,10 @@ const WebsiteSettings = ({ site }: { site: Site }) => {
                 link: site.url,
                 siteId: site.id,
             })
-            toast.success("Website name updated successfully!")
+            toast.success("Project name updated")
             router.refresh()
         } catch (err: any) {
-            const message = err.response?.data?.message || err.message || "Failed to update website name"
+            const message = err.response?.data?.message || err.message || "Failed to update project name"
             setNameError(message)
             toast.error(message)
         } finally {
@@ -66,26 +86,16 @@ const WebsiteSettings = ({ site }: { site: Site }) => {
         }
     }
 
-    const handleUrlSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setUrlError("")
-        setUrlLoading(true)
+    const handleRemoveDomain = async (domainToRemove: string) => {
+        if (!confirm("Are you sure you want to remove this domain?")) return
 
         try {
-            await axios.put(`/api/team/${site.id}`, {
-                title: site.title,
-                description: site.description,
-                link: url,
-                siteId: site.id,
-            })
-            toast.success("Website URL updated successfully!")
+            await axios.delete(`/api/site/${site.id}/domains?domain=${domainToRemove}`)
+            toast.success("Domain removed")
+            setDomainStatus(null)
             router.refresh()
-        } catch (err: any) {
-            const message = err.response?.data?.message || err.message || "Failed to update website URL"
-            setUrlError(message)
-            toast.error(message)
-        } finally {
-            setUrlLoading(false)
+        } catch (error) {
+            toast.error("Failed to remove domain")
         }
     }
 
@@ -100,9 +110,9 @@ const WebsiteSettings = ({ site }: { site: Site }) => {
             await axios.put(`/api/team/${site.id}`, {
                 siteId: site.id,
                 home_Id: homePageId
-                
+
             })
-            toast.success("Homepage updated successfully!")
+            toast.success("Homepage updated")
         } catch (err) {
             console.error(err)
             toast.error("Failed to update homepage")
@@ -111,84 +121,173 @@ const WebsiteSettings = ({ site }: { site: Site }) => {
         }
     }
 
-    return (
-        <div className="max-w-3xl pl-5 w-full">
-            <div className="grid gap-6">
-
-                {/* Website Name */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Change your website name</CardTitle>
-                        <CardDescription>Change the name of your website to something more memorable.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="pb-0">
-                        <form onSubmit={handleNameSubmit}>
-                            <div className="space-y-2">
-                                <Label htmlFor="name">Website Name</Label>
-                                <Input id="name" placeholder="Your website name" value={name} onChange={(e) => setName(e.target.value)} />
-                                {nameError && <p className="text-sm font-medium text-destructive">{nameError}</p>}
-                            </div>
-                        </form>
-                    </CardContent>
-                    <CardFooter className="border-t px-6">
-                        <Button form="" onClick={handleNameSubmit} disabled={isNameLoading}>
-                            {isNameLoading ? "Loading..." : "Update"}
-                        </Button>
-                    </CardFooter>
-                </Card>
-
-                {/* Website URL */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Change your website URL</CardTitle>
-                        <CardDescription>Update the URL where your website is hosted.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="pb-0">
-                        <form onSubmit={handleUrlSubmit}>
-                            <div className="space-y-2">
-                                <Label htmlFor="url">Website URL</Label>
-                                <Input id="url" placeholder="https://example.com" value={url} onChange={(e) => setUrl(e.target.value)} />
-                                {urlError && <p className="text-sm font-medium text-destructive">{urlError}</p>}
-                            </div>
-                        </form>
-                    </CardContent>
-                    <CardFooter className="border-t px-6">
-                        <Button form="" onClick={handleUrlSubmit} disabled={isUrlLoading}>
-                            {isUrlLoading ? "Loading..." : "Update"}
-                        </Button>
-                    </CardFooter>
-                </Card>
-
-                {/* Homepage selection */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Change your Home Page</CardTitle>
-                        <CardDescription>Select which page should be the homepage.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-2">
-                            <Label htmlFor="homepage">Homepage Page</Label>
-                            <Select value={homePageId || ""} onValueChange={setHomePageId} disabled={pagesLoading}>
-                                <SelectTrigger>
-                                    <SelectValue className="w-full" defaultValue={pages.find((f) => f.slug == site.home_Id)} placeholder={pagesLoading ? "Loading pages..." : "Select a page"} />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {pages.map((p: Page) => (
-                                        <SelectItem key={p.slug} value={p.slug}>
-                                            {p.title}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </CardContent>
-                    <CardFooter className="border-t px-6">
-                        <Button onClick={handleSaveHomePage} disabled={isHomePageLoading || pagesLoading}>
-                            {isHomePageLoading ? "Saving..." : "Update"}
-                        </Button>
-                    </CardFooter>
-                </Card>
+    // --- Components ---
+    // --- Components ---
+    const SettingCard = ({ title, description, children, footer, className }: any) => (
+        <div className={cn("rounded-lg border border-border bg-background overflow-hidden", className)}>
+            <div className="p-6">
+                <h3 className="text-lg font-medium leading-none tracking-tight mb-2">{title}</h3>
+                <p className="text-sm text-muted-foreground mb-6 max-w-2xl">
+                    {description}
+                </p>
+                {children}
             </div>
+            {footer && (
+                <div className="flex items-center justify-between p-4 px-6 bg-muted/20 border-t border-border">
+                    <div className="text-sm text-muted-foreground w-full">
+                        {/* Optional footer text left-side */}
+                    </div>
+                    {footer}
+                </div>
+            )}
+        </div>
+    )
+
+    const isCustomDomain = site.url && site.url !== `${site.subdomain}.meindesk.gr`;
+
+    return (
+        <div className="max-w-4xl w-full space-y-8">
+            {/* Website Name */}
+            <SettingCard
+                title="Project Name"
+                description="This is the name of your project on Vercel. It will be visible on your dashboard."
+                footer={
+                    <Button onClick={handleNameSubmit} disabled={isNameLoading || name === site.title} size="sm">
+                        {isNameLoading ? "Saving..." : "Save"}
+                    </Button>
+                }
+            >
+                <div className="max-w-md">
+                    <Input
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="max-w-md"
+                    />
+                    {nameError && <p className="text-sm text-destructive mt-2">{nameError}</p>}
+                </div>
+            </SettingCard>
+
+            {/* Domains */}
+            <SettingCard
+                title="Domains"
+                description="These are the domains associated with your project."
+                className="overflow-hidden"
+                footer={
+                    <div className="flex w-full justify-between items-center">
+                        <span className="text-xs text-muted-foreground">
+                            Looking to add a subdomain? <span className="underline cursor-pointer">Read the docs</span>.
+                        </span>
+                        {!isCustomDomain && (
+                            <Button onClick={() => router.push(`/dashboard/${site.id}/domain-setup`)} size="sm">
+                                <Plus className="w-4 h-4 mr-2" />
+                                Add Domain
+                            </Button>
+                        )}
+                    </div>
+                }
+            >
+                <div className="space-y-4">
+                    {/* Default Subdomain */}
+                    <div className="border rounded-md p-4 flex items-center justify-between bg-card">
+                        <div className="flex items-center gap-3">
+                            <Globe className="w-4 h-4 text-muted-foreground" />
+                            <div>
+                                <div className="font-medium text-sm">{site.subdomain}.meindesk.gr</div>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <Badge variant="secondary" className="text-xs font-normal">Default Subdomain</Badge>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Custom Domain Item */}
+                    {isCustomDomain && (
+                        <div className="border rounded-md divide-y">
+                            <div className="p-4 flex items-center justify-between bg-card">
+                                <div className="flex items-center gap-3">
+                                    <Globe className="w-4 h-4 text-muted-foreground" />
+                                    <div>
+                                        <div className="font-medium text-sm">{site.url}</div>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            {domainVerificationLoading ? (
+                                                <Badge variant="outline" className="text-xs font-normal">Checking...</Badge>
+                                            ) : domainStatus?.verified ? (
+                                                <div className="flex items-center gap-1.5 text-xs text-blue-500">
+                                                    <CheckCircle2 className="w-3 h-3" />
+                                                    Valid Configuration
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center gap-1.5 text-xs text-amber-500">
+                                                    <AlertCircle className="w-3 h-3" />
+                                                    Invalid Configuration
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Button variant="ghost" size="sm" onClick={() => checkDomainStatus(site.url!)} disabled={domainVerificationLoading}>
+                                        <RefreshCw className={cn("w-4 h-4", domainVerificationLoading && "animate-spin")} />
+                                    </Button>
+                                    <Button variant="ghost" size="sm" onClick={() => handleRemoveDomain(site.url!)} className="text-destructive hover:text-destructive hover:bg-destructive/10">
+                                        <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                </div>
+                            </div>
+
+                            {/* Config Instructions if Invalid */}
+                            {!domainStatus?.verified && !domainVerificationLoading && domainStatus && (
+                                <div className="p-4 bg-muted/30 space-y-3">
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <AlertCircle className="w-4 h-4" />
+                                        <span>Set the following record on your DNS provider to continue:</span>
+                                    </div>
+                                    <div className="grid gap-2 text-sm">
+                                        <div className="grid grid-cols-[100px_1fr] md:grid-cols-[100px_200px_auto] gap-2 items-center bg-background border p-2 rounded">
+                                            <span className="font-medium text-muted-foreground pl-2">Type</span>
+                                            <span className="font-mono">A</span>
+                                        </div>
+                                        <div className="grid grid-cols-[100px_1fr] md:grid-cols-[100px_200px_auto] gap-2 items-center bg-background border p-2 rounded">
+                                            <span className="font-medium text-muted-foreground pl-2">Name</span>
+                                            <span className="font-mono">@</span>
+                                        </div>
+                                        <div className="grid grid-cols-[100px_1fr] md:grid-cols-[100px_200px_auto] gap-2 items-center bg-background border p-2 rounded">
+                                            <span className="font-medium text-muted-foreground pl-2">Value</span>
+                                            <span className="font-mono">76.76.21.21</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </SettingCard>
+
+            {/* Homepage */}
+            <SettingCard
+                title="Entry Point"
+                description="Select the page that acts as the entry point (homepage) for your website."
+                footer={
+                    <Button onClick={handleSaveHomePage} disabled={isHomePageLoading || pagesLoading} size="sm">
+                        {isHomePageLoading ? "Saving..." : "Save"}
+                    </Button>
+                }
+            >
+                <div className="max-w-md">
+                    <Select value={homePageId || ""} onValueChange={setHomePageId} disabled={pagesLoading}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select a page" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {pages.map((p: Page) => (
+                                <SelectItem key={p.slug} value={p.slug}>
+                                    {p.title} <span className="text-muted-foreground text-xs ml-2">/{p.slug}</span>
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+            </SettingCard>
         </div>
     )
 }

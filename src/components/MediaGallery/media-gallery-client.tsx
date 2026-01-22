@@ -6,21 +6,6 @@ import NextImage from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { toast } from "sonner"
 // @ts-ignore
 import { CldUploadButton, type CldUploadWidgetResults, type CldErrorEvent } from "next-cloudinary"
 import {
@@ -38,7 +23,33 @@ import {
 } from "lucide-react"
 import { formatTimeLeft } from "@/lib/utils"
 import type { Media } from "@/types/media-gallery"
-import { ScrollArea } from "../ui/scroll-area"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { toast } from "sonner"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { Skeleton } from "@/components/ui/skeleton"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 interface MediaGalleryClientProps {
   onSelect?: (url: string) => void
@@ -57,7 +68,6 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [itemToDelete, setItemToDelete] = useState<any | null>(null)
-  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
 
   const fetchMedia = useCallback(async () => {
     if (!siteId) return
@@ -149,11 +159,6 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
 
       toast.success(`Image "${itemToDelete.name || itemToDelete.public_id}" deleted successfully.`)
       setMediaItems((prev) => prev.filter((item) => item.public_id !== itemToDelete.public_id))
-      setSelectedItems((prev) => {
-        const newSet = new Set(prev)
-        newSet.delete(itemToDelete.public_id)
-        return newSet
-      })
     } catch (error) {
       console.error("Delete error:", error)
       toast.error(error instanceof Error ? error.message : "Failed to delete image")
@@ -193,42 +198,204 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
     })
   }
 
+  // --- Render Helpers ---
+
+  const EmptyState = () => (
+    <div className="flex max-h-[60vh] flex-col items-center justify-center py-20 text-center border border-dashed rounded-lg bg-muted/10 m-6">
+      <div className="bg-muted/20 p-4 rounded-full mb-4">
+        <ImageIcon className="h-8 w-8 text-muted-foreground" />
+      </div>
+      <h3 className="text-base font-medium mb-1">No assets found</h3>
+      <p className="text-sm text-muted-foreground mb-6 max-w-xs mx-auto">
+        {searchTerm ? "Try adjusting your search terms." : "Upload your first image to get started."}
+      </p>
+      {!searchTerm && (
+        <CldUploadButton
+          options={{
+            maxFiles: 10,
+            folder: `${siteId}/uploads/`,
+            cropping: true,
+            tags: ["gallery_image", siteId, "user_upload"],
+          }}
+          onSuccess={handleUploadSuccess}
+          onError={handleUploadError}
+          uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "esiln4yu"}
+        >
+          <Button variant="outline" size="sm">
+            <UploadCloud className="mr-2 h-4 w-4" />
+            Upload Image
+          </Button>
+        </CldUploadButton>
+      )}
+    </div>
+  )
+
+  const GridView = () => (
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 p-6">
+      {filteredItems.map((item) => (
+        <div key={item.public_id} className="group relative flex flex-col gap-2">
+          <div
+            className={cn(
+              "relative aspect-square w-full rounded-md border bg-muted/20 overflow-hidden shadow-sm transition-all duration-200 hover:shadow-md",
+              onSelect && "cursor-pointer ring-offset-2 hover:ring-2 ring-primary/20"
+            )}
+            onClick={() => onSelect && onSelect(item.url)}
+          >
+            <NextImage
+              src={item.url}
+              alt={item.alt || item.name || "Image"}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            {/* Overlay Actions */}
+            {!onSelect && (
+              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="secondary" size="icon" className="h-6 w-6 shadow-sm">
+                      <MoreVertical className="h-3 w-3" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-40">
+                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); window.open(item.url, "_blank") }}>
+                      <Eye className="mr-2 h-3.5 w-3.5" />
+                      View
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); copyToClipboard(item.url) }}>
+                      <Copy className="mr-2 h-3.5 w-3.5" />
+                      Copy link
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); downloadImage(item.url, item.name || "image") }}>
+                      <Download className="mr-2 h-3.5 w-3.5" />
+                      Download
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={(e) => { e.stopPropagation(); handleDeleteClick(item) }}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <Trash2 className="mr-2 h-3.5 w-3.5" />
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            )}
+          </div>
+          <div className="space-y-0.5 px-0.5">
+            <p className="text-xs font-medium truncate select-all" title={item.name || item.public_id}>
+              {item.name || item.public_id}
+            </p>
+            <div className="flex items-center justify-between text-[10px] text-muted-foreground uppercase tracking-wide">
+              <span>{item.format}</span>
+              <span>{formatFileSize(item.size)}</span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+
+  const ListView = () => (
+    <div className="p-6">
+      <div className="rounded-md border bg-background text-sm shadow-sm overflow-hidden">
+        <Table>
+          <TableHeader className="bg-muted/40">
+            <TableRow className="hover:bg-transparent border-b">
+              <TableHead className="w-[100px]">Preview</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Dimensions</TableHead>
+              <TableHead>Size</TableHead>
+              <TableHead>Created</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredItems.map((item) => (
+              <TableRow key={item.public_id} className="group border-b last:border-0 hover:bg-muted/40">
+                <TableCell className="py-2">
+                  <div className="relative h-12 w-12 rounded-md overflow-hidden bg-muted border">
+                    <NextImage src={item.url} alt={item.name || "Image"} fill className="object-cover" />
+                  </div>
+                </TableCell>
+                <TableCell className="font-medium">
+                  <span className="truncate max-w-[200px] block" title={item.name || item.public_id}>
+                    {item.name || item.public_id}
+                  </span>
+                </TableCell>
+                <TableCell className="text-muted-foreground text-xs">
+                  {item.width} x {item.height}
+                </TableCell>
+                <TableCell className="text-muted-foreground text-xs font-mono">
+                  {formatFileSize(item.size)}
+                </TableCell>
+                <TableCell className="text-muted-foreground text-xs">
+                  {formatDate(item.createdAt)}
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex items-center justify-end gap-2">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100" onClick={() => copyToClipboard(item.url)}>
+                      <Copy className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleDeleteClick(item)} className="text-destructive">
+                          <Trash2 className="mr-2 h-4 w-4" /> Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  )
+
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-          <Skeleton className="h-10 w-64" />
-          <Skeleton className="h-10 w-32" />
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-          {Array.from({ length: 12 }).map((_, i) => (
-            <Skeleton key={i} className="aspect-square w-full rounded-lg" />
-          ))}
-        </div>
+      <div className="flex items-center justify-center h-full w-full">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header Actions */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-        <div className="flex flex-1 items-center gap-4">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+    <div className="flex h-full w-full flex-col bg-background/50">
+      {/* Toolbar */}
+      <div className="flex items-center justify-between px-6 py-4 border-b bg-background/95 backdrop-blur z-10">
+        <div className="flex items-center gap-2 flex-1">
+          <div className="relative w-full max-w-sm">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Search images..."
+              placeholder="Search assets..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-9 h-9"
             />
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant={viewMode === "grid" ? "default" : "outline"} size="sm" onClick={() => setViewMode("grid")}>
+          <div className="flex items-center border rounded-md bg-muted/20 p-0.5 ml-2">
+            <Button
+              variant={viewMode === "grid" ? "secondary" : "ghost"}
+              size="icon"
+              className="h-7 w-7 rounded-sm"
+              onClick={() => setViewMode("grid")}
+            >
               <Grid3X3 className="h-4 w-4" />
             </Button>
-            <Button variant={viewMode === "list" ? "default" : "outline"} size="sm" onClick={() => setViewMode("list")}>
+            <Button
+              variant={viewMode === "list" ? "secondary" : "ghost"}
+              size="icon"
+              className="h-7 w-7 rounded-sm"
+              onClick={() => setViewMode("list")}
+            >
               <List className="h-4 w-4" />
             </Button>
           </div>
@@ -247,203 +414,43 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
           onError={handleUploadError}
           onClose={() => setIsUploading(false)}
           uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "prototype"}
+          className="w-auto"
         >
-          <Button disabled={isUploading}>
+          <Button disabled={isUploading} size="sm" className="h-9">
             {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UploadCloud className="mr-2 h-4 w-4" />}
-            Upload Images
+            Upload
           </Button>
         </CldUploadButton>
       </div>
 
-      {/* Stats */}
-      <div className="flex items-center gap-4 text-sm text-muted-foreground" >
-        <span>
-          {filteredItems.length} of {mediaItems.length} images
-        </span>
-        {selectedItems.size > 0 && <Badge variant="secondary">{selectedItems.size} selected</Badge>}
-      </div>
-
-      {/* Media Grid/List */}
-      {
-        filteredItems.length === 0 ? (
-          <div>
-            <div className="flex max-h-screen overflow-auto flex-col items-center justify-center py-16 text-center">
-              <ImageIcon className="h-16 w-16 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No images found</h3>
-              <p className="text-muted-foreground mb-4">
-                {searchTerm ? "No images match your search." : "Upload your first image to get started."}
-              </p>
-              {!searchTerm && (
-                <CldUploadButton
-                  options={{
-                    maxFiles: 10,
-                    folder: `${siteId}/uploads/`,
-                    cropping: true,
-                    tags: ["gallery_image", siteId, "user_upload"],
-                  }}
-                  onSuccess={handleUploadSuccess}
-                  onError={handleUploadError}
-                  uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "esiln4yu"}
-                >
-                  <Button>
-                    <UploadCloud className="mr-2 h-4 w-4" />
-                    Upload Images
-                  </Button>
-                </CldUploadButton>
-              )}
-            </div>
-          </div>
+      {/* Content */}
+      <ScrollArea className="flex-1">
+        {filteredItems.length === 0 ? (
+          <EmptyState />
         ) : viewMode === "grid" ? (
-          <div>
-            <div className="grid max-h-screen grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              {filteredItems.map((item) => (
-                <Card key={item.public_id} className="group p-0 overflow-hidden">
-                  <CardContent className="p-0">
-                    <div
-                      className={cn("relative aspect-square", onSelect && "cursor-pointer")}
-                      onClick={() => onSelect && onSelect(item.url)}
-                    >
-                      <NextImage
-                        src={item.url}
-                        alt={item.alt || item.name || "Image"}
-                        fill
-                        className="object-cover transition-transform "
-                      />
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-                      {!onSelect && (
-                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="secondary" size="icon" className="h-8 w-8">
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); window.open(item.url, "_blank") }}>
-                                <Eye className="mr-2 h-4 w-4" />
-                                View
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); copyToClipboard(item.url) }}>
-                                <Copy className="mr-2 h-4 w-4" />
-                                Copy URL
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); downloadImage(item.url, item.name || "image") }}>
-                                <Download className="mr-2 h-4 w-4" />
-                                Download
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={(e) => { e.stopPropagation(); handleDeleteClick(item) }}
-                                className="text-destructive"
-                                disabled={isDeleting === item.public_id}
-                              >
-                                {isDeleting === item.public_id ? (
-                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                ) : (
-                                  <Trash2 className="mr-2 h-4 w-4" />
-                                )}
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-3">
-                      <p className="text-sm font-medium truncate" title={item.name || item.public_id}>
-                        {item.name || item.public_id}
-                      </p>
-                      <div className="flex items-center justify-between mt-1 text-xs text-muted-foreground">
-                        <span>{formatFileSize(item.size)}</span>
-                        <span>
-                          {item.width} × {item.height}
-                        </span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
+          <GridView />
         ) : (
-          <div className="space-y-2">
-            {filteredItems.map((item) => (
-              <Card key={item.public_id}>
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-4">
-                    <div className="relative w-16 h-16 rounded-md overflow-hidden flex-shrink-0">
-                      <NextImage src={item.url} alt={item.alt || item.name || "Image"} fill className="object-cover" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-medium truncate" title={item.name || item.public_id}>
-                        {item.name || item.public_id}
-                      </h3>
-                      <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
-                        <span>{formatFileSize(item.size)}</span>
-                        <span>
-                          {item.width} × {item.height}
-                        </span>
-                        <span>{formatDate(item.createdAt)}</span>
-                      </div>
-                    </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => window.open(item.url, "_blank")}>
-                          <Eye className="mr-2 h-4 w-4" />
-                          View
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => copyToClipboard(item.url)}>
-                          <Copy className="mr-2 h-4 w-4" />
-                          Copy URL
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => downloadImage(item.url, item.name || "image")}>
-                          <Download className="mr-2 h-4 w-4" />
-                          Download
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleDeleteClick(item)}
-                          className="text-destructive"
-                          disabled={isDeleting === item.public_id}
-                        >
-                          {isDeleting === item.public_id ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          ) : (
-                            <Trash2 className="mr-2 h-4 w-4" />
-                          )}
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )
-      }
+          <ListView />
+        )}
+      </ScrollArea>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Image</AlertDialogTitle>
+            <AlertDialogTitle>Delete Asset</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{itemToDelete?.name || itemToDelete?.public_id}"? This action cannot be
-              undone.
+              Are you sure you want to delete this asset? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setItemToDelete(null)} className="cursor-pointer">Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-white cursor-pointer hover:text-gray-300 hover:bg-destructive/90">
+            <AlertDialogCancel onClick={() => setItemToDelete(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div >
+    </div>
   )
 }

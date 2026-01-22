@@ -20,3 +20,23 @@ export async function getSite() {
   // Explicit return type so TypeScript knows what this object looks like
   return site
 }
+
+export async function getSites() {
+  const user = await getAuthSession();
+  if (!user) return [];
+
+  const sites = await db.site.findMany({
+    where: {
+      userId: user.user.id,
+    },
+    include: {
+      subscription: true,
+      features: true,
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  });
+
+  return sites
+}
