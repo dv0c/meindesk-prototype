@@ -98,7 +98,7 @@ export function ComponentPickerMenuPlugin({
         ) => {
           return anchorElementRef.current && options.length
             ? createPortal(
-              <div className="fixed z-50 w-[220px] rounded-lg border border-border/50 bg-popover/95 backdrop-blur-sm shadow-xl overflow-hidden">
+              <div className="fixed z-[9999] w-[220px] rounded-lg border border-border/50 bg-popover/95 backdrop-blur-sm shadow-xl overflow-hidden">
                 <Command
                   onKeyDown={(e) => {
                     if (e.key === "ArrowUp") {
@@ -129,8 +129,8 @@ export function ComponentPickerMenuPlugin({
                             selectOptionAndCleanUp(option)
                           }}
                           className={`flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors cursor-pointer ${selectedIndex === index
-                              ? "bg-accent text-accent-foreground"
-                              : "bg-transparent hover:bg-accent/50"
+                            ? "bg-accent text-accent-foreground"
+                            : "bg-transparent hover:bg-accent/50"
                             }`}
                         >
                           <span className="text-muted-foreground">{option.icon}</span>

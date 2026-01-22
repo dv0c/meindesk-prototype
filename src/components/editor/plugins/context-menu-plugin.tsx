@@ -195,7 +195,7 @@ export function ContextMenuPlugin({ siteId }: { siteId?: string }): JSX.Element 
   return (
     <>
       <NodeContextMenuPlugin
-        className="bg-popover/95 backdrop-blur-sm text-popover-foreground z-50 min-w-[180px] overflow-hidden rounded-lg border border-border/50 p-1 shadow-xl outline-none"
+        className="bg-popover/95 backdrop-blur-sm text-popover-foreground z-[9999] min-w-[180px] overflow-hidden rounded-lg border border-border/50 p-1 shadow-xl outline-none"
         itemClassName="relative w-full flex cursor-default items-center gap-2.5 rounded-md px-2.5 py-2 text-sm outline-none select-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50"
         separatorClassName="bg-border/50 my-1 h-px"
         items={items}
