@@ -48,8 +48,8 @@ export function GlobalHeader() {
     }
 
     // Hide header on Article Editor and Canva Editor
-    // Patterns: .../articles/[id] and .../canva/[id]
-    const isEditor = /\/articles\/[^/]+$/.test(pathname) || /\/canva\/[^/]+$/.test(pathname)
+    // Patterns: .../articles/[id]... and .../canva/[id]...
+    const isEditor = /\/articles\/[^/]+/.test(pathname) || /\/canva\/[^/]+/.test(pathname)
 
     if (isEditor) {
         return null
