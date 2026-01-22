@@ -3,7 +3,6 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import {
     Table,
     TableBody,
@@ -12,10 +11,23 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { useArticle } from "@/hooks/use-article"
 import { useTeam } from "@/hooks/useTeam"
 import { useMediaQuery } from "@/hooks/use-media-query"
-import { MoreHorizontal, Plus, Search, Loader2, FileText, Trash, Edit, Copy } from "lucide-react"
+import { MoreHorizontal, Search, Loader2, FileText, Trash, Edit, ChevronLeft, ChevronRight, Lock } from "lucide-react"
 import Image from "next/image"
 import { useRouter, useParams } from "next/navigation"
 import { useEffect, useMemo, useState } from "react"
@@ -23,7 +35,6 @@ import { toast } from "sonner"
 import ArticleEditor from "@/components/builder/cms/ArticleEditor";
 import { DeleteConfirmDialog } from "./builder/cms/dialogs/DeleteConfirmDialog"
 import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 
 const statusColors = {
@@ -32,6 +43,8 @@ const statusColors = {
     BANNED: "destructive",
     DELETED: "outline",
 }
+
+const ITEMS_PER_PAGE = 10
 
 interface ArticleTableProps {
     siteId?: string;
@@ -44,25 +57,44 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
     const { articles, getArticles, deleteArticle, loading } = useArticle()
     const { team } = useTeam()
 
-    // Local state for search/filter
+    // Local state
     const [searchQuery, setSearchQuery] = useState("")
+    const [statusFilter, setStatusFilter] = useState("ALL")
+    const [currentPage, setCurrentPage] = useState(1)
+
     const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null)
     const [deleteId, setDeleteId] = useState<string | null>(null)
-    const [isCreating, setIsCreating] = useState(false)
 
     useEffect(() => {
         if (team) getArticles(team.id)
     }, [team, getArticles])
 
+    // Filter Logic
     const filteredArticles = useMemo(() => {
         if (!articles) return []
-        return articles.filter((article: any) => {
+        let filtered = articles.filter((article: any) => {
             const matchesSearch =
                 article.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 article.slug?.toLowerCase().includes(searchQuery.toLowerCase())
-            return matchesSearch
+
+            const matchesStatus = statusFilter === "ALL" || article.status === statusFilter
+
+            return matchesSearch && matchesStatus
         })
-    }, [articles, searchQuery])
+        return filtered
+    }, [articles, searchQuery, statusFilter])
+
+    // Pagination Logic
+    const totalPages = Math.ceil(filteredArticles.length / ITEMS_PER_PAGE)
+    const paginatedArticles = useMemo(() => {
+        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+        return filteredArticles.slice(startIndex, startIndex + ITEMS_PER_PAGE)
+    }, [filteredArticles, currentPage])
+
+    // Reset page when filter changes
+    useEffect(() => {
+        setCurrentPage(1)
+    }, [searchQuery, statusFilter])
 
     const isDesktop = useMediaQuery("(min-width: 768px)")
 
@@ -73,7 +105,6 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
             router.push(`/dashboard/${team?.id}/projects/website/articles/${articleId}/editor`)
         }
     }
-
 
     const handleDelete = async () => {
         if (!team || !deleteId) return
@@ -86,118 +117,159 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
         getArticles(team.id)
     }
 
+    if (loading && !articles) {
+        return (
+            <div className="flex items-center justify-center h-64 w-full">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+        )
+    }
+
     return (
-        <div className="flex h-full w-full flex-col bg-background/50">
+        <div className="space-y-4 w-full">
             {/* Toolbar */}
-            <div className="flex items-center justify-between px-6 md:px-0 py-4 border-b bg-background/95 backdrop-blur z-10">
-                <div className="flex items-center gap-4 flex-1">
-                    <div className="relative w-full max-w-sm">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-end gap-4">
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <div className="relative flex-1 sm:w-64">
                         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                             placeholder="Search articles..."
-                            className="pl-9 h-9"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
+                            className="pl-9 h-9 bg-background"
                         />
                     </div>
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                        <SelectTrigger className="w-[130px] h-9 text-xs">
+                            <SelectValue placeholder="Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="ALL">All Status</SelectItem>
+                            <SelectItem value="PUBLISHED">Published</SelectItem>
+                            <SelectItem value="DRAFT">Draft</SelectItem>
+                            <SelectItem value="BANNED">Banned</SelectItem>
+                            <SelectItem value="DELETED">Deleted</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
 
-            <ScrollArea className="flex-1">
-                <div className="py-6 md:py-6">
-                    <div className="rounded-md border bg-background text-sm shadow-sm overflow-hidden">
-                        <Table>
-                            <TableHeader className="bg-muted/40">
-                                <TableRow>
-                                    <TableHead className="w-[400px]">Article</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Date</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
+            <div className="rounded-md border bg-background text-sm shadow-sm overflow-hidden">
+                <Table>
+                    <TableHeader className="bg-muted/40">
+                        <TableRow className="hover:bg-transparent border-b">
+                            <TableHead className="h-10 text-xs font-medium w-[400px]">Article</TableHead>
+                            <TableHead className="h-10 text-xs font-medium">Status</TableHead>
+                            <TableHead className="h-10 text-xs font-medium">Created</TableHead>
+                            <TableHead className="h-10 text-xs font-medium text-right w-[60px]">Actions</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {paginatedArticles.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                                    No articles found.
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            paginatedArticles.map((article: any) => (
+                                <TableRow
+                                    key={article.id}
+                                    onClick={() => handleArticleClick(article.id)}
+                                    className={cn(
+                                        "group border-b last:border-0 cursor-pointer hover:bg-muted/40 transition-colors",
+                                        selectedArticleId === article.id && "bg-muted/40"
+                                    )}
+                                >
+                                    <TableCell className="font-medium py-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-8 w-8 rounded-md bg-muted/50 flex items-center justify-center border overflow-hidden">
+                                                {article.cover ? (
+                                                    <Image
+                                                        src={article.cover}
+                                                        alt={article.title}
+                                                        width={32}
+                                                        height={32}
+                                                        className="object-cover h-full w-full"
+                                                    />
+                                                ) : (
+                                                    <FileText className="h-4 w-4 text-muted-foreground" />
+                                                )}
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="truncate max-w-[200px] text-foreground font-medium flex items-center gap-1.5">
+                                                    {article.title || "Untitled"}
+                                                </span>
+                                                <span className="text-xs text-muted-foreground truncate max-w-[200px] font-mono">{article.slug}</span>
+                                            </div>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="py-3">
+                                        <Badge variant={(statusColors[article.status as keyof typeof statusColors] || "default") as any} className="h-5 px-2 text-[10px] font-medium rounded-full">
+                                            {article.status}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell className="text-xs text-muted-foreground py-3">
+                                        {new Date(article.createdAt).toLocaleDateString()}
+                                    </TableCell>
+                                    <TableCell className="text-right py-3" onClick={(e) => e.stopPropagation()}>
+                                        <div className="flex items-center justify-end">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem onClick={() => handleArticleClick(article.id)}>
+                                                        <Edit className="mr-2 h-3.5 w-3.5" />
+                                                        Edit
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem
+                                                        onClick={() => setDeleteId(article.id)}
+                                                        className="text-destructive focus:text-destructive"
+                                                    >
+                                                        <Trash className="mr-2 h-3.5 w-3.5" />
+                                                        Delete
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
+                                    </TableCell>
                                 </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {loading && articles.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={4} className="h-24 text-center">
-                                            <div className="flex justify-center items-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
-                                        </TableCell>
-                                    </TableRow>
-                                ) : filteredArticles.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
-                                            No articles found.
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    filteredArticles.map((article: any) => (
-                                        <TableRow
-                                            key={article.id}
-                                            onClick={() => handleArticleClick(article.id)}
-                                            className={cn(
-                                                "cursor-pointer transition-colors hover:bg-muted/40",
-                                                selectedArticleId === article.id && "bg-muted/40 border-l-2 border-l-primary"
-                                            )}
-                                        >
-                                            <TableCell className="font-medium">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="h-9 w-9 relative shrink-0 overflow-hidden rounded-md border bg-muted flex items-center justify-center text-muted-foreground">
-                                                        {article.cover ? (
-                                                            <Image
-                                                                src={article.cover}
-                                                                alt={article.title}
-                                                                fill
-                                                                className="object-cover"
-                                                            />
-                                                        ) : (
-                                                            <FileText className="h-4 w-4" />
-                                                        )}
-                                                    </div>
-                                                    <div className="flex flex-col">
-                                                        <span className="truncate max-w-[200px] font-medium text-foreground">{article.title || "Untitled"}</span>
-                                                        <span className="text-xs text-muted-foreground truncate max-w-[200px]">{article.slug}</span>
-                                                    </div>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Badge variant={(statusColors[article.status as keyof typeof statusColors] || "default") as any} className="h-5 px-2 text-[10px] font-medium rounded-full">
-                                                    {article.status}
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell className="text-muted-foreground">
-                                                {new Date(article.createdAt).toLocaleDateString()}
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <div className="flex items-center justify-end" onClick={(e) => e.stopPropagation()}>
-                                                    <DropdownMenu>
-                                                        <DropdownMenuTrigger asChild>
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
-                                                                <MoreHorizontal className="h-4 w-4" />
-                                                            </Button>
-                                                        </DropdownMenuTrigger>
-                                                        <DropdownMenuContent align="end">
-                                                            <DropdownMenuItem onClick={() => handleArticleClick(article.id)}>
-                                                                <Edit className="mr-2 h-3.5 w-3.5" />
-                                                                Edit
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem
-                                                                onClick={() => setDeleteId(article.id)}
-                                                                className="text-destructive focus:text-destructive"
-                                                            >
-                                                                <Trash className="mr-2 h-3.5 w-3.5" />
-                                                                Delete
-                                                            </DropdownMenuItem>
-                                                        </DropdownMenuContent>
-                                                    </DropdownMenu>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
+                            ))
+                        )}
+                    </TableBody>
+                </Table>
+            </div>
+
+            {filteredArticles.length > 0 && (
+                <div className="flex items-center justify-between px-2 pt-2">
+                    <div className="text-xs text-muted-foreground">
+                        Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredArticles.length)} of {filteredArticles.length}
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                            disabled={currentPage === 1}
+                            className="h-8 w-8 p-0"
+                        >
+                            <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                            disabled={currentPage === totalPages}
+                            className="h-8 w-8 p-0"
+                        >
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
                     </div>
                 </div>
-            </ScrollArea>
+            )}
 
             <Sheet open={!!selectedArticleId} onOpenChange={(open) => !open && setSelectedArticleId(null)}>
                 <SheetContent
