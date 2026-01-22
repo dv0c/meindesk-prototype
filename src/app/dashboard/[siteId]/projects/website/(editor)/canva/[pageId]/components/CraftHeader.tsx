@@ -339,7 +339,7 @@ export function CraftHeader({
 
     return (
         <>
-            <header className="h-[55px] border-b flex items-center justify-between px-6 z-[100] shrink-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <header className="h-[55px] border-b flex items-center justify-between px-6 z-50 shrink-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                 {/* Left: Page title */}
                 <div className="flex items-center gap-4">
                     <Button
