@@ -24,10 +24,80 @@ import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { useFetch } from "@/hooks/useFetch"
 import { Article } from "@prisma/client"
-import { Check, ChevronsUpDown, Image as ImageIcon, Link2, Plus, Tag, Type, Upload, X } from "lucide-react"
+import { Check, ChevronsUpDown, Image as ImageIcon, Link2, Plus, Tag, Type, Upload, X, AlertCircle, CheckCircle2, Search } from "lucide-react"
 import Image from "next/image"
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
+
+// SEO Settings interface
+interface SEOSettings {
+    metaTitle: string
+    metaDescription: string
+    ogImage: string
+}
+
+const defaultSEO: SEOSettings = {
+    metaTitle: "",
+    metaDescription: "",
+    ogImage: ""
+}
+
+// Helper to calculate article SEO score
+const calculateArticleSeoScore = (settings: { title: string; excerpt: string; thumbnail: string; slug: string; seo: SEOSettings }) => {
+    let score = 0
+    const checks: { status: "pass" | "warn" | "fail"; msg: string }[] = []
+
+    // Use metaTitle if set, otherwise fall back to title
+    const metaTitle = settings.seo.metaTitle || settings.title
+    // Use metaDescription if set, otherwise fall back to excerpt
+    const metaDescription = settings.seo.metaDescription || settings.excerpt
+    // Use ogImage if set, otherwise fall back to thumbnail
+    const ogImage = settings.seo.ogImage || settings.thumbnail
+
+    // Meta Title Check (30-60 chars)
+    if (metaTitle.length >= 30 && metaTitle.length <= 60) {
+        score += 25
+        checks.push({ status: "pass", msg: "Meta title length is optimal (30-60 chars)" })
+    } else if (metaTitle.length > 0) {
+        score += 10
+        checks.push({ status: "warn", msg: metaTitle.length < 30 ? "Meta title is too short" : "Meta title is too long" })
+    } else {
+        checks.push({ status: "fail", msg: "Meta title is missing" })
+    }
+
+    // Meta Description Check (120-160 chars)
+    if (metaDescription.length >= 120 && metaDescription.length <= 160) {
+        score += 25
+        checks.push({ status: "pass", msg: "Meta description is optimal (120-160 chars)" })
+    } else if (metaDescription.length > 0) {
+        score += 10
+        checks.push({ status: "warn", msg: metaDescription.length < 120 ? "Meta description is too short" : "Meta description is too long" })
+    } else {
+        checks.push({ status: "fail", msg: "Meta description is missing" })
+    }
+
+    // OG Image Check
+    if (ogImage) {
+        score += 25
+        checks.push({ status: "pass", msg: "Social share image is set" })
+    } else {
+        checks.push({ status: "fail", msg: "Missing social share image" })
+    }
+
+    // Slug Check
+    if (settings.slug && settings.slug.length >= 3 && /^[a-z0-9-]+$/.test(settings.slug)) {
+        score += 25
+        checks.push({ status: "pass", msg: "URL slug is valid" })
+    } else if (settings.slug) {
+        score += 10
+        checks.push({ status: "warn", msg: "Slug should be lowercase with hyphens only" })
+    } else {
+        checks.push({ status: "fail", msg: "URL slug is missing" })
+    }
+
+    return { score, checks }
+}
 
 const EditorRightSection = ({
     article,
@@ -37,7 +107,10 @@ const EditorRightSection = ({
     setExcerpt,
     setThumbnail, thumbnail,
     categories: selectedCategories = [],
-    setCategories
+    setCategories,
+    title = "",
+    seo = defaultSEO,
+    setSeo
 }: {
     article: Article
     slug: string
@@ -48,11 +121,21 @@ const EditorRightSection = ({
     thumbnail: string;
     categories?: string[];
     setCategories?: (val: string[]) => void;
+    title?: string;
+    seo?: SEOSettings;
+    setSeo?: (val: SEOSettings) => void;
 }) => {
     const { siteId } = useSite()
     const [isOpen, setOpen] = useState<boolean>()
+    const [isSeoMediaOpen, setSeoMediaOpen] = useState(false)
     const [categoryPopoverOpen, setCategoryPopoverOpen] = useState(false)
     const [isCreateCategoryOpen, setIsCreateCategoryOpen] = useState(false)
+
+    // SEO Score calculation
+    const { score: seoScore, checks: seoChecks } = useMemo(() =>
+        calculateArticleSeoScore({ title, excerpt, thumbnail, slug, seo }),
+        [title, excerpt, thumbnail, slug, seo]
+    )
 
     const { data: availableCategories, refetch } = useFetch<any[]>(
         siteId ? `/api/team/${siteId}/categories?published=true` : null
@@ -132,7 +215,62 @@ const EditorRightSection = ({
     return (
         <>
             <div className="space-y-6">
+                {/* SEO Score Panel */}
+                <div className="space-y-3 bg-muted/30 p-3 rounded-lg border">
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-medium flex items-center gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-green-500" />
+                            SEO Score
+                        </h3>
+                        <div className="flex items-center gap-2">
+                            <div className="text-right">
+                                <div className={cn("text-lg font-bold leading-none",
+                                    seoScore >= 90 ? "text-green-500" :
+                                        seoScore >= 50 ? "text-yellow-500" : "text-red-500"
+                                )}>
+                                    {seoScore}/100
+                                </div>
+                            </div>
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center relative">
+                                <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                                    <path
+                                        className="text-muted"
+                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="4"
+                                    />
+                                    <path
+                                        className={cn(
+                                            seoScore >= 90 ? "text-green-500" :
+                                                seoScore >= 50 ? "text-yellow-500" : "text-red-500"
+                                        )}
+                                        strokeDasharray={`${seoScore}, 100`}
+                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="4"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="space-y-1">
+                        {seoChecks.map((check, idx) => (
+                            <div key={idx} className="flex items-center gap-2 text-xs">
+                                {check.status === "pass" && <CheckCircle2 className="w-3 h-3 text-green-500 shrink-0" />}
+                                {check.status === "warn" && <AlertCircle className="w-3 h-3 text-yellow-500 shrink-0" />}
+                                {check.status === "fail" && <AlertCircle className="w-3 h-3 text-red-500 shrink-0" />}
+                                <span className={cn(
+                                    check.status === "pass" ? "text-muted-foreground" : "text-foreground"
+                                )}>{check.msg}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
                 {/* Thumbnail Section */}
+
                 <div className="space-y-3">
                     <div className="flex items-center gap-2">
                         <ImageIcon className="h-4 w-4 text-muted-foreground" />
@@ -316,6 +454,98 @@ const EditorRightSection = ({
                         A short description that appears in article previews
                     </p>
                 </div>
+
+                {/* SEO Settings Section */}
+                {setSeo && (
+                    <>
+                        <Separator />
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2">
+                                <Search className="h-4 w-4 text-muted-foreground" />
+                                <Label className="text-sm font-medium">SEO Settings</Label>
+                            </div>
+
+                            {/* Meta Title */}
+                            <div className="space-y-2">
+                                <Label htmlFor="metaTitle" className="text-xs text-muted-foreground">Meta Title</Label>
+                                <Input
+                                    id="metaTitle"
+                                    placeholder={title || "Page title for search engines"}
+                                    value={seo.metaTitle || ""}
+                                    onChange={e => setSeo({ ...seo, metaTitle: e.target.value })}
+                                />
+                                <div className="flex justify-between text-[10px]">
+                                    <span className="text-muted-foreground">Recommended: 30-60 characters</span>
+                                    <span className={cn(
+                                        ((seo.metaTitle || title).length < 30 || (seo.metaTitle || title).length > 60) ? "text-orange-500" : "text-green-500"
+                                    )}>{(seo.metaTitle || title).length} chars</span>
+                                </div>
+                            </div>
+
+                            {/* Meta Description */}
+                            <div className="space-y-2">
+                                <Label htmlFor="metaDescription" className="text-xs text-muted-foreground">Meta Description</Label>
+                                <Textarea
+                                    id="metaDescription"
+                                    placeholder={excerpt || "Description for search engines..."}
+                                    value={seo.metaDescription || ""}
+                                    onChange={e => setSeo({ ...seo, metaDescription: e.target.value })}
+                                    rows={3}
+                                    className="resize-none"
+                                />
+                                <div className="flex justify-between text-[10px]">
+                                    <span className="text-muted-foreground">Recommended: 120-160 characters</span>
+                                    <span className={cn(
+                                        ((seo.metaDescription || excerpt).length < 120 || (seo.metaDescription || excerpt).length > 160) ? "text-orange-500" : "text-green-500"
+                                    )}>{(seo.metaDescription || excerpt).length} chars</span>
+                                </div>
+                            </div>
+
+                            {/* OG Image */}
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <Label className="text-xs text-muted-foreground">Social Share Image</Label>
+                                    {seo.ogImage && (
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-6 text-[10px] text-destructive hover:text-destructive px-2"
+                                            onClick={() => setSeo({ ...seo, ogImage: "" })}
+                                        >
+                                            <X className="w-3 h-3 mr-1" />
+                                            Remove
+                                        </Button>
+                                    )}
+                                </div>
+                                <button
+                                    onClick={() => setSeoMediaOpen(true)}
+                                    className={cn(
+                                        "w-full h-24 border rounded-lg flex items-center justify-center transition-all",
+                                        seo.ogImage ? "p-1" : "border-dashed hover:border-primary/50 hover:bg-muted/50"
+                                    )}
+                                >
+                                    {seo.ogImage ? (
+                                        <Image
+                                            src={seo.ogImage}
+                                            alt="OG Image"
+                                            width={200}
+                                            height={100}
+                                            className="w-full h-full object-cover rounded"
+                                        />
+                                    ) : (
+                                        <div className="flex flex-col items-center gap-1 text-muted-foreground">
+                                            <ImageIcon className="h-5 w-5" />
+                                            <span className="text-xs">Set social image</span>
+                                        </div>
+                                    )}
+                                </button>
+                                <p className="text-[10px] text-muted-foreground">
+                                    Used when sharing on social media. Falls back to cover image if not set.
+                                </p>
+                            </div>
+                        </div>
+                    </>
+                )}
             </div>
 
             {/* Create Category Dialog */}
@@ -373,6 +603,19 @@ const EditorRightSection = ({
             </Dialog>
 
             <MediaLibraryDialog isOpen={!!isOpen} onClose={() => setOpen(!isOpen)} onSelect={(e) => setThumbnail(e[0].url)} siteId={siteId} />
+
+            {/* SEO OG Image Media Dialog */}
+            {setSeo && (
+                <MediaLibraryDialog
+                    isOpen={isSeoMediaOpen}
+                    onClose={() => setSeoMediaOpen(false)}
+                    onSelect={(e) => {
+                        setSeo({ ...seo, ogImage: e[0].url })
+                        setSeoMediaOpen(false)
+                    }}
+                    siteId={siteId}
+                />
+            )}
         </>
     )
 }

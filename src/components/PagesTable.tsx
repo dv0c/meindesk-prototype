@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useMemo, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { MoreHorizontal, Edit, Eye, Trash, Copy, Search, ChevronLeft, ChevronRight, Lock, Loader2, File } from "lucide-react"
-
+import { useRouter, useParams } from "next/navigation"
+import { Search, Plus, Edit, Trash, MoreHorizontal, Loader2, ChevronLeft, ChevronRight, Eye, Copy, File, FileText, LayoutTemplate, Lock } from "lucide-react"
+import { toast } from "sonner"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import {
   Table,
   TableBody,
@@ -12,36 +14,58 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { toast } from "sonner"
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
+import { CreatePageButton } from "@/components/CreatePageButton"
 
 import { useTeam } from "@/hooks/useTeam"
-import { Skeleton } from "./ui/skeleton"
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "./ui/alert-dialog"
 import { usePages } from "@/hooks/use-pages"
-import { cn } from "@/lib/utils"
 
-const statusColors: Record<string, string> = {
+const statusColors: any = {
   PUBLISHED: "default",
   DRAFT: "secondary",
-  ARCHIVED: "outline",
+  BANNED: "destructive",
+  DELETED: "outline",
 }
 
 const ITEMS_PER_PAGE = 10
 
-export function PagesTable() {
+interface PagesTableProps {
+  siteId?: string
+}
+
+export function PagesTable({ siteId: propSiteId }: PagesTableProps = {}) {
   const router = useRouter()
+  const params = useParams()
   const team = useTeam().team
+  const siteId = propSiteId || (params.siteId as string) || team?.id
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("ALL")
   const [activeTab, setActiveTab] = useState("pages")
@@ -115,10 +139,20 @@ export function PagesTable() {
   )
 
   return (
-    <>
+    <div className="h-full flex-1 flex-col space-y-8 p-8 md:flex max-w-7xl mx-auto w-full">
+      <div className="flex items-center justify-between space-y-2">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Pages</h2>
+          <p className="text-muted-foreground">
+            Manage your website pages and templates
+          </p>
+        </div>
+        <CreatePageButton siteId={siteId || (team?.id as string)} />
+      </div>
+
       <div className="space-y-4 w-full">
         {/* Toolbar */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <Tabs defaultValue="pages" value={activeTab} onValueChange={setActiveTab} className="w-auto">
             <TabsList className="grid w-full grid-cols-2 h-9 p-1 bg-muted/50">
               <TabsTrigger value="pages" className="text-xs">Pages</TabsTrigger>
@@ -156,7 +190,7 @@ export function PagesTable() {
           </div>
         </div>
 
-        <div className="rounded-md border bg-background text-sm shadow-sm overflow-hidden">
+        <div className="rounded-md border bg-background text-sm shadow-sm overflow-hidden min-h-[500px]">
           <Table>
             <TableHeader className="bg-muted/40">
               <TableRow className="hover:bg-transparent border-b">
@@ -180,7 +214,7 @@ export function PagesTable() {
                 paginatedPages.map((page: any) => (
                   <TableRow
                     key={page.id}
-                    className="group border-b last:border-0 cursor-pointer hover:bg-muted/40 transition-colors"
+                    className="group border-b last:border-0 cursor-pointer hover:bg-muted/40 transition-colors h-[65px]"
                     onClick={(e) => {
                       const target = e.target as HTMLElement
                       if (target.closest("button") || target.closest("[role='menu']")) return
@@ -285,10 +319,10 @@ export function PagesTable() {
             </div>
           </div>
         )}
-      </div >
+      </div>
 
       {/* Delete confirmation dialog */}
-      < AlertDialog open={isDialogOpenn} onOpenChange={setIsDialogOpen} >
+      <AlertDialog open={isDialogOpenn} onOpenChange={setIsDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this page?</AlertDialogTitle>
@@ -303,7 +337,7 @@ export function PagesTable() {
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog >
-    </>
+      </AlertDialog>
+    </div>
   )
 }

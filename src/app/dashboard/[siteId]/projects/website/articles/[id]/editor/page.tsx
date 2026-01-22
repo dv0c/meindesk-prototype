@@ -14,7 +14,7 @@ import { useMediaQuery } from "@/hooks/use-media-query"
 import { ArrowLeft, ChevronDown, PanelRight, Save, X } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import RightSection from "./_comps/RightSection"
+import EditorRightSection from "@/components/builder/cms/EditorRightSection"
 
 interface EditorPageProps {
   params: {
@@ -33,6 +33,11 @@ export default function EditorPage({ params }: EditorPageProps) {
   const [excerpt, setExcerpt] = useState("")
   const [thumbnail, setThumbnail] = useState("")
   const [categories, setCategories] = useState<string[]>([])
+  const [seo, setSeo] = useState<{ metaTitle: string; metaDescription: string; ogImage: string }>({
+    metaTitle: "",
+    metaDescription: "",
+    ogImage: ""
+  })
   const [loaded, setLoaded] = useState(false)
   const [showSidebar, setShowSidebar] = useState(false)
   const isDesktop = useMediaQuery("(min-width: 768px)")
@@ -63,6 +68,15 @@ export default function EditorPage({ params }: EditorPageProps) {
     setCategories(article.categories || [])
     setLoaded(true)
     setThumbnail(article.cover || "")
+    // Load SEO from metadata
+    const articleMeta = article.metadata as any
+    if (articleMeta?.seo) {
+      setSeo({
+        metaTitle: articleMeta.seo.metaTitle || "",
+        metaDescription: articleMeta.seo.metaDescription || "",
+        ogImage: articleMeta.seo.ogImage || ""
+      })
+    }
   }, [article, loaded])
 
   // Auto-resize title on load and when title changes
@@ -83,7 +97,11 @@ export default function EditorPage({ params }: EditorPageProps) {
         slug,
         excerpt,
         cover: thumbnail,
-        categories
+        categories,
+        metadata: {
+          ...((article?.metadata as any) || {}),
+          seo
+        }
       })
       // toast.success("Saved!")
     } catch (error) {
@@ -253,7 +271,7 @@ export default function EditorPage({ params }: EditorPageProps) {
               </Button>
             </div>
             <div className="flex-1 overflow-y-auto p-4">
-              <RightSection
+              <EditorRightSection
                 setThumbnail={setThumbnail}
                 thumbnail={thumbnail}
                 article={article}
@@ -263,6 +281,9 @@ export default function EditorPage({ params }: EditorPageProps) {
                 setExcerpt={setExcerpt}
                 categories={categories}
                 setCategories={setCategories}
+                title={title}
+                seo={seo}
+                setSeo={setSeo}
               />
             </div>
           </aside>
@@ -282,7 +303,7 @@ export default function EditorPage({ params }: EditorPageProps) {
                   </div>
                 </DrawerHeader>
                 <div className="flex-1 overflow-y-auto p-4">
-                  <RightSection
+                  <EditorRightSection
                     setThumbnail={setThumbnail}
                     thumbnail={thumbnail}
                     article={article}
@@ -292,6 +313,9 @@ export default function EditorPage({ params }: EditorPageProps) {
                     setExcerpt={setExcerpt}
                     categories={categories}
                     setCategories={setCategories}
+                    title={title}
+                    seo={seo}
+                    setSeo={setSeo}
                   />
                 </div>
               </DrawerContent>

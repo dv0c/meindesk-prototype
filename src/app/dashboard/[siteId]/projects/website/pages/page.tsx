@@ -1,7 +1,5 @@
 
-import { CreatePageButton } from "@/components/CreatePageButton";
 import { PagesTable } from "@/components/PagesTable";
-import PageWrapper from "@/components/PageWrapper";
 import {
     Empty,
     EmptyContent,
@@ -17,16 +15,13 @@ export const metadata = {
 }
 
 export default async function Page({ params }: { params: { siteId: string } }) {
-    // if (site?.features?.articles === false) return <EmptyCard />
     const { siteId } = await params
     if (!siteId) {
         return <div className="flex flex-1 items-center justify-center p-4">
             <p className="text-muted-foreground">Site not found.</p>
         </div>
     }
-    return <PageWrapper title="Pages" action={<CreatePageButton siteId={siteId} />} >
-        <PagesTable />
-    </PageWrapper>
+    return <PagesTable siteId={siteId} />
 }
 
 

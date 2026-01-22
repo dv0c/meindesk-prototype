@@ -55,6 +55,11 @@ export default function ArticleEditor({ articleId, siteId, onClose }: ArticleEdi
     const [excerpt, setExcerpt] = useState("")
     const [thumbnail, setThumbnail] = useState("")
     const [categories, setCategories] = useState<string[]>([])
+    const [seo, setSeo] = useState<{ metaTitle: string; metaDescription: string; ogImage: string }>({
+        metaTitle: "",
+        metaDescription: "",
+        ogImage: ""
+    })
     const [loaded, setLoaded] = useState(false)
     const [showSidebar, setShowSidebar] = useState(false)
     const isDesktop = useMediaQuery("(min-width: 768px)")
@@ -86,6 +91,15 @@ export default function ArticleEditor({ articleId, siteId, onClose }: ArticleEdi
         setCategories(article.categories || [])
         setLoaded(true)
         setThumbnail(article.cover || "")
+        // Load SEO from metadata
+        const articleMeta = article.metadata as any
+        if (articleMeta?.seo) {
+            setSeo({
+                metaTitle: articleMeta.seo.metaTitle || "",
+                metaDescription: articleMeta.seo.metaDescription || "",
+                ogImage: articleMeta.seo.ogImage || ""
+            })
+        }
     }, [article, loaded, articleId])
 
     // Auto-resize title on load and when title changes
@@ -106,7 +120,11 @@ export default function ArticleEditor({ articleId, siteId, onClose }: ArticleEdi
                 slug,
                 excerpt,
                 cover: thumbnail,
-                categories
+                categories,
+                metadata: {
+                    ...((article?.metadata as any) || {}),
+                    seo
+                }
             })
             // toast.success("Saved!")
         } catch (error) {
@@ -288,6 +306,9 @@ export default function ArticleEditor({ articleId, siteId, onClose }: ArticleEdi
                                 setExcerpt={setExcerpt}
                                 categories={categories}
                                 setCategories={setCategories}
+                                title={title}
+                                seo={seo}
+                                setSeo={setSeo}
                             />
                         </div>
                     </aside>
