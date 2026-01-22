@@ -14,8 +14,8 @@ const PageWrapper: FC<PageWrapperProps> = ({
   title,
 }) => {
   return (
-    <>
-      <div className="flex items-center justify-between mt-10 px-5">
+    <div className="mx-auto container">
+      <div className="flex container items-center justify-between mt-10 px-5">
         <div>
           <h1 className="text-lg font-bold md:text-4xl">{title}</h1>
           <p className="text-sm text-muted-foreground">{description}</p>
@@ -25,7 +25,7 @@ const PageWrapper: FC<PageWrapperProps> = ({
       <div id="page-wrapper" className="flex my-10 px-5">
         {children}
       </div>
-    </>
+    </div>
   );
 };
 

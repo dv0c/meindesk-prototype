@@ -74,35 +74,6 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
         }
     }
 
-    const handleCreateArticle = async () => {
-        if (!team) return
-        setIsCreating(true)
-        try {
-            const res = await fetch(`/api/team/${team.id}/articles`, {
-                method: 'POST',
-                body: JSON.stringify({
-                    title: 'Untitled Article',
-                    slug: `untitled-article-${Date.now()}`,
-                    content: {},
-                    status: 'DRAFT'
-                })
-            })
-
-            if (res.ok) {
-                const newArticle = await res.json()
-                toast.success("Article created")
-                await getArticles(team.id)
-                setSelectedArticleId(newArticle.id) // Select the new article immediately
-            } else {
-                toast.error("Failed to create article")
-            }
-
-        } catch (e) {
-            toast.error("Error creating article")
-        } finally {
-            setIsCreating(false)
-        }
-    }
 
     const handleDelete = async () => {
         if (!team || !deleteId) return
@@ -130,10 +101,6 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
                         />
                     </div>
                 </div>
-                <Button size="sm" onClick={handleCreateArticle} disabled={isCreating} className="h-9">
-                    {isCreating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
-                    Create Article
-                </Button>
             </div>
 
             <ScrollArea className="flex-1">

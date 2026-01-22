@@ -119,7 +119,7 @@ export function ComponentPickerMenuPlugin({
                     }
                   }}
                 >
-                  <CommandList className="max-h-[300px] p-1">
+                  <CommandList className="max-h-[300px] overflow-y-auto p-1">
                     <CommandGroup>
                       {options.map((option, index) => (
                         <CommandItem

@@ -23,6 +23,8 @@ import { GalleryVerticalEnd } from "lucide-react"
 import { CommandMenu } from "@/components/CommandMenu"
 import { UserMenu } from "@/components/nav/UserMenu"
 
+import { NotificationBell } from "@/components/notifications/notification-bell"
+
 export function GlobalHeader() {
     const { teams } = useTeams()
     const router = useRouter()
@@ -117,15 +119,7 @@ export function GlobalHeader() {
                     </Button>
                     <CommandMenu open={open} setOpen={setOpen} />
 
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
-                        <MessageSquare className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
-                        <HelpCircle className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
-                        <Bell className="h-4 w-4" />
-                    </Button>
+                    <NotificationBell />
 
                     <div className="pl-2">
                         <UserMenu />

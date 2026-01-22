@@ -224,7 +224,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <NavProjects projects={filteredData.projects} />
               <NavRSS items={filteredData.rss} />
               <NavSecondary items={[
-                { title: "Community", url: `/community`, icon: Store },
+                {
+                  title: "Community",
+                  url: `/community`,
+                  icon: Store,
+                  items: [
+                    { title: "Themes", url: "/store" }
+                  ]
+                },
                 { title: "Support", url: "#", icon: LifeBuoy },
                 { title: "Feedback", url: "#", icon: Send },
               ]} className="mt-auto" />
