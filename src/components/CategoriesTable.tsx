@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useMemo } from "react"
-import { Search, Plus, Edit, Trash, MoreHorizontal, Loader2 } from "lucide-react"
+import { useState, useMemo, useEffect } from "react"
+import { Search, Plus, Edit, Trash, MoreHorizontal, Loader2, ChevronLeft, ChevronRight } from "lucide-react"
 import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -27,6 +27,8 @@ import { CreateCategoryDialog } from "./builder/cms/dialogs/CreateCategoryDialog
 import { DeleteConfirmDialog } from "./builder/cms/dialogs/DeleteConfirmDialog"
 import { useParams } from "next/navigation"
 
+const ITEMS_PER_PAGE = 10
+
 interface CategoriesTableProps {
     siteId?: string
 }
@@ -34,10 +36,10 @@ interface CategoriesTableProps {
 export function CategoriesTable({ siteId: propSiteId }: CategoriesTableProps = {}) {
     const params = useParams()
     const { team } = useTeam()
-    const siteId = propSiteId || (params.siteId as string) // Prefer props or params
+    const siteId = propSiteId || (params.siteId as string)
     const [searchQuery, setSearchQuery] = useState("")
+    const [currentPage, setCurrentPage] = useState(1)
 
-    // We can fetch using the hook, but for consistency with CMS view we might want to ensure re-fetch triggers
     const { data: categories, loading, refetch } = useFetch<any[]>(
         (siteId || team?.id) ? `/api/team/${siteId || team?.id}/categories` : null
     )
@@ -51,6 +53,16 @@ export function CategoriesTable({ siteId: propSiteId }: CategoriesTableProps = {
             cat.slug?.toLowerCase().includes(searchQuery.toLowerCase())
         )
     }, [categories, searchQuery])
+
+    const totalPages = Math.ceil(filteredCategories.length / ITEMS_PER_PAGE)
+    const paginatedCategories = useMemo(() => {
+        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+        return filteredCategories.slice(startIndex, startIndex + ITEMS_PER_PAGE)
+    }, [filteredCategories, currentPage])
+
+    useEffect(() => {
+        setCurrentPage(1)
+    }, [searchQuery])
 
     const handleDelete = async () => {
         if (!deleteId || (!siteId && !team?.id)) return
@@ -72,85 +84,124 @@ export function CategoriesTable({ siteId: propSiteId }: CategoriesTableProps = {
     }
 
     return (
-        <div className="flex flex-col h-full bg-background dark:bg-zinc-950">
-            <div className="p-6 py-4 border-b flex items-center justify-between bg-background/95 backdrop-blur">
-                <div className="flex items-center gap-4 flex-1">
-                    <div className="relative max-w-sm w-full">
-                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                        <Input
-                            placeholder="Search categories..."
-                            className="pl-9 h-9"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                    </div>
+        <div className="h-full flex-1 flex-col space-y-8 p-8 md:flex max-w-7xl mx-auto w-full">
+            <div className="flex items-center justify-between space-y-2">
+                <div>
+                    <h2 className="text-2xl font-bold tracking-tight">Categories</h2>
+                    <p className="text-muted-foreground">
+                        Manage your website categories
+                    </p>
                 </div>
-                {/* Re-use the existing CreateCategoryDialog logic but it needs siteId */}
                 <CreateCategoryDialog siteId={(siteId || team?.id) as string} onSuccess={refetch} />
             </div>
 
-            <ScrollArea className="flex-1">
-                <div className="p-6">
-                    <div className="rounded-md border bg-background">
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="bg-muted/40 hover:bg-muted/40">
-                                    <TableHead className="w-[50px]"></TableHead>
-                                    <TableHead>Name</TableHead>
-                                    <TableHead>Slug</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {loading ? (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="h-24 text-center">
-                                            <div className="flex justify-center"><Loader2 className="animate-spin h-6 w-6 text-muted-foreground" /></div>
-                                        </TableCell>
-                                    </TableRow>
-                                ) : filteredCategories.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                                            No categories found.
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    filteredCategories.map((cat: any) => (
-                                        <TableRow key={cat.id} className="group hover:bg-muted/40">
-                                            <TableCell>
-                                                {/* Icon placeholder if any */}
-                                            </TableCell>
-                                            <TableCell className="font-medium">{cat.name}</TableCell>
-                                            <TableCell className="text-muted-foreground text-sm font-mono">{cat.slug}</TableCell>
-                                            <TableCell>
-                                                <Badge variant={cat.published ? "default" : "secondary"} className="text-[10px] px-2 h-5 rounded-full">
-                                                    {cat.published ? "Published" : "Draft"}
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
-                                                            <MoreHorizontal className="h-4 w-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem onClick={() => setDeleteId(cat.id)} className="text-destructive focus:text-destructive">
-                                                            <Trash className="mr-2 h-3.5 w-3.5" />
-                                                            Delete
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
+            <div className="space-y-4 w-full">
+                {/* Toolbar matching ArticlesTable: Right-aligned search */}
+                <div className="flex flex-col sm:flex-row items-center justify-end gap-4">
+                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                        <div className="relative flex-1 sm:w-64">
+                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                placeholder="Search categories..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="pl-9 h-9 bg-background"
+                            />
+                        </div>
                     </div>
                 </div>
-            </ScrollArea>
+
+                <div className="rounded-md border bg-background text-sm shadow-sm overflow-hidden">
+                    <Table>
+                        <TableHeader className="bg-muted/40">
+                            <TableRow className="hover:bg-transparent border-b">
+                                <TableHead className="h-10 text-xs font-medium w-[400px]">Name</TableHead>
+                                <TableHead className="h-10 text-xs font-medium">Slug</TableHead>
+                                <TableHead className="h-10 text-xs font-medium">Status</TableHead>
+                                <TableHead className="h-10 text-xs font-medium text-right w-[60px]">Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {loading ? (
+                                <TableRow>
+                                    <TableCell colSpan={4} className="h-24 text-center">
+                                        <div className="flex justify-center"><Loader2 className="animate-spin h-6 w-6 text-muted-foreground" /></div>
+                                    </TableCell>
+                                </TableRow>
+                            ) : paginatedCategories.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                                        No categories found.
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                paginatedCategories.map((cat: any) => (
+                                    <TableRow
+                                        key={cat.id}
+                                        className="group border-b last:border-0 hover:bg-muted/40 transition-colors"
+                                    >
+                                        <TableCell className="font-medium py-3">
+                                            {cat.name}
+                                        </TableCell>
+                                        <TableCell className="text-muted-foreground text-sm font-mono py-3">
+                                            {cat.slug}
+                                        </TableCell>
+                                        <TableCell className="py-3">
+                                            <Badge variant={cat.published ? "default" : "secondary"} className="h-5 px-2 text-[10px] font-medium rounded-full">
+                                                {cat.published ? "Published" : "Draft"}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell className="text-right py-3">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem onClick={() => setDeleteId(cat.id)} className="text-destructive focus:text-destructive">
+                                                        <Trash className="mr-2 h-3.5 w-3.5" />
+                                                        Delete
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
+
+                {/* Pagination */}
+                {filteredCategories.length > 0 && (
+                    <div className="flex items-center justify-between px-2 pt-2">
+                        <div className="text-xs text-muted-foreground">
+                            Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredCategories.length)} of {filteredCategories.length}
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                                disabled={currentPage === 1}
+                                className="h-8 w-8 p-0"
+                            >
+                                <ChevronLeft className="h-4 w-4" />
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                                disabled={currentPage === totalPages}
+                                className="h-8 w-8 p-0"
+                            >
+                                <ChevronRight className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    </div>
+                )}
+            </div>
 
             <DeleteConfirmDialog
                 open={!!deleteId}

@@ -2,6 +2,7 @@
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { CreateArticleButton } from "@/components/CreateArticleButton"
 import { Input } from "@/components/ui/input"
 import {
     Table,
@@ -126,150 +127,162 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
     }
 
     return (
-        <div className="space-y-4 w-full">
-            {/* Toolbar */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-end gap-4">
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <div className="relative flex-1 sm:w-64">
-                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                            placeholder="Search articles..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-9 h-9 bg-background"
-                        />
-                    </div>
-                    <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="w-[130px] h-9 text-xs">
-                            <SelectValue placeholder="Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="ALL">All Status</SelectItem>
-                            <SelectItem value="PUBLISHED">Published</SelectItem>
-                            <SelectItem value="DRAFT">Draft</SelectItem>
-                            <SelectItem value="BANNED">Banned</SelectItem>
-                            <SelectItem value="DELETED">Deleted</SelectItem>
-                        </SelectContent>
-                    </Select>
+        <div className="h-full flex-1 flex-col space-y-8 p-8 md:flex max-w-7xl mx-auto w-full">
+            <div className="flex items-center justify-between space-y-2">
+                <div>
+                    <h2 className="text-2xl font-bold tracking-tight">Articles</h2>
+                    <p className="text-muted-foreground">
+                        Manage your website articles
+                    </p>
                 </div>
+                <CreateArticleButton siteId={siteId || (team?.id as string)} />
             </div>
 
-            <div className="rounded-md border bg-background text-sm shadow-sm overflow-hidden">
-                <Table>
-                    <TableHeader className="bg-muted/40">
-                        <TableRow className="hover:bg-transparent border-b">
-                            <TableHead className="h-10 text-xs font-medium w-[400px]">Article</TableHead>
-                            <TableHead className="h-10 text-xs font-medium">Status</TableHead>
-                            <TableHead className="h-10 text-xs font-medium">Created</TableHead>
-                            <TableHead className="h-10 text-xs font-medium text-right w-[60px]">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {paginatedArticles.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
-                                    No articles found.
-                                </TableCell>
+            <div className="space-y-4 w-full">
+                {/* Toolbar */}
+                <div className="flex flex-col sm:flex-row items-center justify-end gap-4">
+                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                        <div className="relative flex-1 sm:w-64">
+                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                placeholder="Search articles..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="pl-9 h-9 bg-background"
+                            />
+                        </div>
+                        <Select value={statusFilter} onValueChange={setStatusFilter}>
+                            <SelectTrigger className="w-[130px] h-9 text-xs">
+                                <SelectValue placeholder="Status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="ALL">All Status</SelectItem>
+                                <SelectItem value="PUBLISHED">Published</SelectItem>
+                                <SelectItem value="DRAFT">Draft</SelectItem>
+                                <SelectItem value="BANNED">Banned</SelectItem>
+                                <SelectItem value="DELETED">Deleted</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+
+                <div className="rounded-md border bg-background text-sm shadow-sm overflow-hidden">
+                    <Table>
+                        <TableHeader className="bg-muted/40">
+                            <TableRow className="hover:bg-transparent border-b">
+                                <TableHead className="h-10 text-xs font-medium w-[400px]">Article</TableHead>
+                                <TableHead className="h-10 text-xs font-medium">Status</TableHead>
+                                <TableHead className="h-10 text-xs font-medium">Created</TableHead>
+                                <TableHead className="h-10 text-xs font-medium text-right w-[60px]">Actions</TableHead>
                             </TableRow>
-                        ) : (
-                            paginatedArticles.map((article: any) => (
-                                <TableRow
-                                    key={article.id}
-                                    onClick={() => handleArticleClick(article.id)}
-                                    className={cn(
-                                        "group border-b last:border-0 cursor-pointer hover:bg-muted/40 transition-colors",
-                                        selectedArticleId === article.id && "bg-muted/40"
-                                    )}
-                                >
-                                    <TableCell className="font-medium py-3">
-                                        <div className="flex items-center gap-3">
-                                            <div className="h-8 w-8 rounded-md bg-muted/50 flex items-center justify-center border overflow-hidden">
-                                                {article.cover ? (
-                                                    <Image
-                                                        src={article.cover}
-                                                        alt={article.title}
-                                                        width={32}
-                                                        height={32}
-                                                        className="object-cover h-full w-full"
-                                                    />
-                                                ) : (
-                                                    <FileText className="h-4 w-4 text-muted-foreground" />
-                                                )}
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <span className="truncate max-w-[200px] text-foreground font-medium flex items-center gap-1.5">
-                                                    {article.title || "Untitled"}
-                                                </span>
-                                                <span className="text-xs text-muted-foreground truncate max-w-[200px] font-mono">{article.slug}</span>
-                                            </div>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="py-3">
-                                        <Badge variant={(statusColors[article.status as keyof typeof statusColors] || "default") as any} className="h-5 px-2 text-[10px] font-medium rounded-full">
-                                            {article.status}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell className="text-xs text-muted-foreground py-3">
-                                        {new Date(article.createdAt).toLocaleDateString()}
-                                    </TableCell>
-                                    <TableCell className="text-right py-3" onClick={(e) => e.stopPropagation()}>
-                                        <div className="flex items-center justify-end">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem onClick={() => handleArticleClick(article.id)}>
-                                                        <Edit className="mr-2 h-3.5 w-3.5" />
-                                                        Edit
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem
-                                                        onClick={() => setDeleteId(article.id)}
-                                                        className="text-destructive focus:text-destructive"
-                                                    >
-                                                        <Trash className="mr-2 h-3.5 w-3.5" />
-                                                        Delete
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </div>
+                        </TableHeader>
+                        <TableBody>
+                            {paginatedArticles.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                                        No articles found.
                                     </TableCell>
                                 </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
-
-            {filteredArticles.length > 0 && (
-                <div className="flex items-center justify-between px-2 pt-2">
-                    <div className="text-xs text-muted-foreground">
-                        Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredArticles.length)} of {filteredArticles.length}
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                            disabled={currentPage === 1}
-                            className="h-8 w-8 p-0"
-                        >
-                            <ChevronLeft className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                            disabled={currentPage === totalPages}
-                            className="h-8 w-8 p-0"
-                        >
-                            <ChevronRight className="h-4 w-4" />
-                        </Button>
-                    </div>
+                            ) : (
+                                paginatedArticles.map((article: any) => (
+                                    <TableRow
+                                        key={article.id}
+                                        onClick={() => handleArticleClick(article.id)}
+                                        className={cn(
+                                            "group border-b last:border-0 cursor-pointer hover:bg-muted/40 transition-colors",
+                                            selectedArticleId === article.id && "bg-muted/40"
+                                        )}
+                                    >
+                                        <TableCell className="font-medium py-3">
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-8 w-8 rounded-md bg-muted/50 flex items-center justify-center border overflow-hidden">
+                                                    {article.cover ? (
+                                                        <Image
+                                                            src={article.cover}
+                                                            alt={article.title}
+                                                            width={32}
+                                                            height={32}
+                                                            className="object-cover h-full w-full"
+                                                        />
+                                                    ) : (
+                                                        <FileText className="h-4 w-4 text-muted-foreground" />
+                                                    )}
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="truncate max-w-[200px] text-foreground font-medium flex items-center gap-1.5">
+                                                        {article.title || "Untitled"}
+                                                    </span>
+                                                    <span className="text-xs text-muted-foreground truncate max-w-[200px] font-mono">{article.slug}</span>
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="py-3">
+                                            <Badge variant={(statusColors[article.status as keyof typeof statusColors] || "default") as any} className="h-5 px-2 text-[10px] font-medium rounded-full">
+                                                {article.status}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell className="text-xs text-muted-foreground py-3">
+                                            {new Date(article.createdAt).toLocaleDateString()}
+                                        </TableCell>
+                                        <TableCell className="text-right py-3" onClick={(e) => e.stopPropagation()}>
+                                            <div className="flex items-center justify-end">
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <MoreHorizontal className="h-4 w-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuItem onClick={() => handleArticleClick(article.id)}>
+                                                            <Edit className="mr-2 h-3.5 w-3.5" />
+                                                            Edit
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem
+                                                            onClick={() => setDeleteId(article.id)}
+                                                            className="text-destructive focus:text-destructive"
+                                                        >
+                                                            <Trash className="mr-2 h-3.5 w-3.5" />
+                                                            Delete
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
                 </div>
-            )}
+
+                {filteredArticles.length > 0 && (
+                    <div className="flex items-center justify-between px-2 pt-2">
+                        <div className="text-xs text-muted-foreground">
+                            Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredArticles.length)} of {filteredArticles.length}
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                                disabled={currentPage === 1}
+                                className="h-8 w-8 p-0"
+                            >
+                                <ChevronLeft className="h-4 w-4" />
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                                disabled={currentPage === totalPages}
+                                className="h-8 w-8 p-0"
+                            >
+                                <ChevronRight className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    </div>
+                )}
+            </div>
 
             <Sheet open={!!selectedArticleId} onOpenChange={(open) => !open && setSelectedArticleId(null)}>
                 <SheetContent

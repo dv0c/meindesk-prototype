@@ -1,27 +1,27 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { getCollections, deleteCollection, checkCollectionReferences } from "@/lib/actions/collection-actions"
 import { Button } from "@/components/ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, ArrowLeft, Search, Edit, Trash2, MoreHorizontal, Terminal, Database, Loader2, Folder } from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Plus, Search, Edit, Trash, MoreHorizontal, Loader2, Database, ChevronLeft, ChevronRight } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { toast } from "sonner"
 import { formatDistanceToNow } from "date-fns"
 import { cn } from "@/lib/utils"
 import { DeleteCollectionDialog, type CollectionReference, type CollectionRelationAction } from "@/components/DeleteCollectionDialog"
 
-// Import Setup components
-import { AnimatedNoise } from "@/app/(home)/components/animated-noise"
-import { ScrambleTextOnHover } from "@/app/(home)/components/scramble-text"
+const ITEMS_PER_PAGE = 10
 
 export default function CollectionsPage() {
     const params = useParams()
     const router = useRouter()
     const [collections, setCollections] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
+    const [searchQuery, setSearchQuery] = useState("")
+    const [currentPage, setCurrentPage] = useState(1)
 
     // Delete dialog state
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -44,17 +44,30 @@ export default function CollectionsPage() {
         setLoading(false)
     }
 
+    const filteredCollections = useMemo(() => {
+        return collections.filter((c) =>
+            c.name.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+    }, [collections, searchQuery])
+
+    const totalPages = Math.ceil(filteredCollections.length / ITEMS_PER_PAGE)
+    const paginatedCollections = useMemo(() => {
+        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+        return filteredCollections.slice(startIndex, startIndex + ITEMS_PER_PAGE)
+    }, [filteredCollections, currentPage])
+
+    useEffect(() => {
+        setCurrentPage(1)
+    }, [searchQuery])
+
     const handleDelete = async (id: string, name: string) => {
-        // Check for collection references
         const refRes = await checkCollectionReferences(id)
 
         if (refRes.references && refRes.references.length > 0) {
-            // Has references - show dialog
             setDeleteTarget({ id, name })
             setDeleteReferences(refRes.references)
             setDeleteDialogOpen(true)
         } else {
-            // No references - simple delete with confirmation
             if (confirm(`Delete "${name}"? This will delete all items in this collection.`)) {
                 const res = await deleteCollection(id, params.siteId as string)
                 if (res.success) {
@@ -96,148 +109,141 @@ export default function CollectionsPage() {
         }
     }
 
-    if (loading) return (
-        <div className="fixed inset-0 bg-background flex items-center justify-center font-mono text-foreground">
-            <div className="flex flex-col items-center gap-4">
-                <Loader2 className="w-8 h-8 animate-spin text-foreground/50" />
-                <ScrambleTextOnHover text="ACCESSING SYSTEM..." />
-            </div>
+    if (loading && collections.length === 0) return (
+        <div className="flex items-center justify-center h-[calc(100vh-200px)] w-full">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
     )
 
     return (
-        <div className="fixed inset-0 bg-background text-foreground font-mono z-50 flex flex-col overflow-hidden">
-            <AnimatedNoise opacity={0.05} />
+        <div className="h-full flex-1 flex-col space-y-8 p-8 md:flex max-w-7xl mx-auto w-full">
+            <div className="flex items-center justify-between space-y-2">
+                <div>
+                    <h2 className="text-2xl font-bold tracking-tight">Collections</h2>
+                    <p className="text-muted-foreground">
+                        Manage your dynamic data schemas and content.
+                    </p>
+                </div>
+                <div className="flex items-center space-x-2">
+                    <Button onClick={() => router.push(`/dashboard/${params.siteId}/collections/new`)}>
+                        <Plus className="mr-2 h-4 w-4" /> New Collection
+                    </Button>
+                </div>
+            </div>
 
-            {/* Header */}
-            <header className="h-16 md:h-20 px-4 md:px-8 flex items-center justify-between border-b border-foreground/10 relative z-10 shrink-0 bg-background/50 backdrop-blur-sm">
-                <div className="flex items-center gap-4">
-                    <div className="w-8 h-8 border border-foreground/20 flex items-center justify-center bg-foreground/5">
-                        <Database className="w-4 h-4 text-foreground/80" />
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground/60">
-                            Dynamic Content System
-                        </span>
-                        <h1 className="text-xl font-bold tracking-tight uppercase font-[var(--font-bebas)]">
-                            Collections Registry
-                        </h1>
+            <div className="space-y-4">
+                <div className="flex items-center justify-end">
+                    <div className="relative w-full max-w-sm">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            placeholder="Search collections..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="pl-9 h-9 bg-background"
+                        />
                     </div>
                 </div>
 
-                <div className="flex gap-4 items-center">
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => router.push(`/dashboard/${params.siteId}`)}
-                        className="font-mono text-xs uppercase tracking-widest hover:bg-foreground/5"
-                    >
-                        <ArrowLeft className="w-3 h-3 mr-2" />
-                        <ScrambleTextOnHover text="DASHBOARD" />
-                    </Button>
-                    <Button
-                        onClick={() => router.push(`/dashboard/${params.siteId}/collections/new`)}
-                        className="bg-foreground text-background hover:bg-foreground/90 font-mono text-xs uppercase tracking-widest rounded-none"
-                    >
-                        <Plus className="mr-2 h-3 w-3" />
-                        <ScrambleTextOnHover text="NEW COLLECTION" />
-                    </Button>
-                </div>
-            </header>
-
-            {/* Main Content */}
-            <main className="flex-1 overflow-y-auto relative z-10 p-4 md:p-8">
-                <div className="max-w-[1400px] mx-auto space-y-6">
-
-                    {/* Toolbar */}
-                    <div className="flex items-center justify-between">
-                        <div className="relative w-full max-w-sm">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input
-                                placeholder="SEARCH COLLECTIONS..."
-                                className="pl-10 bg-background/50 border-foreground/20 rounded-none h-10 font-mono text-xs uppercase placeholder:text-foreground/30 focus-visible:ring-1 focus-visible:ring-foreground"
-                            />
-                        </div>
-                        <div className="font-mono text-[10px] text-muted-foreground uppercase tracking-wider">
-                            {collections.length} COLLECTIONS ACTIVE
-                        </div>
-                    </div>
-
-                    {/* Table */}
-                    <div className="border border-foreground/10 bg-foreground/[0.02] backdrop-blur-sm">
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="border-foreground/10 hover:bg-transparent">
-                                    <TableHead className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold h-10 pl-6">Name</TableHead>
-                                    <TableHead className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold h-10">Description</TableHead>
-                                    <TableHead className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold h-10">Items</TableHead>
-                                    <TableHead className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold h-10">Last Updated</TableHead>
-                                    <TableHead className="w-[50px]"></TableHead>
+                <div className="rounded-md border bg-background text-sm shadow-sm overflow-hidden">
+                    <Table>
+                        <TableHeader className="bg-muted/40">
+                            <TableRow className="hover:bg-transparent border-b">
+                                <TableHead className="h-10 text-xs font-medium pl-6 w-[250px]">Name</TableHead>
+                                <TableHead className="h-10 text-xs font-medium">Description</TableHead>
+                                <TableHead className="h-10 text-xs font-medium">Items</TableHead>
+                                <TableHead className="h-10 text-xs font-medium">Last Updated</TableHead>
+                                <TableHead className="h-10 text-xs font-medium text-right w-[60px]"></TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {paginatedCollections.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                                        No collections found.
+                                    </TableCell>
                                 </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {collections.length === 0 ? (
-                                    <TableRow className="hover:bg-transparent">
-                                        <TableCell colSpan={5} className="h-64 text-center">
-                                            <div className="flex flex-col items-center justify-center gap-4 text-muted-foreground">
-                                                <Folder className="w-8 h-8 opacity-20" />
-                                                <p className="text-xs font-mono uppercase tracking-widest">No Collections Initialized</p>
+                            ) : (
+                                paginatedCollections.map((collection) => (
+                                    <TableRow
+                                        key={collection.id}
+                                        className="group border-b last:border-0 cursor-pointer hover:bg-muted/40 transition-colors"
+                                        onClick={() => router.push(`/dashboard/${params.siteId}/collections/${collection.id}`)}
+                                    >
+                                        <TableCell className="font-medium py-3 pl-6">
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-8 w-8 rounded-md bg-muted/50 flex items-center justify-center border text-muted-foreground">
+                                                    <Database className="h-4 w-4" />
+                                                </div>
+                                                <span className="text-foreground font-medium">{collection.name}</span>
                                             </div>
                                         </TableCell>
+                                        <TableCell className="text-muted-foreground py-3 text-xs">
+                                            {collection.description || "-"}
+                                        </TableCell>
+                                        <TableCell className="text-muted-foreground py-3 text-xs font-mono">
+                                            {collection.items?.length || 0}
+                                        </TableCell>
+                                        <TableCell className="text-muted-foreground py-3 text-xs">
+                                            {formatDistanceToNow(new Date(collection.updatedAt), { addSuffix: true })}
+                                        </TableCell>
+                                        <TableCell className="py-3 text-right" onClick={(e) => e.stopPropagation()}>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem
+                                                        onClick={() => router.push(`/dashboard/${params.siteId}/collections/${collection.id}/settings`)}
+                                                    >
+                                                        <Edit className="mr-2 h-3.5 w-3.5" /> Edit Schema
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem
+                                                        className="text-destructive focus:text-destructive"
+                                                        onClick={(e) => { e.stopPropagation(); handleDelete(collection.id, collection.name) }}
+                                                    >
+                                                        <Trash className="mr-2 h-3.5 w-3.5" /> Delete
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </TableCell>
                                     </TableRow>
-                                ) : (
-                                    collections.map((collection) => (
-                                        <TableRow
-                                            key={collection.id}
-                                            className="cursor-pointer border-foreground/5 hover:bg-foreground/5 transition-colors group"
-                                            onClick={() => router.push(`/dashboard/${params.siteId}/collections/${collection.id}`)}
-                                        >
-                                            <TableCell className="font-mono text-xs py-4 text-foreground/80 group-hover:text-foreground transition-colors pl-6 font-bold">
-                                                {collection.name}
-                                            </TableCell>
-                                            <TableCell className="font-mono text-xs py-4 text-foreground/60">
-                                                {collection.description || "N/A"}
-                                            </TableCell>
-                                            <TableCell className="font-mono text-xs py-4 text-foreground/60">
-                                                {collection.items?.length || 0} Records
-                                            </TableCell>
-                                            <TableCell className="text-muted-foreground text-[10px] font-mono uppercase tracking-wider py-4">
-                                                {formatDistanceToNow(new Date(collection.updatedAt), { addSuffix: true })}
-                                            </TableCell>
-                                            <TableCell className="py-4" onClick={(e) => e.stopPropagation()}>
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-foreground/10 rounded-none">
-                                                            <span className="sr-only">Open menu</span>
-                                                            <MoreHorizontal className="h-4 w-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end" className="bg-background border-foreground/20 rounded-none">
-                                                        <DropdownMenuItem
-                                                            onClick={() => router.push(`/dashboard/${params.siteId}/collections/${collection.id}/settings`)}
-                                                            className="font-mono text-xs uppercase focus:bg-foreground/10 focus:text-foreground cursor-pointer"
-                                                        >
-                                                            <Edit className="mr-2 h-3 w-3" /> Edit Schema
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem
-                                                            className="text-destructive font-mono text-xs uppercase focus:bg-destructive/10 focus:text-destructive cursor-pointer"
-                                                            onClick={(e) => { e.stopPropagation(); handleDelete(collection.id, collection.name) }}
-                                                        >
-                                                            <Trash2 className="mr-2 h-3 w-3" /> Delete System
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-                    </div>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
                 </div>
-            </main>
 
-            {/* Delete Collection Dialog */}
+                {filteredCollections.length > 0 && (
+                    <div className="flex items-center justify-between px-2 pt-2">
+                        <div className="text-xs text-muted-foreground">
+                            Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredCollections.length)} of {filteredCollections.length}
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                                disabled={currentPage === 1}
+                                className="h-8 w-8 p-0"
+                            >
+                                <ChevronLeft className="h-4 w-4" />
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                                disabled={currentPage === totalPages}
+                                className="h-8 w-8 p-0"
+                            >
+                                <ChevronRight className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    </div>
+                )}
+            </div>
+
             <DeleteCollectionDialog
                 open={deleteDialogOpen}
                 onOpenChange={setDeleteDialogOpen}
