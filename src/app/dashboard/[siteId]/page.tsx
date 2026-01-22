@@ -40,7 +40,7 @@ export default async function ProjectDashboard({ params }: { params: { siteId: s
           <section>
             <h2 className="text-lg font-medium mb-4">Production Deployment</h2>
             <div className="border rounded-lg overflow-hidden bg-background">
-              <div className="aspect-video w-full bg-muted/10 relative group border-b">
+              <div className="aspect-video max-h-[500px] w-full bg-muted/10 relative group border-b">
                 <iframe
                   src={fullUrl}
                   className="w-full h-full object-cover pointer-events-none border-0"

@@ -16,7 +16,7 @@ export function ProjectNavigation({ siteId }: { siteId: string }) {
         { name: "Media", href: `${baseUrl}/projects/website/media-gallery` },
         { name: "Collections", href: `${baseUrl}/collections` },
         { name: "RSS", href: `${baseUrl}/projects/website/rss/my-feed` },
-        { name: "Store", href: `${baseUrl}/store` },
+        { name: "Community", href: `${baseUrl}/community` },
         { name: "Features", href: `${baseUrl}/projects/website/features` },
         { name: "Analytics", href: `${baseUrl}/projects/website/analytics` },
         { name: "Settings", href: `${baseUrl}/projects/settings` },
