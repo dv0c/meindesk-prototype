@@ -3,17 +3,18 @@
 import { SerializedEditorState } from "lexical"
 import { use, useEffect, useMemo, useRef, useState } from "react"
 
-import { EditorProvider, EditorToolbar, EditorContent } from "@/components/blocks/editor-x/editor"
+import { EditorContent, EditorProvider, EditorToolbar } from "@/components/blocks/editor-x/editor"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from "@/components/ui/drawer"
+import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Spinner } from "@/components/ui/spinner"
 import { useArticle } from "@/hooks/use-article"
 import { useMediaQuery } from "@/hooks/use-media-query"
-import RightSection from "./_comps/RightSection"
 import { ArrowLeft, ChevronDown, PanelRight, Save, X } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import RightSection from "./_comps/RightSection"
 
 interface EditorPageProps {
   params: {
@@ -24,7 +25,7 @@ interface EditorPageProps {
 
 export default function EditorPage({ params }: EditorPageProps) {
   const { id: articleId, siteId } = use(params as any) as any
-
+  const router = useRouter()
   const [title, setTitle] = useState("")
   const [editorState, setEditorState] = useState<SerializedEditorState>()
   const [html, setHtml] = useState("")
@@ -130,7 +131,7 @@ export default function EditorPage({ params }: EditorPageProps) {
         <header className="sticky top-0 z-50 h-12 shrink-0 flex items-center justify-between px-4 border-b bg-background">
           <div className="flex items-center gap-3">
             <Button
-              onClick={() => history.back()}
+              onClick={() => router.push(`/dashboard/${siteId}/projects/website/articles`)}
               variant="ghost"
               size="sm"
               className="h-8 w-8 p-0"

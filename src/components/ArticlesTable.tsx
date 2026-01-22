@@ -89,7 +89,7 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
     return (
         <div className="flex h-full w-full flex-col bg-background/50">
             {/* Toolbar */}
-            <div className="flex items-center justify-between px-6 py-4 border-b bg-background/95 backdrop-blur z-10">
+            <div className="flex items-center justify-between px-6 md:px-0 py-4 border-b bg-background/95 backdrop-blur z-10">
                 <div className="flex items-center gap-4 flex-1">
                     <div className="relative w-full max-w-sm">
                         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -104,7 +104,7 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
             </div>
 
             <ScrollArea className="flex-1">
-                <div className="p-6">
+                <div className="py-6 md:py-6">
                     <div className="rounded-md border bg-background text-sm shadow-sm overflow-hidden">
                         <Table>
                             <TableHeader className="bg-muted/40">
