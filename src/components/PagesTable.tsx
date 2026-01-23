@@ -190,7 +190,7 @@ export function PagesTable({ siteId: propSiteId }: PagesTableProps = {}) {
           </div>
         </div>
 
-        <div className="rounded-md border bg-background text-sm shadow-sm overflow-hidden min-h-[500px]">
+        <div className="rounded-md border bg-background text-sm shadow-sm overflow-hidden ">
           <Table>
             <TableHeader className="bg-muted/40">
               <TableRow className="hover:bg-transparent border-b">

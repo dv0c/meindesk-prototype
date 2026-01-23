@@ -146,3 +146,34 @@ export async function updateProfile(data: { name: string; image?: string }) {
         return { error: "Failed to update profile" };
     }
 }
+
+export async function searchUsers(query: string) {
+    const session = await getAuthSession();
+    if (!session?.user?.id) {
+        return []; // Return empty for consistency or throw error
+    }
+
+    if (!query || query.length < 2) return [];
+
+    try {
+        const users = await db.user.findMany({
+            where: {
+                OR: [
+                    { name: { contains: query, mode: "insensitive" } },
+                    { email: { contains: query, mode: "insensitive" } },
+                ],
+            },
+            take: 10,
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+            },
+        });
+        return users;
+    } catch (error) {
+        console.error("Search users error:", error);
+        return [];
+    }
+}
