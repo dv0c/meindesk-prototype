@@ -136,6 +136,59 @@ export async function createArticleFromRss({
         },
     };
 
+    // --- RSS Category Resolution Logic ---
+    // Map category names to IDs, creating new categories if needed
+    const resolvedCategoryIds: string[] = [];
+
+    if (rssItem.categories && rssItem.categories.length > 0) {
+        for (const catName of rssItem.categories) {
+            if (!catName || typeof catName !== 'string') continue;
+
+            const trimmedName = catName.trim();
+            if (!trimmedName) continue;
+
+            // Try to find existing category
+            let category = await db.category.findFirst({
+                where: {
+                    siteId,
+                    name: { equals: trimmedName, mode: "insensitive" },
+                },
+            });
+
+            if (!category) {
+                // Create new category
+                const catSlug = trimmedName
+                    .toLowerCase()
+                    .replace(/[^\w\s-]/g, "")
+                    .replace(/[\s_-]+/g, "-")
+                    .replace(/^-+|-+$/g, "") || "uncategorized";
+
+                try {
+                    category = await db.category.create({
+                        data: {
+                            name: trimmedName,
+                            slug: catSlug,
+                            description: "Auto-created from RSS import",
+                            siteId,
+                            published: true,
+                        },
+                    });
+                } catch (err) {
+                    // In case of race condition or creation error, just skip adding this category
+                    console.error(`Failed to create category ${trimmedName}:`, err);
+                    continue;
+                }
+            }
+
+            if (category) {
+                resolvedCategoryIds.push(category.id);
+            }
+        }
+    }
+    // Remove duplicates
+    const uniqueCategoryIds = Array.from(new Set(resolvedCategoryIds));
+
+
     // Create the article
     const article = await db.article.create({
         data: {
@@ -148,7 +201,7 @@ export async function createArticleFromRss({
             status: "DRAFT",
             content: attributionContent,
             sourceType: "RSS",
-            categories: rssItem.categories || [],
+            categories: uniqueCategoryIds,
             sourceId: rssItem.id,
             authorId,
             metadata: {
