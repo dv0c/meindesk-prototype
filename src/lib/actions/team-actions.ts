@@ -35,6 +35,8 @@ export async function inviteMember(siteId: string, email: string) {
             include: { memberOfSites: true } // optional check
         })
 
+        console.log("[inviteMember] Inviting email:", email, "User found:", !!userToInvite)
+
         if (userToInvite) {
             // Check if already member
             const isMember = userToInvite.memberOfSites.some(s => s.id === siteId)
@@ -45,6 +47,11 @@ export async function inviteMember(siteId: string, email: string) {
             if (userToInvite.id === site.userId) {
                 return { error: "User is the owner of this team" }
             }
+        } else {
+            console.log("[inviteMember] User not found with email:", email)
+            // We still create invitation for non-existing users (e.g. for future signup or just email invite)
+            // But valid requirements say: "users will get the invitation from notifications panel" implies they MUST exist.
+            // If they don't exist, we can't send a system notification.
         }
 
         // 3. Check if invitation already exists
@@ -58,6 +65,10 @@ export async function inviteMember(siteId: string, email: string) {
         })
 
         if (existingInvitation) {
+            // START DEBUG: Delete existing to allow re-invite for testing
+            // await db.invitation.delete({ where: { id: existingInvitation.id } })
+            // END DEBUG
+            console.log("[inviteMember] Invitation already exists")
             return { error: "Invitation already sent to this email" }
         }
 
@@ -76,18 +87,26 @@ export async function inviteMember(siteId: string, email: string) {
             }
         })
 
+        console.log("[inviteMember] Invitation created:", invitation.id)
+
         // 5. Send Notification (if user exists)
         if (userToInvite) {
-            await db.notification.create({
-                data: {
-                    userId: userToInvite.id,
-                    title: `Invitation to join ${site.title}`,
-                    message: `${session.user.name || "A user"} has invited you to join the team "${site.title}".`,
-                    type: "INVITATION",
-                    metadata: { invitationId: invitation.id, siteId: site.id },
-                    senderId: session.user.id
-                }
-            })
+            console.log("[inviteMember] Sending notification to user:", userToInvite.id)
+            try {
+                const notif = await db.notification.create({
+                    data: {
+                        userId: userToInvite.id,
+                        title: `Invitation to join ${site.title}`,
+                        message: `${session.user.name || "A user"} has invited you to join the team "${site.title}".`,
+                        type: "INVITATION",
+                        metadata: { invitationId: invitation.id, siteId: site.id },
+                        senderId: session.user.id
+                    }
+                })
+                console.log("[inviteMember] Notification created:", notif.id)
+            } catch (err) {
+                console.error("[inviteMember] Failed to create notification:", err)
+            }
         }
 
         // TODO: Send Email (if configured)
