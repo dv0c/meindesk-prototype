@@ -58,7 +58,7 @@ import { DashboardNavigation } from "@/components/nav/DashboardNavigation"
 
 // ... imports
 
-export function DashboardProjectsView({ sites }: { sites: Site[] }) {
+export function DashboardProjectsView({ sites, userId }: { sites: Site[], userId: string }) {
     const router = useRouter()
     const [searchQuery, setSearchQuery] = useState("")
 
@@ -111,7 +111,14 @@ export function DashboardProjectsView({ sites }: { sites: Site[] }) {
                 {/* Projects Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredSites.map((site) => (
-                        <Card key={site.id} className="group hover:border-foreground/50 transition-colors duration-200 cursor-pointer" onClick={() => router.push(`/dashboard/${site.id}`)}>
+                        <Card
+                            key={site.id}
+                            className={cn(
+                                "group hover:border-foreground/50 transition-colors duration-200 cursor-pointer",
+                                site.userId !== userId && "border-orange-500/50 hover:border-orange-500"
+                            )}
+                            onClick={() => router.push(`/dashboard/${site.id}`)}
+                        >
                             <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
                                 <div className="flex gap-3 items-center">
                                     <FrameworkIcon />

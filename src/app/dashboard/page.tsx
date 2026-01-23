@@ -18,7 +18,7 @@ const page = async () => {
         return redirect('/setup')
     }
 
-    return <DashboardProjectsView sites={sites} />
+    return <DashboardProjectsView sites={sites} userId={session.user.id} />
 }
 
 export default page
