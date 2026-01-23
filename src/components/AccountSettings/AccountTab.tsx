@@ -45,7 +45,7 @@ export function AccountTab() {
 
         if (result.success) {
             toast.success("Account deleted successfully")
-            signOut({ callbackUrl: "/" })
+            signOut({ callbackUrl: "/login" })
         } else {
             toast.error("Failed to delete account")
             setIsDeleting(false)
