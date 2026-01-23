@@ -11,6 +11,9 @@ const page = async ({ params }: { params: { siteId: string } }) => {
     Site not found.
   </div>
 
+  const session = await getAuthSession()
+  const isOwner = team.userId === session?.user?.id
+
   return (
     <div className="flex flex-col gap-8 p-8 max-w-5xl mx-auto w-full">
       <div className="flex flex-col gap-2">
@@ -21,8 +24,8 @@ const page = async ({ params }: { params: { siteId: string } }) => {
       </div>
       <div className="grid gap-8">
         <WebsiteSettings site={team} />
-        <TeamSettings siteId={team.id} isOwner={team.userId === (await getAuthSession())?.user?.id} />
-        <DeleteWebsite siteId={team.id} />
+        <TeamSettings siteId={team.id} isOwner={isOwner} />
+        {isOwner && <DeleteWebsite siteId={team.id} />}
       </div>
     </div>
   )
