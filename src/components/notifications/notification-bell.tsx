@@ -63,6 +63,37 @@ export function NotificationBell() {
         setUnreadCount(0)
     }
 
+    const handleAcceptInvitation = async (invitationId: string, ignoredId: string, e?: React.MouseEvent) => {
+        e?.stopPropagation()
+        // Assuming we import acceptInvitation from team-actions
+        // But we need to update imports first.
+        const { acceptInvitation } = await import("@/lib/actions/team-actions")
+        const res = await acceptInvitation(invitationId)
+        if (res.success) {
+            toast.success("Invitation accepted!")
+            // Remove notification or mark as read
+            // setNotifications(prev => prev.filter(n => n.id !== ignoredId)) // or mark read
+            fetchNotifications()
+            if (res.siteId) {
+                window.location.href = `/dashboard/${res.siteId}`
+            }
+        } else {
+            toast.error(res.error || "Failed to accept")
+        }
+    }
+
+    const handleDeclineInvitation = async (invitationId: string, ignoredId: string, e?: React.MouseEvent) => {
+        e?.stopPropagation()
+        const { declineInvitation } = await import("@/lib/actions/team-actions")
+        const res = await declineInvitation(invitationId)
+        if (res.success) {
+            toast.success("Invitation declined")
+            fetchNotifications()
+        } else {
+            toast.error(res.error || "Failed to decline")
+        }
+    }
+
     const handleDelete = async (id: string, e?: React.MouseEvent) => {
         e?.stopPropagation()
         setNotifications(prev => prev.filter(n => n.id !== id))
@@ -150,6 +181,17 @@ export function NotificationBell() {
                                                 {notification.message}
                                             </span>
                                         </div>
+
+                                        {notification.type === "INVITATION" && notification.metadata?.invitationId && (
+                                            <div className="flex gap-2 mt-2">
+                                                <Button size="sm" variant="default" className="h-7 px-3 text-xs" onClick={(e) => handleAcceptInvitation(notification.metadata.invitationId, notification.id, e)}>
+                                                    Accept
+                                                </Button>
+                                                <Button size="sm" variant="outline" className="h-7 px-3 text-xs" onClick={(e) => handleDeclineInvitation(notification.metadata.invitationId, notification.id, e)}>
+                                                    Decline
+                                                </Button>
+                                            </div>
+                                        )}
 
                                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                             <span>{notification.site ? "Project" : "System"}</span>

@@ -21,12 +21,12 @@ exports.Prisma = Prisma
 exports.$Enums = {}
 
 /**
- * Prisma Client JS version: 6.19.0
- * Query Engine version: 2ba551f319ab1df4bc874a89965d8b3641056773
+ * Prisma Client JS version: 6.19.2
+ * Query Engine version: c2990dca591cba766e3b7ef5d9e8a84796e47ab7
  */
 Prisma.prismaVersion = {
-  client: "6.19.0",
-  engine: "2ba551f319ab1df4bc874a89965d8b3641056773"
+  client: "6.19.2",
+  engine: "c2990dca591cba766e3b7ef5d9e8a84796e47ab7"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -125,6 +125,7 @@ exports.Prisma.UserScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   role: 'role',
+  memberOfSiteIds: 'memberOfSiteIds',
   developerMode: 'developerMode'
 };
 
@@ -193,7 +194,8 @@ exports.Prisma.SiteScalarFieldEnum = {
   terms_id: 'terms_id',
   userId: 'userId',
   featuresId: 'featuresId',
-  subscriptionId: 'subscriptionId'
+  subscriptionId: 'subscriptionId',
+  memberIds: 'memberIds'
 };
 
 exports.Prisma.SnippetScalarFieldEnum = {
@@ -388,8 +390,20 @@ exports.Prisma.NotificationScalarFieldEnum = {
   imageUrl: 'imageUrl',
   type: 'type',
   read: 'read',
+  metadata: 'metadata',
   createdAt: 'createdAt',
   senderId: 'senderId'
+};
+
+exports.Prisma.InvitationScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  role: 'role',
+  token: 'token',
+  expires: 'expires',
+  siteId: 'siteId',
+  inviterId: 'inviterId',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.CollectionScalarFieldEnum = {
@@ -452,7 +466,8 @@ exports.NotificationType = exports.$Enums.NotificationType = {
   SUCCESS: 'SUCCESS',
   ERROR: 'ERROR',
   PROMO: 'PROMO',
-  SYSTEM: 'SYSTEM'
+  SYSTEM: 'SYSTEM',
+  INVITATION: 'INVITATION'
 };
 
 exports.ItemStatus = exports.$Enums.ItemStatus = {
@@ -483,6 +498,7 @@ exports.Prisma.ModelName = {
   ThemeBlock: 'ThemeBlock',
   SiteTheme: 'SiteTheme',
   Notification: 'Notification',
+  Invitation: 'Invitation',
   Collection: 'Collection',
   CollectionItem: 'CollectionItem'
 };

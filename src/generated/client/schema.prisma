@@ -40,6 +40,11 @@ model User {
   Notification      Notification[] // Received
   sentNotifications Notification[] @relation("Sender") // Sent
 
+  memberOfSites   Site[]   @relation("SiteMembers", fields: [memberOfSiteIds], references: [id])
+  memberOfSiteIds String[] @db.ObjectId
+
+  sentInvitations Invitation[] @relation("Inviter")
+
   developerMode Boolean @default(false)
 
   @@index([email, id])
@@ -162,6 +167,11 @@ model Site {
   mergedFeeds         MergedFeed[]
   Notification        Notification[]
   collections         Collection[]
+
+  members   User[]   @relation("SiteMembers", fields: [memberIds], references: [id])
+  memberIds String[] @db.ObjectId
+
+  invitations Invitation[]
 
   // Optional: Add a custom index for performance on frequently queried fields
   @@index([userId])
@@ -475,6 +485,8 @@ model Notification {
   type NotificationType @default(INFO)
   read Boolean          @default(false)
 
+  metadata Json?
+
   createdAt DateTime @default(now())
 
   user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -491,6 +503,25 @@ enum NotificationType {
   ERROR
   PROMO
   SYSTEM
+  INVITATION
+}
+
+model Invitation {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  email   String
+  role    String   @default("MEMBER") // "MEMBER", "ADMIN" (for future use)
+  token   String   @unique
+  expires DateTime
+
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  siteId String @db.ObjectId
+
+  inviter   User?   @relation("Inviter", fields: [inviterId], references: [id])
+  inviterId String? @db.ObjectId
+
+  createdAt DateTime @default(now())
+
+  @@unique([email, siteId])
 }
 
 // --- Dynamic Content System ---

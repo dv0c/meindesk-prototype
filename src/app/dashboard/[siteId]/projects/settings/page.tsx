@@ -1,6 +1,8 @@
 import { DeleteWebsite } from "@/components/Settings/DeleteSite"
 import WebsiteSettings from "@/components/Settings/WebsiteSettings"
+import { TeamSettings } from "@/components/Settings/TeamSettings"
 import { getActiveTeam } from "@/lib/actions/helpers/team"
+import { getAuthSession } from "@/lib/auth"
 
 const page = async ({ params }: { params: { siteId: string } }) => {
   const { siteId } = await params
@@ -19,6 +21,7 @@ const page = async ({ params }: { params: { siteId: string } }) => {
       </div>
       <div className="grid gap-8">
         <WebsiteSettings site={team} />
+        <TeamSettings siteId={team.id} isOwner={team.userId === (await getAuthSession())?.user?.id} />
         <DeleteWebsite siteId={team.id} />
       </div>
     </div>
