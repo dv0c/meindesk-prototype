@@ -9,7 +9,10 @@ export async function getSite() {
 
   const site = db.site.findFirst({
     where: {
-      userId: user.user.id,
+      OR: [
+        { userId: user.user.id },
+        { members: { some: { id: user.user.id } } }
+      ]
     },
     include: {
       subscription: true,
@@ -27,7 +30,10 @@ export async function getSites() {
 
   const sites = await db.site.findMany({
     where: {
-      userId: user.user.id,
+      OR: [
+        { userId: user.user.id },
+        { members: { some: { id: user.user.id } } }
+      ]
     },
     include: {
       subscription: true,

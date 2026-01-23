@@ -10,7 +10,13 @@ const _getActiveTeamCached = unstable_cache(
     if (!siteId || !userId) return null;
 
     return await db.site.findFirst({
-      where: { id: siteId, userId },
+      where: {
+        id: siteId,
+        OR: [
+          { userId },
+          { members: { some: { id: userId } } }
+        ]
+      },
       include: {
         features: true,
         Article: true,

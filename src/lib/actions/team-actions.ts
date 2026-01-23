@@ -278,25 +278,49 @@ export async function leaveTeam(siteId: string) {
 }
 
 // ----------------------------------------------------------------------
+// REVOKE INVITATION
+// ----------------------------------------------------------------------
+export async function revokeInvitation(invitationId: string) {
+    const session = await getAuthSession()
+    if (!session?.user?.id) return { error: "Unauthorized" }
+
+    try {
+        const invitation = await db.invitation.findUnique({
+            where: { id: invitationId },
+            include: { site: true }
+        })
+
+        if (!invitation) return { error: "Invitation not found" }
+
+        // Check ownership
+        if (invitation.site.userId !== session.user.id) {
+            return { error: "Only the team owner can revoke invitations" }
+        }
+
+        await db.invitation.delete({ where: { id: invitationId } })
+
+        revalidatePath(`/dashboard/${invitation.siteId}/settings`)
+        return { success: true }
+    } catch (error) {
+        return { error: "Failed to revoke invitation" }
+    }
+}
+
+// ----------------------------------------------------------------------
 // GET MEMBERS (helper for client components if needed, or use separate fetcher)
 // ----------------------------------------------------------------------
 export async function getTeamMembers(siteId: string) {
     const session = await getAuthSession()
     if (!session?.user?.id) return { error: "Unauthorized" }
 
-    // Check if user is owner OR member
-    // Actually, to list members, you should be part of the team?
-
     try {
+        console.log("[getTeamMembers] Fetching for site:", siteId)
+
         const site = await db.site.findUnique({
             where: { id: siteId },
             include: {
                 members: {
                     select: { id: true, name: true, email: true, image: true }
-                },
-                invitations: {
-                    select: { id: true, email: true, role: true, status: true, token: true /* care with token? */ } // 'status' not in schema?
-                    // Schema: id, email, role, token, expires... no status. Status is implied.
                 }
             }
         })
@@ -311,12 +335,23 @@ export async function getTeamMembers(siteId: string) {
             return { error: "Unauthorized" }
         }
 
+        // Fetch invitations separately to debug relation issue
+        let invitations: any[] = []
+        if (isOwner) {
+            invitations = await db.invitation.findMany({
+                where: { siteId },
+                select: { id: true, email: true, role: true, expires: true, token: true }
+            })
+            console.log("[getTeamMembers] Explicit invitations fetch:", invitations.length)
+        }
+
         return {
             members: site.members,
-            invitations: isOwner ? site.invitations : [] // Only owner sees pending invitations? Or all members? User request: "owner ... only to be able to invite". Usually members can see pending props. Let's start with owner only.
+            invitations
         }
 
     } catch (error) {
+        console.error("[getTeamMembers] Error:", error)
         return { error: "Failed to fetch members" }
     }
 }
