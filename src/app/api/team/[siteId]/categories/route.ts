@@ -1,6 +1,7 @@
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
+import { requireSiteAccess } from "@/lib/security/route-auth";
 
 // GET - List all categories for a site
 export async function GET(
@@ -14,17 +15,8 @@ export async function GET(
         return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
-    // Verify site ownership
-    const site = await db.site.findFirst({
-        where: { id: siteId, userId: session.user.id },
-    });
-
-    if (!site) {
-        return NextResponse.json(
-            { error: "Site not found or not yours" },
-            { status: 404 }
-        );
-    }
+    // Verify site access
+    await requireSiteAccess(siteId, session.user.id);
 
     const { searchParams } = new URL(req.url);
     const publishedOnly = searchParams.get("published") === "true";
@@ -74,17 +66,8 @@ export async function POST(
         return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
-    // Verify site ownership
-    const site = await db.site.findFirst({
-        where: { id: siteId, userId: session.user.id },
-    });
-
-    if (!site) {
-        return NextResponse.json(
-            { error: "Site not found or not yours" },
-            { status: 404 }
-        );
-    }
+    // Verify site access
+    await requireSiteAccess(siteId, session.user.id);
 
     try {
         const body = await req.json();

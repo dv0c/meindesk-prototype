@@ -61,6 +61,42 @@ export async function requireSiteOwnership(siteId: string, userId: string) {
 }
 
 /**
+ * Verify site access (Owner OR Member)
+ * Checks if the user owns the site OR is a member
+ */
+export async function requireSiteAccess(siteId: string, userId: string) {
+    if (!siteId || !userId) {
+        throw new Error("Missing siteId or userId")
+    }
+
+    // Check ownership first (fastest)
+    const site = await db.site.findFirst({
+        where: {
+            id: siteId,
+            userId: userId
+        },
+        select: { id: true }
+    })
+
+    if (site) return site
+
+    // Check membership
+    const memberSite = await db.site.findFirst({
+        where: {
+            id: siteId,
+            members: { some: { id: userId } }
+        },
+        select: { id: true }
+    })
+
+    if (!memberSite) {
+        throw new Error("Forbidden: You do not have access to this site")
+    }
+
+    return memberSite
+}
+
+/**
  * Verify article ownership
  * Checks if the authenticated user owns the specified article
  */

@@ -18,9 +18,15 @@ export async function CreateCategory({
     const session = await getAuthSession();
     if (!session?.user.id) throw new Error("Not authorized");
 
-    // Verify site ownership
+    // Verify site access (Owner or Member)
     const site = await db.site.findFirst({
-        where: { id: siteId, userId: session.user.id },
+        where: {
+            id: siteId,
+            OR: [
+                { userId: session.user.id },
+                { members: { some: { id: session.user.id } } }
+            ]
+        },
     });
     if (!site) throw new Error("Site not found or not yours");
 

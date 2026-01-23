@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuth, requireSiteOwnership, createErrorResponse } from "@/lib/security/route-auth";
+import { requireAuth, requireSiteAccess, createErrorResponse } from "@/lib/security/route-auth";
 
 // ------------------------------------------------------
 // GET /api/team/:siteId/pages -> list all pages
@@ -12,7 +12,8 @@ export async function GET(req: NextRequest, { params }: { params: { siteId: stri
     const { siteId } = await params;
 
     // Verify site ownership
-    await requireSiteOwnership(siteId, session.user.id);
+    // Verify site access
+    await requireSiteAccess(siteId, session.user.id);
 
     const pages = await db.page.findMany({
       where: { siteId },
@@ -31,8 +32,8 @@ export async function POST(req: NextRequest, { params }: { params: { siteId: str
     const { siteId } = await params;
     const body = await req.json();
 
-    // Verify site ownership
-    await requireSiteOwnership(siteId, session.user.id);
+    // Verify site access
+    await requireSiteAccess(siteId, session.user.id);
 
     const newPage = await db.page.create({
       data: {
@@ -65,8 +66,8 @@ export async function GETSingle(req: NextRequest, { params }: { params: { siteId
     const session = await requireAuth();
     const { siteId, id } = params;
 
-    // Verify site ownership
-    await requireSiteOwnership(siteId, session.user.id);
+    // Verify site access
+    await requireSiteAccess(siteId, session.user.id);
 
     const page = await db.page.findFirst({
       where: { id, siteId },
@@ -86,8 +87,8 @@ export async function PUT(req: NextRequest, { params }: { params: { siteId: stri
     const { siteId, id } = params;
     const body = await req.json();
 
-    // Verify site ownership
-    await requireSiteOwnership(siteId, session.user.id);
+    // Verify site access
+    await requireSiteAccess(siteId, session.user.id);
 
     const updatedPage = await db.page.update({
       where: { id },
@@ -114,8 +115,8 @@ export async function DELETE(req: NextRequest, { params }: { params: { siteId: s
     const session = await requireAuth();
     const { siteId, id } = params;
 
-    // Verify site ownership
-    await requireSiteOwnership(siteId, session.user.id);
+    // Verify site access
+    await requireSiteAccess(siteId, session.user.id);
 
     await db.page.delete({
       where: { id },

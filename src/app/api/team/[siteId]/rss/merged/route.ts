@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getAuthSession } from "@/lib/auth";
+import { requireSiteAccess } from "@/lib/security/route-auth";
 
 /**
  * Merged Feeds API
@@ -97,7 +98,6 @@ export async function POST(
                 description: body.description || `Merged feed with ${sourceCount} sources`,
                 icon: null,
                 autoImport: false,
-                site_name: "Merged Feed",
             },
         });
 

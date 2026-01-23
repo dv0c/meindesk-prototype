@@ -1,4 +1,4 @@
-import { requireAuth, requireSiteOwnership, createErrorResponse } from "@/lib/security/route-auth";
+import { requireAuth, requireSiteAccess, createErrorResponse } from "@/lib/security/route-auth";
 import cloudinary from "@/lib/cloudinary";
 import { NextResponse } from "next/server";
 
@@ -10,8 +10,8 @@ export async function POST(
     const session = await requireAuth();
     const { siteId } = await params;
 
-    // Verify site ownership
-    await requireSiteOwnership(siteId, session.user.id);
+    // Verify site access
+    await requireSiteAccess(siteId, session.user.id);
 
     const formData = await req.formData();
     const file = formData.get("file") as File;

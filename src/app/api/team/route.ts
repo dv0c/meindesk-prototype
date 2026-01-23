@@ -14,7 +14,10 @@ export async function GET(req: NextRequest) {
 
     const teams = await db.site.findMany({
       where: {
-        userId: session.user.id, // only teams owned by this user
+        OR: [
+          { userId: session.user.id },
+          { members: { some: { id: session.user.id } } }
+        ]
       },
       include: {
         subscription: true,

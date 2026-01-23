@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getAuthSession } from "@/lib/auth";
+import { requireSiteAccess } from "@/lib/security/route-auth";
 
 export const runtime = "nodejs";
 
@@ -12,7 +13,7 @@ export const runtime = "nodejs";
 // -------------------------------------------------------
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ articleId: string }> }
+  { params }: { params: Promise<{ articleId: string; siteId: string }> } // Added siteId to params type if available, or fetch from DB? Next.js params usually has upstream params if not consumed? Actually siteId is in the path.
 ) {
   try {
     const session = await getAuthSession();
@@ -20,10 +21,16 @@ export async function GET(
       return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
-    const { articleId } = await params;
+    const { articleId, siteId } = await params; // siteId is available from parent route
 
-    const article = await db.article.findUnique({
-      where: { id: articleId },
+    // Verify site access FIRST
+    await requireSiteAccess(siteId, session.user.id);
+
+    const article = await db.article.findFirst({
+      where: {
+        id: articleId,
+        siteId: siteId // Ensure article belongs to this site
+      },
       include: {
         author: {
           select: {
@@ -44,11 +51,6 @@ export async function GET(
 
     if (!article) {
       return NextResponse.json({ error: "Article not found" }, { status: 404 });
-    }
-
-    // Optional: restrict access if you only want authors to see their own stuff
-    if (article.authorId !== session.user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     return NextResponse.json(article);
@@ -75,6 +77,10 @@ export async function PATCH(
     }
 
     const { articleId, siteId } = await params;
+
+    // Verify site access
+    await requireSiteAccess(siteId, session.user.id);
+
     const data = await req.json();
 
     const allowed = [
@@ -113,8 +119,9 @@ export async function PATCH(
       }
     }
 
+    // Update if siteId matches
     const updated = await db.article.update({
-      where: { id: articleId, authorId: session.user.id },
+      where: { id: articleId, siteId: siteId },
       data: updateData,
     });
 
@@ -131,7 +138,7 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: Promise<{ articleId: string }> }
+  { params }: { params: Promise<{ articleId: string; siteId: string }> }
 ) {
   try {
     const session = await getAuthSession();
@@ -139,10 +146,13 @@ export async function DELETE(
       return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
-    const { articleId } = await params;
+    const { articleId, siteId } = await params;
+
+    // Verify site access
+    await requireSiteAccess(siteId, session.user.id);
 
     const updated = await db.article.delete({
-      where: { id: articleId, authorId: session.user.id },
+      where: { id: articleId, siteId: siteId },
     });
 
     return NextResponse.json(updated);

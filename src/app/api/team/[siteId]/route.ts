@@ -33,9 +33,16 @@ export async function GET(
       return NextResponse.json({ error: "Site not found" }, { status: 404 });
     }
 
-    // 3. Check if user owns it
+    // 3. Check if user owns it or is a member
     if (site.userId !== session.user.id) {
-      return NextResponse.json({ error: "Access denied" }, { status: 403 });
+      // Check membership if not owner
+      const membershipCheck = await db.site.findUnique({
+        where: { id: siteId },
+        select: { members: { where: { id: session.user.id } } }
+      })
+      if (!membershipCheck?.members.length) {
+        return NextResponse.json({ error: "Access denied" }, { status: 403 });
+      }
     }
 
     // 4. Return site as the team
@@ -125,9 +132,16 @@ export async function PUT(
       return NextResponse.json({ error: "Site not found" }, { status: 404 });
     }
 
-    // 2. Check ownership
+    // 2. Check ownership or membership
     if (site.userId !== session.user.id) {
-      return NextResponse.json({ error: "Access denied" }, { status: 403 });
+      // Check membership
+      const membershipCheck = await db.site.findUnique({
+        where: { id: siteId },
+        select: { members: { where: { id: session.user.id } } }
+      })
+      if (!membershipCheck?.members.length) {
+        return NextResponse.json({ error: "Access denied" }, { status: 403 });
+      }
     }
 
     // 3. Update the site
@@ -143,8 +157,8 @@ export async function PUT(
 
     // 4. Revalidate cache for this team/site
     try {
-      revalidateTag(`team-${siteId}`); // assuming you used this tag in unstable_cache
-      revalidateTag("active-team"); // optional global tag if needed
+      revalidateTag(`team-${siteId}`);
+      revalidateTag("active-team");
     } catch (e) {
       console.warn("Revalidation failed:", e);
     }

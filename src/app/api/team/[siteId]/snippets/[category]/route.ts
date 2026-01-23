@@ -1,7 +1,7 @@
 
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { requireAuth, requireSiteOwnership, createErrorResponse } from "@/lib/security/route-auth";
+import { requireAuth, requireSiteAccess, createErrorResponse } from "@/lib/security/route-auth";
 
 export async function GET(
     req: Request,
@@ -55,8 +55,8 @@ export async function PUT(
             return new NextResponse("Missing content", { status: 400 });
         }
 
-        // Verify site ownership
-        await requireSiteOwnership(siteId, session.user.id);
+        // Verify site access
+        await requireSiteAccess(siteId, session.user.id);
 
         // Upsert the snippet
         // We first try to find it to get the ID, or create new

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getAuthSession } from "@/lib/auth";
+import { requireSiteAccess } from "@/lib/security/route-auth";
 
 /**
  * Custom Feed Templates API
@@ -22,14 +23,8 @@ export async function GET(
     }
 
     try {
-        // Verify site ownership
-        const site = await db.site.findFirst({
-            where: { id: siteId, userId: session.user.id },
-        });
-
-        if (!site) {
-            return NextResponse.json({ error: "Site not found" }, { status: 404 });
-        }
+        // Verify site access
+        await requireSiteAccess(siteId, session.user.id);
 
         const templates = await db.customFeedTemplate.findMany({
             where: { siteId },
@@ -59,14 +54,8 @@ export async function POST(
     }
 
     try {
-        // Verify site ownership
-        const site = await db.site.findFirst({
-            where: { id: siteId, userId: session.user.id },
-        });
-
-        if (!site) {
-            return NextResponse.json({ error: "Site not found" }, { status: 404 });
-        }
+        // Verify site access
+        await requireSiteAccess(siteId, session.user.id);
 
         const body = await req.json();
 

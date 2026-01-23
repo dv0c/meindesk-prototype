@@ -1,6 +1,7 @@
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
+import { requireSiteAccess } from "@/lib/security/route-auth";
 
 export async function GET(
     req: NextRequest,
@@ -13,17 +14,8 @@ export async function GET(
         return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
-    // Verify site ownership
-    const site = await db.site.findFirst({
-        where: { id: siteId, userId: session.user.id },
-    });
-
-    if (!site) {
-        return NextResponse.json(
-            { error: "Site not found or not yours" },
-            { status: 404 }
-        );
-    }
+    // Verify site access
+    await requireSiteAccess(siteId, session.user.id);
 
     // Get all RssItems for this RSS feed
     const rssItems = await db.rssItem.findMany({

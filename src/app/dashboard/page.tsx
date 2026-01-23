@@ -9,14 +9,13 @@ const page = async () => {
 
     const sites = await getSites()
 
-    // If no sites at all, maybe redirect to setup? 
-    // Or just show empty dashboard. Vercel shows empty dashboard. 
-    // But existing logic was redirect setup. I'll keep redirect if 0 sites for now to avoid confusion, 
-    // or arguably showing the dashboard with "Create Project" is better. 
-    // Let's show the dashboard even if empty, it's better UX.
+    // If no sites at all, we now show the dashboard instead of forcing setup
+    // to allow members (who might have been invited but have no owned sites) to navigate.
+    /*
     if (!sites || sites.length === 0) {
         return redirect('/setup')
     }
+    */
 
     return <DashboardProjectsView sites={sites} userId={session.user.id} />
 }

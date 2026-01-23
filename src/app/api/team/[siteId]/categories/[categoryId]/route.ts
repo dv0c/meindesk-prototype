@@ -1,6 +1,7 @@
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
+import { requireSiteAccess } from "@/lib/security/route-auth";
 
 // GET - Get a specific category
 export async function GET(
@@ -14,13 +15,13 @@ export async function GET(
         return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
+    // Verify site access
+    await requireSiteAccess(siteId, session.user.id);
+
     const category = await db.category.findFirst({
         where: {
             id: categoryId,
             siteId,
-            site: {
-                userId: session.user.id,
-            },
         },
     });
 
@@ -46,14 +47,13 @@ export async function PATCH(
         return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
-    // Verify category ownership
+    // Verify site access
+    await requireSiteAccess(siteId, session.user.id);
+
     const category = await db.category.findFirst({
         where: {
             id: categoryId,
             siteId,
-            site: {
-                userId: session.user.id,
-            },
         },
     });
 
@@ -120,14 +120,13 @@ export async function DELETE(
         return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
-    // Verify category ownership
+    // Verify site access
+    await requireSiteAccess(siteId, session.user.id);
+
     const category = await db.category.findFirst({
         where: {
             id: categoryId,
             siteId,
-            site: {
-                userId: session.user.id,
-            },
         },
     });
 

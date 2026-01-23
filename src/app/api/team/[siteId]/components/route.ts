@@ -1,7 +1,7 @@
 
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { requireAuth, requireSiteOwnership, createErrorResponse } from "@/lib/security/route-auth"
+import { requireAuth, requireSiteAccess, createErrorResponse } from "@/lib/security/route-auth"
 
 // GET: List all saved components for a site
 export async function GET(
@@ -16,8 +16,8 @@ export async function GET(
             return new NextResponse("Missing siteId", { status: 400 });
         }
 
-        // Verify site ownership
-        await requireSiteOwnership(siteId, session.user.id);
+        // Verify site access
+        await requireSiteAccess(siteId, session.user.id);
 
         const components = await db.snippet.findMany({
             where: {
@@ -50,8 +50,8 @@ export async function POST(
             return new NextResponse("Missing content or name", { status: 400 });
         }
 
-        // Verify site ownership
-        await requireSiteOwnership(siteId, session.user.id);
+        // Verify site access
+        await requireSiteAccess(siteId, session.user.id);
 
         const component = await db.snippet.create({
             data: {

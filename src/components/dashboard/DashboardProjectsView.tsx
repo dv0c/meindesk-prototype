@@ -115,7 +115,7 @@ export function DashboardProjectsView({ sites, userId }: { sites: Site[], userId
                             key={site.id}
                             className={cn(
                                 "group hover:border-foreground/50 transition-colors duration-200 cursor-pointer",
-                                site.userId !== userId && "border-orange-500/50 hover:border-orange-500"
+                                site.userId !== userId && "border-orange-800/40 hover:border-orange-700/60"
                             )}
                             onClick={() => router.push(`/dashboard/${site.id}`)}
                         >

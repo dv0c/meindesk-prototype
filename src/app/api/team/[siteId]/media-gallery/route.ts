@@ -2,6 +2,7 @@ import { getAuthSession } from "@/lib/auth";
 import cloudinary from "@/lib/cloudinary";
 import type { Media, MediaGalleryResponse } from "@/types/media-gallery";
 import { type NextRequest, NextResponse } from "next/server";
+import { requireSiteAccess } from "@/lib/security/route-auth";
 
 export async function GET(
   req: NextRequest,
@@ -25,6 +26,9 @@ export async function GET(
       );
     }
 
+    // Verify site access
+    await requireSiteAccess(siteId, session.user.id);
+
     const options: any = {
       type: "upload",
       prefix: `${siteId}/uploads/`,
@@ -32,6 +36,7 @@ export async function GET(
       max_results: 24,
       context: true,
     };
+
     if (nextCursor) options.next_cursor = nextCursor;
 
     let expression = `resource_type:image AND folder:${siteId}/*`;
