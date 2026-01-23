@@ -17,6 +17,7 @@ export function SignupForm({ ...props }: React.ComponentPropsWithoutRef<"div">) 
 
   // Form State
   const [name, setName] = useState("")
+  const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -28,7 +29,7 @@ export function SignupForm({ ...props }: React.ComponentPropsWithoutRef<"div">) 
   const totalSteps = 3
 
   const canProceed = () => {
-    if (step === 1) return !!name.trim()
+    if (step === 1) return !!name.trim() && !!username.trim() && username.length >= 3
     if (step === 2) return !!email.trim() && email.includes("@")
     if (step === 3) return !!password && password.length >= 8 && password === confirmPassword
     return true
@@ -40,6 +41,8 @@ export function SignupForm({ ...props }: React.ComponentPropsWithoutRef<"div">) 
       const formData = new FormData()
       formData.append("email", email)
       formData.append("password", password)
+      formData.append("name", name)
+      formData.append("username", username)
 
       await signup(formData)
       toast.success("ACCOUNT INITIALIZED. Check your email.")
@@ -117,6 +120,22 @@ export function SignupForm({ ...props }: React.ComponentPropsWithoutRef<"div">) 
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="ENTER YOUR NAME"
+                        className="w-full h-14 bg-transparent border-0 border-b border-foreground/20 rounded-none px-0 text-xl md:text-2xl font-mono placeholder:text-foreground/20 focus:outline-none focus:border-foreground transition-all"
+                      />
+                      <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-foreground transition-all duration-300 group-focus-within:w-full" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <label className="font-mono text-xs uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      Username
+                    </label>
+                    <div className="relative group">
+                      <input
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        placeholder="CHOOSE USERNAME"
                         className="w-full h-14 bg-transparent border-0 border-b border-foreground/20 rounded-none px-0 text-xl md:text-2xl font-mono placeholder:text-foreground/20 focus:outline-none focus:border-foreground transition-all"
                       />
                       <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-foreground transition-all duration-300 group-focus-within:w-full" />

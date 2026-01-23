@@ -153,8 +153,6 @@ export const authOptions: NextAuthOptions = {
       // @ts-ignore
       token.developerMode = dbUser.developerMode
 
-      /* 
-      // Removed auto-generation to enforce /setup-user flow
       // ensure username exists
       if (!dbUser.username) {
         const newUsername = nanoid(10)
@@ -163,8 +161,7 @@ export const authOptions: NextAuthOptions = {
           data: { username: newUsername },
         })
         token.username = newUsername
-      } 
-      */
+      }
 
       return token
     },

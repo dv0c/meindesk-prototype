@@ -9,17 +9,33 @@ export async function signup(formData: FormData) {
   const email = (formData.get("email") as string)?.trim();
   const password = formData.get("password") as string;
   const name = (formData.get("name") as string)?.trim() || "Anonymous";
+  const username = (formData.get("username") as string)?.trim();
 
   if (!email || !password) {
     throw new Error("Email and password are required");
   }
 
-  // Check if user already exists
-  const existingUser = await db.user.findUnique({
-    where: { email },
+  if (!username) {
+    throw new Error("Username is required");
+  }
+
+  if (username.length < 3) {
+    throw new Error("Username must be at least 3 characters");
+  }
+
+  // Check if user already exists (email or username)
+  const existingUser = await db.user.findFirst({
+    where: {
+      OR: [
+        { email },
+        { username: { equals: username, mode: "insensitive" } }
+      ]
+    },
   });
+
   if (existingUser) {
-    throw new Error("Email already registered");
+    if (existingUser.email === email) throw new Error("Email already registered");
+    throw new Error("Username already taken");
   }
 
   // Hash the password
@@ -30,6 +46,7 @@ export async function signup(formData: FormData) {
     data: {
       email,
       name,
+      username,
       hashedPassword: hashedPassword,
     },
   });

@@ -7,7 +7,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/Providers/ThemeProvider";
-import { AuthGuard } from "@/components/auth/AuthGuard";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -105,9 +104,7 @@ export default function RootLayout({
             <LoadingBar>
               <VersionProvider>
                 <ScrollToTop />
-                <AuthGuard>
-                  {children}
-                </AuthGuard>
+                {children}
               </VersionProvider>
             </LoadingBar>
           </SessionProvider>
