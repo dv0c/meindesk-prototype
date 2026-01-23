@@ -1,6 +1,7 @@
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import generateSlug from "@/lib/generateSlug";
+import { requireSiteAccess } from "@/lib/security/route-auth";
 import { NextRequest, NextResponse } from "next/server";
 
 type PageWithChildren = {
@@ -93,6 +94,10 @@ export async function PUT(
         { status: 403 }
       );
 
+    // Verify site access (Owner or Member)
+    await requireSiteAccess(siteId, session.user.id);
+
+    /* 
     const site = await db.site.findUnique({
       where: { id: siteId },
       include: { user: true },
@@ -101,6 +106,7 @@ export async function PUT(
     if (!site?.user || site.user.id !== session.user.id) {
       return NextResponse.json({ error: "Forbidden, s3302" }, { status: 403 });
     }
+    */
 
     // ------------------------
     // Determine final slug
@@ -196,6 +202,10 @@ export async function DELETE(
       return NextResponse.json({ error: "Page is locked" }, { status: 403 });
     }
 
+    // Verify site access (Owner or Member)
+    await requireSiteAccess(siteId, session.user.id);
+
+    /*
     const site = await db.site.findUnique({
       where: { id: siteId },
       include: { user: true },
@@ -204,6 +214,7 @@ export async function DELETE(
     if (!site?.user || site.user.id !== session.user.id) {
       return NextResponse.json({ error: "Forbidden, s3302" }, { status: 403 });
     }
+    */
 
 
     await db.page.delete({ where: { id } });
