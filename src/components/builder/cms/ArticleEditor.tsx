@@ -124,7 +124,24 @@ export default function ArticleEditor({ articleId, siteId, onClose }: ArticleEdi
                 metadata: {
                     ...((article?.metadata as any) || {}),
                     seo,
-                    readingTime: Math.ceil((html?.replace(/<[^>]*>/g, '').split(/\s+/).length || 0) / 200)
+                    readingTime: Math.ceil((html?.replace(/<[^>]*>/g, '').split(/\s+/).length || 0) / 200),
+                    seoScore: (() => {
+                        let score = 0;
+                        if (title.length > 5 && title.length <= 60) score += 30; // Optimal title length
+                        else if (title.length > 0) score += 10;
+
+                        const desc = seo.metaDescription || excerpt;
+                        if (desc.length > 10 && desc.length <= 160) score += 30; // Optimal description length
+                        else if (desc.length > 0) score += 10;
+
+                        if (thumbnail) score += 20; // Has cover image
+
+                        const wordCount = (html?.replace(/<[^>]*>/g, '').split(/\s+/).length || 0);
+                        if (wordCount > 300) score += 20; // Good content length
+                        else if (wordCount > 100) score += 10;
+
+                        return score;
+                    })()
                 }
             })
             // toast.success("Saved!")

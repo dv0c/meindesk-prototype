@@ -29,6 +29,7 @@ export async function GET(
         cover: true,
         createdAt: true,
         categories: true,
+        metadata: true,
         author: {
           select: {
             id: true,

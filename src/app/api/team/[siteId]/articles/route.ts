@@ -36,6 +36,7 @@ export async function GET(
         siteId: true,
         authorId: true,
         categories: true,
+        metadata: true,
         author: {
           select: {
             id: true,

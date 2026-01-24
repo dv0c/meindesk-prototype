@@ -172,6 +172,7 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
                             <TableRow className="hover:bg-transparent border-b">
                                 <TableHead className="h-10 text-xs font-medium w-[400px]">Article</TableHead>
                                 <TableHead className="h-10 text-xs font-medium">Status</TableHead>
+                                <TableHead className="h-10 text-xs font-medium">SEO</TableHead>
                                 <TableHead className="h-10 text-xs font-medium">Time</TableHead>
                                 <TableHead className="h-10 text-xs font-medium">Created</TableHead>
                                 <TableHead className="h-10 text-xs font-medium text-right w-[60px]">Actions</TableHead>
@@ -221,6 +222,18 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
                                             <Badge variant={(statusColors[article.status as keyof typeof statusColors] || "default") as any} className="h-5 px-2 text-[10px] font-medium rounded-full">
                                                 {article.status}
                                             </Badge>
+                                        </TableCell>
+                                        <TableCell className="py-3">
+                                            {article.metadata?.seoScore !== undefined ? (
+                                                <div className="flex items-center gap-2">
+                                                    <div className={`h-2 w-2 rounded-full ${article.metadata.seoScore >= 80 ? "bg-green-500" :
+                                                            article.metadata.seoScore >= 50 ? "bg-yellow-500" : "bg-red-500"
+                                                        }`} />
+                                                    <span className="text-xs font-medium">{article.metadata.seoScore}</span>
+                                                </div>
+                                            ) : (
+                                                <span className="text-xs text-muted-foreground">-</span>
+                                            )}
                                         </TableCell>
                                         <TableCell className="text-xs text-muted-foreground py-3">
                                             {article.metadata?.readingTime ? `${article.metadata.readingTime} min` : "-"}
