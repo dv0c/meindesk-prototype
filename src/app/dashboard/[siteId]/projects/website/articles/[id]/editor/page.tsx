@@ -38,6 +38,7 @@ export default function EditorPage({ params }: EditorPageProps) {
     metaDescription: "",
     ogImage: ""
   })
+  const [aiGenerated, setAiGenerated] = useState(false)
   const [loaded, setLoaded] = useState(false)
   const [showSidebar, setShowSidebar] = useState(false)
   const isDesktop = useMediaQuery("(min-width: 768px)")
@@ -77,6 +78,7 @@ export default function EditorPage({ params }: EditorPageProps) {
         ogImage: articleMeta.seo.ogImage || ""
       })
     }
+    setAiGenerated(!!articleMeta?.aiGenerated)
   }, [article, loaded])
 
   // Auto-resize title on load and when title changes
@@ -100,7 +102,8 @@ export default function EditorPage({ params }: EditorPageProps) {
         categories,
         metadata: {
           ...((article?.metadata as any) || {}),
-          seo
+          seo,
+          aiGenerated
         }
       })
       // toast.success("Saved!")
@@ -127,7 +130,8 @@ export default function EditorPage({ params }: EditorPageProps) {
     const excerptChanged = excerpt !== (article.excerpt || "")
     const thumbnailChanged = thumbnail !== (article.cover || "")
     const categoriesChanged = JSON.stringify(categories) !== JSON.stringify(article.categories || [])
-    return titleChanged || contentChanged || slugChanged || excerptChanged || thumbnailChanged || categoriesChanged
+    const aiGeneratedChanged = aiGenerated !== (article.metadata?.aiGenerated || false)
+    return titleChanged || contentChanged || slugChanged || excerptChanged || thumbnailChanged || categoriesChanged || aiGeneratedChanged
   }, [title, editorState, slug, excerpt, article, thumbnail, categories])
 
   if (!loaded) {
@@ -284,6 +288,8 @@ export default function EditorPage({ params }: EditorPageProps) {
                 title={title}
                 seo={seo}
                 setSeo={setSeo}
+                aiGenerated={aiGenerated}
+                setAiGenerated={setAiGenerated}
               />
             </div>
           </aside>
@@ -316,6 +322,8 @@ export default function EditorPage({ params }: EditorPageProps) {
                     title={title}
                     seo={seo}
                     setSeo={setSeo}
+                    aiGenerated={aiGenerated}
+                    setAiGenerated={setAiGenerated}
                   />
                 </div>
               </DrawerContent>

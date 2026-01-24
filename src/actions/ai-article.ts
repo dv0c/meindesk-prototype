@@ -80,12 +80,14 @@ export async function createArticleDraft(siteId: string, authorId: string, artic
                 title,
                 slug: `${slug}-${Date.now()}`, // Ensure unique slug
                 content: finalContent, // This is already Lexical state
+                excerpt: metaDescription || "", // Automatically use meta description as excerpt
                 status: "DRAFT",
                 metadata: {
                     seo: {
                         metaTitle,
                         metaDescription
-                    }
+                    },
+                    aiGenerated: true
                 }
             }
         });

@@ -110,7 +110,9 @@ const EditorRightSection = ({
     setCategories,
     title = "",
     seo = defaultSEO,
-    setSeo
+    setSeo,
+    aiGenerated,
+    setAiGenerated
 }: {
     article: Article
     slug: string
@@ -124,6 +126,8 @@ const EditorRightSection = ({
     title?: string;
     seo?: SEOSettings;
     setSeo?: (val: SEOSettings) => void;
+    aiGenerated?: boolean;
+    setAiGenerated?: (val: boolean) => void;
 }) => {
     const { siteId } = useSite()
     const [isOpen, setOpen] = useState<boolean>()
@@ -454,6 +458,29 @@ const EditorRightSection = ({
                         A short description that appears in article previews
                     </p>
                 </div>
+
+                <Separator />
+
+                {/* AI Generated Toggle */}
+                {setAiGenerated && (
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="ai-generated"
+                                    checked={aiGenerated || false}
+                                    onCheckedChange={(checked) => setAiGenerated(!!checked)}
+                                />
+                                <Label htmlFor="ai-generated" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                    AI Generated Content
+                                </Label>
+                            </div>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                            Mark this article as created with AI assistance
+                        </p>
+                    </div>
+                )}
 
                 {/* SEO Settings Section */}
                 {setSeo && (
