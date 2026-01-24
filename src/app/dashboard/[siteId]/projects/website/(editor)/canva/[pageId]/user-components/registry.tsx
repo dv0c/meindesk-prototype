@@ -24,6 +24,7 @@ import {
     Tag,
     Type,
     User,
+    Clock,
 } from 'lucide-react'
 import React from 'react'
 
@@ -35,6 +36,7 @@ import {
     ArticleContent,
     ArticleCover,
     ArticleDate,
+    ArticleReadingTime,
     ArticleTitle,
 } from './article'
 import { Articles } from './Articles'
@@ -307,6 +309,13 @@ export const componentRegistry: ComponentRegistration[] = [
         icon: <Calendar className="h-5 w-5" />,
     },
     {
+        name: 'ArticleReadingTime',
+        component: ArticleReadingTime,
+        category: 'Article Blocks',
+        description: 'Displays article reading time',
+        icon: <Clock className="h-5 w-5" />,
+    },
+    {
         name: 'ArticleCategories',
         component: ArticleCategories,
         category: 'Article Blocks',
@@ -480,7 +489,7 @@ export const componentDefinitions = componentRegistry.map((item) => ({
  * Re-export all components for convenience
  */
 export {
-    ArticleAuthor, ArticleCategories, ArticleContent, ArticleCover, ArticleDate,
+    ArticleAuthor, ArticleCategories, ArticleContent, ArticleCover, ArticleDate, ArticleReadingTime,
     // Article Components
     Articles, ArticleTitle, Button, Card, Container, Divider,
     DividerSettings, FeaturesGrid, FooterInfo, Grid, Heading, Hero,

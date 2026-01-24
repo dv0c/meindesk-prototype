@@ -123,7 +123,8 @@ export default function ArticleEditor({ articleId, siteId, onClose }: ArticleEdi
                 categories,
                 metadata: {
                     ...((article?.metadata as any) || {}),
-                    seo
+                    seo,
+                    readingTime: Math.ceil((html?.replace(/<[^>]*>/g, '').split(/\s+/).length || 0) / 200)
                 }
             })
             // toast.success("Saved!")

@@ -164,7 +164,6 @@ export default function MediaLibraryDialog({
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [mediaToDelete, setMediaToDelete] = useState<MediaItem | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [isDragging, setIsDragging] = useState(false)
 
   const fetchMedia = useCallback(async () => {
     setIsLoading(true)
@@ -255,32 +254,6 @@ export default function MediaLibraryDialog({
     onClose()
   }
 
-  // Drag and drop handlers
-  const handleDragEnter = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragging(true)
-  }
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragging(false)
-  }
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-  }
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragging(false)
-    // Note: Actual file handling would need to be integrated with Cloudinary upload
-    toast.info("Please use the upload button for now")
-  }
-
   return (
     <>
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -293,11 +266,33 @@ export default function MediaLibraryDialog({
             onValueChange={setActiveTab}
             className="flex-grow flex flex-col overflow-hidden p-6 pt-2"
           >
-            <TabsList className="mb-4 shrink-0">
-              <TabsTrigger value="library">Media Library</TabsTrigger>
-              <TabsTrigger value="upload">Upload New</TabsTrigger>
-            </TabsList>
-            <TabsContent value="library" className="flex-grow overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between mb-4 shrink-0">
+              <TabsList>
+                <TabsTrigger value="library">Media Library</TabsTrigger>
+              </TabsList>
+              <CldUploadButton
+                options={{
+                  folder: `${siteId}/uploads/`,
+                  clientAllowedFormats: ["png", "gif", "jpeg", "webp"],
+                  maxFileSize: 5 * 1024 * 1024,
+                  tags: siteId
+                    ? ["gallery_image", siteId, "user_upload"]
+                    : ["gallery_image", "user_upload"],
+                  context: {
+                    site_id: siteId || "",
+                    upload_source: "media_gallery",
+                  },
+                }}
+                uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "prototype"}
+                onSuccess={handleUploadSuccess}
+                className="inline-flex items-center justify-center rounded-md text-xs font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-3"
+              >
+                <UploadCloud className="mr-2 h-4 w-4" />
+                Upload New
+              </CldUploadButton>
+            </div>
+
+            <TabsContent value="library" className="flex-grow overflow-hidden flex flex-col mt-0">
               <div className="relative mb-4 shrink-0">
                 <Input
                   placeholder="Search by name, description, or URL..."
@@ -334,43 +329,6 @@ export default function MediaLibraryDialog({
                   </div>
                 )}
               </ScrollArea>
-            </TabsContent>
-            <TabsContent
-              value="upload"
-              className="flex-grow overflow-hidden flex flex-col items-center justify-center"
-              onDragEnter={handleDragEnter}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-            >
-              <CldUploadButton
-                options={{
-                  folder: `${siteId}/uploads/`,
-                  clientAllowedFormats: ["png", "gif", "jpeg", "webp"],
-                  maxFileSize: 5 * 1024 * 1024,
-                  tags: siteId
-                    ? ["gallery_image", siteId, "user_upload"]
-                    : ["gallery_image", "user_upload"],
-                  context: {
-                    site_id: siteId || "",
-                    upload_source: "media_gallery",
-                  },
-                }}
-                uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "prototype"}
-                onSuccess={handleUploadSuccess}
-                className={`w-full h-full border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 ${isDragging
-                  ? "border-primary bg-primary/5 scale-[0.98]"
-                  : "border-muted-foreground/30 hover:border-primary/60 hover:bg-accent/50"
-                  }`}
-              >
-                <div className="flex flex-col items-center justify-center">
-                  <UploadCloud className={`h-16 w-16 mb-4 transition-all duration-200 ${isDragging ? "text-primary scale-110" : "text-muted-foreground"}`} />
-                  <p className="font-semibold text-lg mb-2">
-                    {isDragging ? "Drop files here" : "Click to upload or drag and drop"}
-                  </p>
-                  <p className="text-xs text-muted-foreground">Max 5MB per image. Supports JPG, PNG, GIF, WEBP.</p>
-                </div>
-              </CldUploadButton>
             </TabsContent>
           </Tabs>
           <DialogFooter className="p-6 pt-4 border-t shrink-0">

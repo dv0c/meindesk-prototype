@@ -172,6 +172,7 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
                             <TableRow className="hover:bg-transparent border-b">
                                 <TableHead className="h-10 text-xs font-medium w-[400px]">Article</TableHead>
                                 <TableHead className="h-10 text-xs font-medium">Status</TableHead>
+                                <TableHead className="h-10 text-xs font-medium">Time</TableHead>
                                 <TableHead className="h-10 text-xs font-medium">Created</TableHead>
                                 <TableHead className="h-10 text-xs font-medium text-right w-[60px]">Actions</TableHead>
                             </TableRow>
@@ -220,6 +221,9 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
                                             <Badge variant={(statusColors[article.status as keyof typeof statusColors] || "default") as any} className="h-5 px-2 text-[10px] font-medium rounded-full">
                                                 {article.status}
                                             </Badge>
+                                        </TableCell>
+                                        <TableCell className="text-xs text-muted-foreground py-3">
+                                            {article.metadata?.readingTime ? `${article.metadata.readingTime} min` : "-"}
                                         </TableCell>
                                         <TableCell className="text-xs text-muted-foreground py-3">
                                             {new Date(article.createdAt).toLocaleDateString()}

@@ -19,6 +19,11 @@ interface Article {
         image?: string | null
     }
     categories?: any[] // We might have full objects or IDs, but for display we assume we might fetch them or just show nothing if complex
+    metadata?: {
+        readingTime?: number
+        seo?: any
+        [key: string]: any
+    }
 }
 
 interface ArticleCardProps {
@@ -56,6 +61,12 @@ export function ArticleCard({ article, className }: ArticleCardProps) {
             <div className="flex flex-col flex-1 p-5">
                 <div className="flex items-center justify-between mb-3 text-xs text-muted-foreground">
                     <span>{format(date, "MMM d, yyyy")}</span>
+                    {article.metadata?.readingTime && (
+                        <>
+                            <span>•</span>
+                            <span>{article.metadata.readingTime} min read</span>
+                        </>
+                    )}
                     {article.author && <span>{article.author.name}</span>}
                 </div>
 

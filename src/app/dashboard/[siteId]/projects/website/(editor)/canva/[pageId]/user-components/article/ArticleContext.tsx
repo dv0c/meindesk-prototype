@@ -29,6 +29,11 @@ export interface ArticleData {
     author: Author | null
     createdAt: string
     updatedAt: string
+    metadata?: {
+        readingTime?: number
+        seo?: any
+        [key: string]: any
+    }
     site: {
         id: string
         title: string

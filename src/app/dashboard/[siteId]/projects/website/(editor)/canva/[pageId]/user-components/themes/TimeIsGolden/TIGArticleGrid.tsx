@@ -277,9 +277,15 @@ export const TIGArticleGrid = defineBlock<TIGArticleGridProps>({
                             </div>
                         )}
                         <div className="flex flex-col gap-2">
-                            <span className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">
-                                {item.data.category || "Story"}
-                            </span>
+                            <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-muted-foreground">
+                                <span className="font-bold">{item.data.category || "Story"}</span>
+                                {item.data.metadata?.readingTime && (
+                                    <>
+                                        <span>•</span>
+                                        <span>{item.data.metadata.readingTime} min read</span>
+                                    </>
+                                )}
+                            </div>
 
                             <h3 className={cn(
                                 "font-serif font-bold text-foreground leading-tight group-hover:underline decoration-1 underline-offset-4",

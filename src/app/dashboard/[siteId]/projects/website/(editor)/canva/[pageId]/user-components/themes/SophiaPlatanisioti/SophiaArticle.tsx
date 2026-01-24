@@ -30,6 +30,10 @@ interface ArticleData {
     author: Author | null
     createdAt: string
     updatedAt: string
+    metadata?: {
+        readingTime?: number
+        [key: string]: any
+    }
     site: {
         id: string
         title: string
@@ -285,6 +289,12 @@ const SophiaArticleBase = forwardRef<HTMLDivElement, SophiaArticleProps>(
                                         day: 'numeric'
                                     })}
                                 </time>
+                            )}
+                            {article.metadata?.readingTime && (
+                                <>
+                                    <span>•</span>
+                                    <span>{article.metadata.readingTime} min read</span>
+                                </>
                             )}
                         </div>
                     )}

@@ -13,4 +13,5 @@ export { ArticleContent } from "./ArticleContent"
 export { ArticleAuthor } from "./ArticleAuthor"
 
 export { ArticleDate } from "./ArticleDate"
+export { ArticleReadingTime } from "./ArticleReadingTime"
 export { ArticleCategories } from "./ArticleCategories"

@@ -25,6 +25,10 @@ interface Article {
     categories: string[]
     cover: string | null
     createdAt: Date
+    metadata?: {
+        readingTime?: number
+        [key: string]: any
+    }
 }
 
 export interface ArticlesProps {
@@ -304,6 +308,12 @@ export const Articles = defineBlock<ArticlesProps>({
                                                 <span>{article.author?.name || "Anonymous"}</span>
                                                 <span>•</span>
                                                 <span>{new Date(article.createdAt).toLocaleDateString()}</span>
+                                                {article.metadata?.readingTime && (
+                                                    <>
+                                                        <span>•</span>
+                                                        <span>{article.metadata.readingTime} min read</span>
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
                                     </ArticleWrapper>
@@ -340,6 +350,12 @@ export const Articles = defineBlock<ArticlesProps>({
                                         <span>{article.author?.name || "Anonymous"}</span>
                                         <span>•</span>
                                         <span>{new Date(article.createdAt).toLocaleDateString()}</span>
+                                        {article.metadata?.readingTime && (
+                                            <>
+                                                <span>•</span>
+                                                <span>{article.metadata.readingTime} min read</span>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             </ArticleWrapper>
@@ -374,6 +390,12 @@ export const Articles = defineBlock<ArticlesProps>({
                                         <span>{article.author?.name || "Anonymous"}</span>
                                         <span>•</span>
                                         <span>{new Date(article.createdAt).toLocaleDateString()}</span>
+                                        {article.metadata?.readingTime && (
+                                            <>
+                                                <span>•</span>
+                                                <span>{article.metadata.readingTime} min read</span>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             </ArticleWrapper>
@@ -419,8 +441,14 @@ export const Articles = defineBlock<ArticlesProps>({
                                                 day: 'numeric'
                                             })}
                                         </span>
+                                        {article.metadata?.readingTime && (
+                                            <span className="text-muted-foreground">
+                                                • {article.metadata.readingTime} min read
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
+
 
                                 {/* Thumbnail */}
                                 {thumbnail && article.cover && (
