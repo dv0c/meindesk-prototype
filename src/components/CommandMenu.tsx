@@ -69,7 +69,7 @@ export function CommandMenu({ open, setOpen }: { open: boolean, setOpen: React.D
                     <p className="text-muted-foreground/80">Try searching for something else.</p>
                 </CommandEmpty>
 
-                <CommandGroup heading="Suggestions" className="text-muted-foreground/70 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider">
+                <CommandGroup heading="Suggestions" className="text-muted-foreground/70 **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:py-2 **:[[cmdk-group-heading]]:text-xs **:[[cmdk-group-heading]]:font-semibold **:[[cmdk-group-heading]]:uppercase **:[[cmdk-group-heading]]:tracking-wider">
                     <CommandItem
                         onSelect={() => runCommand(() => router.push("/dashboard"))}
                         className="flex items-center justify-between px-3 py-3 mb-1 rounded-lg aria-selected:bg-accent aria-selected:text-accent-foreground cursor-pointer group transition-colors"
@@ -105,7 +105,7 @@ export function CommandMenu({ open, setOpen }: { open: boolean, setOpen: React.D
 
                 <CommandSeparator className="bg-border/50 my-1 mx-2" />
 
-                <CommandGroup heading="Projects" className="text-muted-foreground/70 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider">
+                <CommandGroup heading="Projects" className="text-muted-foreground/70 **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:py-2 **:[[cmdk-group-heading]]:text-xs **:[[cmdk-group-heading]]:font-semibold **:[[cmdk-group-heading]]:uppercase **:[[cmdk-group-heading]]:tracking-wider">
                     {teams.map((team) => (
                         <CommandItem
                             key={team.id}
@@ -143,7 +143,7 @@ export function CommandMenu({ open, setOpen }: { open: boolean, setOpen: React.D
 
                 <CommandSeparator className="bg-border/50 my-1 mx-2" />
 
-                <CommandGroup heading="General" className="text-muted-foreground/70 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider">
+                <CommandGroup heading="General" className="text-muted-foreground/70 **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:py-2 **:[[cmdk-group-heading]]:text-xs **:[[cmdk-group-heading]]:font-semibold **:[[cmdk-group-heading]]:uppercase **:[[cmdk-group-heading]]:tracking-wider">
                     <CommandItem
                         onSelect={() => runCommand(() => router.push("/marketplace"))}
                         className="flex items-center justify-between px-3 py-3 mb-1 rounded-lg aria-selected:bg-accent aria-selected:text-accent-foreground cursor-pointer group transition-colors"

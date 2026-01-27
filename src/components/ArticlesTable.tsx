@@ -349,7 +349,7 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
             <Sheet open={!!selectedArticleId} onOpenChange={(open) => !open && setSelectedArticleId(null)}>
                 <SheetContent
                     side="right"
-                    className="w-full sm:max-w-[calc(100vw-40px)] md:max-w-7xl p-0 gap-0 overflow-hidden flex flex-col bg-background z-[150] border-l shadow-2xl"
+                    className="w-full sm:max-w-[calc(100vw-40px)] md:max-w-7xl p-0 gap-0 overflow-hidden flex flex-col bg-background z-150 border-l shadow-2xl"
                     style={{ transition: "transform 0.3s cubic-bezier(0.32, 0.72, 0, 1)" }}
                 >
                     <SheetTitle className="sr-only">Article Editor</SheetTitle>

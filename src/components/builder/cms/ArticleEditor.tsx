@@ -208,7 +208,7 @@ export default function ArticleEditor({ articleId, siteId, onClose, onUpdate }: 
             <div className="h-full flex flex-col bg-background">
                 {/* Header */}
                 {/* Header */}
-                <header className="sticky top-0 z-50 h-14 shrink-0 flex items-center justify-between px-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                <header className="sticky top-0 z-50 h-14 shrink-0 flex items-center justify-between px-4 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
                     <div className="flex items-center gap-4 min-w-0">
                         {onClose && (
                             <Button
