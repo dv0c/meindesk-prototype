@@ -27,7 +27,10 @@ export async function GET(
         },
         include: {
           author: {
-            select: { id: true, name: true, email: true, image: true },
+            select: { id: true, name: true, email: true, image: true, username: true, role: true },
+          },
+          authors: {
+            select: { id: true, name: true, email: true, image: true, username: true, role: true },
           },
           site: {
             select: { id: true, title: true },
@@ -45,7 +48,10 @@ export async function GET(
         },
         include: {
           author: {
-            select: { id: true, name: true, email: true, image: true },
+            select: { id: true, name: true, email: true, image: true, username: true, role: true },
+          },
+          authors: {
+            select: { id: true, name: true, email: true, image: true, username: true, role: true },
           },
           site: {
             select: { id: true, title: true },

@@ -8,9 +8,6 @@ export const runtime = "nodejs";
 // -------------------------------------------------------
 // GET – Fetch a single article by ID
 // -------------------------------------------------------
-// -------------------------------------------------------
-// GET – Fetch a single article by ID
-// -------------------------------------------------------
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ articleId: string; siteId: string }> } // Added siteId to params type if available, or fetch from DB? Next.js params usually has upstream params if not consumed? Actually siteId is in the path.
@@ -38,6 +35,8 @@ export async function GET(
             name: true,
             email: true,
             image: true,
+            username: true,
+            role: true,
           },
         },
         authors: {
@@ -46,6 +45,8 @@ export async function GET(
             name: true,
             email: true,
             image: true,
+            username: true,
+            role: true,
           },
         },
         site: {
