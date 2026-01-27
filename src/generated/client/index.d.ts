@@ -3001,6 +3001,7 @@ export namespace Prisma {
     Notification: number
     sentNotifications: number
     memberOfSites: number
+    contributedArticles: number
     sentInvitations: number
   }
 
@@ -3015,6 +3016,7 @@ export namespace Prisma {
     Notification?: boolean | UserCountOutputTypeCountNotificationArgs
     sentNotifications?: boolean | UserCountOutputTypeCountSentNotificationsArgs
     memberOfSites?: boolean | UserCountOutputTypeCountMemberOfSitesArgs
+    contributedArticles?: boolean | UserCountOutputTypeCountContributedArticlesArgs
     sentInvitations?: boolean | UserCountOutputTypeCountSentInvitationsArgs
   }
 
@@ -3097,6 +3099,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountMemberOfSitesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: SiteWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountContributedArticlesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ArticleWhereInput
   }
 
   /**
@@ -3349,6 +3358,37 @@ export namespace Prisma {
 
 
   /**
+   * Count Type ArticleCountOutputType
+   */
+
+  export type ArticleCountOutputType = {
+    authors: number
+  }
+
+  export type ArticleCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    authors?: boolean | ArticleCountOutputTypeCountAuthorsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * ArticleCountOutputType without action
+   */
+  export type ArticleCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ArticleCountOutputType
+     */
+    select?: ArticleCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * ArticleCountOutputType without action
+   */
+  export type ArticleCountOutputTypeCountAuthorsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: UserWhereInput
+  }
+
+
+  /**
    * Count Type RssCountOutputType
    */
 
@@ -3504,6 +3544,7 @@ export namespace Prisma {
     updatedAt: number
     role: number
     memberOfSiteIds: number
+    contributedArticleIds: number
     developerMode: number
     _all: number
   }
@@ -3549,6 +3590,7 @@ export namespace Prisma {
     updatedAt?: true
     role?: true
     memberOfSiteIds?: true
+    contributedArticleIds?: true
     developerMode?: true
     _all?: true
   }
@@ -3637,6 +3679,7 @@ export namespace Prisma {
     updatedAt: Date
     role: $Enums.Role
     memberOfSiteIds: string[]
+    contributedArticleIds: string[]
     developerMode: boolean
     _count: UserCountAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
@@ -3669,6 +3712,7 @@ export namespace Prisma {
     updatedAt?: boolean
     role?: boolean
     memberOfSiteIds?: boolean
+    contributedArticleIds?: boolean
     developerMode?: boolean
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     accounts?: boolean | User$accountsArgs<ExtArgs>
@@ -3680,6 +3724,7 @@ export namespace Prisma {
     Notification?: boolean | User$NotificationArgs<ExtArgs>
     sentNotifications?: boolean | User$sentNotificationsArgs<ExtArgs>
     memberOfSites?: boolean | User$memberOfSitesArgs<ExtArgs>
+    contributedArticles?: boolean | User$contributedArticlesArgs<ExtArgs>
     sentInvitations?: boolean | User$sentInvitationsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
@@ -3698,10 +3743,11 @@ export namespace Prisma {
     updatedAt?: boolean
     role?: boolean
     memberOfSiteIds?: boolean
+    contributedArticleIds?: boolean
     developerMode?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "username" | "image" | "email" | "emailVerified" | "hashedPassword" | "createdAt" | "updatedAt" | "role" | "memberOfSiteIds" | "developerMode", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "username" | "image" | "email" | "emailVerified" | "hashedPassword" | "createdAt" | "updatedAt" | "role" | "memberOfSiteIds" | "contributedArticleIds" | "developerMode", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     accounts?: boolean | User$accountsArgs<ExtArgs>
@@ -3713,6 +3759,7 @@ export namespace Prisma {
     Notification?: boolean | User$NotificationArgs<ExtArgs>
     sentNotifications?: boolean | User$sentNotificationsArgs<ExtArgs>
     memberOfSites?: boolean | User$memberOfSitesArgs<ExtArgs>
+    contributedArticles?: boolean | User$contributedArticlesArgs<ExtArgs>
     sentInvitations?: boolean | User$sentInvitationsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -3730,6 +3777,7 @@ export namespace Prisma {
       Notification: Prisma.$NotificationPayload<ExtArgs>[]
       sentNotifications: Prisma.$NotificationPayload<ExtArgs>[]
       memberOfSites: Prisma.$SitePayload<ExtArgs>[]
+      contributedArticles: Prisma.$ArticlePayload<ExtArgs>[]
       sentInvitations: Prisma.$InvitationPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -3744,6 +3792,7 @@ export namespace Prisma {
       updatedAt: Date
       role: $Enums.Role
       memberOfSiteIds: string[]
+      contributedArticleIds: string[]
       developerMode: boolean
     }, ExtArgs["result"]["user"]>
     composites: {}
@@ -4118,6 +4167,7 @@ export namespace Prisma {
     Notification<T extends User$NotificationArgs<ExtArgs> = {}>(args?: Subset<T, User$NotificationArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sentNotifications<T extends User$sentNotificationsArgs<ExtArgs> = {}>(args?: Subset<T, User$sentNotificationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     memberOfSites<T extends User$memberOfSitesArgs<ExtArgs> = {}>(args?: Subset<T, User$memberOfSitesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    contributedArticles<T extends User$contributedArticlesArgs<ExtArgs> = {}>(args?: Subset<T, User$contributedArticlesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ArticlePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sentInvitations<T extends User$sentInvitationsArgs<ExtArgs> = {}>(args?: Subset<T, User$sentInvitationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -4159,6 +4209,7 @@ export namespace Prisma {
     readonly updatedAt: FieldRef<"User", 'DateTime'>
     readonly role: FieldRef<"User", 'Role'>
     readonly memberOfSiteIds: FieldRef<"User", 'String[]'>
+    readonly contributedArticleIds: FieldRef<"User", 'String[]'>
     readonly developerMode: FieldRef<"User", 'Boolean'>
   }
     
@@ -4767,6 +4818,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: SiteScalarFieldEnum | SiteScalarFieldEnum[]
+  }
+
+  /**
+   * User.contributedArticles
+   */
+  export type User$contributedArticlesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Article
+     */
+    select?: ArticleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Article
+     */
+    omit?: ArticleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ArticleInclude<ExtArgs> | null
+    where?: ArticleWhereInput
+    orderBy?: ArticleOrderByWithRelationInput | ArticleOrderByWithRelationInput[]
+    cursor?: ArticleWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ArticleScalarFieldEnum | ArticleScalarFieldEnum[]
   }
 
   /**
@@ -15882,6 +15957,7 @@ export namespace Prisma {
     sourceType: number
     sourceId: number
     authorId: number
+    authorIds: number
     metadata: number
     _all: number
   }
@@ -15935,6 +16011,7 @@ export namespace Prisma {
     sourceType?: true
     sourceId?: true
     authorId?: true
+    authorIds?: true
     metadata?: true
     _all?: true
   }
@@ -16027,6 +16104,7 @@ export namespace Prisma {
     sourceType: $Enums.ArticleSourceType
     sourceId: string | null
     authorId: string
+    authorIds: string[]
     metadata: JsonValue | null
     _count: ArticleCountAggregateOutputType | null
     _min: ArticleMinAggregateOutputType | null
@@ -16063,9 +16141,12 @@ export namespace Prisma {
     sourceType?: boolean
     sourceId?: boolean
     authorId?: boolean
+    authorIds?: boolean
     metadata?: boolean
     site?: boolean | SiteDefaultArgs<ExtArgs>
     author?: boolean | UserDefaultArgs<ExtArgs>
+    authors?: boolean | Article$authorsArgs<ExtArgs>
+    _count?: boolean | ArticleCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["article"]>
 
 
@@ -16086,13 +16167,16 @@ export namespace Prisma {
     sourceType?: boolean
     sourceId?: boolean
     authorId?: boolean
+    authorIds?: boolean
     metadata?: boolean
   }
 
-  export type ArticleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "siteId" | "title" | "slug" | "excerpt" | "content" | "html" | "cover" | "createdAt" | "updateAt" | "status" | "categories" | "sourceType" | "sourceId" | "authorId" | "metadata", ExtArgs["result"]["article"]>
+  export type ArticleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "siteId" | "title" | "slug" | "excerpt" | "content" | "html" | "cover" | "createdAt" | "updateAt" | "status" | "categories" | "sourceType" | "sourceId" | "authorId" | "authorIds" | "metadata", ExtArgs["result"]["article"]>
   export type ArticleInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     site?: boolean | SiteDefaultArgs<ExtArgs>
     author?: boolean | UserDefaultArgs<ExtArgs>
+    authors?: boolean | Article$authorsArgs<ExtArgs>
+    _count?: boolean | ArticleCountOutputTypeDefaultArgs<ExtArgs>
   }
 
   export type $ArticlePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -16100,6 +16184,7 @@ export namespace Prisma {
     objects: {
       site: Prisma.$SitePayload<ExtArgs>
       author: Prisma.$UserPayload<ExtArgs>
+      authors: Prisma.$UserPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -16117,6 +16202,7 @@ export namespace Prisma {
       sourceType: $Enums.ArticleSourceType
       sourceId: string | null
       authorId: string
+      authorIds: string[]
       metadata: Prisma.JsonValue | null
     }, ExtArgs["result"]["article"]>
     composites: {}
@@ -16483,6 +16569,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     site<T extends SiteDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SiteDefaultArgs<ExtArgs>>): Prisma__SiteClient<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     author<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    authors<T extends Article$authorsArgs<ExtArgs> = {}>(args?: Subset<T, Article$authorsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -16527,6 +16614,7 @@ export namespace Prisma {
     readonly sourceType: FieldRef<"Article", 'ArticleSourceType'>
     readonly sourceId: FieldRef<"Article", 'String'>
     readonly authorId: FieldRef<"Article", 'String'>
+    readonly authorIds: FieldRef<"Article", 'String[]'>
     readonly metadata: FieldRef<"Article", 'Json'>
   }
     
@@ -16895,6 +16983,30 @@ export namespace Prisma {
      * Additional options to pass to the `aggregate` command ${@link https://docs.mongodb.com/manual/reference/command/aggregate/#command-fields MongoDB Docs}.
      */
     options?: InputJsonValue
+  }
+
+  /**
+   * Article.authors
+   */
+  export type Article$authorsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+    orderBy?: UserOrderByWithRelationInput | UserOrderByWithRelationInput[]
+    cursor?: UserWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
   }
 
   /**
@@ -29614,6 +29726,7 @@ export namespace Prisma {
     updatedAt: 'updatedAt',
     role: 'role',
     memberOfSiteIds: 'memberOfSiteIds',
+    contributedArticleIds: 'contributedArticleIds',
     developerMode: 'developerMode'
   };
 
@@ -29794,6 +29907,7 @@ export namespace Prisma {
     sourceType: 'sourceType',
     sourceId: 'sourceId',
     authorId: 'authorId',
+    authorIds: 'authorIds',
     metadata: 'metadata'
   };
 
@@ -30187,6 +30301,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"User"> | Date | string
     role?: EnumRoleFilter<"User"> | $Enums.Role
     memberOfSiteIds?: StringNullableListFilter<"User">
+    contributedArticleIds?: StringNullableListFilter<"User">
     developerMode?: BoolFilter<"User"> | boolean
     sessions?: SessionListRelationFilter
     accounts?: AccountListRelationFilter
@@ -30198,6 +30313,7 @@ export namespace Prisma {
     Notification?: NotificationListRelationFilter
     sentNotifications?: NotificationListRelationFilter
     memberOfSites?: SiteListRelationFilter
+    contributedArticles?: ArticleListRelationFilter
     sentInvitations?: InvitationListRelationFilter
   }
 
@@ -30213,6 +30329,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     role?: SortOrder
     memberOfSiteIds?: SortOrder
+    contributedArticleIds?: SortOrder
     developerMode?: SortOrder
     sessions?: SessionOrderByRelationAggregateInput
     accounts?: AccountOrderByRelationAggregateInput
@@ -30224,6 +30341,7 @@ export namespace Prisma {
     Notification?: NotificationOrderByRelationAggregateInput
     sentNotifications?: NotificationOrderByRelationAggregateInput
     memberOfSites?: SiteOrderByRelationAggregateInput
+    contributedArticles?: ArticleOrderByRelationAggregateInput
     sentInvitations?: InvitationOrderByRelationAggregateInput
   }
 
@@ -30242,6 +30360,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"User"> | Date | string
     role?: EnumRoleFilter<"User"> | $Enums.Role
     memberOfSiteIds?: StringNullableListFilter<"User">
+    contributedArticleIds?: StringNullableListFilter<"User">
     developerMode?: BoolFilter<"User"> | boolean
     sessions?: SessionListRelationFilter
     accounts?: AccountListRelationFilter
@@ -30253,6 +30372,7 @@ export namespace Prisma {
     Notification?: NotificationListRelationFilter
     sentNotifications?: NotificationListRelationFilter
     memberOfSites?: SiteListRelationFilter
+    contributedArticles?: ArticleListRelationFilter
     sentInvitations?: InvitationListRelationFilter
   }, "id" | "email">
 
@@ -30268,6 +30388,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     role?: SortOrder
     memberOfSiteIds?: SortOrder
+    contributedArticleIds?: SortOrder
     developerMode?: SortOrder
     _count?: UserCountOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
@@ -30289,6 +30410,7 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     role?: EnumRoleWithAggregatesFilter<"User"> | $Enums.Role
     memberOfSiteIds?: StringNullableListFilter<"User">
+    contributedArticleIds?: StringNullableListFilter<"User">
     developerMode?: BoolWithAggregatesFilter<"User"> | boolean
   }
 
@@ -31167,9 +31289,11 @@ export namespace Prisma {
     sourceType?: EnumArticleSourceTypeFilter<"Article"> | $Enums.ArticleSourceType
     sourceId?: StringNullableFilter<"Article"> | string | null
     authorId?: StringFilter<"Article"> | string
+    authorIds?: StringNullableListFilter<"Article">
     metadata?: JsonNullableFilter<"Article">
     site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
     author?: XOR<UserScalarRelationFilter, UserWhereInput>
+    authors?: UserListRelationFilter
   }
 
   export type ArticleOrderByWithRelationInput = {
@@ -31188,9 +31312,11 @@ export namespace Prisma {
     sourceType?: SortOrder
     sourceId?: SortOrder
     authorId?: SortOrder
+    authorIds?: SortOrder
     metadata?: SortOrder
     site?: SiteOrderByWithRelationInput
     author?: UserOrderByWithRelationInput
+    authors?: UserOrderByRelationAggregateInput
   }
 
   export type ArticleWhereUniqueInput = Prisma.AtLeast<{
@@ -31213,9 +31339,11 @@ export namespace Prisma {
     sourceType?: EnumArticleSourceTypeFilter<"Article"> | $Enums.ArticleSourceType
     sourceId?: StringNullableFilter<"Article"> | string | null
     authorId?: StringFilter<"Article"> | string
+    authorIds?: StringNullableListFilter<"Article">
     metadata?: JsonNullableFilter<"Article">
     site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
     author?: XOR<UserScalarRelationFilter, UserWhereInput>
+    authors?: UserListRelationFilter
   }, "id" | "slug_siteId">
 
   export type ArticleOrderByWithAggregationInput = {
@@ -31234,6 +31362,7 @@ export namespace Prisma {
     sourceType?: SortOrder
     sourceId?: SortOrder
     authorId?: SortOrder
+    authorIds?: SortOrder
     metadata?: SortOrder
     _count?: ArticleCountOrderByAggregateInput
     _max?: ArticleMaxOrderByAggregateInput
@@ -31259,6 +31388,7 @@ export namespace Prisma {
     sourceType?: EnumArticleSourceTypeWithAggregatesFilter<"Article"> | $Enums.ArticleSourceType
     sourceId?: StringNullableWithAggregatesFilter<"Article"> | string | null
     authorId?: StringWithAggregatesFilter<"Article"> | string
+    authorIds?: StringNullableListFilter<"Article">
     metadata?: JsonNullableWithAggregatesFilter<"Article">
   }
 
@@ -32259,6 +32389,7 @@ export namespace Prisma {
     Notification?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutSenderInput
     memberOfSites?: SiteCreateNestedManyWithoutMembersInput
+    contributedArticles?: ArticleCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationCreateNestedManyWithoutInviterInput
   }
 
@@ -32274,6 +32405,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     role?: $Enums.Role
     memberOfSiteIds?: UserCreatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserCreatecontributedArticleIdsInput | string[]
     developerMode?: boolean
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
@@ -32285,6 +32417,7 @@ export namespace Prisma {
     Notification?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutSenderInput
     memberOfSites?: SiteUncheckedCreateNestedManyWithoutMembersInput
+    contributedArticles?: ArticleUncheckedCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationUncheckedCreateNestedManyWithoutInviterInput
   }
 
@@ -32309,6 +32442,7 @@ export namespace Prisma {
     Notification?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutSenderNestedInput
     memberOfSites?: SiteUpdateManyWithoutMembersNestedInput
+    contributedArticles?: ArticleUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUpdateManyWithoutInviterNestedInput
   }
 
@@ -32323,6 +32457,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     memberOfSiteIds?: UserUpdatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserUpdatecontributedArticleIdsInput | string[]
     developerMode?: BoolFieldUpdateOperationsInput | boolean
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
@@ -32334,6 +32469,7 @@ export namespace Prisma {
     Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutSenderNestedInput
     memberOfSites?: SiteUncheckedUpdateManyWithoutMembersNestedInput
+    contributedArticles?: ArticleUncheckedUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUncheckedUpdateManyWithoutInviterNestedInput
   }
 
@@ -32349,6 +32485,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     role?: $Enums.Role
     memberOfSiteIds?: UserCreatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserCreatecontributedArticleIdsInput | string[]
     developerMode?: boolean
   }
 
@@ -32376,6 +32513,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     memberOfSiteIds?: UserUpdatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserUpdatecontributedArticleIdsInput | string[]
     developerMode?: BoolFieldUpdateOperationsInput | boolean
   }
 
@@ -33306,6 +33444,7 @@ export namespace Prisma {
     metadata?: InputJsonValue | null
     site: SiteCreateNestedOneWithoutArticleInput
     author: UserCreateNestedOneWithoutArticleInput
+    authors?: UserCreateNestedManyWithoutContributedArticlesInput
   }
 
   export type ArticleUncheckedCreateInput = {
@@ -33324,7 +33463,9 @@ export namespace Prisma {
     sourceType?: $Enums.ArticleSourceType
     sourceId?: string | null
     authorId: string
+    authorIds?: ArticleCreateauthorIdsInput | string[]
     metadata?: InputJsonValue | null
+    authors?: UserUncheckedCreateNestedManyWithoutContributedArticlesInput
   }
 
   export type ArticleUpdateInput = {
@@ -33343,6 +33484,7 @@ export namespace Prisma {
     metadata?: InputJsonValue | InputJsonValue | null
     site?: SiteUpdateOneRequiredWithoutArticleNestedInput
     author?: UserUpdateOneRequiredWithoutArticleNestedInput
+    authors?: UserUpdateManyWithoutContributedArticlesNestedInput
   }
 
   export type ArticleUncheckedUpdateInput = {
@@ -33360,7 +33502,9 @@ export namespace Prisma {
     sourceType?: EnumArticleSourceTypeFieldUpdateOperationsInput | $Enums.ArticleSourceType
     sourceId?: NullableStringFieldUpdateOperationsInput | string | null
     authorId?: StringFieldUpdateOperationsInput | string
+    authorIds?: ArticleUpdateauthorIdsInput | string[]
     metadata?: InputJsonValue | InputJsonValue | null
+    authors?: UserUncheckedUpdateManyWithoutContributedArticlesNestedInput
   }
 
   export type ArticleCreateManyInput = {
@@ -33379,6 +33523,7 @@ export namespace Prisma {
     sourceType?: $Enums.ArticleSourceType
     sourceId?: string | null
     authorId: string
+    authorIds?: ArticleCreateauthorIdsInput | string[]
     metadata?: InputJsonValue | null
   }
 
@@ -33413,6 +33558,7 @@ export namespace Prisma {
     sourceType?: EnumArticleSourceTypeFieldUpdateOperationsInput | $Enums.ArticleSourceType
     sourceId?: NullableStringFieldUpdateOperationsInput | string | null
     authorId?: StringFieldUpdateOperationsInput | string
+    authorIds?: ArticleUpdateauthorIdsInput | string[]
     metadata?: InputJsonValue | InputJsonValue | null
   }
 
@@ -34600,6 +34746,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     role?: SortOrder
     memberOfSiteIds?: SortOrder
+    contributedArticleIds?: SortOrder
     developerMode?: SortOrder
   }
 
@@ -35436,6 +35583,7 @@ export namespace Prisma {
     sourceType?: SortOrder
     sourceId?: SortOrder
     authorId?: SortOrder
+    authorIds?: SortOrder
     metadata?: SortOrder
   }
 
@@ -36165,6 +36313,12 @@ export namespace Prisma {
     connect?: SiteWhereUniqueInput | SiteWhereUniqueInput[]
   }
 
+  export type ArticleCreateNestedManyWithoutAuthorsInput = {
+    create?: XOR<ArticleCreateWithoutAuthorsInput, ArticleUncheckedCreateWithoutAuthorsInput> | ArticleCreateWithoutAuthorsInput[] | ArticleUncheckedCreateWithoutAuthorsInput[]
+    connectOrCreate?: ArticleCreateOrConnectWithoutAuthorsInput | ArticleCreateOrConnectWithoutAuthorsInput[]
+    connect?: ArticleWhereUniqueInput | ArticleWhereUniqueInput[]
+  }
+
   export type InvitationCreateNestedManyWithoutInviterInput = {
     create?: XOR<InvitationCreateWithoutInviterInput, InvitationUncheckedCreateWithoutInviterInput> | InvitationCreateWithoutInviterInput[] | InvitationUncheckedCreateWithoutInviterInput[]
     connectOrCreate?: InvitationCreateOrConnectWithoutInviterInput | InvitationCreateOrConnectWithoutInviterInput[]
@@ -36173,6 +36327,10 @@ export namespace Prisma {
   }
 
   export type UserCreatememberOfSiteIdsInput = {
+    set: string[]
+  }
+
+  export type UserCreatecontributedArticleIdsInput = {
     set: string[]
   }
 
@@ -36243,6 +36401,12 @@ export namespace Prisma {
     create?: XOR<SiteCreateWithoutMembersInput, SiteUncheckedCreateWithoutMembersInput> | SiteCreateWithoutMembersInput[] | SiteUncheckedCreateWithoutMembersInput[]
     connectOrCreate?: SiteCreateOrConnectWithoutMembersInput | SiteCreateOrConnectWithoutMembersInput[]
     connect?: SiteWhereUniqueInput | SiteWhereUniqueInput[]
+  }
+
+  export type ArticleUncheckedCreateNestedManyWithoutAuthorsInput = {
+    create?: XOR<ArticleCreateWithoutAuthorsInput, ArticleUncheckedCreateWithoutAuthorsInput> | ArticleCreateWithoutAuthorsInput[] | ArticleUncheckedCreateWithoutAuthorsInput[]
+    connectOrCreate?: ArticleCreateOrConnectWithoutAuthorsInput | ArticleCreateOrConnectWithoutAuthorsInput[]
+    connect?: ArticleWhereUniqueInput | ArticleWhereUniqueInput[]
   }
 
   export type InvitationUncheckedCreateNestedManyWithoutInviterInput = {
@@ -36417,6 +36581,19 @@ export namespace Prisma {
     deleteMany?: SiteScalarWhereInput | SiteScalarWhereInput[]
   }
 
+  export type ArticleUpdateManyWithoutAuthorsNestedInput = {
+    create?: XOR<ArticleCreateWithoutAuthorsInput, ArticleUncheckedCreateWithoutAuthorsInput> | ArticleCreateWithoutAuthorsInput[] | ArticleUncheckedCreateWithoutAuthorsInput[]
+    connectOrCreate?: ArticleCreateOrConnectWithoutAuthorsInput | ArticleCreateOrConnectWithoutAuthorsInput[]
+    upsert?: ArticleUpsertWithWhereUniqueWithoutAuthorsInput | ArticleUpsertWithWhereUniqueWithoutAuthorsInput[]
+    set?: ArticleWhereUniqueInput | ArticleWhereUniqueInput[]
+    disconnect?: ArticleWhereUniqueInput | ArticleWhereUniqueInput[]
+    delete?: ArticleWhereUniqueInput | ArticleWhereUniqueInput[]
+    connect?: ArticleWhereUniqueInput | ArticleWhereUniqueInput[]
+    update?: ArticleUpdateWithWhereUniqueWithoutAuthorsInput | ArticleUpdateWithWhereUniqueWithoutAuthorsInput[]
+    updateMany?: ArticleUpdateManyWithWhereWithoutAuthorsInput | ArticleUpdateManyWithWhereWithoutAuthorsInput[]
+    deleteMany?: ArticleScalarWhereInput | ArticleScalarWhereInput[]
+  }
+
   export type InvitationUpdateManyWithoutInviterNestedInput = {
     create?: XOR<InvitationCreateWithoutInviterInput, InvitationUncheckedCreateWithoutInviterInput> | InvitationCreateWithoutInviterInput[] | InvitationUncheckedCreateWithoutInviterInput[]
     connectOrCreate?: InvitationCreateOrConnectWithoutInviterInput | InvitationCreateOrConnectWithoutInviterInput[]
@@ -36432,6 +36609,11 @@ export namespace Prisma {
   }
 
   export type UserUpdatememberOfSiteIdsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type UserUpdatecontributedArticleIdsInput = {
     set?: string[]
     push?: string | string[]
   }
@@ -36573,6 +36755,19 @@ export namespace Prisma {
     update?: SiteUpdateWithWhereUniqueWithoutMembersInput | SiteUpdateWithWhereUniqueWithoutMembersInput[]
     updateMany?: SiteUpdateManyWithWhereWithoutMembersInput | SiteUpdateManyWithWhereWithoutMembersInput[]
     deleteMany?: SiteScalarWhereInput | SiteScalarWhereInput[]
+  }
+
+  export type ArticleUncheckedUpdateManyWithoutAuthorsNestedInput = {
+    create?: XOR<ArticleCreateWithoutAuthorsInput, ArticleUncheckedCreateWithoutAuthorsInput> | ArticleCreateWithoutAuthorsInput[] | ArticleUncheckedCreateWithoutAuthorsInput[]
+    connectOrCreate?: ArticleCreateOrConnectWithoutAuthorsInput | ArticleCreateOrConnectWithoutAuthorsInput[]
+    upsert?: ArticleUpsertWithWhereUniqueWithoutAuthorsInput | ArticleUpsertWithWhereUniqueWithoutAuthorsInput[]
+    set?: ArticleWhereUniqueInput | ArticleWhereUniqueInput[]
+    disconnect?: ArticleWhereUniqueInput | ArticleWhereUniqueInput[]
+    delete?: ArticleWhereUniqueInput | ArticleWhereUniqueInput[]
+    connect?: ArticleWhereUniqueInput | ArticleWhereUniqueInput[]
+    update?: ArticleUpdateWithWhereUniqueWithoutAuthorsInput | ArticleUpdateWithWhereUniqueWithoutAuthorsInput[]
+    updateMany?: ArticleUpdateManyWithWhereWithoutAuthorsInput | ArticleUpdateManyWithWhereWithoutAuthorsInput[]
+    deleteMany?: ArticleScalarWhereInput | ArticleScalarWhereInput[]
   }
 
   export type InvitationUncheckedUpdateManyWithoutInviterNestedInput = {
@@ -37513,6 +37708,22 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type UserCreateNestedManyWithoutContributedArticlesInput = {
+    create?: XOR<UserCreateWithoutContributedArticlesInput, UserUncheckedCreateWithoutContributedArticlesInput> | UserCreateWithoutContributedArticlesInput[] | UserUncheckedCreateWithoutContributedArticlesInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutContributedArticlesInput | UserCreateOrConnectWithoutContributedArticlesInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+  }
+
+  export type ArticleCreateauthorIdsInput = {
+    set: string[]
+  }
+
+  export type UserUncheckedCreateNestedManyWithoutContributedArticlesInput = {
+    create?: XOR<UserCreateWithoutContributedArticlesInput, UserUncheckedCreateWithoutContributedArticlesInput> | UserCreateWithoutContributedArticlesInput[] | UserUncheckedCreateWithoutContributedArticlesInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutContributedArticlesInput | UserCreateOrConnectWithoutContributedArticlesInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+  }
+
   export type EnumArticleStatusFieldUpdateOperationsInput = {
     set?: $Enums.ArticleStatus
   }
@@ -37540,6 +37751,37 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutArticleInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutArticleInput, UserUpdateWithoutArticleInput>, UserUncheckedUpdateWithoutArticleInput>
+  }
+
+  export type UserUpdateManyWithoutContributedArticlesNestedInput = {
+    create?: XOR<UserCreateWithoutContributedArticlesInput, UserUncheckedCreateWithoutContributedArticlesInput> | UserCreateWithoutContributedArticlesInput[] | UserUncheckedCreateWithoutContributedArticlesInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutContributedArticlesInput | UserCreateOrConnectWithoutContributedArticlesInput[]
+    upsert?: UserUpsertWithWhereUniqueWithoutContributedArticlesInput | UserUpsertWithWhereUniqueWithoutContributedArticlesInput[]
+    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    update?: UserUpdateWithWhereUniqueWithoutContributedArticlesInput | UserUpdateWithWhereUniqueWithoutContributedArticlesInput[]
+    updateMany?: UserUpdateManyWithWhereWithoutContributedArticlesInput | UserUpdateManyWithWhereWithoutContributedArticlesInput[]
+    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
+  }
+
+  export type ArticleUpdateauthorIdsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type UserUncheckedUpdateManyWithoutContributedArticlesNestedInput = {
+    create?: XOR<UserCreateWithoutContributedArticlesInput, UserUncheckedCreateWithoutContributedArticlesInput> | UserCreateWithoutContributedArticlesInput[] | UserUncheckedCreateWithoutContributedArticlesInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutContributedArticlesInput | UserCreateOrConnectWithoutContributedArticlesInput[]
+    upsert?: UserUpsertWithWhereUniqueWithoutContributedArticlesInput | UserUpsertWithWhereUniqueWithoutContributedArticlesInput[]
+    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    update?: UserUpdateWithWhereUniqueWithoutContributedArticlesInput | UserUpdateWithWhereUniqueWithoutContributedArticlesInput[]
+    updateMany?: UserUpdateManyWithWhereWithoutContributedArticlesInput | UserUpdateManyWithWhereWithoutContributedArticlesInput[]
+    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
   }
 
   export type PageCreatelayoutInput = {
@@ -38567,6 +38809,7 @@ export namespace Prisma {
     sourceId?: string | null
     metadata?: InputJsonValue | null
     site: SiteCreateNestedOneWithoutArticleInput
+    authors?: UserCreateNestedManyWithoutContributedArticlesInput
   }
 
   export type ArticleUncheckedCreateWithoutAuthorInput = {
@@ -38584,7 +38827,9 @@ export namespace Prisma {
     categories?: ArticleCreatecategoriesInput | string[]
     sourceType?: $Enums.ArticleSourceType
     sourceId?: string | null
+    authorIds?: ArticleCreateauthorIdsInput | string[]
     metadata?: InputJsonValue | null
+    authors?: UserUncheckedCreateNestedManyWithoutContributedArticlesInput
   }
 
   export type ArticleCreateOrConnectWithoutAuthorInput = {
@@ -38791,6 +39036,50 @@ export namespace Prisma {
   export type SiteCreateOrConnectWithoutMembersInput = {
     where: SiteWhereUniqueInput
     create: XOR<SiteCreateWithoutMembersInput, SiteUncheckedCreateWithoutMembersInput>
+  }
+
+  export type ArticleCreateWithoutAuthorsInput = {
+    id?: string
+    title: string
+    slug?: string
+    excerpt?: string | null
+    content?: InputJsonValue | null
+    html?: string | null
+    cover?: string | null
+    createdAt?: Date | string
+    updateAt?: Date | string
+    status?: $Enums.ArticleStatus
+    categories?: ArticleCreatecategoriesInput | string[]
+    sourceType?: $Enums.ArticleSourceType
+    sourceId?: string | null
+    metadata?: InputJsonValue | null
+    site: SiteCreateNestedOneWithoutArticleInput
+    author: UserCreateNestedOneWithoutArticleInput
+  }
+
+  export type ArticleUncheckedCreateWithoutAuthorsInput = {
+    id?: string
+    siteId: string
+    title: string
+    slug?: string
+    excerpt?: string | null
+    content?: InputJsonValue | null
+    html?: string | null
+    cover?: string | null
+    createdAt?: Date | string
+    updateAt?: Date | string
+    status?: $Enums.ArticleStatus
+    categories?: ArticleCreatecategoriesInput | string[]
+    sourceType?: $Enums.ArticleSourceType
+    sourceId?: string | null
+    authorId: string
+    authorIds?: ArticleCreateauthorIdsInput | string[]
+    metadata?: InputJsonValue | null
+  }
+
+  export type ArticleCreateOrConnectWithoutAuthorsInput = {
+    where: ArticleWhereUniqueInput
+    create: XOR<ArticleCreateWithoutAuthorsInput, ArticleUncheckedCreateWithoutAuthorsInput>
   }
 
   export type InvitationCreateWithoutInviterInput = {
@@ -39026,6 +39315,7 @@ export namespace Prisma {
     sourceType?: EnumArticleSourceTypeFilter<"Article"> | $Enums.ArticleSourceType
     sourceId?: StringNullableFilter<"Article"> | string | null
     authorId?: StringFilter<"Article"> | string
+    authorIds?: StringNullableListFilter<"Article">
     metadata?: JsonNullableFilter<"Article">
   }
 
@@ -39132,6 +39422,22 @@ export namespace Prisma {
     data: XOR<SiteUpdateManyMutationInput, SiteUncheckedUpdateManyWithoutMembersInput>
   }
 
+  export type ArticleUpsertWithWhereUniqueWithoutAuthorsInput = {
+    where: ArticleWhereUniqueInput
+    update: XOR<ArticleUpdateWithoutAuthorsInput, ArticleUncheckedUpdateWithoutAuthorsInput>
+    create: XOR<ArticleCreateWithoutAuthorsInput, ArticleUncheckedCreateWithoutAuthorsInput>
+  }
+
+  export type ArticleUpdateWithWhereUniqueWithoutAuthorsInput = {
+    where: ArticleWhereUniqueInput
+    data: XOR<ArticleUpdateWithoutAuthorsInput, ArticleUncheckedUpdateWithoutAuthorsInput>
+  }
+
+  export type ArticleUpdateManyWithWhereWithoutAuthorsInput = {
+    where: ArticleScalarWhereInput
+    data: XOR<ArticleUpdateManyMutationInput, ArticleUncheckedUpdateManyWithoutAuthorsInput>
+  }
+
   export type InvitationUpsertWithWhereUniqueWithoutInviterInput = {
     where: InvitationWhereUniqueInput
     update: XOR<InvitationUpdateWithoutInviterInput, InvitationUncheckedUpdateWithoutInviterInput>
@@ -39183,6 +39489,7 @@ export namespace Prisma {
     Notification?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutSenderInput
     memberOfSites?: SiteCreateNestedManyWithoutMembersInput
+    contributedArticles?: ArticleCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationCreateNestedManyWithoutInviterInput
   }
 
@@ -39198,6 +39505,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     role?: $Enums.Role
     memberOfSiteIds?: UserCreatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserCreatecontributedArticleIdsInput | string[]
     developerMode?: boolean
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     Site?: SiteUncheckedCreateNestedManyWithoutUserInput
@@ -39208,6 +39516,7 @@ export namespace Prisma {
     Notification?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutSenderInput
     memberOfSites?: SiteUncheckedCreateNestedManyWithoutMembersInput
+    contributedArticles?: ArticleUncheckedCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationUncheckedCreateNestedManyWithoutInviterInput
   }
 
@@ -39247,6 +39556,7 @@ export namespace Prisma {
     Notification?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutSenderNestedInput
     memberOfSites?: SiteUpdateManyWithoutMembersNestedInput
+    contributedArticles?: ArticleUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUpdateManyWithoutInviterNestedInput
   }
 
@@ -39261,6 +39571,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     memberOfSiteIds?: UserUpdatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserUpdatecontributedArticleIdsInput | string[]
     developerMode?: BoolFieldUpdateOperationsInput | boolean
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     Site?: SiteUncheckedUpdateManyWithoutUserNestedInput
@@ -39271,6 +39582,7 @@ export namespace Prisma {
     Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutSenderNestedInput
     memberOfSites?: SiteUncheckedUpdateManyWithoutMembersNestedInput
+    contributedArticles?: ArticleUncheckedUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUncheckedUpdateManyWithoutInviterNestedInput
   }
 
@@ -39295,6 +39607,7 @@ export namespace Prisma {
     Notification?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutSenderInput
     memberOfSites?: SiteCreateNestedManyWithoutMembersInput
+    contributedArticles?: ArticleCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationCreateNestedManyWithoutInviterInput
   }
 
@@ -39310,6 +39623,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     role?: $Enums.Role
     memberOfSiteIds?: UserCreatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserCreatecontributedArticleIdsInput | string[]
     developerMode?: boolean
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     Site?: SiteUncheckedCreateNestedManyWithoutUserInput
@@ -39320,6 +39634,7 @@ export namespace Prisma {
     Notification?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutSenderInput
     memberOfSites?: SiteUncheckedCreateNestedManyWithoutMembersInput
+    contributedArticles?: ArticleUncheckedCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationUncheckedCreateNestedManyWithoutInviterInput
   }
 
@@ -39359,6 +39674,7 @@ export namespace Prisma {
     Notification?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutSenderNestedInput
     memberOfSites?: SiteUpdateManyWithoutMembersNestedInput
+    contributedArticles?: ArticleUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUpdateManyWithoutInviterNestedInput
   }
 
@@ -39373,6 +39689,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     memberOfSiteIds?: UserUpdatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserUpdatecontributedArticleIdsInput | string[]
     developerMode?: BoolFieldUpdateOperationsInput | boolean
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     Site?: SiteUncheckedUpdateManyWithoutUserNestedInput
@@ -39383,6 +39700,7 @@ export namespace Prisma {
     Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutSenderNestedInput
     memberOfSites?: SiteUncheckedUpdateManyWithoutMembersNestedInput
+    contributedArticles?: ArticleUncheckedUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUncheckedUpdateManyWithoutInviterNestedInput
   }
 
@@ -39487,6 +39805,7 @@ export namespace Prisma {
     Notification?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutSenderInput
     memberOfSites?: SiteCreateNestedManyWithoutMembersInput
+    contributedArticles?: ArticleCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationCreateNestedManyWithoutInviterInput
   }
 
@@ -39502,6 +39821,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     role?: $Enums.Role
     memberOfSiteIds?: UserCreatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserCreatecontributedArticleIdsInput | string[]
     developerMode?: boolean
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
@@ -39512,6 +39832,7 @@ export namespace Prisma {
     Notification?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutSenderInput
     memberOfSites?: SiteUncheckedCreateNestedManyWithoutMembersInput
+    contributedArticles?: ArticleUncheckedCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationUncheckedCreateNestedManyWithoutInviterInput
   }
 
@@ -39670,6 +39991,7 @@ export namespace Prisma {
     Notification?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutSenderNestedInput
     memberOfSites?: SiteUpdateManyWithoutMembersNestedInput
+    contributedArticles?: ArticleUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUpdateManyWithoutInviterNestedInput
   }
 
@@ -39684,6 +40006,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     memberOfSiteIds?: UserUpdatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserUpdatecontributedArticleIdsInput | string[]
     developerMode?: BoolFieldUpdateOperationsInput | boolean
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
@@ -39694,6 +40017,7 @@ export namespace Prisma {
     Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutSenderNestedInput
     memberOfSites?: SiteUncheckedUpdateManyWithoutMembersNestedInput
+    contributedArticles?: ArticleUncheckedUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUncheckedUpdateManyWithoutInviterNestedInput
   }
 
@@ -39750,6 +40074,7 @@ export namespace Prisma {
     Notification?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutSenderInput
     memberOfSites?: SiteCreateNestedManyWithoutMembersInput
+    contributedArticles?: ArticleCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationCreateNestedManyWithoutInviterInput
   }
 
@@ -39765,6 +40090,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     role?: $Enums.Role
     memberOfSiteIds?: UserCreatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserCreatecontributedArticleIdsInput | string[]
     developerMode?: boolean
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
@@ -39775,6 +40101,7 @@ export namespace Prisma {
     Notification?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutSenderInput
     memberOfSites?: SiteUncheckedCreateNestedManyWithoutMembersInput
+    contributedArticles?: ArticleUncheckedCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationUncheckedCreateNestedManyWithoutInviterInput
   }
 
@@ -39896,6 +40223,7 @@ export namespace Prisma {
     sourceId?: string | null
     metadata?: InputJsonValue | null
     author: UserCreateNestedOneWithoutArticleInput
+    authors?: UserCreateNestedManyWithoutContributedArticlesInput
   }
 
   export type ArticleUncheckedCreateWithoutSiteInput = {
@@ -39913,7 +40241,9 @@ export namespace Prisma {
     sourceType?: $Enums.ArticleSourceType
     sourceId?: string | null
     authorId: string
+    authorIds?: ArticleCreateauthorIdsInput | string[]
     metadata?: InputJsonValue | null
+    authors?: UserUncheckedCreateNestedManyWithoutContributedArticlesInput
   }
 
   export type ArticleCreateOrConnectWithoutSiteInput = {
@@ -40251,6 +40581,7 @@ export namespace Prisma {
     Page?: PageCreateNestedManyWithoutUserInput
     Notification?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutSenderInput
+    contributedArticles?: ArticleCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationCreateNestedManyWithoutInviterInput
   }
 
@@ -40266,6 +40597,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     role?: $Enums.Role
     memberOfSiteIds?: UserCreatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserCreatecontributedArticleIdsInput | string[]
     developerMode?: boolean
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
@@ -40276,6 +40608,7 @@ export namespace Prisma {
     Page?: PageUncheckedCreateNestedManyWithoutUserInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutSenderInput
+    contributedArticles?: ArticleUncheckedCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationUncheckedCreateNestedManyWithoutInviterInput
   }
 
@@ -40344,6 +40677,7 @@ export namespace Prisma {
     Notification?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutSenderNestedInput
     memberOfSites?: SiteUpdateManyWithoutMembersNestedInput
+    contributedArticles?: ArticleUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUpdateManyWithoutInviterNestedInput
   }
 
@@ -40358,6 +40692,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     memberOfSiteIds?: UserUpdatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserUpdatecontributedArticleIdsInput | string[]
     developerMode?: BoolFieldUpdateOperationsInput | boolean
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
@@ -40368,6 +40703,7 @@ export namespace Prisma {
     Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutSenderNestedInput
     memberOfSites?: SiteUncheckedUpdateManyWithoutMembersNestedInput
+    contributedArticles?: ArticleUncheckedUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUncheckedUpdateManyWithoutInviterNestedInput
   }
 
@@ -40737,6 +41073,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"User"> | Date | string
     role?: EnumRoleFilter<"User"> | $Enums.Role
     memberOfSiteIds?: StringNullableListFilter<"User">
+    contributedArticleIds?: StringNullableListFilter<"User">
     developerMode?: BoolFilter<"User"> | boolean
   }
 
@@ -41041,6 +41378,7 @@ export namespace Prisma {
     Notification?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutSenderInput
     memberOfSites?: SiteCreateNestedManyWithoutMembersInput
+    contributedArticles?: ArticleCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationCreateNestedManyWithoutInviterInput
   }
 
@@ -41056,6 +41394,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     role?: $Enums.Role
     memberOfSiteIds?: UserCreatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserCreatecontributedArticleIdsInput | string[]
     developerMode?: boolean
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
@@ -41066,6 +41405,7 @@ export namespace Prisma {
     Notification?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutSenderInput
     memberOfSites?: SiteUncheckedCreateNestedManyWithoutMembersInput
+    contributedArticles?: ArticleUncheckedCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationUncheckedCreateNestedManyWithoutInviterInput
   }
 
@@ -41218,6 +41558,7 @@ export namespace Prisma {
     Notification?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutSenderNestedInput
     memberOfSites?: SiteUpdateManyWithoutMembersNestedInput
+    contributedArticles?: ArticleUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUpdateManyWithoutInviterNestedInput
   }
 
@@ -41232,6 +41573,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     memberOfSiteIds?: UserUpdatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserUpdatecontributedArticleIdsInput | string[]
     developerMode?: BoolFieldUpdateOperationsInput | boolean
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
@@ -41242,6 +41584,7 @@ export namespace Prisma {
     Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutSenderNestedInput
     memberOfSites?: SiteUncheckedUpdateManyWithoutMembersNestedInput
+    contributedArticles?: ArticleUncheckedUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUncheckedUpdateManyWithoutInviterNestedInput
   }
 
@@ -41622,6 +41965,7 @@ export namespace Prisma {
     Notification?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutSenderInput
     memberOfSites?: SiteCreateNestedManyWithoutMembersInput
+    contributedArticles?: ArticleCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationCreateNestedManyWithoutInviterInput
   }
 
@@ -41637,6 +41981,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     role?: $Enums.Role
     memberOfSiteIds?: UserCreatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserCreatecontributedArticleIdsInput | string[]
     developerMode?: boolean
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
@@ -41647,12 +41992,70 @@ export namespace Prisma {
     Notification?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutSenderInput
     memberOfSites?: SiteUncheckedCreateNestedManyWithoutMembersInput
+    contributedArticles?: ArticleUncheckedCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationUncheckedCreateNestedManyWithoutInviterInput
   }
 
   export type UserCreateOrConnectWithoutArticleInput = {
     where: UserWhereUniqueInput
     create: XOR<UserCreateWithoutArticleInput, UserUncheckedCreateWithoutArticleInput>
+  }
+
+  export type UserCreateWithoutContributedArticlesInput = {
+    id?: string
+    name: string
+    username?: string | null
+    image?: string | null
+    email: string
+    emailVerified?: Date | string | null
+    hashedPassword?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    role?: $Enums.Role
+    developerMode?: boolean
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    Site?: SiteCreateNestedManyWithoutUserInput
+    Category?: CategoryCreateNestedManyWithoutUserInput
+    Subscription?: SubscriptionCreateNestedManyWithoutUserInput
+    Article?: ArticleCreateNestedManyWithoutAuthorInput
+    Page?: PageCreateNestedManyWithoutUserInput
+    Notification?: NotificationCreateNestedManyWithoutUserInput
+    sentNotifications?: NotificationCreateNestedManyWithoutSenderInput
+    memberOfSites?: SiteCreateNestedManyWithoutMembersInput
+    sentInvitations?: InvitationCreateNestedManyWithoutInviterInput
+  }
+
+  export type UserUncheckedCreateWithoutContributedArticlesInput = {
+    id?: string
+    name: string
+    username?: string | null
+    image?: string | null
+    email: string
+    emailVerified?: Date | string | null
+    hashedPassword?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    role?: $Enums.Role
+    memberOfSiteIds?: UserCreatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserCreatecontributedArticleIdsInput | string[]
+    developerMode?: boolean
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    Site?: SiteUncheckedCreateNestedManyWithoutUserInput
+    Category?: CategoryUncheckedCreateNestedManyWithoutUserInput
+    Subscription?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    Article?: ArticleUncheckedCreateNestedManyWithoutAuthorInput
+    Page?: PageUncheckedCreateNestedManyWithoutUserInput
+    Notification?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    sentNotifications?: NotificationUncheckedCreateNestedManyWithoutSenderInput
+    memberOfSites?: SiteUncheckedCreateNestedManyWithoutMembersInput
+    sentInvitations?: InvitationUncheckedCreateNestedManyWithoutInviterInput
+  }
+
+  export type UserCreateOrConnectWithoutContributedArticlesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutContributedArticlesInput, UserUncheckedCreateWithoutContributedArticlesInput>
   }
 
   export type SiteUpsertWithoutArticleInput = {
@@ -41770,6 +42173,7 @@ export namespace Prisma {
     Notification?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutSenderNestedInput
     memberOfSites?: SiteUpdateManyWithoutMembersNestedInput
+    contributedArticles?: ArticleUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUpdateManyWithoutInviterNestedInput
   }
 
@@ -41784,6 +42188,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     memberOfSiteIds?: UserUpdatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserUpdatecontributedArticleIdsInput | string[]
     developerMode?: BoolFieldUpdateOperationsInput | boolean
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
@@ -41794,7 +42199,24 @@ export namespace Prisma {
     Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutSenderNestedInput
     memberOfSites?: SiteUncheckedUpdateManyWithoutMembersNestedInput
+    contributedArticles?: ArticleUncheckedUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUncheckedUpdateManyWithoutInviterNestedInput
+  }
+
+  export type UserUpsertWithWhereUniqueWithoutContributedArticlesInput = {
+    where: UserWhereUniqueInput
+    update: XOR<UserUpdateWithoutContributedArticlesInput, UserUncheckedUpdateWithoutContributedArticlesInput>
+    create: XOR<UserCreateWithoutContributedArticlesInput, UserUncheckedCreateWithoutContributedArticlesInput>
+  }
+
+  export type UserUpdateWithWhereUniqueWithoutContributedArticlesInput = {
+    where: UserWhereUniqueInput
+    data: XOR<UserUpdateWithoutContributedArticlesInput, UserUncheckedUpdateWithoutContributedArticlesInput>
+  }
+
+  export type UserUpdateManyWithWhereWithoutContributedArticlesInput = {
+    where: UserScalarWhereInput
+    data: XOR<UserUpdateManyMutationInput, UserUncheckedUpdateManyWithoutContributedArticlesInput>
   }
 
   export type SiteCreateWithoutPageInput = {
@@ -41898,6 +42320,7 @@ export namespace Prisma {
     Notification?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutSenderInput
     memberOfSites?: SiteCreateNestedManyWithoutMembersInput
+    contributedArticles?: ArticleCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationCreateNestedManyWithoutInviterInput
   }
 
@@ -41913,6 +42336,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     role?: $Enums.Role
     memberOfSiteIds?: UserCreatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserCreatecontributedArticleIdsInput | string[]
     developerMode?: boolean
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
@@ -41923,6 +42347,7 @@ export namespace Prisma {
     Notification?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutSenderInput
     memberOfSites?: SiteUncheckedCreateNestedManyWithoutMembersInput
+    contributedArticles?: ArticleUncheckedCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationUncheckedCreateNestedManyWithoutInviterInput
   }
 
@@ -42046,6 +42471,7 @@ export namespace Prisma {
     Notification?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutSenderNestedInput
     memberOfSites?: SiteUpdateManyWithoutMembersNestedInput
+    contributedArticles?: ArticleUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUpdateManyWithoutInviterNestedInput
   }
 
@@ -42060,6 +42486,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     memberOfSiteIds?: UserUpdatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserUpdatecontributedArticleIdsInput | string[]
     developerMode?: BoolFieldUpdateOperationsInput | boolean
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
@@ -42070,6 +42497,7 @@ export namespace Prisma {
     Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutSenderNestedInput
     memberOfSites?: SiteUncheckedUpdateManyWithoutMembersNestedInput
+    contributedArticles?: ArticleUncheckedUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUncheckedUpdateManyWithoutInviterNestedInput
   }
 
@@ -43176,6 +43604,7 @@ export namespace Prisma {
     Page?: PageCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutSenderInput
     memberOfSites?: SiteCreateNestedManyWithoutMembersInput
+    contributedArticles?: ArticleCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationCreateNestedManyWithoutInviterInput
   }
 
@@ -43191,6 +43620,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     role?: $Enums.Role
     memberOfSiteIds?: UserCreatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserCreatecontributedArticleIdsInput | string[]
     developerMode?: boolean
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
@@ -43201,6 +43631,7 @@ export namespace Prisma {
     Page?: PageUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutSenderInput
     memberOfSites?: SiteUncheckedCreateNestedManyWithoutMembersInput
+    contributedArticles?: ArticleUncheckedCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationUncheckedCreateNestedManyWithoutInviterInput
   }
 
@@ -43310,6 +43741,7 @@ export namespace Prisma {
     Page?: PageCreateNestedManyWithoutUserInput
     Notification?: NotificationCreateNestedManyWithoutUserInput
     memberOfSites?: SiteCreateNestedManyWithoutMembersInput
+    contributedArticles?: ArticleCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationCreateNestedManyWithoutInviterInput
   }
 
@@ -43325,6 +43757,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     role?: $Enums.Role
     memberOfSiteIds?: UserCreatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserCreatecontributedArticleIdsInput | string[]
     developerMode?: boolean
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
@@ -43335,6 +43768,7 @@ export namespace Prisma {
     Page?: PageUncheckedCreateNestedManyWithoutUserInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutUserInput
     memberOfSites?: SiteUncheckedCreateNestedManyWithoutMembersInput
+    contributedArticles?: ArticleUncheckedCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationUncheckedCreateNestedManyWithoutInviterInput
   }
 
@@ -43374,6 +43808,7 @@ export namespace Prisma {
     Page?: PageUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutSenderNestedInput
     memberOfSites?: SiteUpdateManyWithoutMembersNestedInput
+    contributedArticles?: ArticleUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUpdateManyWithoutInviterNestedInput
   }
 
@@ -43388,6 +43823,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     memberOfSiteIds?: UserUpdatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserUpdatecontributedArticleIdsInput | string[]
     developerMode?: BoolFieldUpdateOperationsInput | boolean
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
@@ -43398,6 +43834,7 @@ export namespace Prisma {
     Page?: PageUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutSenderNestedInput
     memberOfSites?: SiteUncheckedUpdateManyWithoutMembersNestedInput
+    contributedArticles?: ArticleUncheckedUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUncheckedUpdateManyWithoutInviterNestedInput
   }
 
@@ -43516,6 +43953,7 @@ export namespace Prisma {
     Page?: PageUpdateManyWithoutUserNestedInput
     Notification?: NotificationUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUpdateManyWithoutMembersNestedInput
+    contributedArticles?: ArticleUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUpdateManyWithoutInviterNestedInput
   }
 
@@ -43530,6 +43968,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     memberOfSiteIds?: UserUpdatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserUpdatecontributedArticleIdsInput | string[]
     developerMode?: BoolFieldUpdateOperationsInput | boolean
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
@@ -43540,6 +43979,7 @@ export namespace Prisma {
     Page?: PageUncheckedUpdateManyWithoutUserNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUncheckedUpdateManyWithoutMembersNestedInput
+    contributedArticles?: ArticleUncheckedUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUncheckedUpdateManyWithoutInviterNestedInput
   }
 
@@ -43645,6 +44085,7 @@ export namespace Prisma {
     Notification?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutSenderInput
     memberOfSites?: SiteCreateNestedManyWithoutMembersInput
+    contributedArticles?: ArticleCreateNestedManyWithoutAuthorsInput
   }
 
   export type UserUncheckedCreateWithoutSentInvitationsInput = {
@@ -43659,6 +44100,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     role?: $Enums.Role
     memberOfSiteIds?: UserCreatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserCreatecontributedArticleIdsInput | string[]
     developerMode?: boolean
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
@@ -43670,6 +44112,7 @@ export namespace Prisma {
     Notification?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutSenderInput
     memberOfSites?: SiteUncheckedCreateNestedManyWithoutMembersInput
+    contributedArticles?: ArticleUncheckedCreateNestedManyWithoutAuthorsInput
   }
 
   export type UserCreateOrConnectWithoutSentInvitationsInput = {
@@ -43793,6 +44236,7 @@ export namespace Prisma {
     Notification?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutSenderNestedInput
     memberOfSites?: SiteUpdateManyWithoutMembersNestedInput
+    contributedArticles?: ArticleUpdateManyWithoutAuthorsNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSentInvitationsInput = {
@@ -43806,6 +44250,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     memberOfSiteIds?: UserUpdatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserUpdatecontributedArticleIdsInput | string[]
     developerMode?: BoolFieldUpdateOperationsInput | boolean
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
@@ -43817,6 +44262,7 @@ export namespace Prisma {
     Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutSenderNestedInput
     memberOfSites?: SiteUncheckedUpdateManyWithoutMembersNestedInput
+    contributedArticles?: ArticleUncheckedUpdateManyWithoutAuthorsNestedInput
   }
 
   export type CollectionItemCreateWithoutCollectionInput = {
@@ -44181,6 +44627,7 @@ export namespace Prisma {
     categories?: ArticleCreatecategoriesInput | string[]
     sourceType?: $Enums.ArticleSourceType
     sourceId?: string | null
+    authorIds?: ArticleCreateauthorIdsInput | string[]
     metadata?: InputJsonValue | null
   }
 
@@ -44477,6 +44924,7 @@ export namespace Prisma {
     sourceId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: InputJsonValue | InputJsonValue | null
     site?: SiteUpdateOneRequiredWithoutArticleNestedInput
+    authors?: UserUpdateManyWithoutContributedArticlesNestedInput
   }
 
   export type ArticleUncheckedUpdateWithoutAuthorInput = {
@@ -44493,7 +44941,9 @@ export namespace Prisma {
     categories?: ArticleUpdatecategoriesInput | string[]
     sourceType?: EnumArticleSourceTypeFieldUpdateOperationsInput | $Enums.ArticleSourceType
     sourceId?: NullableStringFieldUpdateOperationsInput | string | null
+    authorIds?: ArticleUpdateauthorIdsInput | string[]
     metadata?: InputJsonValue | InputJsonValue | null
+    authors?: UserUncheckedUpdateManyWithoutContributedArticlesNestedInput
   }
 
   export type ArticleUncheckedUpdateManyWithoutAuthorInput = {
@@ -44510,6 +44960,7 @@ export namespace Prisma {
     categories?: ArticleUpdatecategoriesInput | string[]
     sourceType?: EnumArticleSourceTypeFieldUpdateOperationsInput | $Enums.ArticleSourceType
     sourceId?: NullableStringFieldUpdateOperationsInput | string | null
+    authorIds?: ArticleUpdateauthorIdsInput | string[]
     metadata?: InputJsonValue | InputJsonValue | null
   }
 
@@ -44737,6 +45188,62 @@ export namespace Prisma {
     memberIds?: SiteUpdatememberIdsInput | string[]
   }
 
+  export type ArticleUpdateWithoutAuthorsInput = {
+    title?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    excerpt?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: InputJsonValue | InputJsonValue | null
+    html?: NullableStringFieldUpdateOperationsInput | string | null
+    cover?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updateAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumArticleStatusFieldUpdateOperationsInput | $Enums.ArticleStatus
+    categories?: ArticleUpdatecategoriesInput | string[]
+    sourceType?: EnumArticleSourceTypeFieldUpdateOperationsInput | $Enums.ArticleSourceType
+    sourceId?: NullableStringFieldUpdateOperationsInput | string | null
+    metadata?: InputJsonValue | InputJsonValue | null
+    site?: SiteUpdateOneRequiredWithoutArticleNestedInput
+    author?: UserUpdateOneRequiredWithoutArticleNestedInput
+  }
+
+  export type ArticleUncheckedUpdateWithoutAuthorsInput = {
+    siteId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    excerpt?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: InputJsonValue | InputJsonValue | null
+    html?: NullableStringFieldUpdateOperationsInput | string | null
+    cover?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updateAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumArticleStatusFieldUpdateOperationsInput | $Enums.ArticleStatus
+    categories?: ArticleUpdatecategoriesInput | string[]
+    sourceType?: EnumArticleSourceTypeFieldUpdateOperationsInput | $Enums.ArticleSourceType
+    sourceId?: NullableStringFieldUpdateOperationsInput | string | null
+    authorId?: StringFieldUpdateOperationsInput | string
+    authorIds?: ArticleUpdateauthorIdsInput | string[]
+    metadata?: InputJsonValue | InputJsonValue | null
+  }
+
+  export type ArticleUncheckedUpdateManyWithoutAuthorsInput = {
+    siteId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    excerpt?: NullableStringFieldUpdateOperationsInput | string | null
+    content?: InputJsonValue | InputJsonValue | null
+    html?: NullableStringFieldUpdateOperationsInput | string | null
+    cover?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updateAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumArticleStatusFieldUpdateOperationsInput | $Enums.ArticleStatus
+    categories?: ArticleUpdatecategoriesInput | string[]
+    sourceType?: EnumArticleSourceTypeFieldUpdateOperationsInput | $Enums.ArticleSourceType
+    sourceId?: NullableStringFieldUpdateOperationsInput | string | null
+    authorId?: StringFieldUpdateOperationsInput | string
+    authorIds?: ArticleUpdateauthorIdsInput | string[]
+    metadata?: InputJsonValue | InputJsonValue | null
+  }
+
   export type InvitationUpdateWithoutInviterInput = {
     email?: StringFieldUpdateOperationsInput | string
     role?: StringFieldUpdateOperationsInput | string
@@ -44839,6 +45346,7 @@ export namespace Prisma {
     sourceType?: $Enums.ArticleSourceType
     sourceId?: string | null
     authorId: string
+    authorIds?: ArticleCreateauthorIdsInput | string[]
     metadata?: InputJsonValue | null
   }
 
@@ -45015,6 +45523,7 @@ export namespace Prisma {
     sourceId?: NullableStringFieldUpdateOperationsInput | string | null
     metadata?: InputJsonValue | InputJsonValue | null
     author?: UserUpdateOneRequiredWithoutArticleNestedInput
+    authors?: UserUpdateManyWithoutContributedArticlesNestedInput
   }
 
   export type ArticleUncheckedUpdateWithoutSiteInput = {
@@ -45031,7 +45540,9 @@ export namespace Prisma {
     sourceType?: EnumArticleSourceTypeFieldUpdateOperationsInput | $Enums.ArticleSourceType
     sourceId?: NullableStringFieldUpdateOperationsInput | string | null
     authorId?: StringFieldUpdateOperationsInput | string
+    authorIds?: ArticleUpdateauthorIdsInput | string[]
     metadata?: InputJsonValue | InputJsonValue | null
+    authors?: UserUncheckedUpdateManyWithoutContributedArticlesNestedInput
   }
 
   export type ArticleUncheckedUpdateManyWithoutSiteInput = {
@@ -45048,6 +45559,7 @@ export namespace Prisma {
     sourceType?: EnumArticleSourceTypeFieldUpdateOperationsInput | $Enums.ArticleSourceType
     sourceId?: NullableStringFieldUpdateOperationsInput | string | null
     authorId?: StringFieldUpdateOperationsInput | string
+    authorIds?: ArticleUpdateauthorIdsInput | string[]
     metadata?: InputJsonValue | InputJsonValue | null
   }
 
@@ -45378,6 +45890,7 @@ export namespace Prisma {
     Page?: PageUpdateManyWithoutUserNestedInput
     Notification?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutSenderNestedInput
+    contributedArticles?: ArticleUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUpdateManyWithoutInviterNestedInput
   }
 
@@ -45392,6 +45905,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     memberOfSiteIds?: UserUpdatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserUpdatecontributedArticleIdsInput | string[]
     developerMode?: BoolFieldUpdateOperationsInput | boolean
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
@@ -45402,6 +45916,7 @@ export namespace Prisma {
     Page?: PageUncheckedUpdateManyWithoutUserNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutSenderNestedInput
+    contributedArticles?: ArticleUncheckedUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUncheckedUpdateManyWithoutInviterNestedInput
   }
 
@@ -45416,6 +45931,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
     memberOfSiteIds?: UserUpdatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserUpdatecontributedArticleIdsInput | string[]
     developerMode?: BoolFieldUpdateOperationsInput | boolean
   }
 
@@ -45725,6 +46241,71 @@ export namespace Prisma {
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     invoiceUrl?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type UserUpdateWithoutContributedArticlesInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    developerMode?: BoolFieldUpdateOperationsInput | boolean
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    Site?: SiteUpdateManyWithoutUserNestedInput
+    Category?: CategoryUpdateManyWithoutUserNestedInput
+    Subscription?: SubscriptionUpdateManyWithoutUserNestedInput
+    Article?: ArticleUpdateManyWithoutAuthorNestedInput
+    Page?: PageUpdateManyWithoutUserNestedInput
+    Notification?: NotificationUpdateManyWithoutUserNestedInput
+    sentNotifications?: NotificationUpdateManyWithoutSenderNestedInput
+    memberOfSites?: SiteUpdateManyWithoutMembersNestedInput
+    sentInvitations?: InvitationUpdateManyWithoutInviterNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutContributedArticlesInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    memberOfSiteIds?: UserUpdatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserUpdatecontributedArticleIdsInput | string[]
+    developerMode?: BoolFieldUpdateOperationsInput | boolean
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    Site?: SiteUncheckedUpdateManyWithoutUserNestedInput
+    Category?: CategoryUncheckedUpdateManyWithoutUserNestedInput
+    Subscription?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    Article?: ArticleUncheckedUpdateManyWithoutAuthorNestedInput
+    Page?: PageUncheckedUpdateManyWithoutUserNestedInput
+    Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    sentNotifications?: NotificationUncheckedUpdateManyWithoutSenderNestedInput
+    memberOfSites?: SiteUncheckedUpdateManyWithoutMembersNestedInput
+    sentInvitations?: InvitationUncheckedUpdateManyWithoutInviterNestedInput
+  }
+
+  export type UserUncheckedUpdateManyWithoutContributedArticlesInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    memberOfSiteIds?: UserUpdatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserUpdatecontributedArticleIdsInput | string[]
+    developerMode?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type RssItemCreateManyRssInput = {

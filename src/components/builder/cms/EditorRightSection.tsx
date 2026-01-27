@@ -106,13 +106,15 @@ const EditorRightSection = ({
     excerpt,
     setExcerpt,
     setThumbnail, thumbnail,
-    categories: selectedCategories = [],
+    categories = [],
     setCategories,
     title = "",
     seo = defaultSEO,
     setSeo,
     aiGenerated,
-    setAiGenerated
+    setAiGenerated,
+    authors = [],
+    setAuthors
 }: {
     article: Article
     slug: string
@@ -128,6 +130,8 @@ const EditorRightSection = ({
     setSeo?: (val: SEOSettings) => void;
     aiGenerated?: boolean;
     setAiGenerated?: (val: boolean) => void;
+    authors?: string[];
+    setAuthors?: (val: string[]) => void;
 }) => {
     const { siteId } = useSite()
     const [isOpen, setOpen] = useState<boolean>()
@@ -144,6 +148,30 @@ const EditorRightSection = ({
     const { data: availableCategories, refetch } = useFetch<any[]>(
         siteId ? `/api/team/${siteId}/categories?published=true` : null
     )
+
+    const { data: availableMembers } = useFetch<any[]>(
+        siteId ? `/api/team/${siteId}/members` : null
+    )
+
+    const toggleAuthor = (authorId: string) => {
+        if (!setAuthors) return
+        const current = authors || []
+        if (current.includes(authorId)) {
+            setAuthors(current.filter((id) => id !== authorId))
+        } else {
+            setAuthors([...current, authorId])
+        }
+    }
+
+    const removeAuthor = (authorId: string) => {
+        if (!setAuthors) return
+        setAuthors((authors || []).filter((id) => id !== authorId))
+    }
+
+    const getSelectedAuthorNames = () => {
+        if (!availableMembers || !authors) return []
+        return availableMembers.filter((mem) => authors.includes(mem.id))
+    }
 
     const [newCategoryForm, setNewCategoryForm] = useState({
         name: "",
@@ -187,7 +215,7 @@ const EditorRightSection = ({
 
             // Automatically select the newly created category
             if (setCategories) {
-                setCategories([...(selectedCategories || []), newCategory.id])
+                setCategories([...(categories || []), newCategory.id])
             }
         } catch (error: any) {
             toast.error(error.message || "Failed to create category")
@@ -196,7 +224,7 @@ const EditorRightSection = ({
 
     const toggleCategory = (categoryId: string) => {
         if (!setCategories) return
-        const current = selectedCategories || []
+        const current = categories || []
         if (current.includes(categoryId)) {
             setCategories(current.filter((id) => id !== categoryId))
         } else {
@@ -206,12 +234,12 @@ const EditorRightSection = ({
 
     const removeCategory = (categoryId: string) => {
         if (!setCategories) return
-        setCategories((selectedCategories || []).filter((id) => id !== categoryId))
+        setCategories((categories || []).filter((id) => id !== categoryId))
     }
 
     const getSelectedCategoryNames = () => {
-        if (!availableCategories || !selectedCategories) return []
-        return availableCategories.filter((cat) => selectedCategories.includes(cat.id))
+        if (!availableCategories || !categories) return [] // categories is the prop name I used in replacement
+        return availableCategories.filter((cat) => categories.includes(cat.id))
     }
 
     if (!siteId) return null
@@ -354,6 +382,106 @@ const EditorRightSection = ({
 
                 <Separator />
 
+                {/* Authors Section */}
+                {setAuthors && (
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                            <div className="h-4 w-4 rounded-full bg-muted flex items-center justify-center overflow-hidden border">
+                                <span className="text-[8px] font-bold">@</span>
+                            </div>
+                            <Label className="text-sm font-medium">Authors</Label>
+                        </div>
+
+                        {/* Selected Authors */}
+                        {getSelectedAuthorNames().length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                                {getSelectedAuthorNames().map((author) => (
+                                    <Badge key={author.id} variant="secondary" className="gap-1.5 pr-1 pl-1.5 py-1">
+                                        {author.image ? (
+                                            <Image
+                                                src={author.image}
+                                                alt={author.name}
+                                                width={16}
+                                                height={16}
+                                                className="rounded-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-4 h-4 rounded-full bg-muted-foreground/20" />
+                                        )}
+                                        {author.name}
+                                        <button
+                                            onClick={() => removeAuthor(author.id)}
+                                            className="ml-0.5 rounded-sm hover:bg-muted p-0.5 transition-colors"
+                                        >
+                                            <X className="h-3 w-3" />
+                                        </button>
+                                    </Badge>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Author selector */}
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    role="combobox"
+                                    className="w-full justify-between h-9 font-normal"
+                                >
+                                    <span className="text-muted-foreground text-sm">
+                                        {getSelectedAuthorNames().length > 0
+                                            ? `${getSelectedAuthorNames().length} selected`
+                                            : "Select authors..."}
+                                    </span>
+                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[280px] p-0">
+                                <Command>
+                                    <CommandInput placeholder="Search team members..." />
+                                    <CommandEmpty>No members found.</CommandEmpty>
+                                    <CommandGroup className="max-h-64 overflow-auto">
+                                        {availableMembers?.map((member) => (
+                                            <CommandItem
+                                                key={member.id}
+                                                value={member.name}
+                                                onSelect={() => toggleAuthor(member.id)}
+                                            >
+                                                <div className="flex items-center gap-2 flex-1">
+                                                    <Checkbox
+                                                        checked={authors?.includes(member.id)}
+                                                        onCheckedChange={() => toggleAuthor(member.id)}
+                                                    />
+                                                    <div className="flex items-center gap-2">
+                                                        {member.image ? (
+                                                            <Image
+                                                                src={member.image}
+                                                                alt={member.name}
+                                                                width={20}
+                                                                height={20}
+                                                                className="rounded-full object-cover w-5 h-5"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-5 h-5 rounded-full bg-muted-foreground/20" />
+                                                        )}
+                                                        <span className="text-sm">{member.name}</span>
+                                                    </div>
+                                                </div>
+                                                <Check
+                                                    className={`ml-auto h-4 w-4 ${authors?.includes(member.id) ? "opacity-100" : "opacity-0"
+                                                        }`}
+                                                />
+                                            </CommandItem>
+                                        ))}
+                                    </CommandGroup>
+                                </Command>
+                            </PopoverContent>
+                        </Popover>
+                    </div>
+                )}
+
+                <Separator />
+
                 {/* Categories Section */}
                 {setCategories && (
                     <div className="space-y-3">
@@ -420,13 +548,13 @@ const EditorRightSection = ({
                                             >
                                                 <div className="flex items-center gap-2 flex-1">
                                                     <Checkbox
-                                                        checked={selectedCategories?.includes(category.id)}
+                                                        checked={categories?.includes(category.id)}
                                                         onCheckedChange={() => toggleCategory(category.id)}
                                                     />
                                                     <span className="text-sm">{category.name}</span>
                                                 </div>
                                                 <Check
-                                                    className={`ml-auto h-4 w-4 ${selectedCategories?.includes(category.id) ? "opacity-100" : "opacity-0"
+                                                    className={`ml-auto h-4 w-4 ${categories?.includes(category.id) ? "opacity-100" : "opacity-0"
                                                         }`}
                                                 />
                                             </CommandItem>

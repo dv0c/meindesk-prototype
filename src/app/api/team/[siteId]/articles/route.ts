@@ -7,6 +7,9 @@ export const runtime = "nodejs"
 // -------------------------------------------------------
 // GET – Fetch all articles for a specific site by ID (with optional limit)
 // -------------------------------------------------------
+// -------------------------------------------------------
+// GET – Fetch all articles for a specific site by ID (with optional limit)
+// -------------------------------------------------------
 export async function GET(
   req: NextRequest,
   { params }: { params: { siteId: string } }
@@ -35,9 +38,17 @@ export async function GET(
         status: true,
         siteId: true,
         authorId: true,
+        authorIds: true,
         categories: true,
         metadata: true,
         author: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
+        authors: {
           select: {
             id: true,
             name: true,
@@ -63,7 +74,7 @@ export async function GET(
         id: true,
         name: true,
         slug: true,
-      },
+      }
     })
 
     // 3. Create a lookup map for faster access
@@ -133,6 +144,7 @@ export async function POST(
         },
         status: body.status || "DRAFT",
         authorId: session.user.id,
+        authorIds: body.authorIds || [session.user.id], // Default to creator if not provided
         excerpt: body.excerpt || "",
         cover: body.cover || "",
       }

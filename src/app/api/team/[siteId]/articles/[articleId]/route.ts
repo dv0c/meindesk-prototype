@@ -40,6 +40,14 @@ export async function GET(
             image: true,
           },
         },
+        authors: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
         site: {
           select: {
             id: true,
@@ -94,6 +102,7 @@ export async function PATCH(
       "categoryId",
       "categories",
       "metadata",
+      "authorIds",
     ];
     const updateData: Record<string, any> = {};
     for (const key of allowed) {

@@ -4,6 +4,7 @@ import { SerializedEditorState } from "lexical"
 import { useEffect, useMemo, useRef, useState } from "react"
 
 import { EditorProvider, EditorToolbar, EditorContent } from "@/components/blocks/editor-x/editor"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from "@/components/ui/drawer"
@@ -45,9 +46,10 @@ interface ArticleEditorProps {
     articleId: string
     siteId: string
     onClose?: () => void
+    onUpdate?: () => void
 }
 
-export default function ArticleEditor({ articleId, siteId, onClose }: ArticleEditorProps) {
+export default function ArticleEditor({ articleId, siteId, onClose, onUpdate }: ArticleEditorProps) {
     const [title, setTitle] = useState("")
     const [editorState, setEditorState] = useState<SerializedEditorState>()
     const [html, setHtml] = useState("")
@@ -55,6 +57,7 @@ export default function ArticleEditor({ articleId, siteId, onClose }: ArticleEdi
     const [excerpt, setExcerpt] = useState("")
     const [thumbnail, setThumbnail] = useState("")
     const [categories, setCategories] = useState<string[]>([])
+    const [authors, setAuthors] = useState<string[]>([])
     const [seo, setSeo] = useState<{ metaTitle: string; metaDescription: string; ogImage: string }>({
         metaTitle: "",
         metaDescription: "",
@@ -89,6 +92,9 @@ export default function ArticleEditor({ articleId, siteId, onClose }: ArticleEdi
         setSlug(article.slug || "")
         setExcerpt(article.excerpt || "")
         setCategories(article.categories || [])
+        // Handle authors: if authorIds exists use it, else fallback to [authorId] or empty
+        setAuthors(article.authorIds || (article.authorId ? [article.authorId] : []))
+
         setLoaded(true)
         setThumbnail(article.cover || "")
         // Load SEO from metadata
@@ -121,6 +127,7 @@ export default function ArticleEditor({ articleId, siteId, onClose }: ArticleEdi
                 excerpt,
                 cover: thumbnail,
                 categories,
+                authorIds: authors,
                 metadata: {
                     ...((article?.metadata as any) || {}),
                     seo,
@@ -145,6 +152,7 @@ export default function ArticleEditor({ articleId, siteId, onClose }: ArticleEdi
                 }
             })
             // toast.success("Saved!")
+            if (onUpdate) onUpdate()
         } catch (error) {
             toast.error("Failed to save")
         }
@@ -168,10 +176,15 @@ export default function ArticleEditor({ articleId, siteId, onClose }: ArticleEdi
         const excerptChanged = excerpt !== (article.excerpt || "")
         const thumbnailChanged = thumbnail !== (article.cover || "")
         const categoriesChanged = JSON.stringify(categories) !== JSON.stringify(article.categories || [])
+        // Compare authors. Sort both arrays to ensure order doesn't matter
+        const currentAuthors = [...(authors || [])].sort()
+        const savedAuthors = [...(article.authorIds || (article.authorId ? [article.authorId] : []))].sort()
+        const authorsChanged = JSON.stringify(currentAuthors) !== JSON.stringify(savedAuthors)
+
         // If html is loaded from article.html but editorState was empty, contentChanged might be tricky.
         // But usually saving will update both.
-        return titleChanged || contentChanged || slugChanged || excerptChanged || thumbnailChanged || categoriesChanged
-    }, [title, editorState, slug, excerpt, article, thumbnail, categories])
+        return titleChanged || contentChanged || slugChanged || excerptChanged || thumbnailChanged || categoriesChanged || authorsChanged
+    }, [title, editorState, slug, excerpt, article, thumbnail, categories, authors])
 
     if (!loaded && loading) {
         return (
@@ -194,63 +207,65 @@ export default function ArticleEditor({ articleId, siteId, onClose }: ArticleEdi
             )}
             <div className="h-full flex flex-col bg-background">
                 {/* Header */}
-                <header className="sticky top-0 z-50 h-12 shrink-0 flex items-center justify-between px-4 border-b bg-background">
-                    <div className="flex items-center gap-3">
+                {/* Header */}
+                <header className="sticky top-0 z-50 h-14 shrink-0 flex items-center justify-between px-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                    <div className="flex items-center gap-4 min-w-0">
                         {onClose && (
                             <Button
                                 onClick={onClose}
                                 variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0"
+                                size="icon"
+                                className="-ml-2 h-8 w-8 text-muted-foreground hover:text-foreground shrink-0"
                             >
                                 <ArrowLeft className="h-4 w-4" />
                             </Button>
                         )}
-                        <span className="text-sm font-medium truncate max-w-[200px] hidden sm:block">
-                            {title || "Untitled"}
-                        </span>
-                        {unsavedChanges && (
-                            <Badge variant="outline" className="text-orange-500 border-orange-500/50 text-xs">
-                                Unsaved
-                            </Badge>
-                        )}
+                        <div className="flex items-center gap-3 min-w-0 overflow-hidden">
+                            <span className="text-sm font-semibold truncate leading-none tracking-tight">
+                                {title || "Untitled Article"}
+                            </span>
+                            {unsavedChanges && (
+                                <Badge variant="outline" className="text-[10px] h-5 px-1.5 py-0 border-orange-500/50 text-orange-500 bg-orange-500/10 shrink-0">
+                                    Unsaved
+                                </Badge>
+                            )}
+                        </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 shrink-0">
                         <Link href={`/dashboard/${siteId}/projects/website/articles/${articleId}/editor`} target="_blank">
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
                                 <ExternalLink className="h-4 w-4" />
                             </Button>
                         </Link>
 
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-xs">
-                                    <span className={`h-2 w-2 rounded-full ${article?.status === 'PUBLISHED' ? 'bg-green-500' : 'bg-yellow-500'
-                                        }`} />
-                                    {article?.status === 'PUBLISHED' ? 'Published' : 'Draft'}
+                                <Button variant="ghost" size="sm" className="h-8 gap-2 text-muted-foreground hover:text-foreground px-2">
+                                    <div className={`h-1.5 w-1.5 rounded-full ${article.status === 'PUBLISHED' ? 'bg-green-500' : 'bg-yellow-500'}`} />
+                                    <span className="text-xs font-medium capitalize">{article.status.toLowerCase()}</span>
                                     <ChevronDown className="h-3 w-3 opacity-50" />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-40">
-                                <DropdownMenuItem onClick={() => handleStatus({ status: 'PUBLISHED' })}>
-                                    <span className="h-2 w-2 rounded-full bg-green-500 mr-2" />
-                                    Published
-                                </DropdownMenuItem>
+                            <DropdownMenuContent align="end">
                                 <DropdownMenuItem onClick={() => handleStatus({ status: 'DRAFT' })}>
-                                    <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2" />
+                                    <div className="h-1.5 w-1.5 rounded-full bg-yellow-500 mr-2" />
                                     Draft
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleStatus({ status: 'PUBLISHED' })}>
+                                    <div className="h-1.5 w-1.5 rounded-full bg-green-500 mr-2" />
+                                    Published
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
 
-                        <div className="h-4 w-px bg-border" />
+                        <div className="h-4 w-px bg-border mx-1" />
 
                         <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => setShowSidebar(!showSidebar)}
-                            className={`h-8 w-8 p-0 ${showSidebar ? 'bg-accent' : ''}`}
+                            className={`h-8 w-8 p-0 ${showSidebar ? 'bg-muted text-foreground' : 'text-muted-foreground'}`}
                         >
                             <PanelRight className="h-4 w-4" />
                         </Button>
@@ -259,8 +274,8 @@ export default function ArticleEditor({ articleId, siteId, onClose }: ArticleEdi
                             onClick={handleSave}
                             disabled={loading || !unsavedChanges}
                             size="sm"
-                            className="h-8 px-3 gap-1.5"
-                            variant={unsavedChanges ? "default" : "secondary"}
+                            className="h-8 px-4 gap-2 font-medium"
+                            variant={unsavedChanges ? "default" : "outline"}
                         >
                             {loading ? (
                                 <Spinner className="h-3.5 w-3.5" />
@@ -272,63 +287,68 @@ export default function ArticleEditor({ articleId, siteId, onClose }: ArticleEdi
                     </div>
                 </header>
 
-                {/* Toolbar */}
-                <div className="sticky top-12 z-40 shrink-0 border-b bg-background h-12 flex items-center">
-                    <EditorToolbar />
-                </div>
-
                 {/* Main Content */}
-                <div className="flex-1 flex overflow-hidden">
-                    {/* Editor Area */}
-                    <div className="flex-1 overflow-y-auto relative">
-                        {/* Title */}
-                        <div className="px-4 sm:px-6 md:px-8 pt-6 md:pt-8 pb-4 bg-background">
-                            <div className="max-w-3xl mx-auto">
-                                <textarea
-                                    ref={titleRef}
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
-                                    placeholder="Article title"
-                                    rows={1}
-                                    className="w-full bg-transparent text-3xl font-bold tracking-tight placeholder:text-muted-foreground/40 focus:outline-none resize-none overflow-hidden"
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                            e.preventDefault()
-                                            // Focus the editor
-                                            const editor = document.querySelector('.ContentEditable__root') as HTMLElement
-                                            if (editor) editor.focus()
-                                        }
-                                    }}
-                                />
+                <div className="flex-1 flex overflow-hidden bg-muted/5">
+                    {/* Editor Column */}
+                    <div className="flex-1 flex flex-col min-w-0">
+                        {/* Editor Area */}
+                        <ScrollArea className="flex-1 h-full">
+                            {/* Toolbar */}
+                            <div className="w-full border-b bg-background z-10">
+                                <EditorToolbar />
                             </div>
-                        </div>
 
-                        {/* Content */}
-                        <div className="bg-background pb-32 px-4 sm:px-6 md:px-8">
-                            <div className="max-w-3xl mx-auto">
-                                <EditorContent siteId={siteId} />
+                            <div className="min-h-full w-full py-8 px-4 sm:px-6 md:px-8 flex justify-center">
+                                <div className="w-full max-w-3xl space-y-8 bg-background rounded-xl border-none sm:border shadow-sm p-8 sm:p-12 min-h-[calc(100vh-12rem)]">
+                                    {/* Title */}
+                                    <textarea
+                                        ref={titleRef}
+                                        value={title}
+                                        onChange={(e) => setTitle(e.target.value)}
+                                        placeholder="Article Title"
+                                        rows={1}
+                                        className="w-full bg-transparent text-4xl font-extrabold tracking-tight placeholder:text-muted-foreground/30 focus:outline-none resize-none overflow-hidden leading-tight"
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault()
+                                                // Focus the editor
+                                                const editor = document.querySelector('.ContentEditable__root') as HTMLElement
+                                                if (editor) editor.focus()
+                                            }
+                                        }}
+                                    />
+
+                                    {/* Content */}
+                                    <div className="prose prose-stone dark:prose-invert max-w-none prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-p:leading-7">
+                                        <EditorContent siteId={siteId} />
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        </ScrollArea>
                     </div>
 
                     {/* Desktop Sidebar */}
-                    <aside className={`hidden md:flex w-80 border-l bg-background flex-col z-[45] transition-all duration-300 ${showSidebar ? 'mr-0' : '-mr-80'}`}>
-                        <div className="flex-1 overflow-y-auto p-4">
-                            <EditorRightSection
-                                setThumbnail={setThumbnail}
-                                thumbnail={thumbnail}
-                                article={article}
-                                slug={slug}
-                                setSlug={setSlug}
-                                excerpt={excerpt}
-                                setExcerpt={setExcerpt}
-                                categories={categories}
-                                setCategories={setCategories}
-                                title={title}
-                                seo={seo}
-                                setSeo={setSeo}
-                            />
-                        </div>
+                    <aside className={`hidden md:flex w-80 border-l bg-background/50 backdrop-blur-sm flex-col z-40 transition-all duration-300 ${showSidebar ? 'mr-0' : '-mr-80'}`}>
+                        <ScrollArea className="h-full">
+                            <div className="p-6">
+                                <EditorRightSection
+                                    setThumbnail={setThumbnail}
+                                    thumbnail={thumbnail}
+                                    article={article}
+                                    slug={slug}
+                                    setSlug={setSlug}
+                                    excerpt={excerpt}
+                                    setExcerpt={setExcerpt}
+                                    categories={categories}
+                                    setCategories={setCategories}
+                                    title={title}
+                                    seo={seo}
+                                    setSeo={setSeo}
+                                    authors={authors}
+                                    setAuthors={setAuthors}
+                                />
+                            </div>
+                        </ScrollArea>
                     </aside>
                 </div>
             </div>

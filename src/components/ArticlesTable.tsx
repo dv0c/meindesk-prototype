@@ -171,6 +171,7 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
                         <TableHeader className="bg-muted/40">
                             <TableRow className="hover:bg-transparent border-b">
                                 <TableHead className="h-10 text-xs font-medium w-[400px]">Article</TableHead>
+                                <TableHead className="h-10 text-xs font-medium">Authors</TableHead>
                                 <TableHead className="h-10 text-xs font-medium">Status</TableHead>
                                 <TableHead className="h-10 text-xs font-medium">SEO</TableHead>
                                 <TableHead className="h-10 text-xs font-medium">Time</TableHead>
@@ -218,6 +219,48 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
                                                 </div>
                                             </div>
                                         </TableCell>
+                                        {/* Authors Column */}
+                                        <TableCell className="py-3">
+                                            <div className="flex -space-x-2 overflow-hidden">
+                                                {article.authors && article.authors.length > 0 ? (
+                                                    article.authors.map((author: any) => (
+                                                        <div key={author.id} title={author.name} className="relative inline-block border-2 border-background rounded-full">
+                                                            {author.image ? (
+                                                                <Image
+                                                                    src={author.image}
+                                                                    alt={author.name}
+                                                                    width={24}
+                                                                    height={24}
+                                                                    className="h-6 w-6 rounded-full object-cover"
+                                                                />
+                                                            ) : (
+                                                                <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-[10px] font-medium text-muted-foreground">
+                                                                    {author.name?.[0]?.toUpperCase() || "?"}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ))
+                                                ) : article.author ? (
+                                                    <div title={article.author.name} className="relative inline-block border-2 border-background rounded-full">
+                                                        {article.author.image ? (
+                                                            <Image
+                                                                src={article.author.image}
+                                                                alt={article.author.name}
+                                                                width={24}
+                                                                height={24}
+                                                                className="h-6 w-6 rounded-full object-cover"
+                                                            />
+                                                        ) : (
+                                                            <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-[10px] font-medium text-muted-foreground">
+                                                                {article.author.name?.[0]?.toUpperCase() || "?"}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-xs text-muted-foreground">-</span>
+                                                )}
+                                            </div>
+                                        </TableCell>
                                         <TableCell className="py-3">
                                             <Badge variant={(statusColors[article.status as keyof typeof statusColors] || "default") as any} className="h-5 px-2 text-[10px] font-medium rounded-full">
                                                 {article.status}
@@ -227,7 +270,7 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
                                             {article.metadata?.seoScore !== undefined ? (
                                                 <div className="flex items-center gap-2">
                                                     <div className={`h-2 w-2 rounded-full ${article.metadata.seoScore >= 80 ? "bg-green-500" :
-                                                            article.metadata.seoScore >= 50 ? "bg-yellow-500" : "bg-red-500"
+                                                        article.metadata.seoScore >= 50 ? "bg-yellow-500" : "bg-red-500"
                                                         }`} />
                                                     <span className="text-xs font-medium">{article.metadata.seoScore}</span>
                                                 </div>
@@ -272,34 +315,36 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
                     </Table>
                 </div>
 
-                {filteredArticles.length > 0 && (
-                    <div className="flex items-center justify-between px-2 pt-2">
-                        <div className="text-xs text-muted-foreground">
-                            Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredArticles.length)} of {filteredArticles.length}
+                {
+                    filteredArticles.length > 0 && (
+                        <div className="flex items-center justify-between px-2 pt-2">
+                            <div className="text-xs text-muted-foreground">
+                                Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredArticles.length)} of {filteredArticles.length}
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                                    disabled={currentPage === 1}
+                                    className="h-8 w-8 p-0"
+                                >
+                                    <ChevronLeft className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                                    disabled={currentPage === totalPages}
+                                    className="h-8 w-8 p-0"
+                                >
+                                    <ChevronRight className="h-4 w-4" />
+                                </Button>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                                disabled={currentPage === 1}
-                                className="h-8 w-8 p-0"
-                            >
-                                <ChevronLeft className="h-4 w-4" />
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                                disabled={currentPage === totalPages}
-                                className="h-8 w-8 p-0"
-                            >
-                                <ChevronRight className="h-4 w-4" />
-                            </Button>
-                        </div>
-                    </div>
-                )}
-            </div>
+                    )
+                }
+            </div >
 
             <Sheet open={!!selectedArticleId} onOpenChange={(open) => !open && setSelectedArticleId(null)}>
                 <SheetContent
@@ -316,6 +361,9 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
                                 articleId={selectedArticleId}
                                 siteId={siteId || (team?.id as string)}
                                 onClose={() => setSelectedArticleId(null)}
+                                onUpdate={() => {
+                                    if (team) getArticles(team.id)
+                                }}
                             />
                         </div>
                     )}
@@ -328,6 +376,6 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
                 onConfirm={handleDelete}
                 title="Delete Article"
             />
-        </div>
+        </div >
     )
 }

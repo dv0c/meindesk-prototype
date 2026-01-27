@@ -43,6 +43,9 @@ model User {
   memberOfSites   Site[]   @relation("SiteMembers", fields: [memberOfSiteIds], references: [id])
   memberOfSiteIds String[] @db.ObjectId
 
+  contributedArticles   Article[] @relation("ArticleAuthors", fields: [contributedArticleIds], references: [id])
+  contributedArticleIds String[]  @db.ObjectId
+
   sentInvitations Invitation[] @relation("Inviter")
 
   developerMode Boolean @default(false)
@@ -282,6 +285,9 @@ model Article {
 
   author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId String @db.ObjectId
+
+  authors   User[]   @relation("ArticleAuthors", fields: [authorIds], references: [id])
+  authorIds String[] @db.ObjectId
 
   metadata Json?
 

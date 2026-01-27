@@ -126,6 +126,7 @@ exports.Prisma.UserScalarFieldEnum = {
   updatedAt: 'updatedAt',
   role: 'role',
   memberOfSiteIds: 'memberOfSiteIds',
+  contributedArticleIds: 'contributedArticleIds',
   developerMode: 'developerMode'
 };
 
@@ -273,6 +274,7 @@ exports.Prisma.ArticleScalarFieldEnum = {
   sourceType: 'sourceType',
   sourceId: 'sourceId',
   authorId: 'authorId',
+  authorIds: 'authorIds',
   metadata: 'metadata'
 };
 

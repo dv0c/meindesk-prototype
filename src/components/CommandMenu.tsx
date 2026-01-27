@@ -24,6 +24,7 @@ import {
     CommandItem,
     CommandList,
     CommandSeparator,
+    CommandPrimitive,
 } from "@/components/ui/command"
 import { useTeams } from "@/hooks/useTeams"
 import { cn } from "@/lib/utils"
@@ -50,12 +51,12 @@ export function CommandMenu({ open, setOpen }: { open: boolean, setOpen: React.D
     }, [setOpen])
 
     return (
-        <CommandDialog open={open} onOpenChange={setOpen} className="bg-popover/95 backdrop-blur-xl border-border text-popover-foreground sm:max-w-[600px] p-0 overflow-hidden shadow-2xl rounded-xl">
+        <CommandDialog open={open} onOpenChange={setOpen} showCloseButton={false} className="bg-popover/95 backdrop-blur-xl border-border text-popover-foreground sm:max-w-[600px] p-0 overflow-hidden shadow-2xl rounded-xl">
             <div className="flex items-center border-b border-border/50 px-4 h-14">
                 <Search className="mr-3 h-5 w-5 text-muted-foreground/70" />
-                <CommandInput
+                <CommandPrimitive.Input
                     placeholder="Search documentation, projects, settings..."
-                    className="border-0 focus:ring-0 text-base text-popover-foreground placeholder:text-muted-foreground/70 h-full bg-transparent p-0"
+                    className="flex h-full w-full rounded-md bg-transparent py-3 text-base outline-hidden placeholder:text-muted-foreground/70 disabled:cursor-not-allowed disabled:opacity-50 border-0 focus:ring-0 p-0"
                 />
                 <kbd className="pointer-events-none ml-auto inline-flex h-5 select-none items-center gap-1 rounded bg-muted/50 px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
                     <span className="text-xs">ESC</span>
