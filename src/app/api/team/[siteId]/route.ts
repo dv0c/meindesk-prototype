@@ -121,7 +121,7 @@ export async function PUT(
     }
 
     const body = await req.json();
-    const { title, description, link, home_Id } = body;
+    const { title, description, link, home_Id, features } = body;
 
     // 1. Find the site
     const site = await db.site.findUnique({
@@ -145,13 +145,26 @@ export async function PUT(
     }
 
     // 3. Update the site
+    // Remove id from features if present, as it causes Prisma error during update
+    let featuresData = undefined;
+    if (features) {
+      const { id, ...rest } = features;
+      featuresData = rest;
+    }
+
     const updatedSite = await db.site.update({
       where: { id: siteId },
       data: {
         title: title ?? site.title,
         description: description ?? site.description,
         url: link ?? site.url,
-        home_Id: home_Id ?? site.home_Id
+        home_Id: home_Id ?? site.home_Id,
+        features: featuresData ? {
+          upsert: {
+            create: featuresData,
+            update: featuresData
+          }
+        } : undefined
       },
     });
 

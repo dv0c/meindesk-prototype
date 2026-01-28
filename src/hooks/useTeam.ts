@@ -20,6 +20,7 @@ export interface Site {
     pages: boolean
     categories: boolean
     media: boolean
+    rss: boolean
     analytics: boolean
   }
 }

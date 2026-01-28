@@ -16,7 +16,6 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { NavUser } from "@/components/nav-user"
 import { useTeams } from "@/hooks/useTeams"
 import { GalleryVerticalEnd } from "lucide-react"
 

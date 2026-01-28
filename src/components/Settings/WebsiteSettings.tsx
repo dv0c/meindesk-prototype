@@ -1,26 +1,21 @@
 "use client"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import axios from "axios"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { RefreshCw, Trash2, Globe, CheckCircle2, AlertCircle, Plus } from "lucide-react"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { RefreshCw, Trash2, Globe, CheckCircle2, AlertCircle, Plus, Settings } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import type { Site } from "@prisma/client"
 
 import { usePages } from "@/hooks/use-pages"
 import { cn } from "@/lib/utils"
 
-interface Page {
-    id: string
-    title: string
-    slug: string
-}
+
 
 const WebsiteSettings = ({ site }: { site: Site }) => {
     const router = useRouter()
@@ -46,7 +41,7 @@ const WebsiteSettings = ({ site }: { site: Site }) => {
 
     // --- Check Domain Status on Mount/Change ---
     useEffect(() => {
-        if (site.url && site.url !== `${site.subdomain}.meindesk.gr` && !site.url.includes("localhost")) {
+        if (site.url && !site.url.includes(".meindesk.gr") && !site.url.includes("localhost")) {
             checkDomainStatus(site.url)
         }
     }, [site.url])
@@ -122,7 +117,6 @@ const WebsiteSettings = ({ site }: { site: Site }) => {
     }
 
     // --- Components ---
-    // --- Components ---
     const SettingCard = ({ title, description, children, footer, className }: any) => (
         <div className={cn("rounded-lg border border-border bg-background overflow-hidden", className)}>
             <div className="p-6">
@@ -134,16 +128,13 @@ const WebsiteSettings = ({ site }: { site: Site }) => {
             </div>
             {footer && (
                 <div className="flex items-center justify-between p-4 px-6 bg-muted/20 border-t border-border">
-                    <div className="text-sm text-muted-foreground w-full">
-                        {/* Optional footer text left-side */}
-                    </div>
                     {footer}
                 </div>
             )}
         </div>
     )
 
-    const isCustomDomain = site.url && site.url !== `${site.subdomain}.meindesk.gr`;
+    const isCustomDomain = site.url && !site.url.includes(".meindesk.gr");
 
     return (
         <div className="max-w-4xl w-full space-y-8">
@@ -175,14 +166,12 @@ const WebsiteSettings = ({ site }: { site: Site }) => {
                 footer={
                     <div className="flex w-full justify-between items-center">
                         <span className="text-xs text-muted-foreground">
-                            Looking to add a subdomain? <span className="underline cursor-pointer">Read the docs</span>.
+                            Looking to add a subdomain? <Link href="/resources/documentation/subdomains" className="underline cursor-pointer hover:text-foreground">Read the docs</Link>.
                         </span>
-                        {!isCustomDomain && (
-                            <Button onClick={() => router.push(`/dashboard/${site.id}/domain-setup`)} size="sm">
-                                <Plus className="w-4 h-4 mr-2" />
-                                Add Domain
-                            </Button>
-                        )}
+                        <Button onClick={() => router.push(`/dashboard/${site.id}/domain-setup`)} size="sm" variant="outline">
+                            <Settings className="w-4 h-4 mr-2" />
+                            Domain Setup
+                        </Button>
                     </div>
                 }
             >

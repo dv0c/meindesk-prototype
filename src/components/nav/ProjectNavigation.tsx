@@ -4,23 +4,40 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { motion } from "framer-motion"
 
+import { useTeam } from "@/hooks/useTeam"
+import { useSession } from "next-auth/react"
+
 export function ProjectNavigation({ siteId }: { siteId: string }) {
     const pathname = usePathname()
+    const { data: session } = useSession()
+    const { team: site } = useTeam(siteId)
     const baseUrl = `/dashboard/${siteId}`
 
+    // Default features if not loaded yet
+    const features = site?.features || {
+        articles: true,
+        pages: true,
+        categories: true,
+        media: true,
+        rss: true,
+        analytics: true,
+    }
+
+    const isOwner = site?.userId === session?.user?.id
+
     const navItems = [
-        { name: "Overview", href: baseUrl, exact: true },
-        { name: "Articles", href: `${baseUrl}/projects/website/articles` },
-        { name: "Pages", href: `${baseUrl}/projects/website/pages` },
-        { name: "Categories", href: `${baseUrl}/projects/website/categories` },
-        { name: "Media", href: `${baseUrl}/projects/website/media-gallery` },
-        { name: "Collections", href: `${baseUrl}/collections` },
-        { name: "RSS", href: `${baseUrl}/projects/website/rss/my-feed` },
-        { name: "Community", href: `${baseUrl}/community` },
-        { name: "Features", href: `${baseUrl}/projects/website/features` },
-        { name: "Analytics", href: `${baseUrl}/projects/website/analytics` },
-        { name: "Settings", href: `${baseUrl}/projects/settings` },
-    ]
+        { name: "Overview", href: baseUrl, exact: true, show: true },
+        { name: "Articles", href: `${baseUrl}/projects/website/articles`, show: features.articles },
+        { name: "Pages", href: `${baseUrl}/projects/website/pages`, show: features.pages },
+        { name: "Categories", href: `${baseUrl}/projects/website/categories`, show: features.categories },
+        { name: "Media", href: `${baseUrl}/projects/website/media-gallery`, show: features.media },
+        { name: "Collections", href: `${baseUrl}/collections`, show: true },
+        { name: "RSS", href: `${baseUrl}/projects/website/rss/my-feed`, show: features.rss },
+        { name: "Community", href: `${baseUrl}/community`, show: true },
+        { name: "Features", href: `${baseUrl}/projects/website/features`, show: isOwner },
+        { name: "Analytics", href: `${baseUrl}/projects/website/analytics`, show: features.analytics },
+        { name: "Settings", href: `${baseUrl}/projects/settings`, show: true },
+    ].filter(item => item.show)
 
     return (
         <div className="border-b bg-background sticky top-16 z-40">
