@@ -49,6 +49,16 @@ export type Site = $Result.DefaultSelection<Prisma.$SitePayload>
  */
 export type Snippet = $Result.DefaultSelection<Prisma.$SnippetPayload>
 /**
+ * Model Channel
+ * 
+ */
+export type Channel = $Result.DefaultSelection<Prisma.$ChannelPayload>
+/**
+ * Model Message
+ * 
+ */
+export type Message = $Result.DefaultSelection<Prisma.$MessagePayload>
+/**
  * Model Features
  * 
  */
@@ -375,6 +385,26 @@ export class PrismaClient<
     * ```
     */
   get snippet(): Prisma.SnippetDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.channel`: Exposes CRUD operations for the **Channel** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Channels
+    * const channels = await prisma.channel.findMany()
+    * ```
+    */
+  get channel(): Prisma.ChannelDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.message`: Exposes CRUD operations for the **Message** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Messages
+    * const messages = await prisma.message.findMany()
+    * ```
+    */
+  get message(): Prisma.MessageDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.features`: Exposes CRUD operations for the **Features** model.
@@ -993,6 +1023,8 @@ export namespace Prisma {
     Category: 'Category',
     Site: 'Site',
     Snippet: 'Snippet',
+    Channel: 'Channel',
+    Message: 'Message',
     Features: 'Features',
     Subscription: 'Subscription',
     BillingHistory: 'BillingHistory',
@@ -1028,7 +1060,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "account" | "session" | "verificationToken" | "category" | "site" | "snippet" | "features" | "subscription" | "billingHistory" | "analyticsEvent" | "article" | "page" | "rss" | "rssItem" | "customFeedTemplate" | "mergedFeed" | "theme" | "themeBlock" | "siteTheme" | "notification" | "invitation" | "collection" | "collectionItem"
+      modelProps: "user" | "account" | "session" | "verificationToken" | "category" | "site" | "snippet" | "channel" | "message" | "features" | "subscription" | "billingHistory" | "analyticsEvent" | "article" | "page" | "rss" | "rssItem" | "customFeedTemplate" | "mergedFeed" | "theme" | "themeBlock" | "siteTheme" | "notification" | "invitation" | "collection" | "collectionItem"
       txIsolationLevel: never
     }
     model: {
@@ -1547,6 +1579,154 @@ export namespace Prisma {
           count: {
             args: Prisma.SnippetCountArgs<ExtArgs>
             result: $Utils.Optional<SnippetCountAggregateOutputType> | number
+          }
+        }
+      }
+      Channel: {
+        payload: Prisma.$ChannelPayload<ExtArgs>
+        fields: Prisma.ChannelFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ChannelFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChannelPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ChannelFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChannelPayload>
+          }
+          findFirst: {
+            args: Prisma.ChannelFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChannelPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ChannelFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChannelPayload>
+          }
+          findMany: {
+            args: Prisma.ChannelFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChannelPayload>[]
+          }
+          create: {
+            args: Prisma.ChannelCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChannelPayload>
+          }
+          createMany: {
+            args: Prisma.ChannelCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.ChannelDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChannelPayload>
+          }
+          update: {
+            args: Prisma.ChannelUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChannelPayload>
+          }
+          deleteMany: {
+            args: Prisma.ChannelDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ChannelUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ChannelUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChannelPayload>
+          }
+          aggregate: {
+            args: Prisma.ChannelAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateChannel>
+          }
+          groupBy: {
+            args: Prisma.ChannelGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ChannelGroupByOutputType>[]
+          }
+          findRaw: {
+            args: Prisma.ChannelFindRawArgs<ExtArgs>
+            result: JsonObject
+          }
+          aggregateRaw: {
+            args: Prisma.ChannelAggregateRawArgs<ExtArgs>
+            result: JsonObject
+          }
+          count: {
+            args: Prisma.ChannelCountArgs<ExtArgs>
+            result: $Utils.Optional<ChannelCountAggregateOutputType> | number
+          }
+        }
+      }
+      Message: {
+        payload: Prisma.$MessagePayload<ExtArgs>
+        fields: Prisma.MessageFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MessageFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MessagePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MessageFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MessagePayload>
+          }
+          findFirst: {
+            args: Prisma.MessageFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MessagePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MessageFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MessagePayload>
+          }
+          findMany: {
+            args: Prisma.MessageFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MessagePayload>[]
+          }
+          create: {
+            args: Prisma.MessageCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MessagePayload>
+          }
+          createMany: {
+            args: Prisma.MessageCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.MessageDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MessagePayload>
+          }
+          update: {
+            args: Prisma.MessageUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MessagePayload>
+          }
+          deleteMany: {
+            args: Prisma.MessageDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MessageUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.MessageUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MessagePayload>
+          }
+          aggregate: {
+            args: Prisma.MessageAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMessage>
+          }
+          groupBy: {
+            args: Prisma.MessageGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MessageGroupByOutputType>[]
+          }
+          findRaw: {
+            args: Prisma.MessageFindRawArgs<ExtArgs>
+            result: JsonObject
+          }
+          aggregateRaw: {
+            args: Prisma.MessageAggregateRawArgs<ExtArgs>
+            result: JsonObject
+          }
+          count: {
+            args: Prisma.MessageCountArgs<ExtArgs>
+            result: $Utils.Optional<MessageCountAggregateOutputType> | number
           }
         }
       }
@@ -2894,6 +3074,8 @@ export namespace Prisma {
     category?: CategoryOmit
     site?: SiteOmit
     snippet?: SnippetOmit
+    channel?: ChannelOmit
+    message?: MessageOmit
     features?: FeaturesOmit
     subscription?: SubscriptionOmit
     billingHistory?: BillingHistoryOmit
@@ -3000,6 +3182,7 @@ export namespace Prisma {
     Page: number
     Notification: number
     sentNotifications: number
+    messages: number
     memberOfSites: number
     contributedArticles: number
     sentInvitations: number
@@ -3015,6 +3198,7 @@ export namespace Prisma {
     Page?: boolean | UserCountOutputTypeCountPageArgs
     Notification?: boolean | UserCountOutputTypeCountNotificationArgs
     sentNotifications?: boolean | UserCountOutputTypeCountSentNotificationsArgs
+    messages?: boolean | UserCountOutputTypeCountMessagesArgs
     memberOfSites?: boolean | UserCountOutputTypeCountMemberOfSitesArgs
     contributedArticles?: boolean | UserCountOutputTypeCountContributedArticlesArgs
     sentInvitations?: boolean | UserCountOutputTypeCountSentInvitationsArgs
@@ -3097,6 +3281,13 @@ export namespace Prisma {
   /**
    * UserCountOutputType without action
    */
+  export type UserCountOutputTypeCountMessagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MessageWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
   export type UserCountOutputTypeCountMemberOfSitesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: SiteWhereInput
   }
@@ -3165,6 +3356,8 @@ export namespace Prisma {
     collections: number
     members: number
     invitations: number
+    messages: number
+    channels: number
   }
 
   export type SiteCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3181,6 +3374,8 @@ export namespace Prisma {
     collections?: boolean | SiteCountOutputTypeCountCollectionsArgs
     members?: boolean | SiteCountOutputTypeCountMembersArgs
     invitations?: boolean | SiteCountOutputTypeCountInvitationsArgs
+    messages?: boolean | SiteCountOutputTypeCountMessagesArgs
+    channels?: boolean | SiteCountOutputTypeCountChannelsArgs
   }
 
   // Custom InputTypes
@@ -3283,6 +3478,82 @@ export namespace Prisma {
    */
   export type SiteCountOutputTypeCountInvitationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: InvitationWhereInput
+  }
+
+  /**
+   * SiteCountOutputType without action
+   */
+  export type SiteCountOutputTypeCountMessagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MessageWhereInput
+  }
+
+  /**
+   * SiteCountOutputType without action
+   */
+  export type SiteCountOutputTypeCountChannelsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ChannelWhereInput
+  }
+
+
+  /**
+   * Count Type ChannelCountOutputType
+   */
+
+  export type ChannelCountOutputType = {
+    messages: number
+  }
+
+  export type ChannelCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    messages?: boolean | ChannelCountOutputTypeCountMessagesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * ChannelCountOutputType without action
+   */
+  export type ChannelCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChannelCountOutputType
+     */
+    select?: ChannelCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * ChannelCountOutputType without action
+   */
+  export type ChannelCountOutputTypeCountMessagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MessageWhereInput
+  }
+
+
+  /**
+   * Count Type MessageCountOutputType
+   */
+
+  export type MessageCountOutputType = {
+    children: number
+  }
+
+  export type MessageCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    children?: boolean | MessageCountOutputTypeCountChildrenArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * MessageCountOutputType without action
+   */
+  export type MessageCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MessageCountOutputType
+     */
+    select?: MessageCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * MessageCountOutputType without action
+   */
+  export type MessageCountOutputTypeCountChildrenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MessageWhereInput
   }
 
 
@@ -3511,6 +3782,7 @@ export namespace Prisma {
     image: string | null
     email: string | null
     emailVerified: Date | null
+    lastSeen: Date | null
     hashedPassword: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -3525,6 +3797,7 @@ export namespace Prisma {
     image: string | null
     email: string | null
     emailVerified: Date | null
+    lastSeen: Date | null
     hashedPassword: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -3539,6 +3812,7 @@ export namespace Prisma {
     image: number
     email: number
     emailVerified: number
+    lastSeen: number
     hashedPassword: number
     createdAt: number
     updatedAt: number
@@ -3557,6 +3831,7 @@ export namespace Prisma {
     image?: true
     email?: true
     emailVerified?: true
+    lastSeen?: true
     hashedPassword?: true
     createdAt?: true
     updatedAt?: true
@@ -3571,6 +3846,7 @@ export namespace Prisma {
     image?: true
     email?: true
     emailVerified?: true
+    lastSeen?: true
     hashedPassword?: true
     createdAt?: true
     updatedAt?: true
@@ -3585,6 +3861,7 @@ export namespace Prisma {
     image?: true
     email?: true
     emailVerified?: true
+    lastSeen?: true
     hashedPassword?: true
     createdAt?: true
     updatedAt?: true
@@ -3674,6 +3951,7 @@ export namespace Prisma {
     image: string | null
     email: string
     emailVerified: Date | null
+    lastSeen: Date | null
     hashedPassword: string | null
     createdAt: Date
     updatedAt: Date
@@ -3707,6 +3985,7 @@ export namespace Prisma {
     image?: boolean
     email?: boolean
     emailVerified?: boolean
+    lastSeen?: boolean
     hashedPassword?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -3723,6 +4002,7 @@ export namespace Prisma {
     Page?: boolean | User$PageArgs<ExtArgs>
     Notification?: boolean | User$NotificationArgs<ExtArgs>
     sentNotifications?: boolean | User$sentNotificationsArgs<ExtArgs>
+    messages?: boolean | User$messagesArgs<ExtArgs>
     memberOfSites?: boolean | User$memberOfSitesArgs<ExtArgs>
     contributedArticles?: boolean | User$contributedArticlesArgs<ExtArgs>
     sentInvitations?: boolean | User$sentInvitationsArgs<ExtArgs>
@@ -3738,6 +4018,7 @@ export namespace Prisma {
     image?: boolean
     email?: boolean
     emailVerified?: boolean
+    lastSeen?: boolean
     hashedPassword?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -3747,7 +4028,7 @@ export namespace Prisma {
     developerMode?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "username" | "image" | "email" | "emailVerified" | "hashedPassword" | "createdAt" | "updatedAt" | "role" | "memberOfSiteIds" | "contributedArticleIds" | "developerMode", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "username" | "image" | "email" | "emailVerified" | "lastSeen" | "hashedPassword" | "createdAt" | "updatedAt" | "role" | "memberOfSiteIds" | "contributedArticleIds" | "developerMode", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     accounts?: boolean | User$accountsArgs<ExtArgs>
@@ -3758,6 +4039,7 @@ export namespace Prisma {
     Page?: boolean | User$PageArgs<ExtArgs>
     Notification?: boolean | User$NotificationArgs<ExtArgs>
     sentNotifications?: boolean | User$sentNotificationsArgs<ExtArgs>
+    messages?: boolean | User$messagesArgs<ExtArgs>
     memberOfSites?: boolean | User$memberOfSitesArgs<ExtArgs>
     contributedArticles?: boolean | User$contributedArticlesArgs<ExtArgs>
     sentInvitations?: boolean | User$sentInvitationsArgs<ExtArgs>
@@ -3776,6 +4058,7 @@ export namespace Prisma {
       Page: Prisma.$PagePayload<ExtArgs>[]
       Notification: Prisma.$NotificationPayload<ExtArgs>[]
       sentNotifications: Prisma.$NotificationPayload<ExtArgs>[]
+      messages: Prisma.$MessagePayload<ExtArgs>[]
       memberOfSites: Prisma.$SitePayload<ExtArgs>[]
       contributedArticles: Prisma.$ArticlePayload<ExtArgs>[]
       sentInvitations: Prisma.$InvitationPayload<ExtArgs>[]
@@ -3787,6 +4070,7 @@ export namespace Prisma {
       image: string | null
       email: string
       emailVerified: Date | null
+      lastSeen: Date | null
       hashedPassword: string | null
       createdAt: Date
       updatedAt: Date
@@ -4166,6 +4450,7 @@ export namespace Prisma {
     Page<T extends User$PageArgs<ExtArgs> = {}>(args?: Subset<T, User$PageArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     Notification<T extends User$NotificationArgs<ExtArgs> = {}>(args?: Subset<T, User$NotificationArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sentNotifications<T extends User$sentNotificationsArgs<ExtArgs> = {}>(args?: Subset<T, User$sentNotificationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    messages<T extends User$messagesArgs<ExtArgs> = {}>(args?: Subset<T, User$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     memberOfSites<T extends User$memberOfSitesArgs<ExtArgs> = {}>(args?: Subset<T, User$memberOfSitesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     contributedArticles<T extends User$contributedArticlesArgs<ExtArgs> = {}>(args?: Subset<T, User$contributedArticlesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ArticlePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sentInvitations<T extends User$sentInvitationsArgs<ExtArgs> = {}>(args?: Subset<T, User$sentInvitationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -4204,6 +4489,7 @@ export namespace Prisma {
     readonly image: FieldRef<"User", 'String'>
     readonly email: FieldRef<"User", 'String'>
     readonly emailVerified: FieldRef<"User", 'DateTime'>
+    readonly lastSeen: FieldRef<"User", 'DateTime'>
     readonly hashedPassword: FieldRef<"User", 'String'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
@@ -4794,6 +5080,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: NotificationScalarFieldEnum | NotificationScalarFieldEnum[]
+  }
+
+  /**
+   * User.messages
+   */
+  export type User$messagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Message
+     */
+    select?: MessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Message
+     */
+    omit?: MessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MessageInclude<ExtArgs> | null
+    where?: MessageWhereInput
+    orderBy?: MessageOrderByWithRelationInput | MessageOrderByWithRelationInput[]
+    cursor?: MessageWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MessageScalarFieldEnum | MessageScalarFieldEnum[]
   }
 
   /**
@@ -9325,6 +9635,8 @@ export namespace Prisma {
     collections?: boolean | Site$collectionsArgs<ExtArgs>
     members?: boolean | Site$membersArgs<ExtArgs>
     invitations?: boolean | Site$invitationsArgs<ExtArgs>
+    messages?: boolean | Site$messagesArgs<ExtArgs>
+    channels?: boolean | Site$channelsArgs<ExtArgs>
     _count?: boolean | SiteCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["site"]>
 
@@ -9374,6 +9686,8 @@ export namespace Prisma {
     collections?: boolean | Site$collectionsArgs<ExtArgs>
     members?: boolean | Site$membersArgs<ExtArgs>
     invitations?: boolean | Site$invitationsArgs<ExtArgs>
+    messages?: boolean | Site$messagesArgs<ExtArgs>
+    channels?: boolean | Site$channelsArgs<ExtArgs>
     _count?: boolean | SiteCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -9396,6 +9710,8 @@ export namespace Prisma {
       collections: Prisma.$CollectionPayload<ExtArgs>[]
       members: Prisma.$UserPayload<ExtArgs>[]
       invitations: Prisma.$InvitationPayload<ExtArgs>[]
+      messages: Prisma.$MessagePayload<ExtArgs>[]
+      channels: Prisma.$ChannelPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -9800,6 +10116,8 @@ export namespace Prisma {
     collections<T extends Site$collectionsArgs<ExtArgs> = {}>(args?: Subset<T, Site$collectionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CollectionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     members<T extends Site$membersArgs<ExtArgs> = {}>(args?: Subset<T, Site$membersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     invitations<T extends Site$invitationsArgs<ExtArgs> = {}>(args?: Subset<T, Site$invitationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    messages<T extends Site$messagesArgs<ExtArgs> = {}>(args?: Subset<T, Site$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    channels<T extends Site$channelsArgs<ExtArgs> = {}>(args?: Subset<T, Site$channelsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -10588,6 +10906,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: InvitationScalarFieldEnum | InvitationScalarFieldEnum[]
+  }
+
+  /**
+   * Site.messages
+   */
+  export type Site$messagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Message
+     */
+    select?: MessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Message
+     */
+    omit?: MessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MessageInclude<ExtArgs> | null
+    where?: MessageWhereInput
+    orderBy?: MessageOrderByWithRelationInput | MessageOrderByWithRelationInput[]
+    cursor?: MessageWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MessageScalarFieldEnum | MessageScalarFieldEnum[]
+  }
+
+  /**
+   * Site.channels
+   */
+  export type Site$channelsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Channel
+     */
+    select?: ChannelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Channel
+     */
+    omit?: ChannelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChannelInclude<ExtArgs> | null
+    where?: ChannelWhereInput
+    orderBy?: ChannelOrderByWithRelationInput | ChannelOrderByWithRelationInput[]
+    cursor?: ChannelWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ChannelScalarFieldEnum | ChannelScalarFieldEnum[]
   }
 
   /**
@@ -11625,6 +11991,2136 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: SnippetInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Channel
+   */
+
+  export type AggregateChannel = {
+    _count: ChannelCountAggregateOutputType | null
+    _min: ChannelMinAggregateOutputType | null
+    _max: ChannelMaxAggregateOutputType | null
+  }
+
+  export type ChannelMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+    description: string | null
+    type: string | null
+    siteId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ChannelMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+    description: string | null
+    type: string | null
+    siteId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ChannelCountAggregateOutputType = {
+    id: number
+    name: number
+    description: number
+    type: number
+    siteId: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ChannelMinAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+    type?: true
+    siteId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ChannelMaxAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+    type?: true
+    siteId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ChannelCountAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+    type?: true
+    siteId?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ChannelAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Channel to aggregate.
+     */
+    where?: ChannelWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Channels to fetch.
+     */
+    orderBy?: ChannelOrderByWithRelationInput | ChannelOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ChannelWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Channels from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Channels.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Channels
+    **/
+    _count?: true | ChannelCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ChannelMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ChannelMaxAggregateInputType
+  }
+
+  export type GetChannelAggregateType<T extends ChannelAggregateArgs> = {
+        [P in keyof T & keyof AggregateChannel]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateChannel[P]>
+      : GetScalarType<T[P], AggregateChannel[P]>
+  }
+
+
+
+
+  export type ChannelGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ChannelWhereInput
+    orderBy?: ChannelOrderByWithAggregationInput | ChannelOrderByWithAggregationInput[]
+    by: ChannelScalarFieldEnum[] | ChannelScalarFieldEnum
+    having?: ChannelScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ChannelCountAggregateInputType | true
+    _min?: ChannelMinAggregateInputType
+    _max?: ChannelMaxAggregateInputType
+  }
+
+  export type ChannelGroupByOutputType = {
+    id: string
+    name: string
+    description: string | null
+    type: string
+    siteId: string
+    createdAt: Date
+    updatedAt: Date
+    _count: ChannelCountAggregateOutputType | null
+    _min: ChannelMinAggregateOutputType | null
+    _max: ChannelMaxAggregateOutputType | null
+  }
+
+  type GetChannelGroupByPayload<T extends ChannelGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ChannelGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ChannelGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ChannelGroupByOutputType[P]>
+            : GetScalarType<T[P], ChannelGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ChannelSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    description?: boolean
+    type?: boolean
+    siteId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    messages?: boolean | Channel$messagesArgs<ExtArgs>
+    _count?: boolean | ChannelCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["channel"]>
+
+
+
+  export type ChannelSelectScalar = {
+    id?: boolean
+    name?: boolean
+    description?: boolean
+    type?: boolean
+    siteId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ChannelOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "type" | "siteId" | "createdAt" | "updatedAt", ExtArgs["result"]["channel"]>
+  export type ChannelInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    messages?: boolean | Channel$messagesArgs<ExtArgs>
+    _count?: boolean | ChannelCountOutputTypeDefaultArgs<ExtArgs>
+  }
+
+  export type $ChannelPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Channel"
+    objects: {
+      site: Prisma.$SitePayload<ExtArgs>
+      messages: Prisma.$MessagePayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      name: string
+      description: string | null
+      type: string
+      siteId: string
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["channel"]>
+    composites: {}
+  }
+
+  type ChannelGetPayload<S extends boolean | null | undefined | ChannelDefaultArgs> = $Result.GetResult<Prisma.$ChannelPayload, S>
+
+  type ChannelCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ChannelFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ChannelCountAggregateInputType | true
+    }
+
+  export interface ChannelDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Channel'], meta: { name: 'Channel' } }
+    /**
+     * Find zero or one Channel that matches the filter.
+     * @param {ChannelFindUniqueArgs} args - Arguments to find a Channel
+     * @example
+     * // Get one Channel
+     * const channel = await prisma.channel.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ChannelFindUniqueArgs>(args: SelectSubset<T, ChannelFindUniqueArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Channel that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ChannelFindUniqueOrThrowArgs} args - Arguments to find a Channel
+     * @example
+     * // Get one Channel
+     * const channel = await prisma.channel.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ChannelFindUniqueOrThrowArgs>(args: SelectSubset<T, ChannelFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Channel that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChannelFindFirstArgs} args - Arguments to find a Channel
+     * @example
+     * // Get one Channel
+     * const channel = await prisma.channel.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ChannelFindFirstArgs>(args?: SelectSubset<T, ChannelFindFirstArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Channel that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChannelFindFirstOrThrowArgs} args - Arguments to find a Channel
+     * @example
+     * // Get one Channel
+     * const channel = await prisma.channel.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ChannelFindFirstOrThrowArgs>(args?: SelectSubset<T, ChannelFindFirstOrThrowArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Channels that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChannelFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Channels
+     * const channels = await prisma.channel.findMany()
+     * 
+     * // Get first 10 Channels
+     * const channels = await prisma.channel.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const channelWithIdOnly = await prisma.channel.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ChannelFindManyArgs>(args?: SelectSubset<T, ChannelFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Channel.
+     * @param {ChannelCreateArgs} args - Arguments to create a Channel.
+     * @example
+     * // Create one Channel
+     * const Channel = await prisma.channel.create({
+     *   data: {
+     *     // ... data to create a Channel
+     *   }
+     * })
+     * 
+     */
+    create<T extends ChannelCreateArgs>(args: SelectSubset<T, ChannelCreateArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Channels.
+     * @param {ChannelCreateManyArgs} args - Arguments to create many Channels.
+     * @example
+     * // Create many Channels
+     * const channel = await prisma.channel.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ChannelCreateManyArgs>(args?: SelectSubset<T, ChannelCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a Channel.
+     * @param {ChannelDeleteArgs} args - Arguments to delete one Channel.
+     * @example
+     * // Delete one Channel
+     * const Channel = await prisma.channel.delete({
+     *   where: {
+     *     // ... filter to delete one Channel
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ChannelDeleteArgs>(args: SelectSubset<T, ChannelDeleteArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Channel.
+     * @param {ChannelUpdateArgs} args - Arguments to update one Channel.
+     * @example
+     * // Update one Channel
+     * const channel = await prisma.channel.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ChannelUpdateArgs>(args: SelectSubset<T, ChannelUpdateArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Channels.
+     * @param {ChannelDeleteManyArgs} args - Arguments to filter Channels to delete.
+     * @example
+     * // Delete a few Channels
+     * const { count } = await prisma.channel.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ChannelDeleteManyArgs>(args?: SelectSubset<T, ChannelDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Channels.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChannelUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Channels
+     * const channel = await prisma.channel.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ChannelUpdateManyArgs>(args: SelectSubset<T, ChannelUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Channel.
+     * @param {ChannelUpsertArgs} args - Arguments to update or create a Channel.
+     * @example
+     * // Update or create a Channel
+     * const channel = await prisma.channel.upsert({
+     *   create: {
+     *     // ... data to create a Channel
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Channel we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ChannelUpsertArgs>(args: SelectSubset<T, ChannelUpsertArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Channels that matches the filter.
+     * @param {ChannelFindRawArgs} args - Select which filters you would like to apply.
+     * @example
+     * const channel = await prisma.channel.findRaw({
+     *   filter: { age: { $gt: 25 } }
+     * })
+     */
+    findRaw(args?: ChannelFindRawArgs): Prisma.PrismaPromise<JsonObject>
+
+    /**
+     * Perform aggregation operations on a Channel.
+     * @param {ChannelAggregateRawArgs} args - Select which aggregations you would like to apply.
+     * @example
+     * const channel = await prisma.channel.aggregateRaw({
+     *   pipeline: [
+     *     { $match: { status: "registered" } },
+     *     { $group: { _id: "$country", total: { $sum: 1 } } }
+     *   ]
+     * })
+     */
+    aggregateRaw(args?: ChannelAggregateRawArgs): Prisma.PrismaPromise<JsonObject>
+
+
+    /**
+     * Count the number of Channels.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChannelCountArgs} args - Arguments to filter Channels to count.
+     * @example
+     * // Count the number of Channels
+     * const count = await prisma.channel.count({
+     *   where: {
+     *     // ... the filter for the Channels we want to count
+     *   }
+     * })
+    **/
+    count<T extends ChannelCountArgs>(
+      args?: Subset<T, ChannelCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ChannelCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Channel.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChannelAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ChannelAggregateArgs>(args: Subset<T, ChannelAggregateArgs>): Prisma.PrismaPromise<GetChannelAggregateType<T>>
+
+    /**
+     * Group by Channel.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChannelGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ChannelGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ChannelGroupByArgs['orderBy'] }
+        : { orderBy?: ChannelGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ChannelGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetChannelGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Channel model
+   */
+  readonly fields: ChannelFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Channel.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ChannelClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    site<T extends SiteDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SiteDefaultArgs<ExtArgs>>): Prisma__SiteClient<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    messages<T extends Channel$messagesArgs<ExtArgs> = {}>(args?: Subset<T, Channel$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Channel model
+   */
+  interface ChannelFieldRefs {
+    readonly id: FieldRef<"Channel", 'String'>
+    readonly name: FieldRef<"Channel", 'String'>
+    readonly description: FieldRef<"Channel", 'String'>
+    readonly type: FieldRef<"Channel", 'String'>
+    readonly siteId: FieldRef<"Channel", 'String'>
+    readonly createdAt: FieldRef<"Channel", 'DateTime'>
+    readonly updatedAt: FieldRef<"Channel", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Channel findUnique
+   */
+  export type ChannelFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Channel
+     */
+    select?: ChannelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Channel
+     */
+    omit?: ChannelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChannelInclude<ExtArgs> | null
+    /**
+     * Filter, which Channel to fetch.
+     */
+    where: ChannelWhereUniqueInput
+  }
+
+  /**
+   * Channel findUniqueOrThrow
+   */
+  export type ChannelFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Channel
+     */
+    select?: ChannelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Channel
+     */
+    omit?: ChannelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChannelInclude<ExtArgs> | null
+    /**
+     * Filter, which Channel to fetch.
+     */
+    where: ChannelWhereUniqueInput
+  }
+
+  /**
+   * Channel findFirst
+   */
+  export type ChannelFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Channel
+     */
+    select?: ChannelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Channel
+     */
+    omit?: ChannelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChannelInclude<ExtArgs> | null
+    /**
+     * Filter, which Channel to fetch.
+     */
+    where?: ChannelWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Channels to fetch.
+     */
+    orderBy?: ChannelOrderByWithRelationInput | ChannelOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Channels.
+     */
+    cursor?: ChannelWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Channels from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Channels.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Channels.
+     */
+    distinct?: ChannelScalarFieldEnum | ChannelScalarFieldEnum[]
+  }
+
+  /**
+   * Channel findFirstOrThrow
+   */
+  export type ChannelFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Channel
+     */
+    select?: ChannelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Channel
+     */
+    omit?: ChannelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChannelInclude<ExtArgs> | null
+    /**
+     * Filter, which Channel to fetch.
+     */
+    where?: ChannelWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Channels to fetch.
+     */
+    orderBy?: ChannelOrderByWithRelationInput | ChannelOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Channels.
+     */
+    cursor?: ChannelWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Channels from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Channels.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Channels.
+     */
+    distinct?: ChannelScalarFieldEnum | ChannelScalarFieldEnum[]
+  }
+
+  /**
+   * Channel findMany
+   */
+  export type ChannelFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Channel
+     */
+    select?: ChannelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Channel
+     */
+    omit?: ChannelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChannelInclude<ExtArgs> | null
+    /**
+     * Filter, which Channels to fetch.
+     */
+    where?: ChannelWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Channels to fetch.
+     */
+    orderBy?: ChannelOrderByWithRelationInput | ChannelOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Channels.
+     */
+    cursor?: ChannelWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Channels from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Channels.
+     */
+    skip?: number
+    distinct?: ChannelScalarFieldEnum | ChannelScalarFieldEnum[]
+  }
+
+  /**
+   * Channel create
+   */
+  export type ChannelCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Channel
+     */
+    select?: ChannelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Channel
+     */
+    omit?: ChannelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChannelInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Channel.
+     */
+    data: XOR<ChannelCreateInput, ChannelUncheckedCreateInput>
+  }
+
+  /**
+   * Channel createMany
+   */
+  export type ChannelCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Channels.
+     */
+    data: ChannelCreateManyInput | ChannelCreateManyInput[]
+  }
+
+  /**
+   * Channel update
+   */
+  export type ChannelUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Channel
+     */
+    select?: ChannelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Channel
+     */
+    omit?: ChannelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChannelInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Channel.
+     */
+    data: XOR<ChannelUpdateInput, ChannelUncheckedUpdateInput>
+    /**
+     * Choose, which Channel to update.
+     */
+    where: ChannelWhereUniqueInput
+  }
+
+  /**
+   * Channel updateMany
+   */
+  export type ChannelUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Channels.
+     */
+    data: XOR<ChannelUpdateManyMutationInput, ChannelUncheckedUpdateManyInput>
+    /**
+     * Filter which Channels to update
+     */
+    where?: ChannelWhereInput
+    /**
+     * Limit how many Channels to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Channel upsert
+   */
+  export type ChannelUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Channel
+     */
+    select?: ChannelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Channel
+     */
+    omit?: ChannelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChannelInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Channel to update in case it exists.
+     */
+    where: ChannelWhereUniqueInput
+    /**
+     * In case the Channel found by the `where` argument doesn't exist, create a new Channel with this data.
+     */
+    create: XOR<ChannelCreateInput, ChannelUncheckedCreateInput>
+    /**
+     * In case the Channel was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ChannelUpdateInput, ChannelUncheckedUpdateInput>
+  }
+
+  /**
+   * Channel delete
+   */
+  export type ChannelDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Channel
+     */
+    select?: ChannelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Channel
+     */
+    omit?: ChannelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChannelInclude<ExtArgs> | null
+    /**
+     * Filter which Channel to delete.
+     */
+    where: ChannelWhereUniqueInput
+  }
+
+  /**
+   * Channel deleteMany
+   */
+  export type ChannelDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Channels to delete
+     */
+    where?: ChannelWhereInput
+    /**
+     * Limit how many Channels to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Channel findRaw
+   */
+  export type ChannelFindRawArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The query predicate filter. If unspecified, then all documents in the collection will match the predicate. ${@link https://docs.mongodb.com/manual/reference/operator/query MongoDB Docs}.
+     */
+    filter?: InputJsonValue
+    /**
+     * Additional options to pass to the `find` command ${@link https://docs.mongodb.com/manual/reference/command/find/#command-fields MongoDB Docs}.
+     */
+    options?: InputJsonValue
+  }
+
+  /**
+   * Channel aggregateRaw
+   */
+  export type ChannelAggregateRawArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * An array of aggregation stages to process and transform the document stream via the aggregation pipeline. ${@link https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline MongoDB Docs}.
+     */
+    pipeline?: InputJsonValue[]
+    /**
+     * Additional options to pass to the `aggregate` command ${@link https://docs.mongodb.com/manual/reference/command/aggregate/#command-fields MongoDB Docs}.
+     */
+    options?: InputJsonValue
+  }
+
+  /**
+   * Channel.messages
+   */
+  export type Channel$messagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Message
+     */
+    select?: MessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Message
+     */
+    omit?: MessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MessageInclude<ExtArgs> | null
+    where?: MessageWhereInput
+    orderBy?: MessageOrderByWithRelationInput | MessageOrderByWithRelationInput[]
+    cursor?: MessageWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MessageScalarFieldEnum | MessageScalarFieldEnum[]
+  }
+
+  /**
+   * Channel without action
+   */
+  export type ChannelDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Channel
+     */
+    select?: ChannelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Channel
+     */
+    omit?: ChannelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChannelInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Message
+   */
+
+  export type AggregateMessage = {
+    _count: MessageCountAggregateOutputType | null
+    _min: MessageMinAggregateOutputType | null
+    _max: MessageMaxAggregateOutputType | null
+  }
+
+  export type MessageMinAggregateOutputType = {
+    id: string | null
+    content: string | null
+    siteId: string | null
+    userId: string | null
+    channelId: string | null
+    parentId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MessageMaxAggregateOutputType = {
+    id: string | null
+    content: string | null
+    siteId: string | null
+    userId: string | null
+    channelId: string | null
+    parentId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MessageCountAggregateOutputType = {
+    id: number
+    content: number
+    siteId: number
+    userId: number
+    channelId: number
+    parentId: number
+    attachments: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type MessageMinAggregateInputType = {
+    id?: true
+    content?: true
+    siteId?: true
+    userId?: true
+    channelId?: true
+    parentId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MessageMaxAggregateInputType = {
+    id?: true
+    content?: true
+    siteId?: true
+    userId?: true
+    channelId?: true
+    parentId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MessageCountAggregateInputType = {
+    id?: true
+    content?: true
+    siteId?: true
+    userId?: true
+    channelId?: true
+    parentId?: true
+    attachments?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type MessageAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Message to aggregate.
+     */
+    where?: MessageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Messages to fetch.
+     */
+    orderBy?: MessageOrderByWithRelationInput | MessageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MessageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Messages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Messages.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Messages
+    **/
+    _count?: true | MessageCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MessageMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MessageMaxAggregateInputType
+  }
+
+  export type GetMessageAggregateType<T extends MessageAggregateArgs> = {
+        [P in keyof T & keyof AggregateMessage]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMessage[P]>
+      : GetScalarType<T[P], AggregateMessage[P]>
+  }
+
+
+
+
+  export type MessageGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MessageWhereInput
+    orderBy?: MessageOrderByWithAggregationInput | MessageOrderByWithAggregationInput[]
+    by: MessageScalarFieldEnum[] | MessageScalarFieldEnum
+    having?: MessageScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MessageCountAggregateInputType | true
+    _min?: MessageMinAggregateInputType
+    _max?: MessageMaxAggregateInputType
+  }
+
+  export type MessageGroupByOutputType = {
+    id: string
+    content: string
+    siteId: string
+    userId: string
+    channelId: string | null
+    parentId: string | null
+    attachments: JsonValue | null
+    createdAt: Date
+    updatedAt: Date
+    _count: MessageCountAggregateOutputType | null
+    _min: MessageMinAggregateOutputType | null
+    _max: MessageMaxAggregateOutputType | null
+  }
+
+  type GetMessageGroupByPayload<T extends MessageGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MessageGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MessageGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MessageGroupByOutputType[P]>
+            : GetScalarType<T[P], MessageGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MessageSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    content?: boolean
+    siteId?: boolean
+    userId?: boolean
+    channelId?: boolean
+    parentId?: boolean
+    attachments?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    channel?: boolean | Message$channelArgs<ExtArgs>
+    parent?: boolean | Message$parentArgs<ExtArgs>
+    children?: boolean | Message$childrenArgs<ExtArgs>
+    _count?: boolean | MessageCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["message"]>
+
+
+
+  export type MessageSelectScalar = {
+    id?: boolean
+    content?: boolean
+    siteId?: boolean
+    userId?: boolean
+    channelId?: boolean
+    parentId?: boolean
+    attachments?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type MessageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "content" | "siteId" | "userId" | "channelId" | "parentId" | "attachments" | "createdAt" | "updatedAt", ExtArgs["result"]["message"]>
+  export type MessageInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    channel?: boolean | Message$channelArgs<ExtArgs>
+    parent?: boolean | Message$parentArgs<ExtArgs>
+    children?: boolean | Message$childrenArgs<ExtArgs>
+    _count?: boolean | MessageCountOutputTypeDefaultArgs<ExtArgs>
+  }
+
+  export type $MessagePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Message"
+    objects: {
+      site: Prisma.$SitePayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs>
+      channel: Prisma.$ChannelPayload<ExtArgs> | null
+      parent: Prisma.$MessagePayload<ExtArgs> | null
+      children: Prisma.$MessagePayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      content: string
+      siteId: string
+      userId: string
+      channelId: string | null
+      parentId: string | null
+      attachments: Prisma.JsonValue | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["message"]>
+    composites: {}
+  }
+
+  type MessageGetPayload<S extends boolean | null | undefined | MessageDefaultArgs> = $Result.GetResult<Prisma.$MessagePayload, S>
+
+  type MessageCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MessageFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MessageCountAggregateInputType | true
+    }
+
+  export interface MessageDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Message'], meta: { name: 'Message' } }
+    /**
+     * Find zero or one Message that matches the filter.
+     * @param {MessageFindUniqueArgs} args - Arguments to find a Message
+     * @example
+     * // Get one Message
+     * const message = await prisma.message.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MessageFindUniqueArgs>(args: SelectSubset<T, MessageFindUniqueArgs<ExtArgs>>): Prisma__MessageClient<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Message that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MessageFindUniqueOrThrowArgs} args - Arguments to find a Message
+     * @example
+     * // Get one Message
+     * const message = await prisma.message.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MessageFindUniqueOrThrowArgs>(args: SelectSubset<T, MessageFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MessageClient<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Message that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MessageFindFirstArgs} args - Arguments to find a Message
+     * @example
+     * // Get one Message
+     * const message = await prisma.message.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MessageFindFirstArgs>(args?: SelectSubset<T, MessageFindFirstArgs<ExtArgs>>): Prisma__MessageClient<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Message that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MessageFindFirstOrThrowArgs} args - Arguments to find a Message
+     * @example
+     * // Get one Message
+     * const message = await prisma.message.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MessageFindFirstOrThrowArgs>(args?: SelectSubset<T, MessageFindFirstOrThrowArgs<ExtArgs>>): Prisma__MessageClient<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Messages that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MessageFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Messages
+     * const messages = await prisma.message.findMany()
+     * 
+     * // Get first 10 Messages
+     * const messages = await prisma.message.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const messageWithIdOnly = await prisma.message.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MessageFindManyArgs>(args?: SelectSubset<T, MessageFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Message.
+     * @param {MessageCreateArgs} args - Arguments to create a Message.
+     * @example
+     * // Create one Message
+     * const Message = await prisma.message.create({
+     *   data: {
+     *     // ... data to create a Message
+     *   }
+     * })
+     * 
+     */
+    create<T extends MessageCreateArgs>(args: SelectSubset<T, MessageCreateArgs<ExtArgs>>): Prisma__MessageClient<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Messages.
+     * @param {MessageCreateManyArgs} args - Arguments to create many Messages.
+     * @example
+     * // Create many Messages
+     * const message = await prisma.message.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MessageCreateManyArgs>(args?: SelectSubset<T, MessageCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a Message.
+     * @param {MessageDeleteArgs} args - Arguments to delete one Message.
+     * @example
+     * // Delete one Message
+     * const Message = await prisma.message.delete({
+     *   where: {
+     *     // ... filter to delete one Message
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MessageDeleteArgs>(args: SelectSubset<T, MessageDeleteArgs<ExtArgs>>): Prisma__MessageClient<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Message.
+     * @param {MessageUpdateArgs} args - Arguments to update one Message.
+     * @example
+     * // Update one Message
+     * const message = await prisma.message.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MessageUpdateArgs>(args: SelectSubset<T, MessageUpdateArgs<ExtArgs>>): Prisma__MessageClient<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Messages.
+     * @param {MessageDeleteManyArgs} args - Arguments to filter Messages to delete.
+     * @example
+     * // Delete a few Messages
+     * const { count } = await prisma.message.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MessageDeleteManyArgs>(args?: SelectSubset<T, MessageDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Messages.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MessageUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Messages
+     * const message = await prisma.message.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MessageUpdateManyArgs>(args: SelectSubset<T, MessageUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Message.
+     * @param {MessageUpsertArgs} args - Arguments to update or create a Message.
+     * @example
+     * // Update or create a Message
+     * const message = await prisma.message.upsert({
+     *   create: {
+     *     // ... data to create a Message
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Message we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MessageUpsertArgs>(args: SelectSubset<T, MessageUpsertArgs<ExtArgs>>): Prisma__MessageClient<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Messages that matches the filter.
+     * @param {MessageFindRawArgs} args - Select which filters you would like to apply.
+     * @example
+     * const message = await prisma.message.findRaw({
+     *   filter: { age: { $gt: 25 } }
+     * })
+     */
+    findRaw(args?: MessageFindRawArgs): Prisma.PrismaPromise<JsonObject>
+
+    /**
+     * Perform aggregation operations on a Message.
+     * @param {MessageAggregateRawArgs} args - Select which aggregations you would like to apply.
+     * @example
+     * const message = await prisma.message.aggregateRaw({
+     *   pipeline: [
+     *     { $match: { status: "registered" } },
+     *     { $group: { _id: "$country", total: { $sum: 1 } } }
+     *   ]
+     * })
+     */
+    aggregateRaw(args?: MessageAggregateRawArgs): Prisma.PrismaPromise<JsonObject>
+
+
+    /**
+     * Count the number of Messages.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MessageCountArgs} args - Arguments to filter Messages to count.
+     * @example
+     * // Count the number of Messages
+     * const count = await prisma.message.count({
+     *   where: {
+     *     // ... the filter for the Messages we want to count
+     *   }
+     * })
+    **/
+    count<T extends MessageCountArgs>(
+      args?: Subset<T, MessageCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MessageCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Message.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MessageAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MessageAggregateArgs>(args: Subset<T, MessageAggregateArgs>): Prisma.PrismaPromise<GetMessageAggregateType<T>>
+
+    /**
+     * Group by Message.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MessageGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MessageGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MessageGroupByArgs['orderBy'] }
+        : { orderBy?: MessageGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MessageGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMessageGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Message model
+   */
+  readonly fields: MessageFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Message.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MessageClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    site<T extends SiteDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SiteDefaultArgs<ExtArgs>>): Prisma__SiteClient<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    channel<T extends Message$channelArgs<ExtArgs> = {}>(args?: Subset<T, Message$channelArgs<ExtArgs>>): Prisma__ChannelClient<$Result.GetResult<Prisma.$ChannelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    parent<T extends Message$parentArgs<ExtArgs> = {}>(args?: Subset<T, Message$parentArgs<ExtArgs>>): Prisma__MessageClient<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    children<T extends Message$childrenArgs<ExtArgs> = {}>(args?: Subset<T, Message$childrenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Message model
+   */
+  interface MessageFieldRefs {
+    readonly id: FieldRef<"Message", 'String'>
+    readonly content: FieldRef<"Message", 'String'>
+    readonly siteId: FieldRef<"Message", 'String'>
+    readonly userId: FieldRef<"Message", 'String'>
+    readonly channelId: FieldRef<"Message", 'String'>
+    readonly parentId: FieldRef<"Message", 'String'>
+    readonly attachments: FieldRef<"Message", 'Json'>
+    readonly createdAt: FieldRef<"Message", 'DateTime'>
+    readonly updatedAt: FieldRef<"Message", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Message findUnique
+   */
+  export type MessageFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Message
+     */
+    select?: MessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Message
+     */
+    omit?: MessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MessageInclude<ExtArgs> | null
+    /**
+     * Filter, which Message to fetch.
+     */
+    where: MessageWhereUniqueInput
+  }
+
+  /**
+   * Message findUniqueOrThrow
+   */
+  export type MessageFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Message
+     */
+    select?: MessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Message
+     */
+    omit?: MessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MessageInclude<ExtArgs> | null
+    /**
+     * Filter, which Message to fetch.
+     */
+    where: MessageWhereUniqueInput
+  }
+
+  /**
+   * Message findFirst
+   */
+  export type MessageFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Message
+     */
+    select?: MessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Message
+     */
+    omit?: MessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MessageInclude<ExtArgs> | null
+    /**
+     * Filter, which Message to fetch.
+     */
+    where?: MessageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Messages to fetch.
+     */
+    orderBy?: MessageOrderByWithRelationInput | MessageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Messages.
+     */
+    cursor?: MessageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Messages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Messages.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Messages.
+     */
+    distinct?: MessageScalarFieldEnum | MessageScalarFieldEnum[]
+  }
+
+  /**
+   * Message findFirstOrThrow
+   */
+  export type MessageFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Message
+     */
+    select?: MessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Message
+     */
+    omit?: MessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MessageInclude<ExtArgs> | null
+    /**
+     * Filter, which Message to fetch.
+     */
+    where?: MessageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Messages to fetch.
+     */
+    orderBy?: MessageOrderByWithRelationInput | MessageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Messages.
+     */
+    cursor?: MessageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Messages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Messages.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Messages.
+     */
+    distinct?: MessageScalarFieldEnum | MessageScalarFieldEnum[]
+  }
+
+  /**
+   * Message findMany
+   */
+  export type MessageFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Message
+     */
+    select?: MessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Message
+     */
+    omit?: MessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MessageInclude<ExtArgs> | null
+    /**
+     * Filter, which Messages to fetch.
+     */
+    where?: MessageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Messages to fetch.
+     */
+    orderBy?: MessageOrderByWithRelationInput | MessageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Messages.
+     */
+    cursor?: MessageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Messages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Messages.
+     */
+    skip?: number
+    distinct?: MessageScalarFieldEnum | MessageScalarFieldEnum[]
+  }
+
+  /**
+   * Message create
+   */
+  export type MessageCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Message
+     */
+    select?: MessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Message
+     */
+    omit?: MessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MessageInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Message.
+     */
+    data: XOR<MessageCreateInput, MessageUncheckedCreateInput>
+  }
+
+  /**
+   * Message createMany
+   */
+  export type MessageCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Messages.
+     */
+    data: MessageCreateManyInput | MessageCreateManyInput[]
+  }
+
+  /**
+   * Message update
+   */
+  export type MessageUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Message
+     */
+    select?: MessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Message
+     */
+    omit?: MessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MessageInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Message.
+     */
+    data: XOR<MessageUpdateInput, MessageUncheckedUpdateInput>
+    /**
+     * Choose, which Message to update.
+     */
+    where: MessageWhereUniqueInput
+  }
+
+  /**
+   * Message updateMany
+   */
+  export type MessageUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Messages.
+     */
+    data: XOR<MessageUpdateManyMutationInput, MessageUncheckedUpdateManyInput>
+    /**
+     * Filter which Messages to update
+     */
+    where?: MessageWhereInput
+    /**
+     * Limit how many Messages to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Message upsert
+   */
+  export type MessageUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Message
+     */
+    select?: MessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Message
+     */
+    omit?: MessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MessageInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Message to update in case it exists.
+     */
+    where: MessageWhereUniqueInput
+    /**
+     * In case the Message found by the `where` argument doesn't exist, create a new Message with this data.
+     */
+    create: XOR<MessageCreateInput, MessageUncheckedCreateInput>
+    /**
+     * In case the Message was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MessageUpdateInput, MessageUncheckedUpdateInput>
+  }
+
+  /**
+   * Message delete
+   */
+  export type MessageDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Message
+     */
+    select?: MessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Message
+     */
+    omit?: MessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MessageInclude<ExtArgs> | null
+    /**
+     * Filter which Message to delete.
+     */
+    where: MessageWhereUniqueInput
+  }
+
+  /**
+   * Message deleteMany
+   */
+  export type MessageDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Messages to delete
+     */
+    where?: MessageWhereInput
+    /**
+     * Limit how many Messages to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Message findRaw
+   */
+  export type MessageFindRawArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The query predicate filter. If unspecified, then all documents in the collection will match the predicate. ${@link https://docs.mongodb.com/manual/reference/operator/query MongoDB Docs}.
+     */
+    filter?: InputJsonValue
+    /**
+     * Additional options to pass to the `find` command ${@link https://docs.mongodb.com/manual/reference/command/find/#command-fields MongoDB Docs}.
+     */
+    options?: InputJsonValue
+  }
+
+  /**
+   * Message aggregateRaw
+   */
+  export type MessageAggregateRawArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * An array of aggregation stages to process and transform the document stream via the aggregation pipeline. ${@link https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline MongoDB Docs}.
+     */
+    pipeline?: InputJsonValue[]
+    /**
+     * Additional options to pass to the `aggregate` command ${@link https://docs.mongodb.com/manual/reference/command/aggregate/#command-fields MongoDB Docs}.
+     */
+    options?: InputJsonValue
+  }
+
+  /**
+   * Message.channel
+   */
+  export type Message$channelArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Channel
+     */
+    select?: ChannelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Channel
+     */
+    omit?: ChannelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ChannelInclude<ExtArgs> | null
+    where?: ChannelWhereInput
+  }
+
+  /**
+   * Message.parent
+   */
+  export type Message$parentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Message
+     */
+    select?: MessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Message
+     */
+    omit?: MessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MessageInclude<ExtArgs> | null
+    where?: MessageWhereInput
+  }
+
+  /**
+   * Message.children
+   */
+  export type Message$childrenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Message
+     */
+    select?: MessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Message
+     */
+    omit?: MessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MessageInclude<ExtArgs> | null
+    where?: MessageWhereInput
+    orderBy?: MessageOrderByWithRelationInput | MessageOrderByWithRelationInput[]
+    cursor?: MessageWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MessageScalarFieldEnum | MessageScalarFieldEnum[]
+  }
+
+  /**
+   * Message without action
+   */
+  export type MessageDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Message
+     */
+    select?: MessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Message
+     */
+    omit?: MessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MessageInclude<ExtArgs> | null
   }
 
 
@@ -29721,6 +32217,7 @@ export namespace Prisma {
     image: 'image',
     email: 'email',
     emailVerified: 'emailVerified',
+    lastSeen: 'lastSeen',
     hashedPassword: 'hashedPassword',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
@@ -29830,6 +32327,34 @@ export namespace Prisma {
   };
 
   export type SnippetScalarFieldEnum = (typeof SnippetScalarFieldEnum)[keyof typeof SnippetScalarFieldEnum]
+
+
+  export const ChannelScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    description: 'description',
+    type: 'type',
+    siteId: 'siteId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ChannelScalarFieldEnum = (typeof ChannelScalarFieldEnum)[keyof typeof ChannelScalarFieldEnum]
+
+
+  export const MessageScalarFieldEnum: {
+    id: 'id',
+    content: 'content',
+    siteId: 'siteId',
+    userId: 'userId',
+    channelId: 'channelId',
+    parentId: 'parentId',
+    attachments: 'attachments',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
 
 
   export const FeaturesScalarFieldEnum: {
@@ -30296,6 +32821,7 @@ export namespace Prisma {
     image?: StringNullableFilter<"User"> | string | null
     email?: StringFilter<"User"> | string
     emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
+    lastSeen?: DateTimeNullableFilter<"User"> | Date | string | null
     hashedPassword?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
@@ -30312,6 +32838,7 @@ export namespace Prisma {
     Page?: PageListRelationFilter
     Notification?: NotificationListRelationFilter
     sentNotifications?: NotificationListRelationFilter
+    messages?: MessageListRelationFilter
     memberOfSites?: SiteListRelationFilter
     contributedArticles?: ArticleListRelationFilter
     sentInvitations?: InvitationListRelationFilter
@@ -30324,6 +32851,7 @@ export namespace Prisma {
     image?: SortOrder
     email?: SortOrder
     emailVerified?: SortOrder
+    lastSeen?: SortOrder
     hashedPassword?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -30340,6 +32868,7 @@ export namespace Prisma {
     Page?: PageOrderByRelationAggregateInput
     Notification?: NotificationOrderByRelationAggregateInput
     sentNotifications?: NotificationOrderByRelationAggregateInput
+    messages?: MessageOrderByRelationAggregateInput
     memberOfSites?: SiteOrderByRelationAggregateInput
     contributedArticles?: ArticleOrderByRelationAggregateInput
     sentInvitations?: InvitationOrderByRelationAggregateInput
@@ -30355,6 +32884,7 @@ export namespace Prisma {
     username?: StringNullableFilter<"User"> | string | null
     image?: StringNullableFilter<"User"> | string | null
     emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
+    lastSeen?: DateTimeNullableFilter<"User"> | Date | string | null
     hashedPassword?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
@@ -30371,6 +32901,7 @@ export namespace Prisma {
     Page?: PageListRelationFilter
     Notification?: NotificationListRelationFilter
     sentNotifications?: NotificationListRelationFilter
+    messages?: MessageListRelationFilter
     memberOfSites?: SiteListRelationFilter
     contributedArticles?: ArticleListRelationFilter
     sentInvitations?: InvitationListRelationFilter
@@ -30383,6 +32914,7 @@ export namespace Prisma {
     image?: SortOrder
     email?: SortOrder
     emailVerified?: SortOrder
+    lastSeen?: SortOrder
     hashedPassword?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -30405,6 +32937,7 @@ export namespace Prisma {
     image?: StringNullableWithAggregatesFilter<"User"> | string | null
     email?: StringWithAggregatesFilter<"User"> | string
     emailVerified?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+    lastSeen?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     hashedPassword?: StringNullableWithAggregatesFilter<"User"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
@@ -30739,6 +33272,8 @@ export namespace Prisma {
     collections?: CollectionListRelationFilter
     members?: UserListRelationFilter
     invitations?: InvitationListRelationFilter
+    messages?: MessageListRelationFilter
+    channels?: ChannelListRelationFilter
   }
 
   export type SiteOrderByWithRelationInput = {
@@ -30781,6 +33316,8 @@ export namespace Prisma {
     collections?: CollectionOrderByRelationAggregateInput
     members?: UserOrderByRelationAggregateInput
     invitations?: InvitationOrderByRelationAggregateInput
+    messages?: MessageOrderByRelationAggregateInput
+    channels?: ChannelOrderByRelationAggregateInput
   }
 
   export type SiteWhereUniqueInput = Prisma.AtLeast<{
@@ -30826,6 +33363,8 @@ export namespace Prisma {
     collections?: CollectionListRelationFilter
     members?: UserListRelationFilter
     invitations?: InvitationListRelationFilter
+    messages?: MessageListRelationFilter
+    channels?: ChannelListRelationFilter
   }, "id" | "subdomain" | "url">
 
   export type SiteOrderByWithAggregationInput = {
@@ -30961,6 +33500,161 @@ export namespace Prisma {
     siteId?: StringWithAggregatesFilter<"Snippet"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Snippet"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Snippet"> | Date | string
+  }
+
+  export type ChannelWhereInput = {
+    AND?: ChannelWhereInput | ChannelWhereInput[]
+    OR?: ChannelWhereInput[]
+    NOT?: ChannelWhereInput | ChannelWhereInput[]
+    id?: StringFilter<"Channel"> | string
+    name?: StringFilter<"Channel"> | string
+    description?: StringNullableFilter<"Channel"> | string | null
+    type?: StringFilter<"Channel"> | string
+    siteId?: StringFilter<"Channel"> | string
+    createdAt?: DateTimeFilter<"Channel"> | Date | string
+    updatedAt?: DateTimeFilter<"Channel"> | Date | string
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+    messages?: MessageListRelationFilter
+  }
+
+  export type ChannelOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    type?: SortOrder
+    siteId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    site?: SiteOrderByWithRelationInput
+    messages?: MessageOrderByRelationAggregateInput
+  }
+
+  export type ChannelWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: ChannelWhereInput | ChannelWhereInput[]
+    OR?: ChannelWhereInput[]
+    NOT?: ChannelWhereInput | ChannelWhereInput[]
+    name?: StringFilter<"Channel"> | string
+    description?: StringNullableFilter<"Channel"> | string | null
+    type?: StringFilter<"Channel"> | string
+    siteId?: StringFilter<"Channel"> | string
+    createdAt?: DateTimeFilter<"Channel"> | Date | string
+    updatedAt?: DateTimeFilter<"Channel"> | Date | string
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+    messages?: MessageListRelationFilter
+  }, "id">
+
+  export type ChannelOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    type?: SortOrder
+    siteId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ChannelCountOrderByAggregateInput
+    _max?: ChannelMaxOrderByAggregateInput
+    _min?: ChannelMinOrderByAggregateInput
+  }
+
+  export type ChannelScalarWhereWithAggregatesInput = {
+    AND?: ChannelScalarWhereWithAggregatesInput | ChannelScalarWhereWithAggregatesInput[]
+    OR?: ChannelScalarWhereWithAggregatesInput[]
+    NOT?: ChannelScalarWhereWithAggregatesInput | ChannelScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Channel"> | string
+    name?: StringWithAggregatesFilter<"Channel"> | string
+    description?: StringNullableWithAggregatesFilter<"Channel"> | string | null
+    type?: StringWithAggregatesFilter<"Channel"> | string
+    siteId?: StringWithAggregatesFilter<"Channel"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"Channel"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Channel"> | Date | string
+  }
+
+  export type MessageWhereInput = {
+    AND?: MessageWhereInput | MessageWhereInput[]
+    OR?: MessageWhereInput[]
+    NOT?: MessageWhereInput | MessageWhereInput[]
+    id?: StringFilter<"Message"> | string
+    content?: StringFilter<"Message"> | string
+    siteId?: StringFilter<"Message"> | string
+    userId?: StringFilter<"Message"> | string
+    channelId?: StringNullableFilter<"Message"> | string | null
+    parentId?: StringNullableFilter<"Message"> | string | null
+    attachments?: JsonNullableFilter<"Message">
+    createdAt?: DateTimeFilter<"Message"> | Date | string
+    updatedAt?: DateTimeFilter<"Message"> | Date | string
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    channel?: XOR<ChannelNullableScalarRelationFilter, ChannelWhereInput> | null
+    parent?: XOR<MessageNullableScalarRelationFilter, MessageWhereInput> | null
+    children?: MessageListRelationFilter
+  }
+
+  export type MessageOrderByWithRelationInput = {
+    id?: SortOrder
+    content?: SortOrder
+    siteId?: SortOrder
+    userId?: SortOrder
+    channelId?: SortOrder
+    parentId?: SortOrder
+    attachments?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    site?: SiteOrderByWithRelationInput
+    user?: UserOrderByWithRelationInput
+    channel?: ChannelOrderByWithRelationInput
+    parent?: MessageOrderByWithRelationInput
+    children?: MessageOrderByRelationAggregateInput
+  }
+
+  export type MessageWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: MessageWhereInput | MessageWhereInput[]
+    OR?: MessageWhereInput[]
+    NOT?: MessageWhereInput | MessageWhereInput[]
+    content?: StringFilter<"Message"> | string
+    siteId?: StringFilter<"Message"> | string
+    userId?: StringFilter<"Message"> | string
+    channelId?: StringNullableFilter<"Message"> | string | null
+    parentId?: StringNullableFilter<"Message"> | string | null
+    attachments?: JsonNullableFilter<"Message">
+    createdAt?: DateTimeFilter<"Message"> | Date | string
+    updatedAt?: DateTimeFilter<"Message"> | Date | string
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    channel?: XOR<ChannelNullableScalarRelationFilter, ChannelWhereInput> | null
+    parent?: XOR<MessageNullableScalarRelationFilter, MessageWhereInput> | null
+    children?: MessageListRelationFilter
+  }, "id">
+
+  export type MessageOrderByWithAggregationInput = {
+    id?: SortOrder
+    content?: SortOrder
+    siteId?: SortOrder
+    userId?: SortOrder
+    channelId?: SortOrder
+    parentId?: SortOrder
+    attachments?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: MessageCountOrderByAggregateInput
+    _max?: MessageMaxOrderByAggregateInput
+    _min?: MessageMinOrderByAggregateInput
+  }
+
+  export type MessageScalarWhereWithAggregatesInput = {
+    AND?: MessageScalarWhereWithAggregatesInput | MessageScalarWhereWithAggregatesInput[]
+    OR?: MessageScalarWhereWithAggregatesInput[]
+    NOT?: MessageScalarWhereWithAggregatesInput | MessageScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Message"> | string
+    content?: StringWithAggregatesFilter<"Message"> | string
+    siteId?: StringWithAggregatesFilter<"Message"> | string
+    userId?: StringWithAggregatesFilter<"Message"> | string
+    channelId?: StringNullableWithAggregatesFilter<"Message"> | string | null
+    parentId?: StringNullableWithAggregatesFilter<"Message"> | string | null
+    attachments?: JsonNullableWithAggregatesFilter<"Message">
+    createdAt?: DateTimeWithAggregatesFilter<"Message"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Message"> | Date | string
   }
 
   export type FeaturesWhereInput = {
@@ -32374,6 +35068,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -32388,6 +35083,7 @@ export namespace Prisma {
     Page?: PageCreateNestedManyWithoutUserInput
     Notification?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutSenderInput
+    messages?: MessageCreateNestedManyWithoutUserInput
     memberOfSites?: SiteCreateNestedManyWithoutMembersInput
     contributedArticles?: ArticleCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationCreateNestedManyWithoutInviterInput
@@ -32400,6 +35096,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -32416,6 +35113,7 @@ export namespace Prisma {
     Page?: PageUncheckedCreateNestedManyWithoutUserInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutSenderInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     memberOfSites?: SiteUncheckedCreateNestedManyWithoutMembersInput
     contributedArticles?: ArticleUncheckedCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationUncheckedCreateNestedManyWithoutInviterInput
@@ -32427,6 +35125,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32441,6 +35140,7 @@ export namespace Prisma {
     Page?: PageUpdateManyWithoutUserNestedInput
     Notification?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutSenderNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUpdateManyWithoutMembersNestedInput
     contributedArticles?: ArticleUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUpdateManyWithoutInviterNestedInput
@@ -32452,6 +35152,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32468,6 +35169,7 @@ export namespace Prisma {
     Page?: PageUncheckedUpdateManyWithoutUserNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutSenderNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUncheckedUpdateManyWithoutMembersNestedInput
     contributedArticles?: ArticleUncheckedUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUncheckedUpdateManyWithoutInviterNestedInput
@@ -32480,6 +35182,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -32495,6 +35198,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32508,6 +35212,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32838,6 +35543,8 @@ export namespace Prisma {
     collections?: CollectionCreateNestedManyWithoutSiteInput
     members?: UserCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationCreateNestedManyWithoutSiteInput
+    messages?: MessageCreateNestedManyWithoutSiteInput
+    channels?: ChannelCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateInput = {
@@ -32877,6 +35584,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
     members?: UserUncheckedCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationUncheckedCreateNestedManyWithoutSiteInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSiteInput
+    channels?: ChannelUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUpdateInput = {
@@ -32914,6 +35623,8 @@ export namespace Prisma {
     collections?: CollectionUpdateManyWithoutSiteNestedInput
     members?: UserUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUpdateManyWithoutSiteNestedInput
+    messages?: MessageUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateInput = {
@@ -32952,6 +35663,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
     members?: UserUncheckedUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUncheckedUpdateManyWithoutSiteNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteCreateManyInput = {
@@ -33101,6 +35814,155 @@ export namespace Prisma {
     thumbnail?: NullableStringFieldUpdateOperationsInput | string | null
     content?: InputJsonValue | InputJsonValue
     siteId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ChannelCreateInput = {
+    id?: string
+    name: string
+    description?: string | null
+    type?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    site: SiteCreateNestedOneWithoutChannelsInput
+    messages?: MessageCreateNestedManyWithoutChannelInput
+  }
+
+  export type ChannelUncheckedCreateInput = {
+    id?: string
+    name: string
+    description?: string | null
+    type?: string
+    siteId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    messages?: MessageUncheckedCreateNestedManyWithoutChannelInput
+  }
+
+  export type ChannelUpdateInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    site?: SiteUpdateOneRequiredWithoutChannelsNestedInput
+    messages?: MessageUpdateManyWithoutChannelNestedInput
+  }
+
+  export type ChannelUncheckedUpdateInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: StringFieldUpdateOperationsInput | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    messages?: MessageUncheckedUpdateManyWithoutChannelNestedInput
+  }
+
+  export type ChannelCreateManyInput = {
+    id?: string
+    name: string
+    description?: string | null
+    type?: string
+    siteId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ChannelUpdateManyMutationInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ChannelUncheckedUpdateManyInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: StringFieldUpdateOperationsInput | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MessageCreateInput = {
+    id?: string
+    content: string
+    attachments?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    site: SiteCreateNestedOneWithoutMessagesInput
+    user: UserCreateNestedOneWithoutMessagesInput
+    channel?: ChannelCreateNestedOneWithoutMessagesInput
+    parent?: MessageCreateNestedOneWithoutChildrenInput
+    children?: MessageCreateNestedManyWithoutParentInput
+  }
+
+  export type MessageUncheckedCreateInput = {
+    id?: string
+    content: string
+    siteId: string
+    userId: string
+    channelId?: string | null
+    parentId?: string | null
+    attachments?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    children?: MessageUncheckedCreateNestedManyWithoutParentInput
+  }
+
+  export type MessageUpdateInput = {
+    content?: StringFieldUpdateOperationsInput | string
+    attachments?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    site?: SiteUpdateOneRequiredWithoutMessagesNestedInput
+    user?: UserUpdateOneRequiredWithoutMessagesNestedInput
+    channel?: ChannelUpdateOneWithoutMessagesNestedInput
+    parent?: MessageUpdateOneWithoutChildrenNestedInput
+    children?: MessageUpdateManyWithoutParentNestedInput
+  }
+
+  export type MessageUncheckedUpdateInput = {
+    content?: StringFieldUpdateOperationsInput | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    channelId?: NullableStringFieldUpdateOperationsInput | string | null
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
+    attachments?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    children?: MessageUncheckedUpdateManyWithoutParentNestedInput
+  }
+
+  export type MessageCreateManyInput = {
+    id?: string
+    content: string
+    siteId: string
+    userId: string
+    channelId?: string | null
+    parentId?: string | null
+    attachments?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MessageUpdateManyMutationInput = {
+    content?: StringFieldUpdateOperationsInput | string
+    attachments?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MessageUncheckedUpdateManyInput = {
+    content?: StringFieldUpdateOperationsInput | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    channelId?: NullableStringFieldUpdateOperationsInput | string | null
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
+    attachments?: InputJsonValue | InputJsonValue | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -34692,6 +37554,12 @@ export namespace Prisma {
     none?: NotificationWhereInput
   }
 
+  export type MessageListRelationFilter = {
+    every?: MessageWhereInput
+    some?: MessageWhereInput
+    none?: MessageWhereInput
+  }
+
   export type InvitationListRelationFilter = {
     every?: InvitationWhereInput
     some?: InvitationWhereInput
@@ -34730,6 +37598,10 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type MessageOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type InvitationOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -34741,6 +37613,7 @@ export namespace Prisma {
     image?: SortOrder
     email?: SortOrder
     emailVerified?: SortOrder
+    lastSeen?: SortOrder
     hashedPassword?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -34757,6 +37630,7 @@ export namespace Prisma {
     image?: SortOrder
     email?: SortOrder
     emailVerified?: SortOrder
+    lastSeen?: SortOrder
     hashedPassword?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -34771,6 +37645,7 @@ export namespace Prisma {
     image?: SortOrder
     email?: SortOrder
     emailVerified?: SortOrder
+    lastSeen?: SortOrder
     hashedPassword?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -35151,6 +38026,12 @@ export namespace Prisma {
     none?: UserWhereInput
   }
 
+  export type ChannelListRelationFilter = {
+    every?: ChannelWhereInput
+    some?: ChannelWhereInput
+    none?: ChannelWhereInput
+  }
+
   export type AnalyticsEventOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -35176,6 +38057,10 @@ export namespace Prisma {
   }
 
   export type UserOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ChannelOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -35337,6 +38222,80 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedJsonFilter<$PrismaModel>
     _max?: NestedJsonFilter<$PrismaModel>
+  }
+
+  export type ChannelCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    type?: SortOrder
+    siteId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ChannelMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    type?: SortOrder
+    siteId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ChannelMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    type?: SortOrder
+    siteId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ChannelNullableScalarRelationFilter = {
+    is?: ChannelWhereInput | null
+    isNot?: ChannelWhereInput | null
+  }
+
+  export type MessageNullableScalarRelationFilter = {
+    is?: MessageWhereInput | null
+    isNot?: MessageWhereInput | null
+  }
+
+  export type MessageCountOrderByAggregateInput = {
+    id?: SortOrder
+    content?: SortOrder
+    siteId?: SortOrder
+    userId?: SortOrder
+    channelId?: SortOrder
+    parentId?: SortOrder
+    attachments?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MessageMaxOrderByAggregateInput = {
+    id?: SortOrder
+    content?: SortOrder
+    siteId?: SortOrder
+    userId?: SortOrder
+    channelId?: SortOrder
+    parentId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MessageMinOrderByAggregateInput = {
+    id?: SortOrder
+    content?: SortOrder
+    siteId?: SortOrder
+    userId?: SortOrder
+    channelId?: SortOrder
+    parentId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type FeaturesCountOrderByAggregateInput = {
@@ -36307,6 +39266,13 @@ export namespace Prisma {
     connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
   }
 
+  export type MessageCreateNestedManyWithoutUserInput = {
+    create?: XOR<MessageCreateWithoutUserInput, MessageUncheckedCreateWithoutUserInput> | MessageCreateWithoutUserInput[] | MessageUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: MessageCreateOrConnectWithoutUserInput | MessageCreateOrConnectWithoutUserInput[]
+    createMany?: MessageCreateManyUserInputEnvelope
+    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+  }
+
   export type SiteCreateNestedManyWithoutMembersInput = {
     create?: XOR<SiteCreateWithoutMembersInput, SiteUncheckedCreateWithoutMembersInput> | SiteCreateWithoutMembersInput[] | SiteUncheckedCreateWithoutMembersInput[]
     connectOrCreate?: SiteCreateOrConnectWithoutMembersInput | SiteCreateOrConnectWithoutMembersInput[]
@@ -36395,6 +39361,13 @@ export namespace Prisma {
     connectOrCreate?: NotificationCreateOrConnectWithoutSenderInput | NotificationCreateOrConnectWithoutSenderInput[]
     createMany?: NotificationCreateManySenderInputEnvelope
     connect?: NotificationWhereUniqueInput | NotificationWhereUniqueInput[]
+  }
+
+  export type MessageUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<MessageCreateWithoutUserInput, MessageUncheckedCreateWithoutUserInput> | MessageCreateWithoutUserInput[] | MessageUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: MessageCreateOrConnectWithoutUserInput | MessageCreateOrConnectWithoutUserInput[]
+    createMany?: MessageCreateManyUserInputEnvelope
+    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
   }
 
   export type SiteUncheckedCreateNestedManyWithoutMembersInput = {
@@ -36566,6 +39539,20 @@ export namespace Prisma {
     update?: NotificationUpdateWithWhereUniqueWithoutSenderInput | NotificationUpdateWithWhereUniqueWithoutSenderInput[]
     updateMany?: NotificationUpdateManyWithWhereWithoutSenderInput | NotificationUpdateManyWithWhereWithoutSenderInput[]
     deleteMany?: NotificationScalarWhereInput | NotificationScalarWhereInput[]
+  }
+
+  export type MessageUpdateManyWithoutUserNestedInput = {
+    create?: XOR<MessageCreateWithoutUserInput, MessageUncheckedCreateWithoutUserInput> | MessageCreateWithoutUserInput[] | MessageUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: MessageCreateOrConnectWithoutUserInput | MessageCreateOrConnectWithoutUserInput[]
+    upsert?: MessageUpsertWithWhereUniqueWithoutUserInput | MessageUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: MessageCreateManyUserInputEnvelope
+    set?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    disconnect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    delete?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    update?: MessageUpdateWithWhereUniqueWithoutUserInput | MessageUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: MessageUpdateManyWithWhereWithoutUserInput | MessageUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
   }
 
   export type SiteUpdateManyWithoutMembersNestedInput = {
@@ -36742,6 +39729,20 @@ export namespace Prisma {
     update?: NotificationUpdateWithWhereUniqueWithoutSenderInput | NotificationUpdateWithWhereUniqueWithoutSenderInput[]
     updateMany?: NotificationUpdateManyWithWhereWithoutSenderInput | NotificationUpdateManyWithWhereWithoutSenderInput[]
     deleteMany?: NotificationScalarWhereInput | NotificationScalarWhereInput[]
+  }
+
+  export type MessageUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<MessageCreateWithoutUserInput, MessageUncheckedCreateWithoutUserInput> | MessageCreateWithoutUserInput[] | MessageUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: MessageCreateOrConnectWithoutUserInput | MessageCreateOrConnectWithoutUserInput[]
+    upsert?: MessageUpsertWithWhereUniqueWithoutUserInput | MessageUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: MessageCreateManyUserInputEnvelope
+    set?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    disconnect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    delete?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    update?: MessageUpdateWithWhereUniqueWithoutUserInput | MessageUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: MessageUpdateManyWithWhereWithoutUserInput | MessageUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
   }
 
   export type SiteUncheckedUpdateManyWithoutMembersNestedInput = {
@@ -37003,6 +40004,20 @@ export namespace Prisma {
     connect?: InvitationWhereUniqueInput | InvitationWhereUniqueInput[]
   }
 
+  export type MessageCreateNestedManyWithoutSiteInput = {
+    create?: XOR<MessageCreateWithoutSiteInput, MessageUncheckedCreateWithoutSiteInput> | MessageCreateWithoutSiteInput[] | MessageUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: MessageCreateOrConnectWithoutSiteInput | MessageCreateOrConnectWithoutSiteInput[]
+    createMany?: MessageCreateManySiteInputEnvelope
+    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+  }
+
+  export type ChannelCreateNestedManyWithoutSiteInput = {
+    create?: XOR<ChannelCreateWithoutSiteInput, ChannelUncheckedCreateWithoutSiteInput> | ChannelCreateWithoutSiteInput[] | ChannelUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: ChannelCreateOrConnectWithoutSiteInput | ChannelCreateOrConnectWithoutSiteInput[]
+    createMany?: ChannelCreateManySiteInputEnvelope
+    connect?: ChannelWhereUniqueInput | ChannelWhereUniqueInput[]
+  }
+
   export type SiteCreatememberIdsInput = {
     set: string[]
   }
@@ -37095,6 +40110,20 @@ export namespace Prisma {
     connectOrCreate?: InvitationCreateOrConnectWithoutSiteInput | InvitationCreateOrConnectWithoutSiteInput[]
     createMany?: InvitationCreateManySiteInputEnvelope
     connect?: InvitationWhereUniqueInput | InvitationWhereUniqueInput[]
+  }
+
+  export type MessageUncheckedCreateNestedManyWithoutSiteInput = {
+    create?: XOR<MessageCreateWithoutSiteInput, MessageUncheckedCreateWithoutSiteInput> | MessageCreateWithoutSiteInput[] | MessageUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: MessageCreateOrConnectWithoutSiteInput | MessageCreateOrConnectWithoutSiteInput[]
+    createMany?: MessageCreateManySiteInputEnvelope
+    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+  }
+
+  export type ChannelUncheckedCreateNestedManyWithoutSiteInput = {
+    create?: XOR<ChannelCreateWithoutSiteInput, ChannelUncheckedCreateWithoutSiteInput> | ChannelCreateWithoutSiteInput[] | ChannelUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: ChannelCreateOrConnectWithoutSiteInput | ChannelCreateOrConnectWithoutSiteInput[]
+    createMany?: ChannelCreateManySiteInputEnvelope
+    connect?: ChannelWhereUniqueInput | ChannelWhereUniqueInput[]
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -37316,6 +40345,34 @@ export namespace Prisma {
     deleteMany?: InvitationScalarWhereInput | InvitationScalarWhereInput[]
   }
 
+  export type MessageUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<MessageCreateWithoutSiteInput, MessageUncheckedCreateWithoutSiteInput> | MessageCreateWithoutSiteInput[] | MessageUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: MessageCreateOrConnectWithoutSiteInput | MessageCreateOrConnectWithoutSiteInput[]
+    upsert?: MessageUpsertWithWhereUniqueWithoutSiteInput | MessageUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: MessageCreateManySiteInputEnvelope
+    set?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    disconnect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    delete?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    update?: MessageUpdateWithWhereUniqueWithoutSiteInput | MessageUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: MessageUpdateManyWithWhereWithoutSiteInput | MessageUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
+  }
+
+  export type ChannelUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<ChannelCreateWithoutSiteInput, ChannelUncheckedCreateWithoutSiteInput> | ChannelCreateWithoutSiteInput[] | ChannelUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: ChannelCreateOrConnectWithoutSiteInput | ChannelCreateOrConnectWithoutSiteInput[]
+    upsert?: ChannelUpsertWithWhereUniqueWithoutSiteInput | ChannelUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: ChannelCreateManySiteInputEnvelope
+    set?: ChannelWhereUniqueInput | ChannelWhereUniqueInput[]
+    disconnect?: ChannelWhereUniqueInput | ChannelWhereUniqueInput[]
+    delete?: ChannelWhereUniqueInput | ChannelWhereUniqueInput[]
+    connect?: ChannelWhereUniqueInput | ChannelWhereUniqueInput[]
+    update?: ChannelUpdateWithWhereUniqueWithoutSiteInput | ChannelUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: ChannelUpdateManyWithWhereWithoutSiteInput | ChannelUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: ChannelScalarWhereInput | ChannelScalarWhereInput[]
+  }
+
   export type SiteUpdatememberIdsInput = {
     set?: string[]
     push?: string | string[]
@@ -37502,6 +40559,34 @@ export namespace Prisma {
     deleteMany?: InvitationScalarWhereInput | InvitationScalarWhereInput[]
   }
 
+  export type MessageUncheckedUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<MessageCreateWithoutSiteInput, MessageUncheckedCreateWithoutSiteInput> | MessageCreateWithoutSiteInput[] | MessageUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: MessageCreateOrConnectWithoutSiteInput | MessageCreateOrConnectWithoutSiteInput[]
+    upsert?: MessageUpsertWithWhereUniqueWithoutSiteInput | MessageUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: MessageCreateManySiteInputEnvelope
+    set?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    disconnect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    delete?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    update?: MessageUpdateWithWhereUniqueWithoutSiteInput | MessageUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: MessageUpdateManyWithWhereWithoutSiteInput | MessageUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
+  }
+
+  export type ChannelUncheckedUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<ChannelCreateWithoutSiteInput, ChannelUncheckedCreateWithoutSiteInput> | ChannelCreateWithoutSiteInput[] | ChannelUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: ChannelCreateOrConnectWithoutSiteInput | ChannelCreateOrConnectWithoutSiteInput[]
+    upsert?: ChannelUpsertWithWhereUniqueWithoutSiteInput | ChannelUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: ChannelCreateManySiteInputEnvelope
+    set?: ChannelWhereUniqueInput | ChannelWhereUniqueInput[]
+    disconnect?: ChannelWhereUniqueInput | ChannelWhereUniqueInput[]
+    delete?: ChannelWhereUniqueInput | ChannelWhereUniqueInput[]
+    connect?: ChannelWhereUniqueInput | ChannelWhereUniqueInput[]
+    update?: ChannelUpdateWithWhereUniqueWithoutSiteInput | ChannelUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: ChannelUpdateManyWithWhereWithoutSiteInput | ChannelUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: ChannelScalarWhereInput | ChannelScalarWhereInput[]
+  }
+
   export type SiteCreateNestedOneWithoutSnippetsInput = {
     create?: XOR<SiteCreateWithoutSnippetsInput, SiteUncheckedCreateWithoutSnippetsInput>
     connectOrCreate?: SiteCreateOrConnectWithoutSnippetsInput
@@ -37514,6 +40599,164 @@ export namespace Prisma {
     upsert?: SiteUpsertWithoutSnippetsInput
     connect?: SiteWhereUniqueInput
     update?: XOR<XOR<SiteUpdateToOneWithWhereWithoutSnippetsInput, SiteUpdateWithoutSnippetsInput>, SiteUncheckedUpdateWithoutSnippetsInput>
+  }
+
+  export type SiteCreateNestedOneWithoutChannelsInput = {
+    create?: XOR<SiteCreateWithoutChannelsInput, SiteUncheckedCreateWithoutChannelsInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutChannelsInput
+    connect?: SiteWhereUniqueInput
+  }
+
+  export type MessageCreateNestedManyWithoutChannelInput = {
+    create?: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput> | MessageCreateWithoutChannelInput[] | MessageUncheckedCreateWithoutChannelInput[]
+    connectOrCreate?: MessageCreateOrConnectWithoutChannelInput | MessageCreateOrConnectWithoutChannelInput[]
+    createMany?: MessageCreateManyChannelInputEnvelope
+    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+  }
+
+  export type MessageUncheckedCreateNestedManyWithoutChannelInput = {
+    create?: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput> | MessageCreateWithoutChannelInput[] | MessageUncheckedCreateWithoutChannelInput[]
+    connectOrCreate?: MessageCreateOrConnectWithoutChannelInput | MessageCreateOrConnectWithoutChannelInput[]
+    createMany?: MessageCreateManyChannelInputEnvelope
+    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+  }
+
+  export type SiteUpdateOneRequiredWithoutChannelsNestedInput = {
+    create?: XOR<SiteCreateWithoutChannelsInput, SiteUncheckedCreateWithoutChannelsInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutChannelsInput
+    upsert?: SiteUpsertWithoutChannelsInput
+    connect?: SiteWhereUniqueInput
+    update?: XOR<XOR<SiteUpdateToOneWithWhereWithoutChannelsInput, SiteUpdateWithoutChannelsInput>, SiteUncheckedUpdateWithoutChannelsInput>
+  }
+
+  export type MessageUpdateManyWithoutChannelNestedInput = {
+    create?: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput> | MessageCreateWithoutChannelInput[] | MessageUncheckedCreateWithoutChannelInput[]
+    connectOrCreate?: MessageCreateOrConnectWithoutChannelInput | MessageCreateOrConnectWithoutChannelInput[]
+    upsert?: MessageUpsertWithWhereUniqueWithoutChannelInput | MessageUpsertWithWhereUniqueWithoutChannelInput[]
+    createMany?: MessageCreateManyChannelInputEnvelope
+    set?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    disconnect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    delete?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    update?: MessageUpdateWithWhereUniqueWithoutChannelInput | MessageUpdateWithWhereUniqueWithoutChannelInput[]
+    updateMany?: MessageUpdateManyWithWhereWithoutChannelInput | MessageUpdateManyWithWhereWithoutChannelInput[]
+    deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
+  }
+
+  export type MessageUncheckedUpdateManyWithoutChannelNestedInput = {
+    create?: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput> | MessageCreateWithoutChannelInput[] | MessageUncheckedCreateWithoutChannelInput[]
+    connectOrCreate?: MessageCreateOrConnectWithoutChannelInput | MessageCreateOrConnectWithoutChannelInput[]
+    upsert?: MessageUpsertWithWhereUniqueWithoutChannelInput | MessageUpsertWithWhereUniqueWithoutChannelInput[]
+    createMany?: MessageCreateManyChannelInputEnvelope
+    set?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    disconnect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    delete?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    update?: MessageUpdateWithWhereUniqueWithoutChannelInput | MessageUpdateWithWhereUniqueWithoutChannelInput[]
+    updateMany?: MessageUpdateManyWithWhereWithoutChannelInput | MessageUpdateManyWithWhereWithoutChannelInput[]
+    deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
+  }
+
+  export type SiteCreateNestedOneWithoutMessagesInput = {
+    create?: XOR<SiteCreateWithoutMessagesInput, SiteUncheckedCreateWithoutMessagesInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutMessagesInput
+    connect?: SiteWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutMessagesInput = {
+    create?: XOR<UserCreateWithoutMessagesInput, UserUncheckedCreateWithoutMessagesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutMessagesInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type ChannelCreateNestedOneWithoutMessagesInput = {
+    create?: XOR<ChannelCreateWithoutMessagesInput, ChannelUncheckedCreateWithoutMessagesInput>
+    connectOrCreate?: ChannelCreateOrConnectWithoutMessagesInput
+    connect?: ChannelWhereUniqueInput
+  }
+
+  export type MessageCreateNestedOneWithoutChildrenInput = {
+    create?: XOR<MessageCreateWithoutChildrenInput, MessageUncheckedCreateWithoutChildrenInput>
+    connectOrCreate?: MessageCreateOrConnectWithoutChildrenInput
+    connect?: MessageWhereUniqueInput
+  }
+
+  export type MessageCreateNestedManyWithoutParentInput = {
+    create?: XOR<MessageCreateWithoutParentInput, MessageUncheckedCreateWithoutParentInput> | MessageCreateWithoutParentInput[] | MessageUncheckedCreateWithoutParentInput[]
+    connectOrCreate?: MessageCreateOrConnectWithoutParentInput | MessageCreateOrConnectWithoutParentInput[]
+    createMany?: MessageCreateManyParentInputEnvelope
+    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+  }
+
+  export type MessageUncheckedCreateNestedManyWithoutParentInput = {
+    create?: XOR<MessageCreateWithoutParentInput, MessageUncheckedCreateWithoutParentInput> | MessageCreateWithoutParentInput[] | MessageUncheckedCreateWithoutParentInput[]
+    connectOrCreate?: MessageCreateOrConnectWithoutParentInput | MessageCreateOrConnectWithoutParentInput[]
+    createMany?: MessageCreateManyParentInputEnvelope
+    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+  }
+
+  export type SiteUpdateOneRequiredWithoutMessagesNestedInput = {
+    create?: XOR<SiteCreateWithoutMessagesInput, SiteUncheckedCreateWithoutMessagesInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutMessagesInput
+    upsert?: SiteUpsertWithoutMessagesInput
+    connect?: SiteWhereUniqueInput
+    update?: XOR<XOR<SiteUpdateToOneWithWhereWithoutMessagesInput, SiteUpdateWithoutMessagesInput>, SiteUncheckedUpdateWithoutMessagesInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutMessagesNestedInput = {
+    create?: XOR<UserCreateWithoutMessagesInput, UserUncheckedCreateWithoutMessagesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutMessagesInput
+    upsert?: UserUpsertWithoutMessagesInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutMessagesInput, UserUpdateWithoutMessagesInput>, UserUncheckedUpdateWithoutMessagesInput>
+  }
+
+  export type ChannelUpdateOneWithoutMessagesNestedInput = {
+    create?: XOR<ChannelCreateWithoutMessagesInput, ChannelUncheckedCreateWithoutMessagesInput>
+    connectOrCreate?: ChannelCreateOrConnectWithoutMessagesInput
+    upsert?: ChannelUpsertWithoutMessagesInput
+    disconnect?: boolean
+    delete?: ChannelWhereInput | boolean
+    connect?: ChannelWhereUniqueInput
+    update?: XOR<XOR<ChannelUpdateToOneWithWhereWithoutMessagesInput, ChannelUpdateWithoutMessagesInput>, ChannelUncheckedUpdateWithoutMessagesInput>
+  }
+
+  export type MessageUpdateOneWithoutChildrenNestedInput = {
+    create?: XOR<MessageCreateWithoutChildrenInput, MessageUncheckedCreateWithoutChildrenInput>
+    connectOrCreate?: MessageCreateOrConnectWithoutChildrenInput
+    upsert?: MessageUpsertWithoutChildrenInput
+    disconnect?: boolean
+    delete?: MessageWhereInput | boolean
+    connect?: MessageWhereUniqueInput
+    update?: XOR<XOR<MessageUpdateToOneWithWhereWithoutChildrenInput, MessageUpdateWithoutChildrenInput>, MessageUncheckedUpdateWithoutChildrenInput>
+  }
+
+  export type MessageUpdateManyWithoutParentNestedInput = {
+    create?: XOR<MessageCreateWithoutParentInput, MessageUncheckedCreateWithoutParentInput> | MessageCreateWithoutParentInput[] | MessageUncheckedCreateWithoutParentInput[]
+    connectOrCreate?: MessageCreateOrConnectWithoutParentInput | MessageCreateOrConnectWithoutParentInput[]
+    upsert?: MessageUpsertWithWhereUniqueWithoutParentInput | MessageUpsertWithWhereUniqueWithoutParentInput[]
+    createMany?: MessageCreateManyParentInputEnvelope
+    set?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    disconnect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    delete?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    update?: MessageUpdateWithWhereUniqueWithoutParentInput | MessageUpdateWithWhereUniqueWithoutParentInput[]
+    updateMany?: MessageUpdateManyWithWhereWithoutParentInput | MessageUpdateManyWithWhereWithoutParentInput[]
+    deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
+  }
+
+  export type MessageUncheckedUpdateManyWithoutParentNestedInput = {
+    create?: XOR<MessageCreateWithoutParentInput, MessageUncheckedCreateWithoutParentInput> | MessageCreateWithoutParentInput[] | MessageUncheckedCreateWithoutParentInput[]
+    connectOrCreate?: MessageCreateOrConnectWithoutParentInput | MessageCreateOrConnectWithoutParentInput[]
+    upsert?: MessageUpsertWithWhereUniqueWithoutParentInput | MessageUpsertWithWhereUniqueWithoutParentInput[]
+    createMany?: MessageCreateManyParentInputEnvelope
+    set?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    disconnect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    delete?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    connect?: MessageWhereUniqueInput | MessageWhereUniqueInput[]
+    update?: MessageUpdateWithWhereUniqueWithoutParentInput | MessageUpdateWithWhereUniqueWithoutParentInput[]
+    updateMany?: MessageUpdateManyWithWhereWithoutParentInput | MessageUpdateManyWithWhereWithoutParentInput[]
+    deleteMany?: MessageScalarWhereInput | MessageScalarWhereInput[]
   }
 
   export type SiteCreateNestedManyWithoutFeaturesInput = {
@@ -38672,6 +41915,8 @@ export namespace Prisma {
     collections?: CollectionCreateNestedManyWithoutSiteInput
     members?: UserCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationCreateNestedManyWithoutSiteInput
+    messages?: MessageCreateNestedManyWithoutSiteInput
+    channels?: ChannelCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutUserInput = {
@@ -38710,6 +41955,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
     members?: UserUncheckedCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationUncheckedCreateNestedManyWithoutSiteInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSiteInput
+    channels?: ChannelUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutUserInput = {
@@ -38958,6 +42205,39 @@ export namespace Prisma {
     data: NotificationCreateManySenderInput | NotificationCreateManySenderInput[]
   }
 
+  export type MessageCreateWithoutUserInput = {
+    id?: string
+    content: string
+    attachments?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    site: SiteCreateNestedOneWithoutMessagesInput
+    channel?: ChannelCreateNestedOneWithoutMessagesInput
+    parent?: MessageCreateNestedOneWithoutChildrenInput
+    children?: MessageCreateNestedManyWithoutParentInput
+  }
+
+  export type MessageUncheckedCreateWithoutUserInput = {
+    id?: string
+    content: string
+    siteId: string
+    channelId?: string | null
+    parentId?: string | null
+    attachments?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    children?: MessageUncheckedCreateNestedManyWithoutParentInput
+  }
+
+  export type MessageCreateOrConnectWithoutUserInput = {
+    where: MessageWhereUniqueInput
+    create: XOR<MessageCreateWithoutUserInput, MessageUncheckedCreateWithoutUserInput>
+  }
+
+  export type MessageCreateManyUserInputEnvelope = {
+    data: MessageCreateManyUserInput | MessageCreateManyUserInput[]
+  }
+
   export type SiteCreateWithoutMembersInput = {
     id?: string
     subdomain: string
@@ -38993,6 +42273,8 @@ export namespace Prisma {
     Notification?: NotificationCreateNestedManyWithoutSiteInput
     collections?: CollectionCreateNestedManyWithoutSiteInput
     invitations?: InvitationCreateNestedManyWithoutSiteInput
+    messages?: MessageCreateNestedManyWithoutSiteInput
+    channels?: ChannelCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutMembersInput = {
@@ -39031,6 +42313,8 @@ export namespace Prisma {
     Notification?: NotificationUncheckedCreateNestedManyWithoutSiteInput
     collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
     invitations?: InvitationUncheckedCreateNestedManyWithoutSiteInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSiteInput
+    channels?: ChannelUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutMembersInput = {
@@ -39406,6 +42690,37 @@ export namespace Prisma {
     data: XOR<NotificationUpdateManyMutationInput, NotificationUncheckedUpdateManyWithoutSenderInput>
   }
 
+  export type MessageUpsertWithWhereUniqueWithoutUserInput = {
+    where: MessageWhereUniqueInput
+    update: XOR<MessageUpdateWithoutUserInput, MessageUncheckedUpdateWithoutUserInput>
+    create: XOR<MessageCreateWithoutUserInput, MessageUncheckedCreateWithoutUserInput>
+  }
+
+  export type MessageUpdateWithWhereUniqueWithoutUserInput = {
+    where: MessageWhereUniqueInput
+    data: XOR<MessageUpdateWithoutUserInput, MessageUncheckedUpdateWithoutUserInput>
+  }
+
+  export type MessageUpdateManyWithWhereWithoutUserInput = {
+    where: MessageScalarWhereInput
+    data: XOR<MessageUpdateManyMutationInput, MessageUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type MessageScalarWhereInput = {
+    AND?: MessageScalarWhereInput | MessageScalarWhereInput[]
+    OR?: MessageScalarWhereInput[]
+    NOT?: MessageScalarWhereInput | MessageScalarWhereInput[]
+    id?: StringFilter<"Message"> | string
+    content?: StringFilter<"Message"> | string
+    siteId?: StringFilter<"Message"> | string
+    userId?: StringFilter<"Message"> | string
+    channelId?: StringNullableFilter<"Message"> | string | null
+    parentId?: StringNullableFilter<"Message"> | string | null
+    attachments?: JsonNullableFilter<"Message">
+    createdAt?: DateTimeFilter<"Message"> | Date | string
+    updatedAt?: DateTimeFilter<"Message"> | Date | string
+  }
+
   export type SiteUpsertWithWhereUniqueWithoutMembersInput = {
     where: SiteWhereUniqueInput
     update: XOR<SiteUpdateWithoutMembersInput, SiteUncheckedUpdateWithoutMembersInput>
@@ -39475,6 +42790,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -39488,6 +42804,7 @@ export namespace Prisma {
     Page?: PageCreateNestedManyWithoutUserInput
     Notification?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutSenderInput
+    messages?: MessageCreateNestedManyWithoutUserInput
     memberOfSites?: SiteCreateNestedManyWithoutMembersInput
     contributedArticles?: ArticleCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationCreateNestedManyWithoutInviterInput
@@ -39500,6 +42817,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -39515,6 +42833,7 @@ export namespace Prisma {
     Page?: PageUncheckedCreateNestedManyWithoutUserInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutSenderInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     memberOfSites?: SiteUncheckedCreateNestedManyWithoutMembersInput
     contributedArticles?: ArticleUncheckedCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationUncheckedCreateNestedManyWithoutInviterInput
@@ -39542,6 +42861,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -39555,6 +42875,7 @@ export namespace Prisma {
     Page?: PageUpdateManyWithoutUserNestedInput
     Notification?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutSenderNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUpdateManyWithoutMembersNestedInput
     contributedArticles?: ArticleUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUpdateManyWithoutInviterNestedInput
@@ -39566,6 +42887,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -39581,6 +42903,7 @@ export namespace Prisma {
     Page?: PageUncheckedUpdateManyWithoutUserNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutSenderNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUncheckedUpdateManyWithoutMembersNestedInput
     contributedArticles?: ArticleUncheckedUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUncheckedUpdateManyWithoutInviterNestedInput
@@ -39593,6 +42916,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -39606,6 +42930,7 @@ export namespace Prisma {
     Page?: PageCreateNestedManyWithoutUserInput
     Notification?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutSenderInput
+    messages?: MessageCreateNestedManyWithoutUserInput
     memberOfSites?: SiteCreateNestedManyWithoutMembersInput
     contributedArticles?: ArticleCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationCreateNestedManyWithoutInviterInput
@@ -39618,6 +42943,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -39633,6 +42959,7 @@ export namespace Prisma {
     Page?: PageUncheckedCreateNestedManyWithoutUserInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutSenderInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     memberOfSites?: SiteUncheckedCreateNestedManyWithoutMembersInput
     contributedArticles?: ArticleUncheckedCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationUncheckedCreateNestedManyWithoutInviterInput
@@ -39660,6 +42987,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -39673,6 +43001,7 @@ export namespace Prisma {
     Page?: PageUpdateManyWithoutUserNestedInput
     Notification?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutSenderNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUpdateManyWithoutMembersNestedInput
     contributedArticles?: ArticleUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUpdateManyWithoutInviterNestedInput
@@ -39684,6 +43013,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -39699,6 +43029,7 @@ export namespace Prisma {
     Page?: PageUncheckedUpdateManyWithoutUserNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutSenderNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUncheckedUpdateManyWithoutMembersNestedInput
     contributedArticles?: ArticleUncheckedUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUncheckedUpdateManyWithoutInviterNestedInput
@@ -39739,6 +43070,8 @@ export namespace Prisma {
     collections?: CollectionCreateNestedManyWithoutSiteInput
     members?: UserCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationCreateNestedManyWithoutSiteInput
+    messages?: MessageCreateNestedManyWithoutSiteInput
+    channels?: ChannelCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutCategoryInput = {
@@ -39777,6 +43110,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
     members?: UserUncheckedCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationUncheckedCreateNestedManyWithoutSiteInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSiteInput
+    channels?: ChannelUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutCategoryInput = {
@@ -39791,6 +43126,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -39804,6 +43140,7 @@ export namespace Prisma {
     Page?: PageCreateNestedManyWithoutUserInput
     Notification?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutSenderInput
+    messages?: MessageCreateNestedManyWithoutUserInput
     memberOfSites?: SiteCreateNestedManyWithoutMembersInput
     contributedArticles?: ArticleCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationCreateNestedManyWithoutInviterInput
@@ -39816,6 +43153,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -39831,6 +43169,7 @@ export namespace Prisma {
     Page?: PageUncheckedCreateNestedManyWithoutUserInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutSenderInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     memberOfSites?: SiteUncheckedCreateNestedManyWithoutMembersInput
     contributedArticles?: ArticleUncheckedCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationUncheckedCreateNestedManyWithoutInviterInput
@@ -39921,6 +43260,8 @@ export namespace Prisma {
     collections?: CollectionUpdateManyWithoutSiteNestedInput
     members?: UserUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUpdateManyWithoutSiteNestedInput
+    messages?: MessageUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutCategoryInput = {
@@ -39958,6 +43299,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
     members?: UserUncheckedUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUncheckedUpdateManyWithoutSiteNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutCategoryInput = {
@@ -39977,6 +43320,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -39990,6 +43334,7 @@ export namespace Prisma {
     Page?: PageUpdateManyWithoutUserNestedInput
     Notification?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutSenderNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUpdateManyWithoutMembersNestedInput
     contributedArticles?: ArticleUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUpdateManyWithoutInviterNestedInput
@@ -40001,6 +43346,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -40016,6 +43362,7 @@ export namespace Prisma {
     Page?: PageUncheckedUpdateManyWithoutUserNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutSenderNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUncheckedUpdateManyWithoutMembersNestedInput
     contributedArticles?: ArticleUncheckedUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUncheckedUpdateManyWithoutInviterNestedInput
@@ -40060,6 +43407,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -40073,6 +43421,7 @@ export namespace Prisma {
     Page?: PageCreateNestedManyWithoutUserInput
     Notification?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutSenderInput
+    messages?: MessageCreateNestedManyWithoutUserInput
     memberOfSites?: SiteCreateNestedManyWithoutMembersInput
     contributedArticles?: ArticleCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationCreateNestedManyWithoutInviterInput
@@ -40085,6 +43434,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -40100,6 +43450,7 @@ export namespace Prisma {
     Page?: PageUncheckedCreateNestedManyWithoutUserInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutSenderInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     memberOfSites?: SiteUncheckedCreateNestedManyWithoutMembersInput
     contributedArticles?: ArticleUncheckedCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationUncheckedCreateNestedManyWithoutInviterInput
@@ -40567,6 +43918,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -40581,6 +43933,7 @@ export namespace Prisma {
     Page?: PageCreateNestedManyWithoutUserInput
     Notification?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutSenderInput
+    messages?: MessageCreateNestedManyWithoutUserInput
     contributedArticles?: ArticleCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationCreateNestedManyWithoutInviterInput
   }
@@ -40592,6 +43945,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -40608,6 +43962,7 @@ export namespace Prisma {
     Page?: PageUncheckedCreateNestedManyWithoutUserInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutSenderInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     contributedArticles?: ArticleUncheckedCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationUncheckedCreateNestedManyWithoutInviterInput
   }
@@ -40646,6 +44001,68 @@ export namespace Prisma {
     data: InvitationCreateManySiteInput | InvitationCreateManySiteInput[]
   }
 
+  export type MessageCreateWithoutSiteInput = {
+    id?: string
+    content: string
+    attachments?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutMessagesInput
+    channel?: ChannelCreateNestedOneWithoutMessagesInput
+    parent?: MessageCreateNestedOneWithoutChildrenInput
+    children?: MessageCreateNestedManyWithoutParentInput
+  }
+
+  export type MessageUncheckedCreateWithoutSiteInput = {
+    id?: string
+    content: string
+    userId: string
+    channelId?: string | null
+    parentId?: string | null
+    attachments?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    children?: MessageUncheckedCreateNestedManyWithoutParentInput
+  }
+
+  export type MessageCreateOrConnectWithoutSiteInput = {
+    where: MessageWhereUniqueInput
+    create: XOR<MessageCreateWithoutSiteInput, MessageUncheckedCreateWithoutSiteInput>
+  }
+
+  export type MessageCreateManySiteInputEnvelope = {
+    data: MessageCreateManySiteInput | MessageCreateManySiteInput[]
+  }
+
+  export type ChannelCreateWithoutSiteInput = {
+    id?: string
+    name: string
+    description?: string | null
+    type?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    messages?: MessageCreateNestedManyWithoutChannelInput
+  }
+
+  export type ChannelUncheckedCreateWithoutSiteInput = {
+    id?: string
+    name: string
+    description?: string | null
+    type?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    messages?: MessageUncheckedCreateNestedManyWithoutChannelInput
+  }
+
+  export type ChannelCreateOrConnectWithoutSiteInput = {
+    where: ChannelWhereUniqueInput
+    create: XOR<ChannelCreateWithoutSiteInput, ChannelUncheckedCreateWithoutSiteInput>
+  }
+
+  export type ChannelCreateManySiteInputEnvelope = {
+    data: ChannelCreateManySiteInput | ChannelCreateManySiteInput[]
+  }
+
   export type UserUpsertWithoutSiteInput = {
     update: XOR<UserUpdateWithoutSiteInput, UserUncheckedUpdateWithoutSiteInput>
     create: XOR<UserCreateWithoutSiteInput, UserUncheckedCreateWithoutSiteInput>
@@ -40663,6 +44080,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -40676,6 +44094,7 @@ export namespace Prisma {
     Page?: PageUpdateManyWithoutUserNestedInput
     Notification?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutSenderNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUpdateManyWithoutMembersNestedInput
     contributedArticles?: ArticleUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUpdateManyWithoutInviterNestedInput
@@ -40687,6 +44106,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -40702,6 +44122,7 @@ export namespace Prisma {
     Page?: PageUncheckedUpdateManyWithoutUserNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutSenderNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUncheckedUpdateManyWithoutMembersNestedInput
     contributedArticles?: ArticleUncheckedUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUncheckedUpdateManyWithoutInviterNestedInput
@@ -41068,6 +44489,7 @@ export namespace Prisma {
     image?: StringNullableFilter<"User"> | string | null
     email?: StringFilter<"User"> | string
     emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
+    lastSeen?: DateTimeNullableFilter<"User"> | Date | string | null
     hashedPassword?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
@@ -41091,6 +44513,51 @@ export namespace Prisma {
   export type InvitationUpdateManyWithWhereWithoutSiteInput = {
     where: InvitationScalarWhereInput
     data: XOR<InvitationUpdateManyMutationInput, InvitationUncheckedUpdateManyWithoutSiteInput>
+  }
+
+  export type MessageUpsertWithWhereUniqueWithoutSiteInput = {
+    where: MessageWhereUniqueInput
+    update: XOR<MessageUpdateWithoutSiteInput, MessageUncheckedUpdateWithoutSiteInput>
+    create: XOR<MessageCreateWithoutSiteInput, MessageUncheckedCreateWithoutSiteInput>
+  }
+
+  export type MessageUpdateWithWhereUniqueWithoutSiteInput = {
+    where: MessageWhereUniqueInput
+    data: XOR<MessageUpdateWithoutSiteInput, MessageUncheckedUpdateWithoutSiteInput>
+  }
+
+  export type MessageUpdateManyWithWhereWithoutSiteInput = {
+    where: MessageScalarWhereInput
+    data: XOR<MessageUpdateManyMutationInput, MessageUncheckedUpdateManyWithoutSiteInput>
+  }
+
+  export type ChannelUpsertWithWhereUniqueWithoutSiteInput = {
+    where: ChannelWhereUniqueInput
+    update: XOR<ChannelUpdateWithoutSiteInput, ChannelUncheckedUpdateWithoutSiteInput>
+    create: XOR<ChannelCreateWithoutSiteInput, ChannelUncheckedCreateWithoutSiteInput>
+  }
+
+  export type ChannelUpdateWithWhereUniqueWithoutSiteInput = {
+    where: ChannelWhereUniqueInput
+    data: XOR<ChannelUpdateWithoutSiteInput, ChannelUncheckedUpdateWithoutSiteInput>
+  }
+
+  export type ChannelUpdateManyWithWhereWithoutSiteInput = {
+    where: ChannelScalarWhereInput
+    data: XOR<ChannelUpdateManyMutationInput, ChannelUncheckedUpdateManyWithoutSiteInput>
+  }
+
+  export type ChannelScalarWhereInput = {
+    AND?: ChannelScalarWhereInput | ChannelScalarWhereInput[]
+    OR?: ChannelScalarWhereInput[]
+    NOT?: ChannelScalarWhereInput | ChannelScalarWhereInput[]
+    id?: StringFilter<"Channel"> | string
+    name?: StringFilter<"Channel"> | string
+    description?: StringNullableFilter<"Channel"> | string | null
+    type?: StringFilter<"Channel"> | string
+    siteId?: StringFilter<"Channel"> | string
+    createdAt?: DateTimeFilter<"Channel"> | Date | string
+    updatedAt?: DateTimeFilter<"Channel"> | Date | string
   }
 
   export type SiteCreateWithoutSnippetsInput = {
@@ -41128,6 +44595,8 @@ export namespace Prisma {
     collections?: CollectionCreateNestedManyWithoutSiteInput
     members?: UserCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationCreateNestedManyWithoutSiteInput
+    messages?: MessageCreateNestedManyWithoutSiteInput
+    channels?: ChannelCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutSnippetsInput = {
@@ -41166,6 +44635,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
     members?: UserUncheckedCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationUncheckedCreateNestedManyWithoutSiteInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSiteInput
+    channels?: ChannelUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutSnippetsInput = {
@@ -41218,6 +44689,8 @@ export namespace Prisma {
     collections?: CollectionUpdateManyWithoutSiteNestedInput
     members?: UserUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUpdateManyWithoutSiteNestedInput
+    messages?: MessageUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutSnippetsInput = {
@@ -41255,6 +44728,692 @@ export namespace Prisma {
     collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
     members?: UserUncheckedUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUncheckedUpdateManyWithoutSiteNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUncheckedUpdateManyWithoutSiteNestedInput
+  }
+
+  export type SiteCreateWithoutChannelsInput = {
+    id?: string
+    subdomain: string
+    url: string
+    views?: number
+    limitViews?: number
+    title: string
+    description?: string | null
+    logo?: string | null
+    theme?: InputJsonValue | null
+    status?: string
+    defaultThemePreference?: string
+    template_schema?: InputJsonValue | null
+    settings?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    home_Id?: string | null
+    privacy_policy_id?: string | null
+    cookies_id?: string | null
+    terms_id?: string | null
+    user?: UserCreateNestedOneWithoutSiteInput
+    features?: FeaturesCreateNestedOneWithoutSiteInput
+    subscription?: SubscriptionCreateNestedOneWithoutSiteInput
+    category?: CategoryCreateNestedManyWithoutSiteInput
+    Article?: ArticleCreateNestedManyWithoutSiteInput
+    Page?: PageCreateNestedManyWithoutSiteInput
+    RSS?: RssCreateNestedManyWithoutSiteInput
+    AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
+    snippets?: SnippetCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
+    Notification?: NotificationCreateNestedManyWithoutSiteInput
+    collections?: CollectionCreateNestedManyWithoutSiteInput
+    members?: UserCreateNestedManyWithoutMemberOfSitesInput
+    invitations?: InvitationCreateNestedManyWithoutSiteInput
+    messages?: MessageCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteUncheckedCreateWithoutChannelsInput = {
+    id?: string
+    subdomain: string
+    url: string
+    views?: number
+    limitViews?: number
+    title: string
+    description?: string | null
+    logo?: string | null
+    theme?: InputJsonValue | null
+    status?: string
+    defaultThemePreference?: string
+    template_schema?: InputJsonValue | null
+    settings?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    home_Id?: string | null
+    privacy_policy_id?: string | null
+    cookies_id?: string | null
+    terms_id?: string | null
+    userId?: string | null
+    featuresId?: string | null
+    subscriptionId?: string | null
+    memberIds?: SiteCreatememberIdsInput | string[]
+    category?: CategoryUncheckedCreateNestedManyWithoutSiteInput
+    Article?: ArticleUncheckedCreateNestedManyWithoutSiteInput
+    Page?: PageUncheckedCreateNestedManyWithoutSiteInput
+    RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
+    AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
+    snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
+    Notification?: NotificationUncheckedCreateNestedManyWithoutSiteInput
+    collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
+    members?: UserUncheckedCreateNestedManyWithoutMemberOfSitesInput
+    invitations?: InvitationUncheckedCreateNestedManyWithoutSiteInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteCreateOrConnectWithoutChannelsInput = {
+    where: SiteWhereUniqueInput
+    create: XOR<SiteCreateWithoutChannelsInput, SiteUncheckedCreateWithoutChannelsInput>
+  }
+
+  export type MessageCreateWithoutChannelInput = {
+    id?: string
+    content: string
+    attachments?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    site: SiteCreateNestedOneWithoutMessagesInput
+    user: UserCreateNestedOneWithoutMessagesInput
+    parent?: MessageCreateNestedOneWithoutChildrenInput
+    children?: MessageCreateNestedManyWithoutParentInput
+  }
+
+  export type MessageUncheckedCreateWithoutChannelInput = {
+    id?: string
+    content: string
+    siteId: string
+    userId: string
+    parentId?: string | null
+    attachments?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    children?: MessageUncheckedCreateNestedManyWithoutParentInput
+  }
+
+  export type MessageCreateOrConnectWithoutChannelInput = {
+    where: MessageWhereUniqueInput
+    create: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput>
+  }
+
+  export type MessageCreateManyChannelInputEnvelope = {
+    data: MessageCreateManyChannelInput | MessageCreateManyChannelInput[]
+  }
+
+  export type SiteUpsertWithoutChannelsInput = {
+    update: XOR<SiteUpdateWithoutChannelsInput, SiteUncheckedUpdateWithoutChannelsInput>
+    create: XOR<SiteCreateWithoutChannelsInput, SiteUncheckedCreateWithoutChannelsInput>
+    where?: SiteWhereInput
+  }
+
+  export type SiteUpdateToOneWithWhereWithoutChannelsInput = {
+    where?: SiteWhereInput
+    data: XOR<SiteUpdateWithoutChannelsInput, SiteUncheckedUpdateWithoutChannelsInput>
+  }
+
+  export type SiteUpdateWithoutChannelsInput = {
+    subdomain?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    views?: IntFieldUpdateOperationsInput | number
+    limitViews?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    theme?: InputJsonValue | InputJsonValue | null
+    status?: StringFieldUpdateOperationsInput | string
+    defaultThemePreference?: StringFieldUpdateOperationsInput | string
+    template_schema?: InputJsonValue | InputJsonValue | null
+    settings?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_Id?: NullableStringFieldUpdateOperationsInput | string | null
+    privacy_policy_id?: NullableStringFieldUpdateOperationsInput | string | null
+    cookies_id?: NullableStringFieldUpdateOperationsInput | string | null
+    terms_id?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneWithoutSiteNestedInput
+    features?: FeaturesUpdateOneWithoutSiteNestedInput
+    subscription?: SubscriptionUpdateOneWithoutSiteNestedInput
+    category?: CategoryUpdateManyWithoutSiteNestedInput
+    Article?: ArticleUpdateManyWithoutSiteNestedInput
+    Page?: PageUpdateManyWithoutSiteNestedInput
+    RSS?: RssUpdateManyWithoutSiteNestedInput
+    AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
+    Notification?: NotificationUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUpdateManyWithoutSiteNestedInput
+    members?: UserUpdateManyWithoutMemberOfSitesNestedInput
+    invitations?: InvitationUpdateManyWithoutSiteNestedInput
+    messages?: MessageUpdateManyWithoutSiteNestedInput
+  }
+
+  export type SiteUncheckedUpdateWithoutChannelsInput = {
+    subdomain?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    views?: IntFieldUpdateOperationsInput | number
+    limitViews?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    theme?: InputJsonValue | InputJsonValue | null
+    status?: StringFieldUpdateOperationsInput | string
+    defaultThemePreference?: StringFieldUpdateOperationsInput | string
+    template_schema?: InputJsonValue | InputJsonValue | null
+    settings?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_Id?: NullableStringFieldUpdateOperationsInput | string | null
+    privacy_policy_id?: NullableStringFieldUpdateOperationsInput | string | null
+    cookies_id?: NullableStringFieldUpdateOperationsInput | string | null
+    terms_id?: NullableStringFieldUpdateOperationsInput | string | null
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    featuresId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    memberIds?: SiteUpdatememberIdsInput | string[]
+    category?: CategoryUncheckedUpdateManyWithoutSiteNestedInput
+    Article?: ArticleUncheckedUpdateManyWithoutSiteNestedInput
+    Page?: PageUncheckedUpdateManyWithoutSiteNestedInput
+    RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
+    AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
+    Notification?: NotificationUncheckedUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
+    members?: UserUncheckedUpdateManyWithoutMemberOfSitesNestedInput
+    invitations?: InvitationUncheckedUpdateManyWithoutSiteNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSiteNestedInput
+  }
+
+  export type MessageUpsertWithWhereUniqueWithoutChannelInput = {
+    where: MessageWhereUniqueInput
+    update: XOR<MessageUpdateWithoutChannelInput, MessageUncheckedUpdateWithoutChannelInput>
+    create: XOR<MessageCreateWithoutChannelInput, MessageUncheckedCreateWithoutChannelInput>
+  }
+
+  export type MessageUpdateWithWhereUniqueWithoutChannelInput = {
+    where: MessageWhereUniqueInput
+    data: XOR<MessageUpdateWithoutChannelInput, MessageUncheckedUpdateWithoutChannelInput>
+  }
+
+  export type MessageUpdateManyWithWhereWithoutChannelInput = {
+    where: MessageScalarWhereInput
+    data: XOR<MessageUpdateManyMutationInput, MessageUncheckedUpdateManyWithoutChannelInput>
+  }
+
+  export type SiteCreateWithoutMessagesInput = {
+    id?: string
+    subdomain: string
+    url: string
+    views?: number
+    limitViews?: number
+    title: string
+    description?: string | null
+    logo?: string | null
+    theme?: InputJsonValue | null
+    status?: string
+    defaultThemePreference?: string
+    template_schema?: InputJsonValue | null
+    settings?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    home_Id?: string | null
+    privacy_policy_id?: string | null
+    cookies_id?: string | null
+    terms_id?: string | null
+    user?: UserCreateNestedOneWithoutSiteInput
+    features?: FeaturesCreateNestedOneWithoutSiteInput
+    subscription?: SubscriptionCreateNestedOneWithoutSiteInput
+    category?: CategoryCreateNestedManyWithoutSiteInput
+    Article?: ArticleCreateNestedManyWithoutSiteInput
+    Page?: PageCreateNestedManyWithoutSiteInput
+    RSS?: RssCreateNestedManyWithoutSiteInput
+    AnalyticsEvent?: AnalyticsEventCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeCreateNestedManyWithoutSiteInput
+    snippets?: SnippetCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedCreateNestedManyWithoutSiteInput
+    Notification?: NotificationCreateNestedManyWithoutSiteInput
+    collections?: CollectionCreateNestedManyWithoutSiteInput
+    members?: UserCreateNestedManyWithoutMemberOfSitesInput
+    invitations?: InvitationCreateNestedManyWithoutSiteInput
+    channels?: ChannelCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteUncheckedCreateWithoutMessagesInput = {
+    id?: string
+    subdomain: string
+    url: string
+    views?: number
+    limitViews?: number
+    title: string
+    description?: string | null
+    logo?: string | null
+    theme?: InputJsonValue | null
+    status?: string
+    defaultThemePreference?: string
+    template_schema?: InputJsonValue | null
+    settings?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    home_Id?: string | null
+    privacy_policy_id?: string | null
+    cookies_id?: string | null
+    terms_id?: string | null
+    userId?: string | null
+    featuresId?: string | null
+    subscriptionId?: string | null
+    memberIds?: SiteCreatememberIdsInput | string[]
+    category?: CategoryUncheckedCreateNestedManyWithoutSiteInput
+    Article?: ArticleUncheckedCreateNestedManyWithoutSiteInput
+    Page?: PageUncheckedCreateNestedManyWithoutSiteInput
+    RSS?: RssUncheckedCreateNestedManyWithoutSiteInput
+    AnalyticsEvent?: AnalyticsEventUncheckedCreateNestedManyWithoutSiteInput
+    installedThemes?: SiteThemeUncheckedCreateNestedManyWithoutSiteInput
+    snippets?: SnippetUncheckedCreateNestedManyWithoutSiteInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedCreateNestedManyWithoutSiteInput
+    mergedFeeds?: MergedFeedUncheckedCreateNestedManyWithoutSiteInput
+    Notification?: NotificationUncheckedCreateNestedManyWithoutSiteInput
+    collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
+    members?: UserUncheckedCreateNestedManyWithoutMemberOfSitesInput
+    invitations?: InvitationUncheckedCreateNestedManyWithoutSiteInput
+    channels?: ChannelUncheckedCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteCreateOrConnectWithoutMessagesInput = {
+    where: SiteWhereUniqueInput
+    create: XOR<SiteCreateWithoutMessagesInput, SiteUncheckedCreateWithoutMessagesInput>
+  }
+
+  export type UserCreateWithoutMessagesInput = {
+    id?: string
+    name: string
+    username?: string | null
+    image?: string | null
+    email: string
+    emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
+    hashedPassword?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    role?: $Enums.Role
+    developerMode?: boolean
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    Site?: SiteCreateNestedManyWithoutUserInput
+    Category?: CategoryCreateNestedManyWithoutUserInput
+    Subscription?: SubscriptionCreateNestedManyWithoutUserInput
+    Article?: ArticleCreateNestedManyWithoutAuthorInput
+    Page?: PageCreateNestedManyWithoutUserInput
+    Notification?: NotificationCreateNestedManyWithoutUserInput
+    sentNotifications?: NotificationCreateNestedManyWithoutSenderInput
+    memberOfSites?: SiteCreateNestedManyWithoutMembersInput
+    contributedArticles?: ArticleCreateNestedManyWithoutAuthorsInput
+    sentInvitations?: InvitationCreateNestedManyWithoutInviterInput
+  }
+
+  export type UserUncheckedCreateWithoutMessagesInput = {
+    id?: string
+    name: string
+    username?: string | null
+    image?: string | null
+    email: string
+    emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
+    hashedPassword?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    role?: $Enums.Role
+    memberOfSiteIds?: UserCreatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserCreatecontributedArticleIdsInput | string[]
+    developerMode?: boolean
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    Site?: SiteUncheckedCreateNestedManyWithoutUserInput
+    Category?: CategoryUncheckedCreateNestedManyWithoutUserInput
+    Subscription?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    Article?: ArticleUncheckedCreateNestedManyWithoutAuthorInput
+    Page?: PageUncheckedCreateNestedManyWithoutUserInput
+    Notification?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    sentNotifications?: NotificationUncheckedCreateNestedManyWithoutSenderInput
+    memberOfSites?: SiteUncheckedCreateNestedManyWithoutMembersInput
+    contributedArticles?: ArticleUncheckedCreateNestedManyWithoutAuthorsInput
+    sentInvitations?: InvitationUncheckedCreateNestedManyWithoutInviterInput
+  }
+
+  export type UserCreateOrConnectWithoutMessagesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutMessagesInput, UserUncheckedCreateWithoutMessagesInput>
+  }
+
+  export type ChannelCreateWithoutMessagesInput = {
+    id?: string
+    name: string
+    description?: string | null
+    type?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    site: SiteCreateNestedOneWithoutChannelsInput
+  }
+
+  export type ChannelUncheckedCreateWithoutMessagesInput = {
+    id?: string
+    name: string
+    description?: string | null
+    type?: string
+    siteId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ChannelCreateOrConnectWithoutMessagesInput = {
+    where: ChannelWhereUniqueInput
+    create: XOR<ChannelCreateWithoutMessagesInput, ChannelUncheckedCreateWithoutMessagesInput>
+  }
+
+  export type MessageCreateWithoutChildrenInput = {
+    id?: string
+    content: string
+    attachments?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    site: SiteCreateNestedOneWithoutMessagesInput
+    user: UserCreateNestedOneWithoutMessagesInput
+    channel?: ChannelCreateNestedOneWithoutMessagesInput
+    parent?: MessageCreateNestedOneWithoutChildrenInput
+  }
+
+  export type MessageUncheckedCreateWithoutChildrenInput = {
+    id?: string
+    content: string
+    siteId: string
+    userId: string
+    channelId?: string | null
+    parentId?: string | null
+    attachments?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MessageCreateOrConnectWithoutChildrenInput = {
+    where: MessageWhereUniqueInput
+    create: XOR<MessageCreateWithoutChildrenInput, MessageUncheckedCreateWithoutChildrenInput>
+  }
+
+  export type MessageCreateWithoutParentInput = {
+    id?: string
+    content: string
+    attachments?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    site: SiteCreateNestedOneWithoutMessagesInput
+    user: UserCreateNestedOneWithoutMessagesInput
+    channel?: ChannelCreateNestedOneWithoutMessagesInput
+    children?: MessageCreateNestedManyWithoutParentInput
+  }
+
+  export type MessageUncheckedCreateWithoutParentInput = {
+    id?: string
+    content: string
+    siteId: string
+    userId: string
+    channelId?: string | null
+    attachments?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    children?: MessageUncheckedCreateNestedManyWithoutParentInput
+  }
+
+  export type MessageCreateOrConnectWithoutParentInput = {
+    where: MessageWhereUniqueInput
+    create: XOR<MessageCreateWithoutParentInput, MessageUncheckedCreateWithoutParentInput>
+  }
+
+  export type MessageCreateManyParentInputEnvelope = {
+    data: MessageCreateManyParentInput | MessageCreateManyParentInput[]
+  }
+
+  export type SiteUpsertWithoutMessagesInput = {
+    update: XOR<SiteUpdateWithoutMessagesInput, SiteUncheckedUpdateWithoutMessagesInput>
+    create: XOR<SiteCreateWithoutMessagesInput, SiteUncheckedCreateWithoutMessagesInput>
+    where?: SiteWhereInput
+  }
+
+  export type SiteUpdateToOneWithWhereWithoutMessagesInput = {
+    where?: SiteWhereInput
+    data: XOR<SiteUpdateWithoutMessagesInput, SiteUncheckedUpdateWithoutMessagesInput>
+  }
+
+  export type SiteUpdateWithoutMessagesInput = {
+    subdomain?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    views?: IntFieldUpdateOperationsInput | number
+    limitViews?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    theme?: InputJsonValue | InputJsonValue | null
+    status?: StringFieldUpdateOperationsInput | string
+    defaultThemePreference?: StringFieldUpdateOperationsInput | string
+    template_schema?: InputJsonValue | InputJsonValue | null
+    settings?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_Id?: NullableStringFieldUpdateOperationsInput | string | null
+    privacy_policy_id?: NullableStringFieldUpdateOperationsInput | string | null
+    cookies_id?: NullableStringFieldUpdateOperationsInput | string | null
+    terms_id?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneWithoutSiteNestedInput
+    features?: FeaturesUpdateOneWithoutSiteNestedInput
+    subscription?: SubscriptionUpdateOneWithoutSiteNestedInput
+    category?: CategoryUpdateManyWithoutSiteNestedInput
+    Article?: ArticleUpdateManyWithoutSiteNestedInput
+    Page?: PageUpdateManyWithoutSiteNestedInput
+    RSS?: RssUpdateManyWithoutSiteNestedInput
+    AnalyticsEvent?: AnalyticsEventUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUpdateManyWithoutSiteNestedInput
+    Notification?: NotificationUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUpdateManyWithoutSiteNestedInput
+    members?: UserUpdateManyWithoutMemberOfSitesNestedInput
+    invitations?: InvitationUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUpdateManyWithoutSiteNestedInput
+  }
+
+  export type SiteUncheckedUpdateWithoutMessagesInput = {
+    subdomain?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    views?: IntFieldUpdateOperationsInput | number
+    limitViews?: IntFieldUpdateOperationsInput | number
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    logo?: NullableStringFieldUpdateOperationsInput | string | null
+    theme?: InputJsonValue | InputJsonValue | null
+    status?: StringFieldUpdateOperationsInput | string
+    defaultThemePreference?: StringFieldUpdateOperationsInput | string
+    template_schema?: InputJsonValue | InputJsonValue | null
+    settings?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    home_Id?: NullableStringFieldUpdateOperationsInput | string | null
+    privacy_policy_id?: NullableStringFieldUpdateOperationsInput | string | null
+    cookies_id?: NullableStringFieldUpdateOperationsInput | string | null
+    terms_id?: NullableStringFieldUpdateOperationsInput | string | null
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    featuresId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    memberIds?: SiteUpdatememberIdsInput | string[]
+    category?: CategoryUncheckedUpdateManyWithoutSiteNestedInput
+    Article?: ArticleUncheckedUpdateManyWithoutSiteNestedInput
+    Page?: PageUncheckedUpdateManyWithoutSiteNestedInput
+    RSS?: RssUncheckedUpdateManyWithoutSiteNestedInput
+    AnalyticsEvent?: AnalyticsEventUncheckedUpdateManyWithoutSiteNestedInput
+    installedThemes?: SiteThemeUncheckedUpdateManyWithoutSiteNestedInput
+    snippets?: SnippetUncheckedUpdateManyWithoutSiteNestedInput
+    customFeedTemplates?: CustomFeedTemplateUncheckedUpdateManyWithoutSiteNestedInput
+    mergedFeeds?: MergedFeedUncheckedUpdateManyWithoutSiteNestedInput
+    Notification?: NotificationUncheckedUpdateManyWithoutSiteNestedInput
+    collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
+    members?: UserUncheckedUpdateManyWithoutMemberOfSitesNestedInput
+    invitations?: InvitationUncheckedUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUncheckedUpdateManyWithoutSiteNestedInput
+  }
+
+  export type UserUpsertWithoutMessagesInput = {
+    update: XOR<UserUpdateWithoutMessagesInput, UserUncheckedUpdateWithoutMessagesInput>
+    create: XOR<UserCreateWithoutMessagesInput, UserUncheckedCreateWithoutMessagesInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutMessagesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutMessagesInput, UserUncheckedUpdateWithoutMessagesInput>
+  }
+
+  export type UserUpdateWithoutMessagesInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    developerMode?: BoolFieldUpdateOperationsInput | boolean
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    Site?: SiteUpdateManyWithoutUserNestedInput
+    Category?: CategoryUpdateManyWithoutUserNestedInput
+    Subscription?: SubscriptionUpdateManyWithoutUserNestedInput
+    Article?: ArticleUpdateManyWithoutAuthorNestedInput
+    Page?: PageUpdateManyWithoutUserNestedInput
+    Notification?: NotificationUpdateManyWithoutUserNestedInput
+    sentNotifications?: NotificationUpdateManyWithoutSenderNestedInput
+    memberOfSites?: SiteUpdateManyWithoutMembersNestedInput
+    contributedArticles?: ArticleUpdateManyWithoutAuthorsNestedInput
+    sentInvitations?: InvitationUpdateManyWithoutInviterNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutMessagesInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    memberOfSiteIds?: UserUpdatememberOfSiteIdsInput | string[]
+    contributedArticleIds?: UserUpdatecontributedArticleIdsInput | string[]
+    developerMode?: BoolFieldUpdateOperationsInput | boolean
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    Site?: SiteUncheckedUpdateManyWithoutUserNestedInput
+    Category?: CategoryUncheckedUpdateManyWithoutUserNestedInput
+    Subscription?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    Article?: ArticleUncheckedUpdateManyWithoutAuthorNestedInput
+    Page?: PageUncheckedUpdateManyWithoutUserNestedInput
+    Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    sentNotifications?: NotificationUncheckedUpdateManyWithoutSenderNestedInput
+    memberOfSites?: SiteUncheckedUpdateManyWithoutMembersNestedInput
+    contributedArticles?: ArticleUncheckedUpdateManyWithoutAuthorsNestedInput
+    sentInvitations?: InvitationUncheckedUpdateManyWithoutInviterNestedInput
+  }
+
+  export type ChannelUpsertWithoutMessagesInput = {
+    update: XOR<ChannelUpdateWithoutMessagesInput, ChannelUncheckedUpdateWithoutMessagesInput>
+    create: XOR<ChannelCreateWithoutMessagesInput, ChannelUncheckedCreateWithoutMessagesInput>
+    where?: ChannelWhereInput
+  }
+
+  export type ChannelUpdateToOneWithWhereWithoutMessagesInput = {
+    where?: ChannelWhereInput
+    data: XOR<ChannelUpdateWithoutMessagesInput, ChannelUncheckedUpdateWithoutMessagesInput>
+  }
+
+  export type ChannelUpdateWithoutMessagesInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    site?: SiteUpdateOneRequiredWithoutChannelsNestedInput
+  }
+
+  export type ChannelUncheckedUpdateWithoutMessagesInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: StringFieldUpdateOperationsInput | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MessageUpsertWithoutChildrenInput = {
+    update: XOR<MessageUpdateWithoutChildrenInput, MessageUncheckedUpdateWithoutChildrenInput>
+    create: XOR<MessageCreateWithoutChildrenInput, MessageUncheckedCreateWithoutChildrenInput>
+    where?: MessageWhereInput
+  }
+
+  export type MessageUpdateToOneWithWhereWithoutChildrenInput = {
+    where?: MessageWhereInput
+    data: XOR<MessageUpdateWithoutChildrenInput, MessageUncheckedUpdateWithoutChildrenInput>
+  }
+
+  export type MessageUpdateWithoutChildrenInput = {
+    content?: StringFieldUpdateOperationsInput | string
+    attachments?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    site?: SiteUpdateOneRequiredWithoutMessagesNestedInput
+    user?: UserUpdateOneRequiredWithoutMessagesNestedInput
+    channel?: ChannelUpdateOneWithoutMessagesNestedInput
+    parent?: MessageUpdateOneWithoutChildrenNestedInput
+  }
+
+  export type MessageUncheckedUpdateWithoutChildrenInput = {
+    content?: StringFieldUpdateOperationsInput | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    channelId?: NullableStringFieldUpdateOperationsInput | string | null
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
+    attachments?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MessageUpsertWithWhereUniqueWithoutParentInput = {
+    where: MessageWhereUniqueInput
+    update: XOR<MessageUpdateWithoutParentInput, MessageUncheckedUpdateWithoutParentInput>
+    create: XOR<MessageCreateWithoutParentInput, MessageUncheckedCreateWithoutParentInput>
+  }
+
+  export type MessageUpdateWithWhereUniqueWithoutParentInput = {
+    where: MessageWhereUniqueInput
+    data: XOR<MessageUpdateWithoutParentInput, MessageUncheckedUpdateWithoutParentInput>
+  }
+
+  export type MessageUpdateManyWithWhereWithoutParentInput = {
+    where: MessageScalarWhereInput
+    data: XOR<MessageUpdateManyMutationInput, MessageUncheckedUpdateManyWithoutParentInput>
   }
 
   export type SiteCreateWithoutFeaturesInput = {
@@ -41292,6 +45451,8 @@ export namespace Prisma {
     collections?: CollectionCreateNestedManyWithoutSiteInput
     members?: UserCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationCreateNestedManyWithoutSiteInput
+    messages?: MessageCreateNestedManyWithoutSiteInput
+    channels?: ChannelCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutFeaturesInput = {
@@ -41330,6 +45491,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
     members?: UserUncheckedCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationUncheckedCreateNestedManyWithoutSiteInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSiteInput
+    channels?: ChannelUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutFeaturesInput = {
@@ -41364,6 +45527,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -41377,6 +45541,7 @@ export namespace Prisma {
     Page?: PageCreateNestedManyWithoutUserInput
     Notification?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutSenderInput
+    messages?: MessageCreateNestedManyWithoutUserInput
     memberOfSites?: SiteCreateNestedManyWithoutMembersInput
     contributedArticles?: ArticleCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationCreateNestedManyWithoutInviterInput
@@ -41389,6 +45554,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -41404,6 +45570,7 @@ export namespace Prisma {
     Page?: PageUncheckedCreateNestedManyWithoutUserInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutSenderInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     memberOfSites?: SiteUncheckedCreateNestedManyWithoutMembersInput
     contributedArticles?: ArticleUncheckedCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationUncheckedCreateNestedManyWithoutInviterInput
@@ -41449,6 +45616,8 @@ export namespace Prisma {
     collections?: CollectionCreateNestedManyWithoutSiteInput
     members?: UserCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationCreateNestedManyWithoutSiteInput
+    messages?: MessageCreateNestedManyWithoutSiteInput
+    channels?: ChannelCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutSubscriptionInput = {
@@ -41487,6 +45656,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
     members?: UserUncheckedCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationUncheckedCreateNestedManyWithoutSiteInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSiteInput
+    channels?: ChannelUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutSubscriptionInput = {
@@ -41544,6 +45715,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -41557,6 +45729,7 @@ export namespace Prisma {
     Page?: PageUpdateManyWithoutUserNestedInput
     Notification?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutSenderNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUpdateManyWithoutMembersNestedInput
     contributedArticles?: ArticleUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUpdateManyWithoutInviterNestedInput
@@ -41568,6 +45741,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -41583,6 +45757,7 @@ export namespace Prisma {
     Page?: PageUncheckedUpdateManyWithoutUserNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutSenderNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUncheckedUpdateManyWithoutMembersNestedInput
     contributedArticles?: ArticleUncheckedUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUncheckedUpdateManyWithoutInviterNestedInput
@@ -41735,6 +45910,8 @@ export namespace Prisma {
     collections?: CollectionCreateNestedManyWithoutSiteInput
     members?: UserCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationCreateNestedManyWithoutSiteInput
+    messages?: MessageCreateNestedManyWithoutSiteInput
+    channels?: ChannelCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutAnalyticsEventInput = {
@@ -41773,6 +45950,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
     members?: UserUncheckedCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationUncheckedCreateNestedManyWithoutSiteInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSiteInput
+    channels?: ChannelUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutAnalyticsEventInput = {
@@ -41825,6 +46004,8 @@ export namespace Prisma {
     collections?: CollectionUpdateManyWithoutSiteNestedInput
     members?: UserUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUpdateManyWithoutSiteNestedInput
+    messages?: MessageUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutAnalyticsEventInput = {
@@ -41862,6 +46043,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
     members?: UserUncheckedUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUncheckedUpdateManyWithoutSiteNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteCreateWithoutArticleInput = {
@@ -41899,6 +46082,8 @@ export namespace Prisma {
     collections?: CollectionCreateNestedManyWithoutSiteInput
     members?: UserCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationCreateNestedManyWithoutSiteInput
+    messages?: MessageCreateNestedManyWithoutSiteInput
+    channels?: ChannelCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutArticleInput = {
@@ -41937,6 +46122,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
     members?: UserUncheckedCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationUncheckedCreateNestedManyWithoutSiteInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSiteInput
+    channels?: ChannelUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutArticleInput = {
@@ -41951,6 +46138,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -41964,6 +46152,7 @@ export namespace Prisma {
     Page?: PageCreateNestedManyWithoutUserInput
     Notification?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutSenderInput
+    messages?: MessageCreateNestedManyWithoutUserInput
     memberOfSites?: SiteCreateNestedManyWithoutMembersInput
     contributedArticles?: ArticleCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationCreateNestedManyWithoutInviterInput
@@ -41976,6 +46165,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -41991,6 +46181,7 @@ export namespace Prisma {
     Page?: PageUncheckedCreateNestedManyWithoutUserInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutSenderInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     memberOfSites?: SiteUncheckedCreateNestedManyWithoutMembersInput
     contributedArticles?: ArticleUncheckedCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationUncheckedCreateNestedManyWithoutInviterInput
@@ -42008,6 +46199,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -42022,6 +46214,7 @@ export namespace Prisma {
     Page?: PageCreateNestedManyWithoutUserInput
     Notification?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutSenderInput
+    messages?: MessageCreateNestedManyWithoutUserInput
     memberOfSites?: SiteCreateNestedManyWithoutMembersInput
     sentInvitations?: InvitationCreateNestedManyWithoutInviterInput
   }
@@ -42033,6 +46226,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -42049,6 +46243,7 @@ export namespace Prisma {
     Page?: PageUncheckedCreateNestedManyWithoutUserInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutSenderInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     memberOfSites?: SiteUncheckedCreateNestedManyWithoutMembersInput
     sentInvitations?: InvitationUncheckedCreateNestedManyWithoutInviterInput
   }
@@ -42103,6 +46298,8 @@ export namespace Prisma {
     collections?: CollectionUpdateManyWithoutSiteNestedInput
     members?: UserUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUpdateManyWithoutSiteNestedInput
+    messages?: MessageUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutArticleInput = {
@@ -42140,6 +46337,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
     members?: UserUncheckedUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUncheckedUpdateManyWithoutSiteNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutArticleInput = {
@@ -42159,6 +46358,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -42172,6 +46372,7 @@ export namespace Prisma {
     Page?: PageUpdateManyWithoutUserNestedInput
     Notification?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutSenderNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUpdateManyWithoutMembersNestedInput
     contributedArticles?: ArticleUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUpdateManyWithoutInviterNestedInput
@@ -42183,6 +46384,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -42198,6 +46400,7 @@ export namespace Prisma {
     Page?: PageUncheckedUpdateManyWithoutUserNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutSenderNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUncheckedUpdateManyWithoutMembersNestedInput
     contributedArticles?: ArticleUncheckedUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUncheckedUpdateManyWithoutInviterNestedInput
@@ -42254,6 +46457,8 @@ export namespace Prisma {
     collections?: CollectionCreateNestedManyWithoutSiteInput
     members?: UserCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationCreateNestedManyWithoutSiteInput
+    messages?: MessageCreateNestedManyWithoutSiteInput
+    channels?: ChannelCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutPageInput = {
@@ -42292,6 +46497,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
     members?: UserUncheckedCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationUncheckedCreateNestedManyWithoutSiteInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSiteInput
+    channels?: ChannelUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutPageInput = {
@@ -42306,6 +46513,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -42319,6 +46527,7 @@ export namespace Prisma {
     Article?: ArticleCreateNestedManyWithoutAuthorInput
     Notification?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutSenderInput
+    messages?: MessageCreateNestedManyWithoutUserInput
     memberOfSites?: SiteCreateNestedManyWithoutMembersInput
     contributedArticles?: ArticleCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationCreateNestedManyWithoutInviterInput
@@ -42331,6 +46540,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -42346,6 +46556,7 @@ export namespace Prisma {
     Article?: ArticleUncheckedCreateNestedManyWithoutAuthorInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutSenderInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     memberOfSites?: SiteUncheckedCreateNestedManyWithoutMembersInput
     contributedArticles?: ArticleUncheckedCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationUncheckedCreateNestedManyWithoutInviterInput
@@ -42401,6 +46612,8 @@ export namespace Prisma {
     collections?: CollectionUpdateManyWithoutSiteNestedInput
     members?: UserUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUpdateManyWithoutSiteNestedInput
+    messages?: MessageUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutPageInput = {
@@ -42438,6 +46651,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
     members?: UserUncheckedUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUncheckedUpdateManyWithoutSiteNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutPageInput = {
@@ -42457,6 +46672,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -42470,6 +46686,7 @@ export namespace Prisma {
     Article?: ArticleUpdateManyWithoutAuthorNestedInput
     Notification?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutSenderNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUpdateManyWithoutMembersNestedInput
     contributedArticles?: ArticleUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUpdateManyWithoutInviterNestedInput
@@ -42481,6 +46698,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -42496,6 +46714,7 @@ export namespace Prisma {
     Article?: ArticleUncheckedUpdateManyWithoutAuthorNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutSenderNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUncheckedUpdateManyWithoutMembersNestedInput
     contributedArticles?: ArticleUncheckedUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUncheckedUpdateManyWithoutInviterNestedInput
@@ -42536,6 +46755,8 @@ export namespace Prisma {
     collections?: CollectionCreateNestedManyWithoutSiteInput
     members?: UserCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationCreateNestedManyWithoutSiteInput
+    messages?: MessageCreateNestedManyWithoutSiteInput
+    channels?: ChannelCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutRSSInput = {
@@ -42574,6 +46795,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
     members?: UserUncheckedCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationUncheckedCreateNestedManyWithoutSiteInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSiteInput
+    channels?: ChannelUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutRSSInput = {
@@ -42698,6 +46921,8 @@ export namespace Prisma {
     collections?: CollectionUpdateManyWithoutSiteNestedInput
     members?: UserUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUpdateManyWithoutSiteNestedInput
+    messages?: MessageUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutRSSInput = {
@@ -42735,6 +46960,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
     members?: UserUncheckedUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUncheckedUpdateManyWithoutSiteNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type RssItemUpsertWithWhereUniqueWithoutRssInput = {
@@ -42910,6 +47137,8 @@ export namespace Prisma {
     collections?: CollectionCreateNestedManyWithoutSiteInput
     members?: UserCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationCreateNestedManyWithoutSiteInput
+    messages?: MessageCreateNestedManyWithoutSiteInput
+    channels?: ChannelCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutCustomFeedTemplatesInput = {
@@ -42948,6 +47177,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
     members?: UserUncheckedCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationUncheckedCreateNestedManyWithoutSiteInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSiteInput
+    channels?: ChannelUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutCustomFeedTemplatesInput = {
@@ -43000,6 +47231,8 @@ export namespace Prisma {
     collections?: CollectionUpdateManyWithoutSiteNestedInput
     members?: UserUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUpdateManyWithoutSiteNestedInput
+    messages?: MessageUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutCustomFeedTemplatesInput = {
@@ -43037,6 +47270,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
     members?: UserUncheckedUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUncheckedUpdateManyWithoutSiteNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteCreateWithoutMergedFeedsInput = {
@@ -43074,6 +47309,8 @@ export namespace Prisma {
     collections?: CollectionCreateNestedManyWithoutSiteInput
     members?: UserCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationCreateNestedManyWithoutSiteInput
+    messages?: MessageCreateNestedManyWithoutSiteInput
+    channels?: ChannelCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutMergedFeedsInput = {
@@ -43112,6 +47349,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
     members?: UserUncheckedCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationUncheckedCreateNestedManyWithoutSiteInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSiteInput
+    channels?: ChannelUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutMergedFeedsInput = {
@@ -43164,6 +47403,8 @@ export namespace Prisma {
     collections?: CollectionUpdateManyWithoutSiteNestedInput
     members?: UserUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUpdateManyWithoutSiteNestedInput
+    messages?: MessageUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutMergedFeedsInput = {
@@ -43201,6 +47442,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
     members?: UserUncheckedUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUncheckedUpdateManyWithoutSiteNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type ThemeBlockCreateWithoutThemeInput = {
@@ -43388,6 +47631,8 @@ export namespace Prisma {
     collections?: CollectionCreateNestedManyWithoutSiteInput
     members?: UserCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationCreateNestedManyWithoutSiteInput
+    messages?: MessageCreateNestedManyWithoutSiteInput
+    channels?: ChannelCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutInstalledThemesInput = {
@@ -43426,6 +47671,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
     members?: UserUncheckedCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationUncheckedCreateNestedManyWithoutSiteInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSiteInput
+    channels?: ChannelUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutInstalledThemesInput = {
@@ -43509,6 +47756,8 @@ export namespace Prisma {
     collections?: CollectionUpdateManyWithoutSiteNestedInput
     members?: UserUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUpdateManyWithoutSiteNestedInput
+    messages?: MessageUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutInstalledThemesInput = {
@@ -43546,6 +47795,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
     members?: UserUncheckedUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUncheckedUpdateManyWithoutSiteNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type ThemeUpsertWithoutInstalledInInput = {
@@ -43590,6 +47841,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -43603,6 +47855,7 @@ export namespace Prisma {
     Article?: ArticleCreateNestedManyWithoutAuthorInput
     Page?: PageCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutSenderInput
+    messages?: MessageCreateNestedManyWithoutUserInput
     memberOfSites?: SiteCreateNestedManyWithoutMembersInput
     contributedArticles?: ArticleCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationCreateNestedManyWithoutInviterInput
@@ -43615,6 +47868,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -43630,6 +47884,7 @@ export namespace Prisma {
     Article?: ArticleUncheckedCreateNestedManyWithoutAuthorInput
     Page?: PageUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutSenderInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     memberOfSites?: SiteUncheckedCreateNestedManyWithoutMembersInput
     contributedArticles?: ArticleUncheckedCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationUncheckedCreateNestedManyWithoutInviterInput
@@ -43675,6 +47930,8 @@ export namespace Prisma {
     collections?: CollectionCreateNestedManyWithoutSiteInput
     members?: UserCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationCreateNestedManyWithoutSiteInput
+    messages?: MessageCreateNestedManyWithoutSiteInput
+    channels?: ChannelCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutNotificationInput = {
@@ -43713,6 +47970,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
     members?: UserUncheckedCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationUncheckedCreateNestedManyWithoutSiteInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSiteInput
+    channels?: ChannelUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutNotificationInput = {
@@ -43727,6 +47986,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -43740,6 +48000,7 @@ export namespace Prisma {
     Article?: ArticleCreateNestedManyWithoutAuthorInput
     Page?: PageCreateNestedManyWithoutUserInput
     Notification?: NotificationCreateNestedManyWithoutUserInput
+    messages?: MessageCreateNestedManyWithoutUserInput
     memberOfSites?: SiteCreateNestedManyWithoutMembersInput
     contributedArticles?: ArticleCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationCreateNestedManyWithoutInviterInput
@@ -43752,6 +48013,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -43767,6 +48029,7 @@ export namespace Prisma {
     Article?: ArticleUncheckedCreateNestedManyWithoutAuthorInput
     Page?: PageUncheckedCreateNestedManyWithoutUserInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     memberOfSites?: SiteUncheckedCreateNestedManyWithoutMembersInput
     contributedArticles?: ArticleUncheckedCreateNestedManyWithoutAuthorsInput
     sentInvitations?: InvitationUncheckedCreateNestedManyWithoutInviterInput
@@ -43794,6 +48057,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43807,6 +48071,7 @@ export namespace Prisma {
     Article?: ArticleUpdateManyWithoutAuthorNestedInput
     Page?: PageUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutSenderNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUpdateManyWithoutMembersNestedInput
     contributedArticles?: ArticleUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUpdateManyWithoutInviterNestedInput
@@ -43818,6 +48083,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43833,6 +48099,7 @@ export namespace Prisma {
     Article?: ArticleUncheckedUpdateManyWithoutAuthorNestedInput
     Page?: PageUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutSenderNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUncheckedUpdateManyWithoutMembersNestedInput
     contributedArticles?: ArticleUncheckedUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUncheckedUpdateManyWithoutInviterNestedInput
@@ -43883,6 +48150,8 @@ export namespace Prisma {
     collections?: CollectionUpdateManyWithoutSiteNestedInput
     members?: UserUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUpdateManyWithoutSiteNestedInput
+    messages?: MessageUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutNotificationInput = {
@@ -43920,6 +48189,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
     members?: UserUncheckedUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUncheckedUpdateManyWithoutSiteNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutSentNotificationsInput = {
@@ -43939,6 +48210,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43952,6 +48224,7 @@ export namespace Prisma {
     Article?: ArticleUpdateManyWithoutAuthorNestedInput
     Page?: PageUpdateManyWithoutUserNestedInput
     Notification?: NotificationUpdateManyWithoutUserNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUpdateManyWithoutMembersNestedInput
     contributedArticles?: ArticleUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUpdateManyWithoutInviterNestedInput
@@ -43963,6 +48236,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -43978,6 +48252,7 @@ export namespace Prisma {
     Article?: ArticleUncheckedUpdateManyWithoutAuthorNestedInput
     Page?: PageUncheckedUpdateManyWithoutUserNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUncheckedUpdateManyWithoutMembersNestedInput
     contributedArticles?: ArticleUncheckedUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUncheckedUpdateManyWithoutInviterNestedInput
@@ -44018,6 +48293,8 @@ export namespace Prisma {
     Notification?: NotificationCreateNestedManyWithoutSiteInput
     collections?: CollectionCreateNestedManyWithoutSiteInput
     members?: UserCreateNestedManyWithoutMemberOfSitesInput
+    messages?: MessageCreateNestedManyWithoutSiteInput
+    channels?: ChannelCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutInvitationsInput = {
@@ -44056,6 +48333,8 @@ export namespace Prisma {
     Notification?: NotificationUncheckedCreateNestedManyWithoutSiteInput
     collections?: CollectionUncheckedCreateNestedManyWithoutSiteInput
     members?: UserUncheckedCreateNestedManyWithoutMemberOfSitesInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSiteInput
+    channels?: ChannelUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutInvitationsInput = {
@@ -44070,6 +48349,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -44084,6 +48364,7 @@ export namespace Prisma {
     Page?: PageCreateNestedManyWithoutUserInput
     Notification?: NotificationCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationCreateNestedManyWithoutSenderInput
+    messages?: MessageCreateNestedManyWithoutUserInput
     memberOfSites?: SiteCreateNestedManyWithoutMembersInput
     contributedArticles?: ArticleCreateNestedManyWithoutAuthorsInput
   }
@@ -44095,6 +48376,7 @@ export namespace Prisma {
     image?: string | null
     email: string
     emailVerified?: Date | string | null
+    lastSeen?: Date | string | null
     hashedPassword?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -44111,6 +48393,7 @@ export namespace Prisma {
     Page?: PageUncheckedCreateNestedManyWithoutUserInput
     Notification?: NotificationUncheckedCreateNestedManyWithoutUserInput
     sentNotifications?: NotificationUncheckedCreateNestedManyWithoutSenderInput
+    messages?: MessageUncheckedCreateNestedManyWithoutUserInput
     memberOfSites?: SiteUncheckedCreateNestedManyWithoutMembersInput
     contributedArticles?: ArticleUncheckedCreateNestedManyWithoutAuthorsInput
   }
@@ -44165,6 +48448,8 @@ export namespace Prisma {
     Notification?: NotificationUpdateManyWithoutSiteNestedInput
     collections?: CollectionUpdateManyWithoutSiteNestedInput
     members?: UserUpdateManyWithoutMemberOfSitesNestedInput
+    messages?: MessageUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutInvitationsInput = {
@@ -44202,6 +48487,8 @@ export namespace Prisma {
     Notification?: NotificationUncheckedUpdateManyWithoutSiteNestedInput
     collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
     members?: UserUncheckedUpdateManyWithoutMemberOfSitesNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutSentInvitationsInput = {
@@ -44221,6 +48508,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -44235,6 +48523,7 @@ export namespace Prisma {
     Page?: PageUpdateManyWithoutUserNestedInput
     Notification?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutSenderNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUpdateManyWithoutMembersNestedInput
     contributedArticles?: ArticleUpdateManyWithoutAuthorsNestedInput
   }
@@ -44245,6 +48534,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -44261,6 +48551,7 @@ export namespace Prisma {
     Page?: PageUncheckedUpdateManyWithoutUserNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutSenderNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUncheckedUpdateManyWithoutMembersNestedInput
     contributedArticles?: ArticleUncheckedUpdateManyWithoutAuthorsNestedInput
   }
@@ -44327,6 +48618,8 @@ export namespace Prisma {
     Notification?: NotificationCreateNestedManyWithoutSiteInput
     members?: UserCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationCreateNestedManyWithoutSiteInput
+    messages?: MessageCreateNestedManyWithoutSiteInput
+    channels?: ChannelCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutCollectionsInput = {
@@ -44365,6 +48658,8 @@ export namespace Prisma {
     Notification?: NotificationUncheckedCreateNestedManyWithoutSiteInput
     members?: UserUncheckedCreateNestedManyWithoutMemberOfSitesInput
     invitations?: InvitationUncheckedCreateNestedManyWithoutSiteInput
+    messages?: MessageUncheckedCreateNestedManyWithoutSiteInput
+    channels?: ChannelUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutCollectionsInput = {
@@ -44446,6 +48741,8 @@ export namespace Prisma {
     Notification?: NotificationUpdateManyWithoutSiteNestedInput
     members?: UserUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUpdateManyWithoutSiteNestedInput
+    messages?: MessageUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutCollectionsInput = {
@@ -44483,6 +48780,8 @@ export namespace Prisma {
     Notification?: NotificationUncheckedUpdateManyWithoutSiteNestedInput
     members?: UserUncheckedUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUncheckedUpdateManyWithoutSiteNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type CollectionCreateWithoutItemsInput = {
@@ -44676,6 +48975,17 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type MessageCreateManyUserInput = {
+    id?: string
+    content: string
+    siteId: string
+    channelId?: string | null
+    parentId?: string | null
+    attachments?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type InvitationCreateManyInviterInput = {
     id?: string
     email: string
@@ -44774,6 +49084,8 @@ export namespace Prisma {
     collections?: CollectionUpdateManyWithoutSiteNestedInput
     members?: UserUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUpdateManyWithoutSiteNestedInput
+    messages?: MessageUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutUserInput = {
@@ -44811,6 +49123,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
     members?: UserUncheckedUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUncheckedUpdateManyWithoutSiteNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateManyWithoutUserInput = {
@@ -45090,6 +49404,38 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type MessageUpdateWithoutUserInput = {
+    content?: StringFieldUpdateOperationsInput | string
+    attachments?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    site?: SiteUpdateOneRequiredWithoutMessagesNestedInput
+    channel?: ChannelUpdateOneWithoutMessagesNestedInput
+    parent?: MessageUpdateOneWithoutChildrenNestedInput
+    children?: MessageUpdateManyWithoutParentNestedInput
+  }
+
+  export type MessageUncheckedUpdateWithoutUserInput = {
+    content?: StringFieldUpdateOperationsInput | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    channelId?: NullableStringFieldUpdateOperationsInput | string | null
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
+    attachments?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    children?: MessageUncheckedUpdateManyWithoutParentNestedInput
+  }
+
+  export type MessageUncheckedUpdateManyWithoutUserInput = {
+    content?: StringFieldUpdateOperationsInput | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    channelId?: NullableStringFieldUpdateOperationsInput | string | null
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
+    attachments?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type SiteUpdateWithoutMembersInput = {
     subdomain?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
@@ -45124,6 +49470,8 @@ export namespace Prisma {
     Notification?: NotificationUpdateManyWithoutSiteNestedInput
     collections?: CollectionUpdateManyWithoutSiteNestedInput
     invitations?: InvitationUpdateManyWithoutSiteNestedInput
+    messages?: MessageUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutMembersInput = {
@@ -45161,6 +49509,8 @@ export namespace Prisma {
     Notification?: NotificationUncheckedUpdateManyWithoutSiteNestedInput
     collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
     invitations?: InvitationUncheckedUpdateManyWithoutSiteNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateManyWithoutMembersInput = {
@@ -45468,6 +49818,26 @@ export namespace Prisma {
     expires: Date | string
     inviterId?: string | null
     createdAt?: Date | string
+  }
+
+  export type MessageCreateManySiteInput = {
+    id?: string
+    content: string
+    userId: string
+    channelId?: string | null
+    parentId?: string | null
+    attachments?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ChannelCreateManySiteInput = {
+    id?: string
+    name: string
+    description?: string | null
+    type?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type CategoryUpdateWithoutSiteInput = {
@@ -45876,6 +50246,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -45890,6 +50261,7 @@ export namespace Prisma {
     Page?: PageUpdateManyWithoutUserNestedInput
     Notification?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutSenderNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
     contributedArticles?: ArticleUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUpdateManyWithoutInviterNestedInput
   }
@@ -45900,6 +50272,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -45916,6 +50289,7 @@ export namespace Prisma {
     Page?: PageUncheckedUpdateManyWithoutUserNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutSenderNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     contributedArticles?: ArticleUncheckedUpdateManyWithoutAuthorsNestedInput
     sentInvitations?: InvitationUncheckedUpdateManyWithoutInviterNestedInput
   }
@@ -45926,6 +50300,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -45960,6 +50335,150 @@ export namespace Prisma {
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
     inviterId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MessageUpdateWithoutSiteInput = {
+    content?: StringFieldUpdateOperationsInput | string
+    attachments?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutMessagesNestedInput
+    channel?: ChannelUpdateOneWithoutMessagesNestedInput
+    parent?: MessageUpdateOneWithoutChildrenNestedInput
+    children?: MessageUpdateManyWithoutParentNestedInput
+  }
+
+  export type MessageUncheckedUpdateWithoutSiteInput = {
+    content?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    channelId?: NullableStringFieldUpdateOperationsInput | string | null
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
+    attachments?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    children?: MessageUncheckedUpdateManyWithoutParentNestedInput
+  }
+
+  export type MessageUncheckedUpdateManyWithoutSiteInput = {
+    content?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    channelId?: NullableStringFieldUpdateOperationsInput | string | null
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
+    attachments?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ChannelUpdateWithoutSiteInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    messages?: MessageUpdateManyWithoutChannelNestedInput
+  }
+
+  export type ChannelUncheckedUpdateWithoutSiteInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    messages?: MessageUncheckedUpdateManyWithoutChannelNestedInput
+  }
+
+  export type ChannelUncheckedUpdateManyWithoutSiteInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    type?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MessageCreateManyChannelInput = {
+    id?: string
+    content: string
+    siteId: string
+    userId: string
+    parentId?: string | null
+    attachments?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MessageUpdateWithoutChannelInput = {
+    content?: StringFieldUpdateOperationsInput | string
+    attachments?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    site?: SiteUpdateOneRequiredWithoutMessagesNestedInput
+    user?: UserUpdateOneRequiredWithoutMessagesNestedInput
+    parent?: MessageUpdateOneWithoutChildrenNestedInput
+    children?: MessageUpdateManyWithoutParentNestedInput
+  }
+
+  export type MessageUncheckedUpdateWithoutChannelInput = {
+    content?: StringFieldUpdateOperationsInput | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
+    attachments?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    children?: MessageUncheckedUpdateManyWithoutParentNestedInput
+  }
+
+  export type MessageUncheckedUpdateManyWithoutChannelInput = {
+    content?: StringFieldUpdateOperationsInput | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
+    attachments?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MessageCreateManyParentInput = {
+    id?: string
+    content: string
+    siteId: string
+    userId: string
+    channelId?: string | null
+    attachments?: InputJsonValue | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MessageUpdateWithoutParentInput = {
+    content?: StringFieldUpdateOperationsInput | string
+    attachments?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    site?: SiteUpdateOneRequiredWithoutMessagesNestedInput
+    user?: UserUpdateOneRequiredWithoutMessagesNestedInput
+    channel?: ChannelUpdateOneWithoutMessagesNestedInput
+    children?: MessageUpdateManyWithoutParentNestedInput
+  }
+
+  export type MessageUncheckedUpdateWithoutParentInput = {
+    content?: StringFieldUpdateOperationsInput | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    channelId?: NullableStringFieldUpdateOperationsInput | string | null
+    attachments?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    children?: MessageUncheckedUpdateManyWithoutParentNestedInput
+  }
+
+  export type MessageUncheckedUpdateManyWithoutParentInput = {
+    content?: StringFieldUpdateOperationsInput | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    channelId?: NullableStringFieldUpdateOperationsInput | string | null
+    attachments?: InputJsonValue | InputJsonValue | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SiteCreateManyFeaturesInput = {
@@ -46021,6 +50540,8 @@ export namespace Prisma {
     collections?: CollectionUpdateManyWithoutSiteNestedInput
     members?: UserUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUpdateManyWithoutSiteNestedInput
+    messages?: MessageUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutFeaturesInput = {
@@ -46058,6 +50579,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
     members?: UserUncheckedUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUncheckedUpdateManyWithoutSiteNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateManyWithoutFeaturesInput = {
@@ -46153,6 +50676,8 @@ export namespace Prisma {
     collections?: CollectionUpdateManyWithoutSiteNestedInput
     members?: UserUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUpdateManyWithoutSiteNestedInput
+    messages?: MessageUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutSubscriptionInput = {
@@ -46190,6 +50715,8 @@ export namespace Prisma {
     collections?: CollectionUncheckedUpdateManyWithoutSiteNestedInput
     members?: UserUncheckedUpdateManyWithoutMemberOfSitesNestedInput
     invitations?: InvitationUncheckedUpdateManyWithoutSiteNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutSiteNestedInput
+    channels?: ChannelUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateManyWithoutSubscriptionInput = {
@@ -46249,6 +50776,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -46263,6 +50791,7 @@ export namespace Prisma {
     Page?: PageUpdateManyWithoutUserNestedInput
     Notification?: NotificationUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUpdateManyWithoutSenderNestedInput
+    messages?: MessageUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUpdateManyWithoutMembersNestedInput
     sentInvitations?: InvitationUpdateManyWithoutInviterNestedInput
   }
@@ -46273,6 +50802,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -46289,6 +50819,7 @@ export namespace Prisma {
     Page?: PageUncheckedUpdateManyWithoutUserNestedInput
     Notification?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     sentNotifications?: NotificationUncheckedUpdateManyWithoutSenderNestedInput
+    messages?: MessageUncheckedUpdateManyWithoutUserNestedInput
     memberOfSites?: SiteUncheckedUpdateManyWithoutMembersNestedInput
     sentInvitations?: InvitationUncheckedUpdateManyWithoutInviterNestedInput
   }
@@ -46299,6 +50830,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     email?: StringFieldUpdateOperationsInput | string
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSeen?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     hashedPassword?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string

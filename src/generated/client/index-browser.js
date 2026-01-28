@@ -121,6 +121,7 @@ exports.Prisma.UserScalarFieldEnum = {
   image: 'image',
   email: 'email',
   emailVerified: 'emailVerified',
+  lastSeen: 'lastSeen',
   hashedPassword: 'hashedPassword',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
@@ -207,6 +208,28 @@ exports.Prisma.SnippetScalarFieldEnum = {
   thumbnail: 'thumbnail',
   content: 'content',
   siteId: 'siteId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ChannelScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  type: 'type',
+  siteId: 'siteId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.MessageScalarFieldEnum = {
+  id: 'id',
+  content: 'content',
+  siteId: 'siteId',
+  userId: 'userId',
+  channelId: 'channelId',
+  parentId: 'parentId',
+  attachments: 'attachments',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -486,6 +509,8 @@ exports.Prisma.ModelName = {
   Category: 'Category',
   Site: 'Site',
   Snippet: 'Snippet',
+  Channel: 'Channel',
+  Message: 'Message',
   Features: 'Features',
   Subscription: 'Subscription',
   BillingHistory: 'BillingHistory',

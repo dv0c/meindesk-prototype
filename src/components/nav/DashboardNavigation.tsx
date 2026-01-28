@@ -10,8 +10,12 @@ export function DashboardNavigation() {
     // For root dashboard, exact match usually
     const isActive = (path: string) => pathname === path
 
+    const siteIdMatch = pathname?.match(/\/dashboard\/([^\/]+)/)
+    const currentId = siteIdMatch ? siteIdMatch[1] : null
+    const isProjectContext = currentId && currentId !== 'teams' && currentId !== 'settings' // simple check, 'teams' is a reserved route
+
     return (
-        <div className="border-b bg-background">
+        <div className="border-b bg-background backdrop-blur-xl">
             <div className="max-w-7xl mx-auto px-6 h-12 flex items-center gap-6 overflow-x-auto text-sm font-medium text-muted-foreground">
                 <Link href="/dashboard" className={cn("h-full flex items-center border-b-2 px-1 transition-colors", isActive("/dashboard") ? "border-foreground text-foreground" : "border-transparent hover:text-foreground")}>
                     Overview
@@ -19,6 +23,11 @@ export function DashboardNavigation() {
                 <Link href="/dashboard/teams" className={cn("h-full flex items-center border-b-2 px-1 transition-colors", isActive("/dashboard/teams") ? "border-foreground text-foreground" : "border-transparent hover:text-foreground")}>
                     Teams
                 </Link>
+                {isProjectContext && (
+                    <Link href={`/dashboard/${currentId}/chat`} className={cn("h-full flex items-center border-b-2 px-1 transition-colors", isActive(`/dashboard/${currentId}/chat`) ? "border-foreground text-foreground" : "border-transparent hover:text-foreground")}>
+                        Chat
+                    </Link>
+                )}
                 <Link href="#" className="h-full flex items-center border-b-2 border-transparent px-1 transition-colors hover:text-foreground">
                     Activity
                 </Link>
