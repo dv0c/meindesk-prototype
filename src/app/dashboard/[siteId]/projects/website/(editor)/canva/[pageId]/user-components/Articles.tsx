@@ -22,7 +22,7 @@ interface Article {
     author: {
         name: string | null
     }
-    categories: string[]
+    categories: { id: string; name: string }[]
     cover: string | null
     createdAt: Date
     metadata?: {
@@ -36,7 +36,9 @@ export interface ArticlesProps {
     thumbnail?: boolean
     limit?: number
     style?: "boxed" | "simple" | "minimal" | "magazine"
-    category?: string
+    minimalImageAlignment?: "left" | "right"
+    category?: string // Legacy or fallback
+    selectedCategories?: { name: string }[] // Array of category objects from settings
 
     // Block styles
     blockStyle?: BlockStyle
@@ -53,7 +55,9 @@ export const Articles = defineBlock<ArticlesProps>({
         thumbnail: true,
         limit: 10,
         style: "magazine",
+        minimalImageAlignment: "left",
         category: "ARTICLES",
+        selectedCategories: [],
         blockStyle: {},
     },
 
@@ -71,11 +75,28 @@ export const Articles = defineBlock<ArticlesProps>({
                 { label: "Minimal", value: "minimal" },
             ],
         },
+        minimalImageAlignment: {
+            label: "Image Alignment (Minimal Only)",
+            type: "select",
+            section: "Display",
+            options: [
+                { label: "Left", value: "left" },
+                { label: "Right", value: "right" },
+            ],
+        },
         thumbnail: { label: "Show Thumbnails", type: "checkbox", section: "Display" },
 
         // Data Section
         limit: { label: "Articles Limit", type: "slider", min: 1, max: 50, section: "Data" },
-        category: { label: "Default Category", type: "text", section: "Data" },
+        category: { label: "Default Category Label", type: "text", section: "Data" },
+        selectedCategories: {
+            label: "Filter Categories",
+            type: "array",
+            section: "Data",
+            arrayFields: {
+                name: { type: "text", label: "Category" }
+            }
+        },
     },
 
     render: ({
@@ -83,7 +104,9 @@ export const Articles = defineBlock<ArticlesProps>({
         thumbnail = true,
         limit = 10,
         style = "magazine",
+        minimalImageAlignment = "left",
         category = "ARTICLES",
+        selectedCategories = [],
         className = "",
         blockStyle,
     }) => {
@@ -134,8 +157,20 @@ export const Articles = defineBlock<ArticlesProps>({
             const loadArticles = async () => {
                 try {
                     setLoading(true)
+
+                    // Build query params
+                    const params = new URLSearchParams()
+                    params.set("limit", limit.toString())
+
+                    if (selectedCategories && selectedCategories.length > 0) {
+                        const categoryNames = selectedCategories.map(c => c.name).filter(Boolean).join(",")
+                        if (categoryNames) {
+                            params.set("categories", categoryNames)
+                        }
+                    }
+
                     const { data } = await axios.get(
-                        `/api/v1/${team.id}/articles?limit=${limit}`,
+                        `/api/v1/${team.id}/articles?${params.toString()}`,
                         { signal: controller.signal }
                     )
                     setArticles(data || [])
@@ -149,7 +184,7 @@ export const Articles = defineBlock<ArticlesProps>({
 
             loadArticles()
             return () => controller.abort()
-        }, [team?.id, limit])
+        }, [team?.id, limit, selectedCategories])
 
         // Design tokens - explicitly set directly on elements (CSS variable inheritance can be tricky in some contexts)
         const headingFont = {
@@ -241,7 +276,7 @@ export const Articles = defineBlock<ArticlesProps>({
             return (
                 <div className={cn("space-y-4", computedClassName)} style={computedStyle}>
                     {Array.from({ length: Math.min(limit, 3) }).map((_, i) => (
-                        <div key={i} className="border-b pb-4 last:border-0 flex gap-3">
+                        <div key={i} className={`border-b pb-4 last:border-0 flex flex-col gap-3 ${minimalImageAlignment === 'right' ? 'sm:flex-row-reverse' : 'sm:flex-row'}`}>
                             {thumbnail && (
                                 <div className="w-80 h-64 bg-muted animate-pulse" />
                             )}
@@ -370,7 +405,7 @@ export const Articles = defineBlock<ArticlesProps>({
                             <ArticleWrapper
                                 href={`/article/${article.slug}`}
                                 key={article.id}
-                                className="border-b pb-4 last:border-0 last:pb-0 flex flex-col sm:flex-row gap-3 cursor-pointer"
+                                className={`border-b pb-4 last:border-0 flex flex-col gap-3 ${minimalImageAlignment === 'right' ? 'sm:flex-row-reverse' : 'sm:flex-row'} cursor-pointer`}
                             >
                                 {thumbnail && article.cover && (
                                     <div className="w-full sm:w-80 h-64 overflow-hidden bg-muted">
@@ -422,7 +457,7 @@ export const Articles = defineBlock<ArticlesProps>({
                                             ...bodyFont
                                         }}
                                     >
-                                        {article.categories?.[0] || category}
+                                        {article.categories?.[0]?.name || category}
                                     </span>
                                 </div>
 

@@ -7,9 +7,6 @@ export const runtime = "nodejs"
 // -------------------------------------------------------
 // GET – Fetch all articles for a specific site by ID (with optional limit)
 // -------------------------------------------------------
-// -------------------------------------------------------
-// GET – Fetch all articles for a specific site by ID (with optional limit)
-// -------------------------------------------------------
 export async function GET(
   req: NextRequest,
   { params }: { params: { tenantId: string } }
@@ -17,10 +14,33 @@ export async function GET(
   const { tenantId } = await params
   const { searchParams } = new URL(req.url)
   const limitParam = searchParams.get("limit")
+  const categoriesParam = searchParams.get("categories")
   const limit = limitParam ? parseInt(limitParam, 10) : 10 // default to 10 results
+
   try {
+    let whereClause: any = { siteId: tenantId }
+
+    if (categoriesParam) {
+      const categoryNames = categoriesParam.split(",").map((c) => c.trim())
+      const foundCategories = await db.category.findMany({
+        where: {
+          siteId: tenantId,
+          name: { in: categoryNames, mode: "insensitive" },
+        },
+        select: { id: true },
+      })
+
+      if (foundCategories.length > 0) {
+        const categoryIds = foundCategories.map((c) => c.id)
+        whereClause.categories = { hasSome: categoryIds }
+      } else {
+        // If specific categories were requested but none matched, return empty result
+        return NextResponse.json([])
+      }
+    }
+
     const articles = await db.article.findMany({
-      where: { siteId: tenantId },
+      where: whereClause,
       select: {
         id: true,
         title: true,

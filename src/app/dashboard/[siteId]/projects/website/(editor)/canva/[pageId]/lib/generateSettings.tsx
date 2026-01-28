@@ -408,7 +408,7 @@ export function generateSettings<P extends Record<string, any>>(
                 )
             }
 
-            // Field Select that auto-detects parent collection
+            // Collection items select
             if (normalized.type === 'collection-field-select') {
                 // 1. Traverse up to find parent with collectionId
                 const parentCollectionId = findParentCollectionId(selectedId)
@@ -469,6 +469,8 @@ export function generateSettings<P extends Record<string, any>>(
                     </PropertyRow>
                 )
             }
+
+
 
             return null
         }
