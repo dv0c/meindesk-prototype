@@ -85,7 +85,7 @@ export async function sendMessage(
         const isMember = site.userId === session.user.id || site.members.some(m => m.id === session.user.id)
         if (!isMember) return { error: "You are not a member of this project." }
 
-        await db.message.create({
+        const message = await db.message.create({
             data: {
                 content,
                 siteId,
@@ -93,10 +93,19 @@ export async function sendMessage(
                 channelId,
                 parentId,
                 attachments: attachments || []
+            },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        name: true,
+                        image: true
+                    }
+                }
             }
         })
 
-        return { success: true }
+        return { success: true, message }
     } catch (error) {
         console.error("Send message error:", error)
         return { error: "Failed to send message" }

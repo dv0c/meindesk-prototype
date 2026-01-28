@@ -42,6 +42,8 @@ export function ChatInterface({ siteId, currentUserId, channelId, channelName }:
 
     // Polling for messages (every 3 seconds)
     React.useEffect(() => {
+        if (sending) return
+
         const fetchMessages = async () => {
             const msgs = await getMessages(siteId, channelId)
             setMessages(msgs as any)
@@ -50,7 +52,7 @@ export function ChatInterface({ siteId, currentUserId, channelId, channelName }:
         fetchMessages()
         const interval = setInterval(fetchMessages, 3000)
         return () => clearInterval(interval)
-    }, [siteId, channelId])
+    }, [siteId, channelId, sending])
 
     // Auto-scroll to bottom only on new messages
     const prevMsgLen = React.useRef(0)
@@ -136,9 +138,11 @@ export function ChatInterface({ siteId, currentUserId, channelId, channelName }:
                 toast.error(result.error)
                 setMessages(prev => prev.filter(m => m.id !== optimisticMsg.id))
                 setNewMessage(content) // Restore text
-            } else {
-                const msgs = await getMessages(siteId, channelId)
-                setMessages(msgs as any)
+            } else if (result.message) {
+                // Replace optimistic message with real one
+                setMessages(prev => prev.map(m =>
+                    m.id === optimisticMsg.id ? result.message as any : m
+                ))
             }
         } catch (error) {
             console.error("Failed to send", error)
