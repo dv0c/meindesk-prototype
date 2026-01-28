@@ -1,7 +1,7 @@
 
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { requireAuth, requireSiteAccess, createErrorResponse } from "@/lib/security/route-auth";
+import { requireAuth, requireSiteAccess, requireSiteOwnership, createErrorResponse } from "@/lib/security/route-auth";
 
 export async function GET(
     req: Request,
