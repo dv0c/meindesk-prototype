@@ -6,6 +6,7 @@ import { motion } from "framer-motion"
 
 import { useTeam } from "@/hooks/useTeam"
 import { useSession } from "next-auth/react"
+import { OnlineMembers } from "@/components/dashboard/chat/OnlineMembers"
 
 export function ProjectNavigation({ siteId }: { siteId: string }) {
     const pathname = usePathname()
@@ -40,38 +41,47 @@ export function ProjectNavigation({ siteId }: { siteId: string }) {
 
     return (
         <div className="border-b bg-background sticky top-16 z-40">
-            <div className="max-w-7xl mx-auto px-6 h-12 flex items-center gap-6 overflow-x-auto text-sm font-medium text-muted-foreground no-scrollbar">
-                {navItems.map((item) => {
-                    const isActive = item.exact
-                        ? pathname === item.href
-                        : pathname.startsWith(item.href)
+            <div className="max-w-7xl mx-auto px-6 h-12 flex items-center justify-between gap-6">
+                <div className="flex items-center gap-6 overflow-x-auto text-sm font-medium text-muted-foreground no-scrollbar h-full">
+                    {navItems.map((item) => {
+                        const isActive = item.exact
+                            ? pathname === item.href
+                            : pathname.startsWith(item.href)
 
-                    return (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={cn(
-                                "relative h-full flex items-center px-1 transition-colors",
-                                isActive ? "text-foreground" : "hover:text-foreground"
-                            )}
-                        >
-                            {item.name}
-                            {isActive && (
-                                <motion.div
-                                    layoutId="active-tab"
-                                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-foreground"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{
-                                        type: "spring",
-                                        stiffness: 300,
-                                        damping: 30
-                                    }}
-                                />
-                            )}
-                        </Link>
-                    )
-                })}
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={cn(
+                                    "relative h-full flex items-center px-1 transition-colors",
+                                    isActive ? "text-foreground" : "hover:text-foreground"
+                                )}
+                            >
+                                {item.name}
+                                {isActive && (
+                                    <motion.div
+                                        layoutId="active-tab"
+                                        className="absolute bottom-0 left-0 right-0 h-[2px] bg-foreground"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{
+                                            type: "spring",
+                                            stiffness: 300,
+                                            damping: 30
+                                        }}
+                                    />
+                                )}
+                            </Link>
+                        )
+                    })}
+                </div>
+
+                {session?.user && (
+                    <div className="flex items-center gap-2 pl-4 border-l h-6">
+                        <span className="text-[10px] font-medium text-muted-foreground uppercase hidden sm:block">Online</span>
+                        <OnlineMembers siteId={siteId} currentUserId={session.user.id} />
+                    </div>
+                )}
             </div>
         </div>
     )
