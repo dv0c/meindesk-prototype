@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  reactCompiler: true,
+  reactCompiler: false,
   trailingSlash: false, // avoid redirect /api/analytics/ -> /api/analytics
   images: {
     remotePatterns: [
