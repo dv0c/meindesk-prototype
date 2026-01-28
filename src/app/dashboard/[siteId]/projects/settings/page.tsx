@@ -1,34 +1,32 @@
+import { GeneralSettings } from "@/components/Settings/GeneralSettings"
 import { DeleteWebsite } from "@/components/Settings/DeleteSite"
-import WebsiteSettings from "@/components/Settings/WebsiteSettings"
-import { TeamSettings } from "@/components/Settings/TeamSettings"
 import { getActiveTeam } from "@/lib/actions/helpers/team"
 import { getAuthSession } from "@/lib/auth"
 
-const page = async ({ params }: { params: { siteId: string } }) => {
+export default async function SettingsGeneralPage({ params }: { params: { siteId: string } }) {
   const { siteId } = await params
   const team = await getActiveTeam(siteId)
-  if (!team) return <div>
-    Site not found.
-  </div>
+  if (!team) return <div>Site not found</div>
 
   const session = await getAuthSession()
   const isOwner = team.userId === session?.user?.id
 
   return (
-    <div className="flex flex-col gap-8 p-8 max-w-5xl mx-auto w-full">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-medium">General</h3>
         <p className="text-sm text-muted-foreground">
-          Manage your project settings and preferences.
+          Update your project name and other general settings.
         </p>
       </div>
-      <div className="grid gap-8">
-        <WebsiteSettings site={team} />
-        <TeamSettings siteId={team.id} isOwner={isOwner} />
-        {isOwner && <DeleteWebsite siteId={team.id} />}
-      </div>
+
+      <GeneralSettings site={team} />
+
+      {isOwner && (
+        <div className="mt-10">
+          <DeleteWebsite siteId={team.id} />
+        </div>
+      )}
     </div>
   )
 }
-
-export default page

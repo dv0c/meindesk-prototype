@@ -34,7 +34,6 @@ export function ProjectNavigation({ siteId }: { siteId: string }) {
         { name: "Collections", href: `${baseUrl}/collections`, show: true },
         { name: "RSS", href: `${baseUrl}/projects/website/rss/my-feed`, show: features.rss },
         { name: "Community", href: `${baseUrl}/community`, show: true },
-        { name: "Features", href: `${baseUrl}/projects/website/features`, show: isOwner },
         { name: "Analytics", href: `${baseUrl}/projects/website/analytics`, show: features.analytics },
         { name: "Settings", href: `${baseUrl}/projects/settings`, show: true },
     ].filter(item => item.show)
