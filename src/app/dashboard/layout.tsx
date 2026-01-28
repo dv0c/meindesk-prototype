@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import React, { FC } from 'react'
 import { GlobalHeader } from "@/components/nav/GlobalHeader"
+import { DashboardFooter } from "@/components/nav/DashboardFooter"
 
 interface layoutProps {
     children: React.ReactNode
@@ -37,6 +38,7 @@ const layout: FC<layoutProps> = ({ children }) => {
         <div className="flex-1">
             {children}
         </div>
+        <DashboardFooter />
     </main>
 }
 

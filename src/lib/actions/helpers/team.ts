@@ -7,7 +7,9 @@ import { unstable_cache } from "next/cache";
 // cached function — no dynamic calls allowed here
 const _getActiveTeamCached = unstable_cache(
   async (userId: string, siteId: string, analytics?: string) => {
-    if (!siteId || !userId) return null;
+    // Validate ObjectId format (24 hex characters)
+    const objectIdRegex = /^[0-9a-fA-F]{24}$/
+    if (!siteId || !userId || !objectIdRegex.test(siteId)) return null;
 
     return await db.site.findFirst({
       where: {

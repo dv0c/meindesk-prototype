@@ -1,4 +1,3 @@
-
 "use client"
 
 import { Button } from "@/components/ui/button"
@@ -15,27 +14,24 @@ import { Switch } from "@/components/ui/switch"
 import { toast } from "sonner"
 import { useSession } from "next-auth/react"
 import { useState } from "react"
-import axios from "axios"
-import { useRouter } from "next/navigation"
+import { toggleDeveloperMode } from "@/lib/actions/user-actions"
+import { Loader2 } from "lucide-react"
 
 export function DeveloperTab() {
     const { data: session, update } = useSession()
     // @ts-ignore
     const [isEnabled, setIsEnabled] = useState(session?.user?.developerMode || false)
     const [isLoading, setIsLoading] = useState(false)
-    const router = useRouter()
 
-    const handleSave = async () => {
+    const handleToggle = async (checked: boolean) => {
+        setIsEnabled(checked)
         setIsLoading(true)
         try {
-            await axios.put("/api/user/settings", {
-                developerMode: isEnabled
-            })
-
+            await toggleDeveloperMode(checked)
             await update() // Update session
-            toast.success("Developer settings updated")
-            router.refresh()
+            toast.success(checked ? "Developer mode enabled" : "Developer mode disabled")
         } catch (error) {
+            setIsEnabled(!checked) // Revert
             toast.error("Failed to update settings")
             console.error(error)
         } finally {
@@ -55,7 +51,7 @@ export function DeveloperTab() {
                 <CardHeader>
                     <CardTitle>Developer Mode</CardTitle>
                     <CardDescription>
-                        Enable developer tools such as raw HTML export in the website builder.
+                        Unlock advanced features, API keys, and raw data access across the platform.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -63,21 +59,20 @@ export function DeveloperTab() {
                         <div className="space-y-1">
                             <Label htmlFor="dev-mode">Enable Developer Mode</Label>
                             <p className="text-sm text-muted-foreground">
-                                This will show additional options in the builder interface for exporting code.
+                                This will enable the "Developer" tab in project settings and allow access to raw API endpoints.
                             </p>
                         </div>
-                        <Switch
-                            id="dev-mode"
-                            checked={isEnabled}
-                            onCheckedChange={setIsEnabled}
-                        />
+                        <div className="flex items-center gap-2">
+                            {isLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+                            <Switch
+                                id="dev-mode"
+                                checked={isEnabled}
+                                onCheckedChange={handleToggle}
+                                disabled={isLoading}
+                            />
+                        </div>
                     </div>
                 </CardContent>
-                <CardFooter className="border-t px-6 py-4">
-                    <Button onClick={handleSave} disabled={isLoading}>
-                        {isLoading ? "Saving..." : "Save Changes"}
-                    </Button>
-                </CardFooter>
             </Card>
         </div>
     )

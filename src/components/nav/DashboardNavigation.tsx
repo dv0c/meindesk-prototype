@@ -20,9 +20,6 @@ export function DashboardNavigation() {
                     Teams
                 </Link>
                 <Link href="#" className="h-full flex items-center border-b-2 border-transparent px-1 transition-colors hover:text-foreground">
-                    Integrations
-                </Link>
-                <Link href="#" className="h-full flex items-center border-b-2 border-transparent px-1 transition-colors hover:text-foreground">
                     Activity
                 </Link>
                 <Link href="/community" className="h-full flex items-center border-b-2 border-transparent px-1 transition-colors hover:text-foreground">
@@ -34,9 +31,9 @@ export function DashboardNavigation() {
                 <Link href="#" className="h-full flex items-center border-b-2 border-transparent px-1 transition-colors hover:text-foreground">
                     Usage
                 </Link>
-                <Link href="#" className="h-full flex items-center border-b-2 border-transparent px-1 transition-colors hover:text-foreground">
+                {/* <Link href="#" className="h-full flex items-center border-b-2 border-transparent px-1 transition-colors hover:text-foreground">
                     Settings
-                </Link>
+                </Link> */}
             </div>
         </div>
     )

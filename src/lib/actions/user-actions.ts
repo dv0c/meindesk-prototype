@@ -177,3 +177,20 @@ export async function searchUsers(query: string) {
         return [];
     }
 }
+
+export async function toggleDeveloperMode(enabled: boolean) {
+    const session = await getAuthSession()
+
+    if (!session?.user) {
+        throw new Error("Unauthorized")
+    }
+
+    await db.user.update({
+        where: { id: session.user.id },
+        data: { developerMode: enabled }
+    })
+
+    revalidatePath("/dashboard")
+    revalidatePath("/dashboard/account")
+    return { success: true }
+}

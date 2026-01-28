@@ -16,6 +16,10 @@ const getSidebarNavItems = (siteId: string) => [
         title: "Features",
         href: `/dashboard/${siteId}/projects/settings/features`,
     },
+    {
+        title: "Team",
+        href: `/dashboard/${siteId}/projects/settings/team`,
+    },
 ]
 
 interface SettingsLayoutProps {

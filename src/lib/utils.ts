@@ -74,3 +74,5 @@ export function formatTimeLeft(seconds: number): string {
 
   return parts.join(" ");
 }
+
+export const global_blur = "backdrop-filter backdrop-blur-xl bg-background/60"
