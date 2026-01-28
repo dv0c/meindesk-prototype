@@ -264,7 +264,7 @@ const WebsiteSettings = ({ site }: { site: Site }) => {
             </SettingCard>
 
             {/* Homepage */}
-            <SettingCard
+            {/* <SettingCard
                 title="Entry Point"
                 description="Select the page that acts as the entry point (homepage) for your website."
                 footer={
@@ -287,7 +287,7 @@ const WebsiteSettings = ({ site }: { site: Site }) => {
                         </SelectContent>
                     </Select>
                 </div>
-            </SettingCard>
+            </SettingCard> */}
         </div>
     )
 }
