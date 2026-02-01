@@ -144,7 +144,9 @@ export async function POST(
         },
         status: body.status || "DRAFT",
         authorId: session.user.id,
-        authorIds: body.authorIds || [session.user.id], // Default to creator if not provided
+        authorIds: body.authorIds
+          ? Array.from(new Set([...body.authorIds, session.user.id]))
+          : [session.user.id],
         excerpt: body.excerpt || "",
         cover: body.cover || "",
       }
