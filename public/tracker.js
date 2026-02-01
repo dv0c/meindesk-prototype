@@ -1,8 +1,15 @@
 (function () {
     "use strict";
 
+    function getSiteId() {
+        const script = document.currentScript;
+        if (script) {
+            return script.getAttribute("data-site-id");
+        }
+        return null;
+    }
+
     function getApiUrl() {
-        // Attempt to derive the API origin from the script source
         const script = document.currentScript;
         if (script && script.src) {
             try {
@@ -12,19 +19,20 @@
                 console.warn("Analytics: Could not parse script source URL.");
             }
         }
-        // Fallback if hosted on the same domain (e.g. testing)
         return "/api/analytics";
     }
 
+    const SITE_ID = getSiteId();
     const ENDPOINT = getApiUrl();
 
-    /**
-     * Detect if the current page is an article page and extract the slug.
-     * Common patterns: /articles/slug, /blog/slug, /news/slug, /post/slug
-     */
+    if (!SITE_ID) {
+        console.warn("Analytics: Missing data-site-id attribute on script tag.");
+        return;
+    }
+
+
     function detectArticleSlug() {
         const path = window.location.pathname;
-        // Match common article URL patterns
         const articlePatterns = [
             /^\/articles\/([^\/]+)\/?$/,
             /^\/blog\/([^\/]+)\/?$/,
@@ -46,11 +54,11 @@
         const articleSlug = detectArticleSlug();
 
         const payload = {
-            url: window.location.host, // The domain of the site being tracked
+            siteId: SITE_ID,
             path: window.location.pathname,
             referrer: document.referrer,
             userAgent: navigator.userAgent,
-            articleSlug: articleSlug, // Will be null if not an article page
+            articleSlug: articleSlug,
         };
 
         fetch(ENDPOINT, {
@@ -59,10 +67,8 @@
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(payload),
-            keepalive: true, // Ensures request completes even if page unloads
-        }).catch((err) => {
-            // Silently fail to avoid disrupting the host site
-            // console.error("Analytics Error:", err);
+            keepalive: true,
+        }).catch(() => {
         });
     }
 
@@ -73,8 +79,7 @@
         window.addEventListener("load", trackPageView);
     }
 
-    // --- Optional: SPA Support (History API) ---
-    // If the host site is a Single Page Application, we need to monkey-patch pushState/replaceState
+    // SPA Support
     const originalPushState = history.pushState;
     const originalReplaceState = history.replaceState;
 

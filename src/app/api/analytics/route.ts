@@ -29,10 +29,10 @@ async function getRegionFromIP(ip: string): Promise<string | null> {
 // POST request
 export async function POST(req: NextRequest) {
   try {
-    const { url, path, referrer, userAgent, articleSlug } = await req.json();
+    const { siteId, path, referrer, userAgent, articleSlug } = await req.json();
 
-    if (!url || !path) {
-      const res = NextResponse.json({ error: "url and path required" }, { status: 400 });
+    if (!siteId || !path) {
+      const res = NextResponse.json({ error: "siteId and path required" }, { status: 400 });
       res.headers.set("Access-Control-Allow-Origin", "*");
       return res;
     }
@@ -42,8 +42,8 @@ export async function POST(req: NextRequest) {
     // Get region from IP (ip-api.com)
     const region = await getRegionFromIP(ipAddress);
 
-    // Find the site by URL
-    const site = await db.site.findUnique({ where: { url } });
+    // Verify the site exists
+    const site = await db.site.findUnique({ where: { id: siteId } });
     if (!site) {
       const res = NextResponse.json({ error: "Site not found" }, { status: 404 });
       res.headers.set("Access-Control-Allow-Origin", "*");
@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
 
     // Increment site views
     await db.site.update({
-      where: { url },
+      where: { id: site.id },
       data: { views: { increment: 1 } },
     });
 
