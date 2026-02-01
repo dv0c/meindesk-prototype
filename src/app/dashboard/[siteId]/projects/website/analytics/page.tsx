@@ -18,13 +18,18 @@ export const metadata = {
 export default async function Page({ params }: { params: { siteId: string } }) {
     const { siteId } = await params
     const site = await getActiveTeam(siteId, "analytics")
-    if (site?.features?.analytics === false) return <EmptyCard />
+
     if (!site) {
         return <div className="flex flex-1 items-center justify-center p-4">
             <p className="text-muted-foreground">Site not found.</p>
         </div>
     }
-    return <AnalyticsContainer siteId={site.id} />
+
+    // Pass featureEnabled state (Check settings for CMS mode connection status)
+    const settings = (site.settings as any) || {}
+    const analyticsConnected = settings.analyticsConnected ?? true
+
+    return <AnalyticsContainer siteId={site.id} analyticsConnected={analyticsConnected} />
 }
 
 

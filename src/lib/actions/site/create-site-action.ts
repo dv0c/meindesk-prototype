@@ -26,6 +26,7 @@ export async function createSite(formData: FormData) {
   try {
     const pages = JSON.parse(formData.get("pages")?.toString() || "[]");
     const siteType = formData.get("type")?.toString() || "blog";
+    const mode = formData.get("mode")?.toString() || "builder"; // "builder" or "cms"
     const themeId = formData.get("theme")?.toString() || "core";
 
     const site = await db.site.create({
@@ -39,6 +40,8 @@ export async function createSite(formData: FormData) {
         userId: session.user.id,
         settings: {
           type: siteType,
+          mode: mode, // Store mode in settings
+          analyticsConnected: mode === "builder", // CMS mode requires manual connection
           themeId: themeId
         }
       },
@@ -80,6 +83,8 @@ export async function createSite(formData: FormData) {
       db.features.create({
         data: {
           Site: { connect: { id: site.id } },
+          pages: mode === "cms" ? false : true, // Disable pages for CMS mode
+          analytics: true, // Always enabled as a feature, but might require setup
         },
       }),
 

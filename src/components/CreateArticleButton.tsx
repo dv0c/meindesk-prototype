@@ -1,12 +1,17 @@
-'use client'
+"use client"
 
 import { CreateArticle } from "@/lib/actions/helpers/create-article"
 import { useTransition } from "react"
 import { toast } from "sonner"
-import { Button } from "./ui/button"
+import { Button, ButtonProps } from "./ui/button"
 import { useRouter } from "next/navigation"
+import { Loader2 } from "lucide-react"
 
-export function CreateArticleButton({ siteId }: { siteId: string }) {
+interface CreateArticleButtonProps extends ButtonProps {
+    siteId: string
+}
+
+export function CreateArticleButton({ siteId, children, className, ...props }: CreateArticleButtonProps) {
     const router = useRouter()
     const [isPending, startTransition] = useTransition()
 
@@ -17,7 +22,10 @@ export function CreateArticleButton({ siteId }: { siteId: string }) {
                 startTransition(async () => {
                     try {
                         await CreateArticle({ siteId }).then((res: any) => {
-                            
+                            if (typeof res === "string") {
+                                toast.error(res)
+                                return
+                            }
                             router.push(res.url)
                         })
                     } catch (error: any) {
@@ -25,8 +33,11 @@ export function CreateArticleButton({ siteId }: { siteId: string }) {
                     }
                 })
             }}
+            className={className}
+            {...props}
         >
-            {isPending ? "Creating..." : "Create Article"}
+            {isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+            {children || (isPending ? "Creating..." : "Create Article")}
         </Button>
     )
 }

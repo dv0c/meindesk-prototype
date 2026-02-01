@@ -1,4 +1,5 @@
 import { SettingsLayout } from "@/components/Settings/SettingsLayout"
+import { getActiveTeam } from "@/lib/actions/helpers/team"
 
 export default async function SettingsLayoutWrapper({
     children,
@@ -8,5 +9,8 @@ export default async function SettingsLayoutWrapper({
     params: { siteId: string }
 }) {
     const { siteId } = await params
-    return <SettingsLayout siteId={siteId}>{children}</SettingsLayout>
+    const team = await getActiveTeam(siteId)
+    const mode = (team?.settings as any)?.mode || 'builder'
+
+    return <SettingsLayout siteId={siteId} mode={mode}>{children}</SettingsLayout>
 }

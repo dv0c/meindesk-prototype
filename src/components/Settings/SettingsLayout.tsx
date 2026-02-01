@@ -3,32 +3,46 @@
 import { Separator } from "@/components/ui/separator"
 import { SettingsSidebar } from "@/components/Settings/SettingsSidebar"
 
-const getSidebarNavItems = (siteId: string) => [
-    {
-        title: "General",
-        href: `/dashboard/${siteId}/projects/settings`,
-    },
-    {
-        title: "Domains",
-        href: `/dashboard/${siteId}/projects/settings/domains`,
-    },
-    {
-        title: "Features",
-        href: `/dashboard/${siteId}/projects/settings/features`,
-    },
-    {
-        title: "Team",
-        href: `/dashboard/${siteId}/projects/settings/team`,
-    },
-]
+const getSidebarNavItems = (siteId: string, mode: string) => {
+    const items = [
+        {
+            title: "General",
+            href: `/dashboard/${siteId}/projects/settings`,
+            show: true,
+        },
+        {
+            title: "Domains",
+            href: `/dashboard/${siteId}/projects/settings/domains`,
+            show: mode !== 'cms',
+        },
+        {
+            title: "Connections", // API / Developers
+            href: `/dashboard/${siteId}/projects/settings/api`,
+            show: mode === 'cms',
+        },
+        {
+            title: "Features",
+            href: `/dashboard/${siteId}/projects/settings/features`,
+            show: true,
+        },
+        {
+            title: "Team",
+            href: `/dashboard/${siteId}/projects/settings/team`,
+            show: true,
+        },
+    ]
+
+    return items.filter(item => item.show)
+}
 
 interface SettingsLayoutProps {
     children: React.ReactNode
     siteId: string
+    mode?: string
 }
 
-export function SettingsLayout({ children, siteId }: SettingsLayoutProps) {
-    const sidebarNavItems = getSidebarNavItems(siteId)
+export function SettingsLayout({ children, siteId, mode = 'builder' }: SettingsLayoutProps) {
+    const sidebarNavItems = getSidebarNavItems(siteId, mode)
 
     return (
         <div className="mx-auto max-w-[1200px] px-6 py-10 md:px-10">

@@ -46,6 +46,7 @@ export function SetupForm({ className, ...props }: React.ComponentProps<"div">) 
 
   // Form State
   const [siteType, setSiteType] = useState("")
+  const [mode, setMode] = useState("builder") // "builder" | "cms"
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [subdomain, setSubdomain] = useState("")
@@ -57,12 +58,24 @@ export function SetupForm({ className, ...props }: React.ComponentProps<"div">) 
     setMounted(true)
   }, [])
 
-  const totalSteps = 4
+  // Auto-generate subdomain for CMS mode from title
+  useEffect(() => {
+    if (mode === "cms" && title) {
+      const slug = title.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
+      setSubdomain(slug + "-" + Math.random().toString(36).substring(2, 7)) // Ensure uniqueness
+    }
+  }, [mode, title])
+
+  const totalSteps = mode === "cms" ? 3 : 5
 
   const canProceed = () => {
     if (step === 1) return !!siteType
-    if (step === 2) return !!title.trim() && !!subdomain.trim()
-    if (step === 3) return selectedPages.length > 0
+    if (step === 2) return !!mode
+    if (step === 3) {
+      if (mode === "cms") return !!title.trim()
+      return !!title.trim() && !!subdomain.trim()
+    }
+    if (step === 4) return selectedPages.length > 0
     return true
   }
 
@@ -85,6 +98,7 @@ export function SetupForm({ className, ...props }: React.ComponentProps<"div">) 
       formData.append("url", `https://${subdomain.toLowerCase()}${BASE_DOMAIN}`)
       formData.append("logo", logo)
       formData.append("type", siteType)
+      formData.append("mode", mode) // Add mode
       formData.append("pages", JSON.stringify(selectedPages))
       formData.append("theme", selectedTheme)
 
@@ -186,8 +200,76 @@ export function SetupForm({ className, ...props }: React.ComponentProps<"div">) 
               </motion.div>
             )}
 
-            {/* Step 2: Details */}
+            {/* Step 2: Architecture Mode */}
             {step === 2 && (
+              <motion.div
+                key="step2"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="w-full flex flex-col items-center"
+              >
+                <h1 className="font-[var(--font-bebas)] text-3xl md:text-4xl lg:text-6xl text-center mb-4 tracking-wide text-foreground/80">
+                  SYSTEM ARCHITECTURE
+                </h1>
+                <p className="text-center font-mono text-[10px] md:text-xs uppercase tracking-[0.2em] text-muted-foreground mb-8 md:mb-16">
+                                    // Define operational mode
+                </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
+                  {/* Visual Builder Mode */}
+                  <button
+                    onClick={() => setMode("builder")}
+                    className={cn(
+                      "group relative h-48 flex flex-col items-center justify-center gap-4 border transition-all duration-300 p-6 text-center",
+                      mode === "builder"
+                        ? "border-foreground bg-foreground/5"
+                        : "border-foreground/20 hover:border-foreground/50 hover:bg-foreground/[0.02]"
+                    )}
+                  >
+                    <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-foreground/20 transition-all group-hover:w-4 group-hover:h-4 group-hover:border-foreground/40" />
+                    <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-foreground/20 transition-all group-hover:w-4 group-hover:h-4 group-hover:border-foreground/40" />
+                    <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-foreground/20 transition-all group-hover:w-4 group-hover:h-4 group-hover:border-foreground/40" />
+                    <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-foreground/20 transition-all group-hover:w-4 group-hover:h-4 group-hover:border-foreground/40" />
+
+                    <div className="w-12 h-12 border border-foreground/30 flex items-center justify-center rounded-full mb-2">
+                      <Palette className="w-6 h-6" />
+                    </div>
+                    <h3 className="font-[var(--font-bebas)] text-2xl tracking-wide">VISUAL BUILDER</h3>
+                    <p className="font-mono text-[10px] text-muted-foreground">
+                      Full control. Drag & Drop interface with Pages enabled.
+                    </p>
+                  </button>
+
+                  {/* Headless CMS Mode */}
+                  <button
+                    onClick={() => setMode("cms")}
+                    className={cn(
+                      "group relative h-48 flex flex-col items-center justify-center gap-4 border transition-all duration-300 p-6 text-center",
+                      mode === "cms"
+                        ? "border-foreground bg-foreground/5"
+                        : "border-foreground/20 hover:border-foreground/50 hover:bg-foreground/[0.02]"
+                    )}
+                  >
+                    <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-foreground/20 transition-all group-hover:w-4 group-hover:h-4 group-hover:border-foreground/40" />
+                    <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-foreground/20 transition-all group-hover:w-4 group-hover:h-4 group-hover:border-foreground/40" />
+                    <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-foreground/20 transition-all group-hover:w-4 group-hover:h-4 group-hover:border-foreground/40" />
+                    <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-foreground/20 transition-all group-hover:w-4 group-hover:h-4 group-hover:border-foreground/40" />
+
+                    <div className="w-12 h-12 border border-foreground/30 flex items-center justify-center rounded-full mb-2">
+                      <Layout className="w-6 h-6" />
+                    </div>
+                    <h3 className="font-[var(--font-bebas)] text-2xl tracking-wide">HEADLESS CMS</h3>
+                    <p className="font-mono text-[10px] text-muted-foreground">
+                      Content API only. Pages feature disabled by default.
+                    </p>
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Step 3: Details */}
+            {step === 3 && (
               <motion.div
                 key="step2"
                 initial={{ opacity: 0, y: 10 }}
@@ -216,28 +298,30 @@ export function SetupForm({ className, ...props }: React.ComponentProps<"div">) 
                     </div>
                   </div>
 
-                  <div className="space-y-4">
-                    <Label className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Network Address</Label>
-                    <div className="flex flex-col md:flex-row md:items-end gap-2 font-mono text-lg md:text-xl border-b border-foreground/20 pb-4 relative group">
-                      <div className="flex items-end gap-1 w-full">
-                        <span className="text-muted-foreground text-sm md:text-lg">https://</span>
-                        <input
-                          value={subdomain}
-                          onChange={(e) => setSubdomain(e.target.value.replace(/[^a-zA-Z0-9-]/g, ''))}
-                          placeholder="subdomain"
-                          className="flex-1 bg-transparent border-none outline-none placeholder:text-foreground/20 uppercase text-base md:text-xl min-w-0"
-                        />
+                  {mode !== "cms" && (
+                    <div className="space-y-4">
+                      <Label className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Network Address</Label>
+                      <div className="flex flex-col md:flex-row md:items-end gap-2 font-mono text-lg md:text-xl border-b border-foreground/20 pb-4 relative group">
+                        <div className="flex items-end gap-1 w-full">
+                          <span className="text-muted-foreground text-sm md:text-lg">https://</span>
+                          <input
+                            value={subdomain}
+                            onChange={(e) => setSubdomain(e.target.value.replace(/[^a-zA-Z0-9-]/g, ''))}
+                            placeholder="subdomain"
+                            className="flex-1 bg-transparent border-none outline-none placeholder:text-foreground/20 uppercase text-base md:text-xl min-w-0"
+                          />
+                        </div>
+                        <span className="text-muted-foreground text-xs md:text-lg text-right md:text-left">{BASE_DOMAIN}</span>
+                        <div className="absolute bottom-[-1px] left-0 w-0 h-[1px] bg-foreground transition-all duration-300 group-focus-within:w-full" />
                       </div>
-                      <span className="text-muted-foreground text-xs md:text-lg text-right md:text-left">{BASE_DOMAIN}</span>
-                      <div className="absolute bottom-[-1px] left-0 w-0 h-[1px] bg-foreground transition-all duration-300 group-focus-within:w-full" />
+                      {subdomain && (
+                        <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-green-500/80">
+                          <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                          AVAILABLE
+                        </div>
+                      )}
                     </div>
-                    {subdomain && (
-                      <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-green-500/80">
-                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
-                        AVAILABLE
-                      </div>
-                    )}
-                  </div>
+                  )}
 
                   <div className="space-y-4">
                     <Label className="font-mono text-xs uppercase tracking-widest text-muted-foreground">Manifesto (Optional)</Label>
@@ -252,10 +336,10 @@ export function SetupForm({ className, ...props }: React.ComponentProps<"div">) 
               </motion.div>
             )}
 
-            {/* Step 3: Pages */}
-            {step === 3 && (
+            {/* Step 4: Pages */}
+            {step === 4 && (
               <motion.div
-                key="step3"
+                key="step4"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
@@ -300,10 +384,10 @@ export function SetupForm({ className, ...props }: React.ComponentProps<"div">) 
               </motion.div>
             )}
 
-            {/* Step 4: Theme */}
-            {step === 4 && (
+            {/* Step 5: Theme */}
+            {step === 5 && (
               <motion.div
-                key="step4"
+                key="step5"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
@@ -417,7 +501,7 @@ export function SetupForm({ className, ...props }: React.ComponentProps<"div">) 
             </button>
           </div>
         </div>
-      </footer>
-    </div>
+      </footer >
+    </div >
   )
 }

@@ -167,6 +167,7 @@ export async function triggerNotification(data: {
     type?: NotificationType
     link?: string
     imageUrl?: string
+    siteId?: string
 }) {
     // Determine context?
     // This function can be imported by other server actions directly.
@@ -179,6 +180,7 @@ export async function triggerNotification(data: {
                 type: data.type || "SYSTEM",
                 link: data.link,
                 imageUrl: data.imageUrl,
+                siteId: data.siteId,
                 senderId: null // System
             }
         })
