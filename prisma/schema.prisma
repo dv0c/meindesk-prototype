@@ -49,6 +49,7 @@ model User {
   contributedArticleIds String[] @db.ObjectId
 
   sentInvitations Invitation[] @relation("Inviter")
+  activityLogs    ActivityLog[]
 
   developerMode Boolean @default(false)
 
@@ -179,6 +180,7 @@ model Site {
   invitations Invitation[]
   messages    Message[]
   channels    Channel[]
+  activityLogs ActivityLog[]
 
   // Optional: Add a custom index for performance on frequently queried fields
   @@index([userId])
@@ -616,4 +618,38 @@ enum ItemStatus {
   PUBLISHED
   DRAFT
   ARCHIVED
+}
+
+// --- Activity Logging ---
+// Tracks all user actions for audit and change tracking
+enum ActivityAction {
+  CREATE
+  UPDATE
+  DELETE
+  PUBLISH
+  UNPUBLISH
+  INVITE
+  REMOVE
+  LOGIN
+  OTHER
+}
+
+model ActivityLog {
+  id        String         @id @default(auto()) @map("_id") @db.ObjectId
+  action    ActivityAction
+  entity    String         // e.g., "article", "category", "page", "member"
+  entityId  String?        @db.ObjectId // ID of the affected entity
+  entityName String?       // Human-readable name (e.g., article title)
+  metadata  Json?          // Additional details (old/new values, etc.)
+  
+  siteId    String         @db.ObjectId
+  userId    String         @db.ObjectId
+  
+  createdAt DateTime       @default(now())
+
+  site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([siteId, createdAt])
+  @@index([userId])
 }

@@ -22,6 +22,7 @@ export default async function ProjectDashboard({ params }: { params: { siteId: s
     : `${site.subdomain}.meindesk.gr`
 
   const fullUrl = productionUrl.startsWith('http') ? productionUrl : `https://${productionUrl}`
+
   const isCMS = (site.settings as any)?.mode === 'cms'
 
   // Fetch Stats for CMS Mode
@@ -36,7 +37,7 @@ export default async function ProjectDashboard({ params }: { params: { siteId: s
       db.article.findMany({
         where: { siteId },
         orderBy: { updateAt: 'desc' },
-        take: 5,
+        take: 4,
         include: { author: true }
       })
     ])
@@ -124,7 +125,7 @@ export default async function ProjectDashboard({ params }: { params: { siteId: s
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Recent Activity Feed */}
-            <Card className="md:col-span-2">
+            <Card className="md:col-span-2 h-full">
               <CardHeader>
                 <CardTitle className="text-lg">Recent Content Activity</CardTitle>
                 <CardDescription>Latest updates to your content repository.</CardDescription>
@@ -274,3 +275,6 @@ export default async function ProjectDashboard({ params }: { params: { siteId: s
     </div>
   )
 }
+
+
+

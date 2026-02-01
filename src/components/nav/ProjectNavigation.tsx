@@ -25,6 +25,7 @@ export function ProjectNavigation({ siteId }: { siteId: string }) {
     }
 
     const isOwner = site?.userId === session?.user?.id
+    const isCMS = (site?.settings as any)?.mode === 'cms'
 
     const navItems = [
         { name: "Overview", href: baseUrl, exact: true, show: true },
@@ -34,8 +35,9 @@ export function ProjectNavigation({ siteId }: { siteId: string }) {
         { name: "Media", href: `${baseUrl}/projects/website/media-gallery`, show: features.media },
         { name: "Collections", href: `${baseUrl}/collections`, show: true },
         { name: "RSS", href: `${baseUrl}/projects/website/rss/my-feed`, show: features.rss },
-        { name: "Community", href: `${baseUrl}/community`, show: true },
+        { name: "Community", href: `${baseUrl}/community`, show: !isCMS },
         { name: "Analytics", href: `${baseUrl}/projects/website/analytics`, show: features.analytics },
+        { name: "Logs", href: `${baseUrl}/logs`, show: isCMS },
         { name: "Settings", href: `${baseUrl}/projects/settings`, show: true },
     ].filter(item => item.show)
 
@@ -77,10 +79,12 @@ export function ProjectNavigation({ siteId }: { siteId: string }) {
                 </div>
 
                 {session?.user && (
-                    <div className="flex items-center gap-2 pl-4 border-l h-6">
-                        <span className="text-[10px] font-medium text-muted-foreground uppercase hidden sm:block">Online</span>
-                        <OnlineMembers siteId={siteId} currentUserId={session.user.id} />
-                    </div>
+                    <OnlineMembers
+                        siteId={siteId}
+                        currentUserId={session.user.id}
+                        showLabel={true}
+                        showSeparator={true}
+                    />
                 )}
             </div>
         </div>

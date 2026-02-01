@@ -27,7 +27,7 @@ const _getActiveTeamCached = unstable_cache(
       },
     });
   },
-  ["get-active-team"],
+  ["get-active-team-v2"],
   { tags: ["active-team"] }
 );
 
