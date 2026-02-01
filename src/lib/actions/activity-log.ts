@@ -2,7 +2,9 @@
 
 import { db } from "@/lib/db"
 import { getAuthSession } from "@/lib/auth"
-import { ActivityAction } from "@/generated/client"
+
+// ActivityAction enum - matches Prisma schema
+type ActivityAction = "CREATE" | "UPDATE" | "DELETE" | "PUBLISH" | "UNPUBLISH" | "INVITE" | "REMOVE" | "LOGIN" | "OTHER"
 
 interface LogActivityParams {
     siteId: string

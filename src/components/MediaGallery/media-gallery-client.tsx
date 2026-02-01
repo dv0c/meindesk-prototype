@@ -367,7 +367,7 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
   }
 
   return (
-    <div className="flex h-full w-full flex-col bg-background/50">
+    <div className="flex max-w-7xl mx-auto h-full w-full flex-col bg-background/50">
       {/* Toolbar */}
       <div className="flex items-center justify-between px-6 py-4 border-b bg-background/95 backdrop-blur z-10">
         <div className="flex items-center gap-2 flex-1">

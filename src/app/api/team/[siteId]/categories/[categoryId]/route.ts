@@ -2,6 +2,7 @@ import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { requireSiteAccess } from "@/lib/security/route-auth";
+import { logActivity } from "@/lib/actions/activity-log";
 
 // GET - Get a specific category
 export async function GET(
@@ -98,6 +99,15 @@ export async function PATCH(
             },
         });
 
+        // Log the activity
+        await logActivity({
+            siteId,
+            action: "UPDATE",
+            entity: "category",
+            entityId: updatedCategory.id,
+            entityName: updatedCategory.name,
+        });
+
         return NextResponse.json(updatedCategory);
     } catch (error: any) {
         console.error("Error updating category:", error);
@@ -160,6 +170,15 @@ export async function DELETE(
     try {
         await db.category.delete({
             where: { id: categoryId },
+        });
+
+        // Log the activity
+        await logActivity({
+            siteId,
+            action: "DELETE",
+            entity: "category",
+            entityId: categoryId,
+            entityName: category.name,
         });
 
         return NextResponse.json({
