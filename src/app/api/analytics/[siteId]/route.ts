@@ -41,9 +41,27 @@ export async function GET(req: NextRequest, { params }: { params: { siteId: stri
     });
     const prevEvents = previousSince
       ? await db.analyticsEvent.findMany({
-          where: { siteId, createdAt: { gte: previousSince, lt: since } },
-        })
+        where: { siteId, createdAt: { gte: previousSince, lt: since } },
+      })
       : [];
+
+    // --- NEW vs RETURNING VISITORS ---
+    const currentIPs = Array.from(new Set(events.map((e) => e.ipAddress || "unknown"))).filter(ip => ip !== "unknown");
+
+    // Find which of these IPs have visited before the current period start date
+    let returningVisitorCount = 0;
+    if (currentIPs.length > 0) {
+      const returningIPs = await db.analyticsEvent.findMany({
+        where: {
+          siteId,
+          ipAddress: { in: currentIPs },
+          createdAt: { lt: since },
+        },
+        select: { ipAddress: true },
+        distinct: ["ipAddress"],
+      });
+      returningVisitorCount = returningIPs.length;
+    }
 
     // --- VIEWS OVER TIME ---
     const dailyStats: Record<string, { views: number; visitors: Set<string> }> = {};
@@ -74,8 +92,8 @@ export async function GET(req: NextRequest, { params }: { params: { siteId: stri
         ? e.referrer.includes("google")
           ? "Google"
           : e.referrer.includes("facebook") || e.referrer.includes("instagram")
-          ? "Social Media"
-          : "Referral"
+            ? "Social Media"
+            : "Referral"
         : "Direct";
       refSources[ref] = (refSources[ref] || 0) + 1;
     }
@@ -177,6 +195,8 @@ export async function GET(req: NextRequest, { params }: { params: { siteId: stri
         pageViewsChange,
         avgSessionDuration,
         durationChange,
+        newVisitors: uniqueVisitors - returningVisitorCount,
+        returningVisitors: returningVisitorCount,
       },
     });
     res.headers.set("Access-Control-Allow-Origin", "*");
