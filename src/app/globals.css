@@ -222,17 +222,35 @@
   /* Logo color wave animation */
   @keyframes colorWave {
     0%, 80%, 100% {
-      color: var(--foreground);
-      opacity: 0.8;
+      color: oklch(from var(--foreground) l c h / 0.8);
     }
     85%, 90% {
       color: #f97316; /* orange-500 */
-      opacity: 1;
     }
   }
 
   .animate-color-wave {
+    color: oklch(from var(--foreground) l c h / 0.8);
     animation: colorWave 4s ease-in-out infinite;
+  }
+
+  .group:hover .animate-color-wave {
+    animation: none;
+  }
+
+  /* Logo letter hover effect - gradient fill from bottom to top */
+  .logo-letter {
+    background: linear-gradient(to top, #f97316 0%, #f97316 50%, oklch(from var(--foreground) l c h / 0.8) 50%, oklch(from var(--foreground) l c h / 0.8) 100%);
+    background-size: 100% 200%;
+    background-position: top;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: background-position 0.3s ease-out;
+  }
+
+  .group:hover .logo-letter {
+    background-position: bottom;
   }
 }
 

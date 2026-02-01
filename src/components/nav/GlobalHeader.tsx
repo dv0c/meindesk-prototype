@@ -62,13 +62,13 @@ export function GlobalHeader() {
                     {/* <div className="bg-black dark:bg-white text-white dark:text-black flex size-6 items-center justify-center rounded-lg">
                         <GalleryVerticalEnd className="size-4" />
                     </div> */}
-                    <div className="font-[var(--font-bebas)] text-xl tracking-tight text-foreground/80 flex">
-                        <span className="text-orange-400">P</span>
+                    <div className="font-[var(--font-bebas)] text-xl tracking-tight flex group transition-transform duration-300 hover:scale-[1.02]">
+                        <span className="text-orange-500 transition-colors duration-300">P</span>
                         {"ROTOTYPE".split("").map((letter, i) => (
                             <span
                                 key={i}
-                                className="animate-color-wave"
-                                style={{ animationDelay: `${i * 0.1}s` }}
+                                className="logo-letter animate-color-wave"
+                                style={{ animationDelay: `${i * 0.1}s`, transitionDelay: `${i * 30}ms` }}
                             >
                                 {letter}
                             </span>
@@ -135,7 +135,7 @@ export function GlobalHeader() {
                         <UserMenu />
                     </div>
                 </div>
-            </div>
-        </header>
+            </div >
+        </header >
     )
 }
