@@ -58,6 +58,14 @@ export async function GET(
             image: true,
           },
         },
+        authors: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
       },
       orderBy: { createdAt: "desc" },
       take: limit, // here's your limit

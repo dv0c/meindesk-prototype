@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  reactCompiler: false,
+  reactCompiler: false, //causing issues with Builder, haven't found a solution yet
   trailingSlash: false, // avoid redirect /api/analytics/ -> /api/analytics
   images: {
     remotePatterns: [
