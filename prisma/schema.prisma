@@ -296,11 +296,14 @@ model AnalyticsEvent {
   region    String?
   device    String?
   ipAddress String?
+  articleSlug String? // If this is an article view, store the slug
+  isUniqueArticleView Boolean? // True if first time this IP viewed this article
   createdAt DateTime @default(now())
 
   Site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
   @@index([siteId, createdAt])
+  @@index([siteId, articleSlug])
 }
 
 model Article {
@@ -334,6 +337,9 @@ model Article {
   authorIds String[] @db.ObjectId
 
   metadata Json?
+
+  views Int @default(0) // Total views
+  uniqueViews Int @default(0) // Unique visitor views
 
   @@unique([slug, siteId])
   @@index([slug, id])

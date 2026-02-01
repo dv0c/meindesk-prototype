@@ -29,7 +29,7 @@ async function getRegionFromIP(ip: string): Promise<string | null> {
 // POST request
 export async function POST(req: NextRequest) {
   try {
-    const { url, path, referrer, userAgent } = await req.json();
+    const { url, path, referrer, userAgent, articleSlug } = await req.json();
 
     if (!url || !path) {
       const res = NextResponse.json({ error: "url and path required" }, { status: 400 });
@@ -50,6 +50,36 @@ export async function POST(req: NextRequest) {
       return res;
     }
 
+    // Check if this is a unique article view
+    let isUniqueArticleView: boolean | undefined;
+
+    if (articleSlug) {
+      // Check if this IP has already viewed this article
+      const existingView = await db.analyticsEvent.findFirst({
+        where: {
+          siteId: site.id,
+          articleSlug,
+          ipAddress,
+        },
+      });
+
+      isUniqueArticleView = !existingView;
+
+      // If unique, increment the article's uniqueViews count
+      if (isUniqueArticleView) {
+        await db.article.updateMany({
+          where: { siteId: site.id, slug: articleSlug },
+          data: { uniqueViews: { increment: 1 } },
+        });
+      }
+
+      // Always increment total views
+      await db.article.updateMany({
+        where: { siteId: site.id, slug: articleSlug },
+        data: { views: { increment: 1 } },
+      });
+    }
+
     // Create analytics event
     await db.analyticsEvent.create({
       data: {
@@ -59,6 +89,8 @@ export async function POST(req: NextRequest) {
         userAgent,
         region,
         ipAddress,
+        articleSlug: articleSlug || undefined,
+        isUniqueArticleView,
       },
     });
 

@@ -18,12 +18,39 @@
 
     const ENDPOINT = getApiUrl();
 
+    /**
+     * Detect if the current page is an article page and extract the slug.
+     * Common patterns: /articles/slug, /blog/slug, /news/slug, /post/slug
+     */
+    function detectArticleSlug() {
+        const path = window.location.pathname;
+        // Match common article URL patterns
+        const articlePatterns = [
+            /^\/articles\/([^\/]+)\/?$/,
+            /^\/blog\/([^\/]+)\/?$/,
+            /^\/news\/([^\/]+)\/?$/,
+            /^\/post\/([^\/]+)\/?$/,
+            /^\/p\/([^\/]+)\/?$/,
+        ];
+
+        for (const pattern of articlePatterns) {
+            const match = path.match(pattern);
+            if (match && match[1]) {
+                return match[1];
+            }
+        }
+        return null;
+    }
+
     function trackPageView() {
+        const articleSlug = detectArticleSlug();
+
         const payload = {
             url: window.location.host, // The domain of the site being tracked
             path: window.location.pathname,
             referrer: document.referrer,
             userAgent: navigator.userAgent,
+            articleSlug: articleSlug, // Will be null if not an article page
         };
 
         fetch(ENDPOINT, {

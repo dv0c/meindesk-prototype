@@ -2,6 +2,7 @@
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import generateSlug from "@/lib/generateSlug";
+import { logActivity } from "@/lib/actions/activity-log";
 
 export async function CreateArticle({ siteId }: { siteId: string }) {
   const session = await getAuthSession();
@@ -17,13 +18,22 @@ export async function CreateArticle({ siteId }: { siteId: string }) {
       slug,
       authorId: session.user.id,
       siteId,
-      
+
     },
   });
 
   if (!article) {
     return "An error has occured";
   }
+
+  // Log the activity
+  await logActivity({
+    siteId,
+    action: "CREATE",
+    entity: "article",
+    entityId: article.id,
+    entityName: article.title,
+  });
 
   return {
     url: `/dashboard/${siteId}/projects/website/articles/${article.id}/editor`,

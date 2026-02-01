@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getAuthSession } from "@/lib/auth";
 import { requireSiteAccess } from "@/lib/security/route-auth";
+import { logActivity } from "@/lib/actions/activity-log";
 
 export const runtime = "nodejs";
 
@@ -135,6 +136,17 @@ export async function PATCH(
       data: updateData,
     });
 
+    // Log the activity
+    const action = data.status === "PUBLISHED" ? "PUBLISH" : data.status === "DRAFT" ? "UNPUBLISH" : "UPDATE";
+    await logActivity({
+      siteId,
+      action: action as any,
+      entity: "article",
+      entityId: updated.id,
+      entityName: updated.title,
+      metadata: { updatedFields: Object.keys(updateData) },
+    });
+
     return NextResponse.json(updated);
   } catch (error: any) {
     console.error("Error updating article:", error);
@@ -161,13 +173,25 @@ export async function DELETE(
     // Verify site access
     await requireSiteAccess(siteId, session.user.id);
 
-    const updated = await db.article.delete({
+    // Get article info before deletion for logging
+    const article = await db.article.findUnique({ where: { id: articleId } });
+
+    const deleted = await db.article.delete({
       where: { id: articleId, siteId: siteId },
     });
 
-    return NextResponse.json(updated);
+    // Log the activity
+    await logActivity({
+      siteId,
+      action: "DELETE",
+      entity: "article",
+      entityId: articleId,
+      entityName: article?.title || "Unknown",
+    });
+
+    return NextResponse.json(deleted);
   } catch (error: any) {
-    console.error("Error updating article:", error);
+    console.error("Error deleting article:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

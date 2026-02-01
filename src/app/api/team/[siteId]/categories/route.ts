@@ -2,6 +2,7 @@ import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { requireSiteAccess } from "@/lib/security/route-auth";
+import { logActivity } from "@/lib/actions/activity-log";
 
 // GET - List all categories for a site
 export async function GET(
@@ -103,6 +104,15 @@ export async function POST(
                 siteId,
                 userId: session.user.id,
             },
+        });
+
+        // Log the activity
+        await logActivity({
+            siteId,
+            action: "CREATE",
+            entity: "category",
+            entityId: category.id,
+            entityName: category.name,
         });
 
         return NextResponse.json(category, { status: 201 });
