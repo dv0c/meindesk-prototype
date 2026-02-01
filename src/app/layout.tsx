@@ -102,10 +102,10 @@ export default function RootLayout({
           <SessionProvider>
             <Toaster />
             <LoadingBar>
-              <VersionProvider>
-                <ScrollToTop />
-                {children}
-              </VersionProvider>
+              {/* <VersionProvider> */}
+              <ScrollToTop />
+              {children}
+              {/* </VersionProvider> */}
             </LoadingBar>
           </SessionProvider>
         </ThemeProvider>
