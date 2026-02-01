@@ -59,13 +59,24 @@ export function GlobalHeader() {
             <div className="flex h-16 items-center px-4 md:px-6 gap-2">
                 {/* Logo Area */}
                 <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
-                    <div className="bg-black dark:bg-white text-white dark:text-black flex size-6 items-center justify-center rounded-lg">
+                    {/* <div className="bg-black dark:bg-white text-white dark:text-black flex size-6 items-center justify-center rounded-lg">
                         <GalleryVerticalEnd className="size-4" />
+                    </div> */}
+                    <div className="font-[var(--font-bebas)] text-xl tracking-tight text-foreground/80 flex">
+                        <span className="text-orange-400">P</span>
+                        {"ROTOTYPE".split("").map((letter, i) => (
+                            <span
+                                key={i}
+                                className="animate-color-wave"
+                                style={{ animationDelay: `${i * 0.1}s` }}
+                            >
+                                {letter}
+                            </span>
+                        ))}
                     </div>
-                    <span className="hidden md:block">Meindesk</span>
                 </Link>
 
-                <Slash className="text-muted-foreground/30 w-4 h-4 rotate-[-15deg]" />
+                <Slash className="text-muted-foreground/40 w-4 h-4 rotate-[-15deg]" />
 
                 {/* Scope Switcher (User / Team) */}
                 <DropdownMenu>

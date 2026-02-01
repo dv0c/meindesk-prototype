@@ -218,4 +218,21 @@
   .canvas-interactive-area:has(.draggable-node:hover) .draggable-node:hover {
     opacity: 1 !important;
   }
+
+  /* Logo color wave animation */
+  @keyframes colorWave {
+    0%, 80%, 100% {
+      color: var(--foreground);
+      opacity: 0.8;
+    }
+    85%, 90% {
+      color: #f97316; /* orange-500 */
+      opacity: 1;
+    }
+  }
+
+  .animate-color-wave {
+    animation: colorWave 4s ease-in-out infinite;
+  }
 }
+
