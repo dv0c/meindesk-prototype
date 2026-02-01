@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
@@ -191,20 +192,12 @@ export function ApiPlayground({ siteId, className, hideHeader = false }: { siteI
                                     </div>
                                 ) : endpoint === "categories" ? (
                                     <div className="space-y-3">
-                                        <div className="space-y-1">
-                                            <label className="text-[10px] font-medium uppercase text-muted-foreground">Has Articles</label>
-                                            <Select
-                                                value={queryParams.has_articles || "all"}
-                                                onValueChange={(val) => updateQueryParam("has_articles", val === "all" ? "" : val)}
-                                            >
-                                                <SelectTrigger className="h-8 text-xs bg-background">
-                                                    <SelectValue placeholder="All Categories" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="all">All Categories</SelectItem>
-                                                    <SelectItem value="true">Only with Articles</SelectItem>
-                                                </SelectContent>
-                                            </Select>
+                                        <div className="flex items-center justify-between border rounded-md p-3 bg-background">
+                                            <label className="text-xs font-medium uppercase text-muted-foreground">Only with Articles</label>
+                                            <Switch
+                                                checked={queryParams.has_articles === "true"}
+                                                onCheckedChange={(checked) => updateQueryParam("has_articles", checked ? "true" : "")}
+                                            />
                                         </div>
                                     </div>
                                 ) : (
