@@ -328,46 +328,50 @@ const UpdatesCarouselBase = forwardRef<HTMLElement, UpdatesCarouselProps>(
                             </motion.div>
                         </div>
 
-                        {/* Navigation Controls (Desktop Only) */}
-                        {showArrows && (
+                        {/* Navigation / Pagination Controls (Desktop Only) */}
+                        {(showArrows || showDots) && (
                             <div className="flex items-center gap-4 mt-8">
-                                <button
-                                    onClick={prevSlide}
-                                    className={cn(
-                                        "group p-3 border border-border/40 transition-all duration-300 hover:border-accent",
-                                    )}
-                                    aria-label="Previous slide"
-                                >
-                                    <svg
-                                        className={cn(
-                                            "w-5 h-5 transition-colors duration-300 text-muted-foreground group-hover:text-accent",
-                                        )}
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                                    </svg>
-                                </button>
+                                {showArrows && (
+                                    <>
+                                        <button
+                                            onClick={prevSlide}
+                                            className={cn(
+                                                "group p-3 border border-border/40 transition-all duration-300 hover:border-accent",
+                                            )}
+                                            aria-label="Previous slide"
+                                        >
+                                            <svg
+                                                className={cn(
+                                                    "w-5 h-5 transition-colors duration-300 text-muted-foreground group-hover:text-accent",
+                                                )}
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                            </svg>
+                                        </button>
 
-                                <button
-                                    onClick={nextSlide}
-                                    className={cn(
-                                        "group p-3 border border-border/40 transition-all duration-300 hover:border-accent",
-                                    )}
-                                    aria-label="Next slide"
-                                >
-                                    <svg
-                                        className={cn(
-                                            "w-5 h-5 transition-colors duration-300 text-muted-foreground group-hover:text-accent",
-                                        )}
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </button>
+                                        <button
+                                            onClick={nextSlide}
+                                            className={cn(
+                                                "group p-3 border border-border/40 transition-all duration-300 hover:border-accent",
+                                            )}
+                                            aria-label="Next slide"
+                                        >
+                                            <svg
+                                                className={cn(
+                                                    "w-5 h-5 transition-colors duration-300 text-muted-foreground group-hover:text-accent",
+                                                )}
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </button>
+                                    </>
+                                )}
 
                                 {/* Progress Dots */}
                                 {showDots && (

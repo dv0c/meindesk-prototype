@@ -109,7 +109,7 @@ export interface BlockConfig<P> {
     // The component to render
     // Injected props: theme, isEditing
     // Injected props: theme, isEditing, deviceMode
-    render: (props: P & { theme: EditorTheme; isEditing?: boolean; deviceMode?: DeviceMode | null }) => React.ReactElement
+    render: (props: P & { theme: EditorTheme; isEditing?: boolean; deviceMode?: DeviceMode | null }) => React.ReactElement | null
 
     // Craft.js specific rules
     rules?: {
@@ -170,6 +170,7 @@ export function useBlockStyles(props: {
     nodeId?: string
 }) {
     const { style = {}, mobileStyle, tabletStyle, className, responsive, isEditing, deviceMode, nodeId } = props
+    const localId = React.useId()
 
     // Select the active style based on device mode (For Editor WYSIWYG)
     const activeStyle = React.useMemo(() => {
@@ -274,16 +275,19 @@ export function useBlockStyles(props: {
         const isHidden = (bp: string) => responsive.hiddenOn?.includes(bp)
 
         // Mobile (< 768px in standard Tailwind, or 'max-md' usually means < 768px)
-        if (isHidden('mobile') && isEditing) {
-            classes.push('max-md:opacity-25 max-md:outline-dashed max-md:outline-1 max-md:outline-rose-400')
+        if (isHidden('mobile')) {
+            if (isEditing) classes.push('max-md:opacity-25 max-md:outline-dashed max-md:outline-1 max-md:outline-rose-400')
+            else classes.push('max-md:hidden')
         }
         // Tablet (768px - 1024px)
-        if (isHidden('tablet') && isEditing) {
-            classes.push('md:max-lg:opacity-25 md:max-lg:outline-dashed md:max-lg:outline-1 md:max-lg:outline-rose-400')
+        if (isHidden('tablet')) {
+            if (isEditing) classes.push('md:max-lg:opacity-25 md:max-lg:outline-dashed md:max-lg:outline-1 md:max-lg:outline-rose-400')
+            else classes.push('md:max-lg:hidden')
         }
         // Desktop (>= 1024px)
-        if (isHidden('desktop') && isEditing) {
-            classes.push('lg:opacity-25 lg:outline-dashed lg:outline-1 lg:outline-rose-400')
+        if (isHidden('desktop')) {
+            if (isEditing) classes.push('lg:opacity-25 lg:outline-dashed lg:outline-1 lg:outline-rose-400')
+            else classes.push('lg:hidden')
         }
 
         return classes.join(" ")
@@ -315,12 +319,35 @@ export function useBlockStyles(props: {
     // Actually, in Editor we rely on inline style switching (activeStyle).
     // In Runtime (published), we need the <style> block.
     // We can return the CSS string if nodeId is provided.
-    const generatedCss = React.useMemo(() => {
-        if (!nodeId) return null
-        return generateResponsiveCss(nodeId, style, tabletStyle, mobileStyle, responsive)
-    }, [nodeId, style, tabletStyle, mobileStyle, responsive])
+    const resolvedNodeId = React.useMemo(() => {
+        const raw = nodeId || `uid-${localId}`
+        return String(raw).replace(/[^a-zA-Z0-9_-]/g, "")
+    }, [nodeId, localId])
 
-    const uniqueClassName = nodeId ? `c-${nodeId}` : ''
+    const generatedCss = React.useMemo(() => {
+        return generateResponsiveCss(resolvedNodeId, style, tabletStyle, mobileStyle, responsive)
+    }, [resolvedNodeId, style, tabletStyle, mobileStyle, responsive])
+
+    const uniqueClassName = `c-${resolvedNodeId}`
+
+    React.useEffect(() => {
+        if (!generatedCss || typeof document === 'undefined') return
+        const styleId = `responsive-style-${uniqueClassName}`
+        let styleEl = document.getElementById(styleId) as HTMLStyleElement | null
+
+        if (!styleEl) {
+            styleEl = document.createElement('style')
+            styleEl.id = styleId
+            document.head.appendChild(styleEl)
+        }
+        styleEl.textContent = generatedCss
+
+        return () => {
+            if (styleEl && styleEl.parentNode) {
+                styleEl.parentNode.removeChild(styleEl)
+            }
+        }
+    }, [generatedCss, uniqueClassName])
 
     return {
         style: { ...computedStyle, ...viewModeOverride },
@@ -332,6 +359,22 @@ export function useBlockStyles(props: {
 // --- Main API Function ---
 
 export function defineBlock<P extends object>(config: BlockConfig<P>): BlockAPI<P> {
+    if (process.env.NODE_ENV !== 'production' && config.settingsConfig) {
+        const knownKeys = new Set<string>([
+            ...Object.keys((config.defaultProps || {}) as Record<string, unknown>),
+            'style',
+            'mobileStyle',
+            'tabletStyle',
+            'responsive',
+            'className'
+        ])
+        Object.keys(config.settingsConfig).forEach((key) => {
+            if (!knownKeys.has(key)) {
+                console.warn(`[defineBlock:${config.name}] settings key '${key}' is not in defaultProps. Check if this prop is wired in render.`)
+            }
+        })
+    }
+
     const Component: React.FC<P> = (props) => {
         const { theme } = useEditorTheme()
         const { enabled } = useEditor((state) => ({ enabled: state.options.enabled }))

@@ -28,8 +28,8 @@ export const ThemeHero = defineBlock({
             minHeight: '600px',
         }
     },
-    render: ({ title, subtitle, image, ctaText, style, theme }) => {
-        const { style: blockStyle, className } = useBlockStyles({ style })
+    render: ({ title, subtitle, image, ctaText, style, theme, responsive, isEditing, deviceMode }) => {
+        const { style: blockStyle, className } = useBlockStyles({ style, responsive, isEditing, deviceMode })
 
         return (
             <section style={blockStyle} className={className}>

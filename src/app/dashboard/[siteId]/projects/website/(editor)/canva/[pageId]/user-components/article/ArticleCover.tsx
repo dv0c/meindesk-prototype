@@ -11,7 +11,6 @@ import {
     PropertySlider,
     PropertyInput,
     PropertySelect,
-    PropertyCheckbox,
 } from "../../components/PropertySection"
 
 export interface ArticleCoverProps {
@@ -21,8 +20,8 @@ export interface ArticleCoverProps {
     width?: string
     height?: string
     className?: string
-    enableSnapping?: boolean
     blockStyle?: BlockStyle
+    responsive?: { hiddenOn?: string[] }
 }
 
 const aspectRatioMap = {
@@ -41,14 +40,12 @@ const ArticleCoverSettings = () => {
         borderRadius,
         width,
         height,
-        enableSnapping,
     } = useNode((node) => ({
         aspectRatio: node.data.props.aspectRatio,
         objectFit: node.data.props.objectFit,
         borderRadius: node.data.props.borderRadius,
         width: node.data.props.width,
         height: node.data.props.height,
-        enableSnapping: node.data.props.enableSnapping,
     }))
 
     const dimensionsSummary = `${width || 'auto'} × ${height || 'auto'}`
@@ -96,17 +93,6 @@ const ArticleCoverSettings = () => {
                         placeholder="auto"
                     />
                 </PropertyRow>
-                <PropertyRow label="Snap to Breakpoints">
-                    <div className="flex items-center justify-between pt-1">
-                        <label className="text-xs text-muted-foreground">Enabled</label>
-                        <PropertyCheckbox
-                            id="enableSnapping"
-                            label=""
-                            checked={enableSnapping}
-                            onChange={(checked) => setProp((props: ArticleCoverProps) => (props.enableSnapping = checked))}
-                        />
-                    </div>
-                </PropertyRow>
             </PropertySection>
 
             <PropertySection title="Style">
@@ -134,7 +120,6 @@ export const ArticleCover = defineBlock<ArticleCoverProps>({
         borderRadius: 8,
         width: "100%",
         height: "auto",
-        enableSnapping: false,
         blockStyle: {},
     },
 
@@ -147,8 +132,10 @@ export const ArticleCover = defineBlock<ArticleCoverProps>({
         width = "100%",
         height = "auto",
         className = "",
-        enableSnapping = false,
         blockStyle,
+        responsive,
+        isEditing,
+        deviceMode,
     }) => {
         const { article, loading, isEditor } = useArticle()
 
@@ -160,7 +147,10 @@ export const ArticleCover = defineBlock<ArticleCoverProps>({
                 borderRadius,
                 position: 'relative'
             },
-            className: cn("overflow-hidden", aspectRatioMap[aspectRatio], className)
+            className: cn("overflow-hidden", aspectRatioMap[aspectRatio], className),
+            responsive,
+            isEditing,
+            deviceMode,
         })
 
         // Loading skeleton

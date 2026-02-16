@@ -27,8 +27,8 @@ export const Section = defineBlock({
             </div>
         )
     },
-    render: ({ children, style, theme }) => {
-        const { style: blockStyle, className } = useBlockStyles({ style })
+    render: ({ children, style, theme, responsive, isEditing, deviceMode }) => {
+        const { style: blockStyle, className } = useBlockStyles({ style, responsive, isEditing, deviceMode })
 
         return (
             <section

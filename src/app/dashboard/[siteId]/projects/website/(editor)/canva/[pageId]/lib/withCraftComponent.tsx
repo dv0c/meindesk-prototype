@@ -61,6 +61,9 @@ export interface CraftComponentProps {
     // Other
     className?: string
     style?: React.CSSProperties
+    responsive?: {
+        hiddenOn?: Array<'desktop' | 'tablet' | 'mobile'>
+    }
 }
 
 /**
@@ -534,6 +537,21 @@ export function withCraftComponent<P extends CraftComponentProps, E extends HTML
     Component: React.ForwardRefExoticComponent<P & React.RefAttributes<E>>,
     options: Partial<WithCraftComponentOptions<P>>
 ) {
+    if (process.env.NODE_ENV !== 'production' && options.settingsConfig) {
+        const known = new Set<string>([
+            ...Object.keys((options.defaultProps || {}) as Record<string, unknown>),
+            ...Object.keys(STANDARD_DEFAULTS),
+            'style',
+            'className'
+        ])
+
+        Object.keys(options.settingsConfig).forEach((key) => {
+            if (!known.has(key)) {
+                console.warn(`[withCraftComponent:${options.displayName || Component.displayName || 'Component'}] settings key '${key}' is not in defaultProps/standard props. Verify render wiring.`)
+            }
+        })
+    }
+
     // Determine settings behavior
     const includeStyleSettings = options.includeStyleSettings !== false // Default: true
     const includeStandardDefaults = options.includeStandardDefaults !== false // Default: true
@@ -542,11 +560,29 @@ export function withCraftComponent<P extends CraftComponentProps, E extends HTML
         const { connectors: { connect, drag }, nodeProps } = useNode((node) => ({
             nodeProps: node.data.props
         }))
+        const { enabled } = useEditor((state) => ({
+            enabled: state.options.enabled
+        }))
+
+        const responsive = (nodeProps as any)?.responsive
+        const hiddenOn = responsive?.hiddenOn || []
+        const responsiveClasses = [
+            hiddenOn.includes('mobile') ? (enabled ? 'max-md:opacity-25 max-md:outline-dashed max-md:outline-1 max-md:outline-rose-400' : 'max-md:hidden') : '',
+            hiddenOn.includes('tablet') ? (enabled ? 'md:max-lg:opacity-25 md:max-lg:outline-dashed md:max-lg:outline-1 md:max-lg:outline-rose-400' : 'md:max-lg:hidden') : '',
+            hiddenOn.includes('desktop') ? (enabled ? 'lg:opacity-25 lg:outline-dashed lg:outline-1 lg:outline-rose-400' : 'lg:hidden') : '',
+        ].filter(Boolean).join(' ')
+
+        const mergedClassName = cn(
+            (props as any).className,
+            (nodeProps as any)?.className,
+            responsiveClasses
+        )
 
         return (
             <Component
                 {...props}
                 {...(nodeProps as Partial<P>)}
+                className={mergedClassName as any}
                 ref={(el: E | null) => {
                     if (el) {
                         connect(drag(el))
@@ -602,4 +638,3 @@ export function withCraftComponent<P extends CraftComponentProps, E extends HTML
 
     return craftComponent
 }
-

@@ -55,19 +55,22 @@ export const GlobalStylesPanel = ({ exclude = [] }: { exclude?: string[] }) => {
 
     if (!id || !currentProps) return null
 
+    const styleContainerKey = currentProps.style && typeof currentProps.style === 'object'
+        ? 'style'
+        : (currentProps.blockStyle && typeof currentProps.blockStyle === 'object' ? 'blockStyle' : null)
+
     // Helper for Typography (legacy logic until Typography moved to Universal)
-    const hasStyleObject = currentProps.style && typeof currentProps.style === 'object'
     const getValue = (key: string) => {
-        if (hasStyleObject) {
-            return currentProps.style[key]
+        if (styleContainerKey) {
+            return currentProps[styleContainerKey]?.[key]
         }
         return currentProps[key]
     }
     const updateProp = (key: string, value: any) => {
         actions.setProp(id, (props: any) => {
-            if (hasStyleObject) {
-                if (!props.style) props.style = {}
-                props.style[key] = value
+            if (styleContainerKey) {
+                if (!props[styleContainerKey]) props[styleContainerKey] = {}
+                props[styleContainerKey][key] = value
             } else {
                 props[key] = value
             }
@@ -174,4 +177,3 @@ export const GlobalStylesPanel = ({ exclude = [] }: { exclude?: string[] }) => {
 // Actually, I should remove them to force migration and avoid confusion.
 // But some components import them. I will update imports later.
 // For now, I overwrite the file.
-

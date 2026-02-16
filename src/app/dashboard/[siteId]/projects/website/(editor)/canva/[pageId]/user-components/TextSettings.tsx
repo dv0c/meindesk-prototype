@@ -82,13 +82,14 @@ export const TextSettings = () => {
         props: node.data.props,
     }))
 
-    const fontWeightLabel = {
+    const fontWeightLabels: Record<string, string> = {
         "300": "Light",
         "400": "Regular",
         "500": "Medium",
         "600": "Semibold",
         "700": "Bold",
-    }[fontWeight || "400"] || "Regular"
+    }
+    const fontWeightLabel = fontWeightLabels[String(fontWeight || "400")] || "Regular"
 
     const typographySummary = `${fontSize}px, ${fontWeightLabel}, ${textAlign}`
 
@@ -194,7 +195,7 @@ export const TextSettings = () => {
                 <PropertyRow label="Width">
                     <PropertySliderWithUnit
                         value={parseInt(width) || 0}
-                        unit={width?.toString().replace(/[0-9.]/g, '') || 'percent'}
+                        unit={width?.toString().replace(/[0-9.]/g, '') || '%'}
                         onChange={(val, unit) => updateStyle('width', `${val}${unit}`)}
                         min={0}
                         max={100}
@@ -204,7 +205,7 @@ export const TextSettings = () => {
                 <PropertyRow label="Height">
                     <PropertySliderWithUnit
                         value={parseInt(height) || 0}
-                        unit={height?.toString().replace(/[0-9.]/g, '') || 'auto'}
+                        unit={height?.toString().replace(/[0-9.]/g, '') || 'px'}
                         onChange={(val, unit) => updateStyle('height', `${val}${unit}`)}
                         min={0}
                         max={100}
@@ -224,7 +225,7 @@ export const TextSettings = () => {
                 <PropertyRow label="Max Width">
                     <PropertySliderWithUnit
                         value={parseInt(maxWidth) || 0}
-                        unit={maxWidth?.toString().replace(/[0-9.]/g, '') || 'none'}
+                        unit={maxWidth?.toString().replace(/[0-9.]/g, '') || 'px'}
                         onChange={(val, unit) => updateStyle('maxWidth', `${val}${unit}`)}
                         min={0}
                         max={100}
@@ -234,7 +235,7 @@ export const TextSettings = () => {
                 <PropertyRow label="Max Height">
                     <PropertySliderWithUnit
                         value={parseInt(maxHeight) || 0}
-                        unit={maxHeight?.toString().replace(/[0-9.]/g, '') || 'none'}
+                        unit={maxHeight?.toString().replace(/[0-9.]/g, '') || 'px'}
                         onChange={(val, unit) => updateStyle('maxHeight', `${val}${unit}`)}
                         min={0}
                         max={100}

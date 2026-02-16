@@ -281,7 +281,7 @@ const defaultProps: Partial<HeroSectionProps> = {
     enableScramble: true,
     enableNoise: true,
     noiseOpacity: 5,
-    splitFlapSpeed: 1,
+    splitFlapSpeed: 50,
     minHeight: "100vh",
     paddingTop: 0,
     paddingBottom: 0,
@@ -317,10 +317,10 @@ export const HeroSection = withCraftComponent<HeroSectionProps, HTMLElement>(
             },
             splitFlapSpeed: {
                 type: "slider",
-                label: "Split-Flap Speed",
-                min: 30,
-                max: 150,
-                step: 10
+                label: "Split-Flap Speed (ms)",
+                min: 10,
+                max: 200,
+                step: 5
             },
         },
     }

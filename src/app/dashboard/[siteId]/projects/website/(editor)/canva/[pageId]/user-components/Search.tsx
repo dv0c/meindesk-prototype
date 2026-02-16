@@ -130,7 +130,6 @@ export const Search = ({
             <SearchOverlay
                 open={open}
                 onOpenChange={setOpen}
-                onOpenChange={setOpen}
                 collections={collections}
                 siteId={siteId}
                 theme="light"
@@ -299,7 +298,10 @@ export const SearchSettings = () => {
                             <SelectValue placeholder="Select theme" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="minimal">Default</SelectItem>
+                            <SelectItem value="minimal">Minimal</SelectItem>
+                            <SelectItem value="dashboard">Dashboard</SelectItem>
+                            <SelectItem value="classic">Classic</SelectItem>
+                            <SelectItem value="modern">Modern</SelectItem>
                         </SelectContent>
                     </Select>
                 </PropertyRow>
@@ -355,8 +357,6 @@ Search.craft = {
         width: "100%",
         padding: 12,
         backgroundColor: "#ffffff",
-        color: "#6b7280",
-        borderRadius: 8,
         color: "#6b7280",
         borderRadius: 8,
         collections: [],

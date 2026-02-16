@@ -42,8 +42,6 @@ export function SearchOverlay({ open, onOpenChange, collections = [], siteId, th
             try {
                 // Fetch all collections first to get slugs/names
                 const allCollectionsRes = await getCollections(siteId)
-                console.log("[SearchOverlay] siteId:", siteId)
-                console.log("[SearchOverlay] allCollectionsRes:", allCollectionsRes)
 
                 const colMap = new Map<string, { name: string, slug: string }>()
 
@@ -52,16 +50,14 @@ export function SearchOverlay({ open, onOpenChange, collections = [], siteId, th
                         colMap.set(c.id, { name: c.name, slug: c.slug })
                     })
                 }
-                console.log("[SearchOverlay] colMap content:", Array.from(colMap.entries()))
+                colMap.set("Articles", { name: "Articles", slug: "articles" })
 
                 // Determine which collection IDs to fetch items from
                 let targetCollectionIds = collections
-                console.log("[SearchOverlay] collections prop:", collections)
 
                 if (collections.length === 0) {
                     targetCollectionIds = Array.from(colMap.keys())
                 }
-                console.log("[SearchOverlay] targetCollectionIds:", targetCollectionIds)
 
                 // Fetch items
                 const promises = targetCollectionIds.map(async (colId) => {
@@ -90,7 +86,6 @@ export function SearchOverlay({ open, onOpenChange, collections = [], siteId, th
                 })
 
                 const results = await Promise.all(promises)
-                console.log("[SearchOverlay] results:", results)
 
                 // Virtual "Articles" collection map entry
                 // colMap.set("Articles", { name: "Articles", slug: "articles" }) 
@@ -103,9 +98,7 @@ export function SearchOverlay({ open, onOpenChange, collections = [], siteId, th
 
                 const allItems: SearchItem[] = []
                 results.forEach(({ colId, items }) => {
-                    console.log(`[SearchOverlay] Processing colId: ${colId}`)
                     const colDetails = colMap.get(colId)
-                    console.log(`[SearchOverlay] colDetails for ${colId}:`, colDetails)
 
                     const categoryName = colDetails?.name || (colId === "Articles" ? "Articles" : "Other")
                     const collectionSlug = colDetails?.slug
@@ -120,7 +113,6 @@ export function SearchOverlay({ open, onOpenChange, collections = [], siteId, th
                         } else if (collectionSlug) {
                             href = `/c/${collectionSlug}/${item.slug}`
                         }
-                        console.log(`[SearchOverlay] Item: ${title}, Category: ${categoryName}, Slug: ${item.slug}, CollectionSlug: ${collectionSlug}, Href: ${href}`)
 
                         allItems.push({
                             id: item.id,
@@ -142,7 +134,16 @@ export function SearchOverlay({ open, onOpenChange, collections = [], siteId, th
         }
 
         fetchData()
-    }, [siteId]) // Check dependencies: removed 'open' to enable preload. 'collections' might change, but usually static per instance.
+    }, [siteId, collections])
+
+    const layoutClass =
+        layout === "dashboard"
+            ? "rounded-xl border border-border/70"
+            : layout === "classic"
+                ? "rounded-none border-y"
+                : layout === "modern"
+                    ? "rounded-2xl border border-border/40 shadow-2xl"
+                    : ""
 
     // Group items by category
     const groupedItems = items.reduce((acc, item) => {
@@ -161,7 +162,7 @@ export function SearchOverlay({ open, onOpenChange, collections = [], siteId, th
 
     return (
         <CommandDialog open={open} onOpenChange={onOpenChange}>
-            <div className={cn("flex flex-col h-full bg-background/95 backdrop-blur-sm", theme === "dark" ? "dark" : "")}>
+            <div className={cn("flex flex-col h-full bg-background/95 backdrop-blur-sm", theme === "dark" ? "dark" : "", layoutClass)}>
                 <div className="flex items-center border-b px-4 transition-colors focus-within:border-primary/50">
                     <SearchIcon className="mr-2 h-5 w-5 shrink-0 opacity-50" />
                     <CommandInput

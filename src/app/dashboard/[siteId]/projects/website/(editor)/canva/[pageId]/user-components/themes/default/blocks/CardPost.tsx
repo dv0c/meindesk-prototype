@@ -22,8 +22,8 @@ export const CardPost = defineBlock({
             flexDirection: 'column',
         }
     },
-    render: ({ title, excerpt, image, style, theme }) => {
-        const { style: blockStyle, className } = useBlockStyles({ style })
+    render: ({ title, excerpt, image, style, theme, responsive, isEditing, deviceMode }) => {
+        const { style: blockStyle, className } = useBlockStyles({ style, responsive, isEditing, deviceMode })
 
         return (
             <article style={blockStyle} className={className}>

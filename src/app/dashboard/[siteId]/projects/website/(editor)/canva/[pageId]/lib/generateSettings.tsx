@@ -734,7 +734,15 @@ function SortableArrayItem({ id, item, index, arrayFields, isOpen, onToggle, onC
                                         placeholder={fieldConfig.placeholder}
                                     />
                                 )}
-                                {/* Add more field types here if needed (e.g. number, select) - keeping it simple for now */}
+                                {fieldConfig.type === 'textarea' && (
+                                    <Textarea
+                                        value={item[fieldKey] || ''}
+                                        onChange={(e) => onChange(fieldKey, e.target.value)}
+                                        rows={fieldConfig.rows || 3}
+                                        className="text-xs"
+                                        placeholder={fieldConfig.placeholder}
+                                    />
+                                )}
                                 {fieldConfig.type === 'number' && (
                                     <input
                                         type="number"
@@ -742,6 +750,29 @@ function SortableArrayItem({ id, item, index, arrayFields, isOpen, onToggle, onC
                                         onChange={(e) => onChange(fieldKey, Number(e.target.value))}
                                         className="w-full h-9 px-3 text-sm border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
                                     />
+                                )}
+                                {fieldConfig.type === 'select' && fieldConfig.options && (
+                                    <select
+                                        value={item[fieldKey] ?? fieldConfig.options[0]?.value ?? ''}
+                                        onChange={(e) => onChange(fieldKey, e.target.value)}
+                                        className="w-full h-9 px-3 text-sm border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
+                                    >
+                                        {fieldConfig.options.map((option) => (
+                                            <option key={String(option.value)} value={String(option.value)}>
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                )}
+                                {fieldConfig.type === 'checkbox' && (
+                                    <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                                        <input
+                                            type="checkbox"
+                                            checked={Boolean(item[fieldKey])}
+                                            onChange={(e) => onChange(fieldKey, e.target.checked)}
+                                        />
+                                        Enabled
+                                    </label>
                                 )}
                             </div>
                         )

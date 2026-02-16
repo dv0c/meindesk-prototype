@@ -20,6 +20,7 @@ import {
     PropertyButtonGroup,
     PropertyIconButtonGroup,
     PropertyBoxModel,
+    PropertyToggle,
 } from '../components/PropertySection'
 
 /**
@@ -60,6 +61,11 @@ export const STANDARD_DEFAULTS = {
 
     // Typography (common)
     textAlign: 'left' as 'left' | 'center' | 'right' | 'justify',
+
+    // Responsive visibility
+    responsive: {
+        hiddenOn: [] as Array<'desktop' | 'tablet' | 'mobile'>,
+    },
 }
 
 export type StandardProps = typeof STANDARD_DEFAULTS
@@ -101,6 +107,7 @@ export function StandardStyleSettings() {
         opacity,
         // Typography
         textAlign,
+        responsive,
     } = useNode((node) => ({
         width: node.data.props.width,
         height: node.data.props.height,
@@ -123,6 +130,7 @@ export function StandardStyleSettings() {
         boxShadow: node.data.props.boxShadow,
         opacity: node.data.props.opacity,
         textAlign: node.data.props.textAlign,
+        responsive: node.data.props.responsive || { hiddenOn: [] },
     }))
 
 
@@ -150,9 +158,6 @@ export function StandardStyleSettings() {
                         value={widthValue}
                         unit={widthUnit}
                         onChange={(v, u) => setProp((props: any) => (props.width = u === '%' && v === 100 ? '100%' : `${v}${u}`))}
-                        showAuto
-                        onAutoChange={() => setProp((props: any) => (props.width = 'auto'))}
-                        isAuto={width === 'auto'}
                     />
                 </PropertyRow>
                 <PropertyRow label="Max Width">
@@ -356,6 +361,58 @@ export function StandardStyleSettings() {
                         max={100}
                         unit="%"
                     />
+                </PropertyRow>
+            </PropertySection>
+
+            <PropertySection title="Responsive" defaultOpen={false}>
+                <PropertyRow label="Visibility">
+                    <div className="flex flex-col gap-2 pt-2">
+                        <PropertyToggle
+                            label="Hide on Desktop"
+                            value={responsive?.hiddenOn?.includes('desktop') || false}
+                            onChange={(checked) => {
+                                setProp((props: any) => {
+                                    if (!props.responsive) props.responsive = { hiddenOn: [] }
+                                    if (!props.responsive.hiddenOn) props.responsive.hiddenOn = []
+                                    if (checked) {
+                                        if (!props.responsive.hiddenOn.includes('desktop')) props.responsive.hiddenOn.push('desktop')
+                                    } else {
+                                        props.responsive.hiddenOn = props.responsive.hiddenOn.filter((bp: string) => bp !== 'desktop')
+                                    }
+                                })
+                            }}
+                        />
+                        <PropertyToggle
+                            label="Hide on Tablet"
+                            value={responsive?.hiddenOn?.includes('tablet') || false}
+                            onChange={(checked) => {
+                                setProp((props: any) => {
+                                    if (!props.responsive) props.responsive = { hiddenOn: [] }
+                                    if (!props.responsive.hiddenOn) props.responsive.hiddenOn = []
+                                    if (checked) {
+                                        if (!props.responsive.hiddenOn.includes('tablet')) props.responsive.hiddenOn.push('tablet')
+                                    } else {
+                                        props.responsive.hiddenOn = props.responsive.hiddenOn.filter((bp: string) => bp !== 'tablet')
+                                    }
+                                })
+                            }}
+                        />
+                        <PropertyToggle
+                            label="Hide on Mobile"
+                            value={responsive?.hiddenOn?.includes('mobile') || false}
+                            onChange={(checked) => {
+                                setProp((props: any) => {
+                                    if (!props.responsive) props.responsive = { hiddenOn: [] }
+                                    if (!props.responsive.hiddenOn) props.responsive.hiddenOn = []
+                                    if (checked) {
+                                        if (!props.responsive.hiddenOn.includes('mobile')) props.responsive.hiddenOn.push('mobile')
+                                    } else {
+                                        props.responsive.hiddenOn = props.responsive.hiddenOn.filter((bp: string) => bp !== 'mobile')
+                                    }
+                                })
+                            }}
+                        />
+                    </div>
                 </PropertyRow>
             </PropertySection>
         </div>

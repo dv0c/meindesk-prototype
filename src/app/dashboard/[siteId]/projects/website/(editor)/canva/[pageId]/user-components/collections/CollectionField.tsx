@@ -16,6 +16,7 @@ export interface CollectionFieldProps {
 
     style?: BlockStyle
     className?: string
+    responsive?: { hiddenOn?: string[] }
 }
 
 export const CollectionField = defineBlock<CollectionFieldProps>({
@@ -82,6 +83,12 @@ export const CollectionField = defineBlock<CollectionFieldProps>({
             type: "text",
             section: "Rendering",
         },
+        linkHref: {
+            label: "Link URL",
+            type: "text",
+            section: "Rendering",
+            description: "Used only when Render As = Link"
+        },
     },
 
     render: ({
@@ -93,11 +100,17 @@ export const CollectionField = defineBlock<CollectionFieldProps>({
         placeholder = "—",
         linkHref = "",
         style,
-        className
+        className,
+        responsive,
+        isEditing,
+        deviceMode,
     }) => {
         const { style: computedStyle, className: computedClassName } = useBlockStyles({
             style,
-            className
+            className,
+            responsive,
+            isEditing,
+            deviceMode,
         })
 
         const contextField = useCollectionField(fieldName)
@@ -223,7 +236,7 @@ export const CollectionField = defineBlock<CollectionFieldProps>({
 
             // Heading rendering
             if (renderAs === "heading") {
-                const HeadingTag = headingLevel as keyof JSX.IntrinsicElements
+                const HeadingTag = (headingLevel || "h2") as "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
                 return (
                     <HeadingTag className={computedClassName} style={computedStyle}>
                         {String(value)}

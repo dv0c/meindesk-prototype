@@ -26,8 +26,8 @@ export const DefaultHeader = defineBlock({
             justifyContent: 'space-between',
         }
     },
-    render: ({ logo, style, theme }) => {
-        const { style: blockStyle, className } = useBlockStyles({ style })
+    render: ({ logo, style, theme, responsive, isEditing, deviceMode }) => {
+        const { style: blockStyle, className } = useBlockStyles({ style, responsive, isEditing, deviceMode })
 
         return (
             <header style={blockStyle} className={className}>

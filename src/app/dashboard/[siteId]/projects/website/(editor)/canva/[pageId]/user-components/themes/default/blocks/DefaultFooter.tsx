@@ -20,8 +20,8 @@ export const DefaultFooter = defineBlock({
             color: 'var(--theme-background)', // Light text on dark
         }
     },
-    render: ({ style, theme }) => {
-        const { style: blockStyle, className } = useBlockStyles({ style })
+    render: ({ style, theme, responsive, isEditing, deviceMode }) => {
+        const { style: blockStyle, className } = useBlockStyles({ style, responsive, isEditing, deviceMode })
 
         return (
             <footer style={blockStyle} className={className}>
