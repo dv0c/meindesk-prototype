@@ -46,9 +46,8 @@ export function GlobalHeader() {
         router.push(`/dashboard/${teamId}`)
     }
 
-    // Hide header on Article Editor and Canva Editor
-    // Patterns: .../articles/[id]... and .../canva/[id]...
-    const isEditor = /\/articles\/[^/]+/.test(pathname) || /\/canva\/[^/]+/.test(pathname)
+    // Hide header on Article Editor and visual builders
+    const isEditor = /\/articles\/[^/]+/.test(pathname) || /\/(canva|builder)\/[^/]+/.test(pathname)
 
     if (isEditor) {
         return null

@@ -16,11 +16,11 @@ export async function OPTIONS(req: NextRequest) {
 async function getRegionFromIP(ip: string): Promise<string | null> {
   if (!ip || ip === "unknown") return null;
   try {
-    const res = await fetch(`http://ip-api.com/json/${ip}`);
+    const res = await fetch(`https://ipapi.co/${encodeURIComponent(ip)}/json/`);
     if (!res.ok) return null;
     const data = await res.json();
     // Combine city and country if available
-    return `${data.city || ""}${data.city ? ", " : ""}${data.country || ""}`.trim() || null;
+    return `${data.city || ""}${data.city ? ", " : ""}${data.country_name || ""}`.trim() || null;
   } catch {
     return null;
   }

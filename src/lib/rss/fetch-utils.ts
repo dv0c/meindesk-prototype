@@ -1,3 +1,6 @@
+import { lookup } from "node:dns/promises";
+import net from "node:net";
+
 const FETCH_TIMEOUT = 15000; // 15s timeout (increased for slower sites)
 
 // Pool of common browser User-Agents for rotation
@@ -77,6 +80,8 @@ export async function safeFetch(
   options: RequestInit = {},
   maxRetries = 3
 ) {
+  await assertSafeTarget(url);
+
   let lastError: any = null;
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -124,4 +129,52 @@ export async function safeFetch(
     lastError?.message
   );
   return null;
+}
+
+function isPrivateIpAddress(ip: string): boolean {
+  if (net.isIP(ip) === 4) {
+    if (ip.startsWith("10.")) return true;
+    if (ip.startsWith("127.")) return true;
+    if (ip.startsWith("169.254.")) return true;
+    if (ip.startsWith("192.168.")) return true;
+    if (ip.startsWith("0.")) return true;
+
+    const secondOctet = Number.parseInt(ip.split(".")[1] || "0", 10);
+    if (ip.startsWith("172.") && secondOctet >= 16 && secondOctet <= 31) return true;
+    return false;
+  }
+
+  if (net.isIP(ip) === 6) {
+    const normalized = ip.toLowerCase();
+    if (normalized === "::1") return true;
+    if (normalized.startsWith("fc") || normalized.startsWith("fd")) return true;
+    if (normalized.startsWith("fe8") || normalized.startsWith("fe9") || normalized.startsWith("fea") || normalized.startsWith("feb")) return true;
+    return false;
+  }
+
+  return true;
+}
+
+async function assertSafeTarget(rawUrl: string): Promise<void> {
+  const allowPrivate = process.env.ALLOW_PRIVATE_FETCH === "true";
+  if (allowPrivate) return;
+
+  const parsed = new URL(rawUrl);
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    throw new Error("Blocked URL protocol");
+  }
+
+  const hostname = parsed.hostname.toLowerCase();
+  if (hostname === "localhost" || hostname.endsWith(".localhost")) {
+    throw new Error("Blocked private hostname");
+  }
+
+  if (net.isIP(hostname) && isPrivateIpAddress(hostname)) {
+    throw new Error("Blocked private IP target");
+  }
+
+  const resolved = await lookup(hostname, { all: true, verbatim: true });
+  if (resolved.some((entry) => isPrivateIpAddress(entry.address))) {
+    throw new Error("Blocked private network target");
+  }
 }

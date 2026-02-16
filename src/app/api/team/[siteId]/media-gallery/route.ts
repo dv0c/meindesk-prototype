@@ -2,11 +2,11 @@ import { getAuthSession } from "@/lib/auth";
 import cloudinary from "@/lib/cloudinary";
 import type { Media, MediaGalleryResponse } from "@/types/media-gallery";
 import { type NextRequest, NextResponse } from "next/server";
-import { requireSiteAccess } from "@/lib/security/route-auth";
+import { createErrorResponse, requireSiteAccess } from "@/lib/security/route-auth";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { siteId: string } }
+  { params }: { params: Promise<{ siteId: string }> }
 ) {
   const { siteId } = await params;
   const session = await getAuthSession();
@@ -114,7 +114,7 @@ export async function GET(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { siteId: string } }
+  { params }: { params: Promise<{ siteId: string }> }
 ) {
   const { siteId } = await params;
   const session = await getAuthSession();
@@ -136,6 +136,12 @@ export async function DELETE(
       { error: "siteId is required for verification" },
       { status: 400 }
     );
+  }
+
+  try {
+    await requireSiteAccess(siteId, session.user.id);
+  } catch (error) {
+    return createErrorResponse(error);
   }
 
   if (!publicId.startsWith(`${siteId}/`)) {

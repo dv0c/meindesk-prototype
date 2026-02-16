@@ -214,6 +214,18 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
     const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
     const [showOnboarding, setShowOnboarding] = useState(false)
     const [editorMode, setEditorMode] = useState<"page" | "header" | "footer">("page")
+    const [uxMode, setUxMode] = useState<"simple" | "advanced">("simple")
+
+    useEffect(() => {
+        const stored = localStorage.getItem("builder-ux-mode")
+        if (stored === "advanced") {
+            setUxMode("advanced")
+        }
+    }, [])
+
+    useEffect(() => {
+        localStorage.setItem("builder-ux-mode", uxMode)
+    }, [uxMode])
 
     // Check for onboarding status
     useEffect(() => {
@@ -395,7 +407,7 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
             } finally {
                 // Ensure minimum loading time of 1s for transition (reduced from 2.5s for mode switching)
                 const elapsed = Date.now() - startTime
-                const minTime = hasLoaded.current ? 1000 : 2500 // Longer for initial load
+                const minTime = hasLoaded.current ? 250 : 900 // Keep fast and responsive
                 if (elapsed < minTime) {
                     await new Promise(resolve => setTimeout(resolve, minTime - elapsed))
                 }
@@ -536,6 +548,8 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                     setEditorMode={setEditorMode}
                     headerContent={headerContent}
                     footerContent={footerContent}
+                    uxMode={uxMode}
+                    setUxMode={setUxMode}
                 />
 
                 {/* Main Content */}
@@ -545,7 +559,7 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
                         className={`transition-[width,opacity] duration-300 ease-in-out overflow-hidden ${showSidebar ? 'w-[380px] opacity-100' : 'w-0 opacity-0'
                             }`}
                     >
-                        <CraftSidebar isArticlePage={pageSlug === 'article'} editorMode={editorMode} siteId={siteId} />
+                        <CraftSidebar isArticlePage={pageSlug === 'article'} editorMode={editorMode} siteId={siteId} uxMode={uxMode} />
                     </div>
 
                     {/* Canvas Area */}

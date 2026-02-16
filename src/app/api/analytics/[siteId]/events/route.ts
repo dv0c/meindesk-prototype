@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { subDays } from "date-fns";
 import { db } from "@/lib/db";
+import { createErrorResponse, requireAuth, requireSiteAccess } from "@/lib/security/route-auth";
 
 // --- helper: determine date range
 function getDateRange(range: string): { since: Date } {
@@ -19,11 +20,14 @@ function getDateRange(range: string): { since: Date } {
     }
 }
 
-export async function GET(req: NextRequest, { params }: { params: { siteId: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ siteId: string }> }) {
     const { siteId } = await params;
     const range = req.nextUrl.searchParams.get("range") || "last60Days";
 
     try {
+        const session = await requireAuth();
+        await requireSiteAccess(siteId, session.user.id);
+
         const { since } = getDateRange(range);
 
         // Fetch events ordered by most recent first
@@ -55,8 +59,7 @@ export async function GET(req: NextRequest, { params }: { params: { siteId: stri
         res.headers.set("Access-Control-Allow-Origin", "*");
         return res;
     } catch (err) {
-        console.error("Failed to fetch analytics events:", err);
-        const res = NextResponse.json({ error: "Failed to load events" }, { status: 500 });
+        const res = createErrorResponse(err);
         res.headers.set("Access-Control-Allow-Origin", "*");
         return res;
     }

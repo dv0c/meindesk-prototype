@@ -16,25 +16,25 @@ const steps: Step[] = [
     {
         id: "welcome",
         title: "WELCOME",
-        description: "Your new powerful design workspace. Let's show you around in 30 seconds.",
+        description: "You can build your page in 3 easy steps. This quick guide takes less than 30 seconds.",
         icon: <Sparkles className="w-6 h-6 text-white" />,
     },
     {
         id: "blocks",
-        title: "DRAG & DROP",
-        description: "Grab sections and elements from the sidebar. Drop them anywhere to build your layout instantly.",
+        title: "STEP 1: ADD BLOCKS",
+        description: "Open the Build tab on the left and drag a block into the page.",
         icon: <LayoutTemplate className="w-6 h-6 text-white" />,
     },
     {
         id: "design",
-        title: "GLOBAL STYLES",
-        description: "Control your entire site's look from one place. tweak colors, fonts, and spacing with the Design panel.",
+        title: "STEP 2: EDIT",
+        description: "Click any block in the canvas, then use the Edit tab to change text and settings.",
         icon: <Palette className="w-6 h-6 text-white" />,
     },
     {
         id: "publish",
-        title: "GO LIVE",
-        description: "When you're ready, hit Publish. Your site will be live and shareable in seconds.",
+        title: "STEP 3: SAVE & PUBLISH",
+        description: "Use Save to keep changes, then Publish when your page is ready.",
         icon: <Rocket className="w-6 h-6 text-white" />,
     },
 ]

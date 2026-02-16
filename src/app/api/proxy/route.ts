@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as cheerio from "cheerio";
 import { safeFetch } from "@/lib/rss/fetch-utils";
+import { createErrorResponse, requireAuth } from "@/lib/security/route-auth";
 
 export const runtime = "nodejs";
 
@@ -26,7 +27,13 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Invalid URL" }, { status: 400 });
   }
 
+  if (targetUrl.protocol !== "http:" && targetUrl.protocol !== "https:") {
+    return NextResponse.json({ error: "Only HTTP(S) URLs are supported" }, { status: 400 });
+  }
+
   try {
+    await requireAuth();
+
     const response = await safeFetch(targetUrl.href);
 
     if (!response || !response.ok) {
@@ -360,6 +367,10 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (err: any) {
+    if (err?.message === "Unauthorized" || err?.message?.startsWith("Forbidden")) {
+      return createErrorResponse(err);
+    }
+
     console.error("Proxy error:", err.message);
     return NextResponse.json(
       { error: err.message || "Failed to fetch page" },

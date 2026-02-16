@@ -2,6 +2,11 @@
 
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
+import {
+    createErrorResponse,
+    requireAuth,
+    requireSiteAccess,
+} from "@/lib/security/route-auth";
 
 // GET /api/v1/[tenantId]/snippets -> list all snippets for a site
 export async function GET(
@@ -18,8 +23,7 @@ export async function GET(
 
         return NextResponse.json(snippets, { status: 200 });
     } catch (err) {
-        console.error("Failed to fetch snippets:", err);
-        return NextResponse.json({ error: "Failed to fetch snippets" }, { status: 500 });
+        return createErrorResponse(err);
     }
 }
 
@@ -31,6 +35,9 @@ export async function POST(
     const { tenantId } = await params;
 
     try {
+        const session = await requireAuth();
+        await requireSiteAccess(tenantId, session.user.id);
+
         const body = await req.json();
         const { name, description, category, thumbnail, content } = body;
 
@@ -54,7 +61,6 @@ export async function POST(
 
         return NextResponse.json(snippet, { status: 201 });
     } catch (err) {
-        console.error("Failed to create snippet:", err);
-        return NextResponse.json({ error: "Failed to create snippet" }, { status: 500 });
+        return createErrorResponse(err);
     }
 }

@@ -1,15 +1,19 @@
 // app/api/analytics/[siteId]/stats/route.ts
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
+import { createErrorResponse, requireAuth, requireSiteAccess } from "@/lib/security/route-auth"
 
 export const runtime = "nodejs"
 
 export async function GET(
   req: Request,
-  { params }: { params: { siteId: string } }
+  { params }: { params: Promise<{ siteId: string }> }
 ) {
   try {
     const { siteId } = await params
+    const session = await requireAuth()
+    await requireSiteAccess(siteId, session.user.id)
+
     if (!siteId) return NextResponse.json({ error: "Missing siteId" }, { status: 400 })
 
     const url = new URL(req.url)
@@ -57,7 +61,6 @@ export async function GET(
       period: { from: lastMonth.toISOString(), to: now.toISOString() }
     })
   } catch (error) {
-    console.error("Error fetching site analytics stats:", error)
-    return NextResponse.json({ error: "Failed to fetch stats" }, { status: 500 })
+    return createErrorResponse(error)
   }
 }

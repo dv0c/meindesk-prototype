@@ -48,7 +48,7 @@ export function EmptyCanvasPlaceholder() {
             <div>
                 <h3 className="font-semibold text-lg">Start Building</h3>
                 <p className="text-sm text-muted-foreground">
-                    Drag elements from the sidebar or click + to get started.
+                    1) Open Build on the left 2) Drag a block here 3) Click the block to edit it.
                 </p>
             </div>
         </div>

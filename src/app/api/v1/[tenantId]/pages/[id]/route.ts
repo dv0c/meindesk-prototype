@@ -21,9 +21,9 @@ type PageWithChildren = {
 // ------------------------------------
 // Recursive fetch for nested pages
 // ------------------------------------
-async function fetchChildren(parentId: string): Promise<PageWithChildren[]> {
+async function fetchChildren(parentId: string, tenantId: string): Promise<PageWithChildren[]> {
   const children = await db.page.findMany({
-    where: { parentId },
+    where: { parentId, siteId: tenantId },
     orderBy: { order: "asc" },
   });
 
@@ -35,7 +35,7 @@ async function fetchChildren(parentId: string): Promise<PageWithChildren[]> {
       parentId: child.parentId ?? undefined,
       authorId: child.authorId ?? undefined,
       layout: child.layout ?? [],
-      children: await fetchChildren(child.id),
+      children: await fetchChildren(child.id, tenantId),
     }))
   );
 }
@@ -45,24 +45,23 @@ async function fetchChildren(parentId: string): Promise<PageWithChildren[]> {
 // ------------------------------------
 export async function GET(
   req: NextRequest,
-  { params }: { params: { tenantId: string; id: string } }
+  { params }: { params: Promise<{ tenantId: string; id: string }> }
 ) {
   const { tenantId, id } = await params;
 
   try {
-    // Try fetching by ID first
-    let page = await db.page.findUnique({ where: { id } });
-
-    // Fallback: if not found, search by slug
-    if (!page) {
-      page = await db.page.findFirst({ where: { slug: id, siteId: tenantId } });
-    }
+    const page = await db.page.findFirst({
+      where: {
+        siteId: tenantId,
+        OR: [{ id }, { slug: id }],
+      },
+    });
 
     if (!page) {
       return NextResponse.json({ error: "Page not found" }, { status: 404 });
     }
 
-    const children = await fetchChildren(page.id);
+    const children = await fetchChildren(page.id, tenantId);
 
     // ✅ Add aggressive cache headers for CDN caching
     return NextResponse.json(

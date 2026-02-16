@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { subDays, format } from "date-fns";
 import { db } from "@/lib/db";
+import { createErrorResponse, requireAuth, requireSiteAccess } from "@/lib/security/route-auth";
 
 // --- helper: detect device type
 function getDeviceType(uaString?: string) {
@@ -28,11 +29,14 @@ function getDateRange(range: string): { since: Date; previousSince?: Date } {
   }
 }
 
-export async function GET(req: NextRequest, { params }: { params: { siteId: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ siteId: string }> }) {
   const { siteId } = await params;
   const range = req.nextUrl.searchParams.get("range") || "last60Days";
 
   try {
+    const session = await requireAuth();
+    await requireSiteAccess(siteId, session.user.id);
+
     const { since, previousSince } = getDateRange(range);
 
     // Fetch current and previous events
@@ -202,8 +206,7 @@ export async function GET(req: NextRequest, { params }: { params: { siteId: stri
     res.headers.set("Access-Control-Allow-Origin", "*");
     return res;
   } catch (err) {
-    console.error(err);
-    const res = NextResponse.json({ error: "Failed to load analytics" }, { status: 500 });
+    const res = createErrorResponse(err);
     res.headers.set("Access-Control-Allow-Origin", "*");
     return res;
   }

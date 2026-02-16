@@ -4,6 +4,7 @@ import { useEditor } from "@craftjs/core"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, Trash2, FileCode } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { Package, Palette, Search } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { CraftToolbox } from "./CraftToolbox"
@@ -34,7 +35,7 @@ const contentVariants = {
     exit: { opacity: 0, y: -5 }
 }
 
-export function CraftSidebar({ isArticlePage = false, editorMode = "page", siteId }: { isArticlePage?: boolean; editorMode?: "page" | "header" | "footer", siteId?: string }) {
+export function CraftSidebar({ isArticlePage = false, editorMode = "page", siteId, uxMode = "simple" }: { isArticlePage?: boolean; editorMode?: "page" | "header" | "footer", siteId?: string, uxMode?: "simple" | "advanced" }) {
     const { selected, name, isDeletable, styleConfig, actions } = useEditor((state) => {
         const currentNodeId = state.events.selected?.values().next().value
         const node = currentNodeId ? state.nodes[currentNodeId] : null
@@ -52,6 +53,10 @@ export function CraftSidebar({ isArticlePage = false, editorMode = "page", siteI
     useEffect(() => {
         setCurrentView(selected ? "properties" : "palette")
     }, [selected])
+
+    if (uxMode === "simple") {
+        return <SimpleSidebar isArticlePage={isArticlePage} editorMode={editorMode} siteId={siteId} selected={selected} />
+    }
 
     return (
         <div className="w-[380px] border-r bg-gradient-to-b from-background to-muted/20 flex flex-col h-full shadow-lg z-20 overflow-hidden">
@@ -91,6 +96,80 @@ export function CraftSidebar({ isArticlePage = false, editorMode = "page", siteI
                     </motion.div>
                 )}
             </AnimatePresence>
+        </div>
+    )
+}
+
+function SimpleSidebar({
+    isArticlePage,
+    editorMode,
+    siteId,
+    selected,
+}: {
+    isArticlePage: boolean
+    editorMode: "page" | "header" | "footer"
+    siteId?: string
+    selected?: string
+}) {
+    const [activeTab, setActiveTab] = useState<"build" | "edit" | "design" | "seo">("build")
+
+    useEffect(() => {
+        if (selected) setActiveTab("edit")
+    }, [selected])
+
+    return (
+        <div className="w-[380px] border-r bg-background flex flex-col h-full z-20 overflow-hidden">
+            <div className="border-b p-4 space-y-3">
+                <h2 className="text-sm font-semibold">Builder</h2>
+                <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
+                    <TabsList className="grid grid-cols-4 w-full h-9">
+                        <TabsTrigger value="build" className="text-xs">Build</TabsTrigger>
+                        <TabsTrigger value="edit" className="text-xs">Edit</TabsTrigger>
+                        <TabsTrigger value="design" className="text-xs">Design</TabsTrigger>
+                        <TabsTrigger value="seo" className="text-xs" disabled={editorMode !== "page"}>SEO</TabsTrigger>
+                    </TabsList>
+                </Tabs>
+            </div>
+
+            {activeTab === "build" && (
+                <div className="flex-1 overflow-hidden">
+                    <div className="mx-4 mt-4 rounded-lg border bg-muted/30 p-3 text-xs">
+                        <p className="font-medium mb-1">Start here</p>
+                        <ol className="space-y-1 text-muted-foreground list-decimal ml-4">
+                            <li>Drag a block into the canvas.</li>
+                            <li>Click it to edit content.</li>
+                            <li>Use Save/Publish when done.</li>
+                        </ol>
+                    </div>
+                    <div className="h-[calc(100%-110px)]">
+                        <CraftToolbox isArticlePage={isArticlePage} />
+                    </div>
+                </div>
+            )}
+
+            {activeTab === "edit" && (
+                <ScrollArea className="flex-1 min-h-0 px-4">
+                    {!selected ? (
+                        <div className="py-8 text-sm text-muted-foreground">
+                            Select a block in the canvas to edit it.
+                        </div>
+                    ) : (
+                        <CraftPropertiesPanel />
+                    )}
+                </ScrollArea>
+            )}
+
+            {activeTab === "design" && (
+                <div className="flex-1 overflow-y-auto">
+                    <DesignPanel />
+                </div>
+            )}
+
+            {activeTab === "seo" && editorMode === "page" && (
+                <div className="flex-1 overflow-y-auto">
+                    <SEOPanel onBack={() => setActiveTab("build")} />
+                </div>
+            )}
         </div>
     )
 }

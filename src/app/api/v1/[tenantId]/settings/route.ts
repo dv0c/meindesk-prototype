@@ -4,6 +4,11 @@ import { revalidatePath } from "next/cache";
 import { sanitizeCSS } from "@/lib/security/sanitize-css";
 import type { WebsiteSettings } from "@/lib/types";
 import {
+    createErrorResponse,
+    requireAuth,
+    requireSiteAccess,
+} from "@/lib/security/route-auth";
+import {
     sanitizeColor,
     sanitizeFontFamily,
     sanitizeText,
@@ -55,6 +60,8 @@ export async function PATCH(
 ) {
     try {
         const { tenantId } = await params;
+        const session = await requireAuth();
+        await requireSiteAccess(tenantId, session.user.id);
         const rawSettings: Partial<WebsiteSettings> = await req.json();
 
         // Validation errors array
@@ -302,10 +309,6 @@ export async function PATCH(
 
         return NextResponse.json(site.settings);
     } catch (error) {
-        console.error("Error updating site settings:", error);
-        return NextResponse.json(
-            { error: "Failed to update settings" },
-            { status: 500 }
-        );
+        return createErrorResponse(error);
     }
 }

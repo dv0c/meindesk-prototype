@@ -70,6 +70,8 @@ interface CraftHeaderProps {
     footerContent?: any
     showLayers?: boolean
     setShowLayers?: (show: boolean) => void
+    uxMode: "simple" | "advanced"
+    setUxMode: (mode: "simple" | "advanced") => void
 }
 
 export function CraftHeader({
@@ -97,6 +99,8 @@ export function CraftHeader({
     footerContent,
     showLayers,
     setShowLayers,
+    uxMode,
+    setUxMode,
 }: CraftHeaderProps) {
     const { actions, query, canUndo, canRedo, enabled, selected } = useEditor((state, query) => {
         const currentNodeId = state.events.selected?.values().next().value
@@ -432,6 +436,16 @@ export function CraftHeader({
 
                 {/* Right: Actions */}
                 <div className="flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 text-xs"
+                        onClick={() => setUxMode(uxMode === "simple" ? "advanced" : "simple")}
+                        title="Switch builder complexity"
+                    >
+                        {uxMode === "simple" ? "Simple mode" : "Advanced mode"}
+                    </Button>
+
                     {enabled && (
                         <>
                             {/* Undo/Redo Group */}
@@ -462,50 +476,53 @@ export function CraftHeader({
                             <div className="h-6 w-px bg-border/50 mx-1" />
 
                             {/* View & Data Tools */}
-                            <Button
-                                variant={showLayers ? "secondary" : "ghost"}
-                                size="sm"
-                                className="h-8 px-2 text-xs"
-                                onClick={() => setShowLayers?.(!showLayers)}
-                                title="Toggle Layers Panel"
-                            >
-                                <Layers className="h-4 w-4 mr-2" />
-                                Layers
-                            </Button>
-
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="sm" className="h-8 gap-2 text-xs px-2">
-                                        <Database className="h-4 w-4" />
-                                        Tools
+                            {uxMode === "advanced" && (
+                                <>
+                                    <Button
+                                        variant={showLayers ? "secondary" : "ghost"}
+                                        size="sm"
+                                        className="h-8 px-2 text-xs"
+                                        onClick={() => setShowLayers?.(!showLayers)}
+                                        title="Toggle Layers Panel"
+                                    >
+                                        <Layers className="h-4 w-4 mr-2" />
+                                        Layers
                                     </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-48">
-                                    <DropdownMenuLabel>Data & Assets</DropdownMenuLabel>
-                                    <DropdownMenuItem onClick={() => setShowCMS(true)}>
-                                        <Database className="h-4 w-4 mr-2" />
-                                        <span>CMS Database</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => setShowTemplates?.(!showTemplates)}>
-                                        <LayoutTemplate className="h-4 w-4 mr-2" />
-                                        <span>Templates</span>
-                                    </DropdownMenuItem>
-                                    {/* @ts-ignore */}
-                                    {session?.user?.developerMode && (
-                                        <>
-                                            <DropdownMenuSeparator />
-                                            <DropdownMenuLabel>Developer</DropdownMenuLabel>
-                                            <DropdownMenuItem onClick={handleExportHtml}>
-                                                <Code className="h-4 w-4 mr-2" />
-                                                <span>Export HTML</span>
-                                            </DropdownMenuItem>
-                                        </>
-                                    )}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
 
-                            {/* AI & Sidebar */}
-                            <AIGeneratorDialog siteId={siteId} />
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" size="sm" className="h-8 gap-2 text-xs px-2">
+                                                <Database className="h-4 w-4" />
+                                                Tools
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end" className="w-48">
+                                            <DropdownMenuLabel>Data & Assets</DropdownMenuLabel>
+                                            <DropdownMenuItem onClick={() => setShowCMS(true)}>
+                                                <Database className="h-4 w-4 mr-2" />
+                                                <span>CMS Database</span>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => setShowTemplates?.(!showTemplates)}>
+                                                <LayoutTemplate className="h-4 w-4 mr-2" />
+                                                <span>Templates</span>
+                                            </DropdownMenuItem>
+                                            {/* @ts-ignore */}
+                                            {session?.user?.developerMode && (
+                                                <>
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuLabel>Developer</DropdownMenuLabel>
+                                                    <DropdownMenuItem onClick={handleExportHtml}>
+                                                        <Code className="h-4 w-4 mr-2" />
+                                                        <span>Export HTML</span>
+                                                    </DropdownMenuItem>
+                                                </>
+                                            )}
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+
+                                    <AIGeneratorDialog siteId={siteId} />
+                                </>
+                            )}
 
                             <Button
                                 variant={showSidebar ? "secondary" : "ghost"}

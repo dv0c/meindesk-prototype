@@ -2,6 +2,11 @@
 
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
+import {
+    createErrorResponse,
+    requireAuth,
+    requireSiteAccess,
+} from "@/lib/security/route-auth";
 
 // GET /api/v1/[tenantId]/snippets/[snippetId] -> get a single snippet
 export async function GET(
@@ -34,6 +39,9 @@ export async function PUT(
     const { tenantId, snippetId } = await params;
 
     try {
+        const session = await requireAuth();
+        await requireSiteAccess(tenantId, session.user.id);
+
         const body = await req.json();
         const { name, description, category, thumbnail, content } = body;
 
@@ -59,8 +67,7 @@ export async function PUT(
 
         return NextResponse.json(updated, { status: 200 });
     } catch (err) {
-        console.error("Failed to update snippet:", err);
-        return NextResponse.json({ error: "Failed to update snippet" }, { status: 500 });
+        return createErrorResponse(err);
     }
 }
 
@@ -72,6 +79,9 @@ export async function DELETE(
     const { tenantId, snippetId } = await params;
 
     try {
+        const session = await requireAuth();
+        await requireSiteAccess(tenantId, session.user.id);
+
         // Check if snippet exists and belongs to this site
         const existing = await db.snippet.findFirst({
             where: { id: snippetId, siteId: tenantId },
@@ -87,7 +97,6 @@ export async function DELETE(
 
         return NextResponse.json({ success: true }, { status: 200 });
     } catch (err) {
-        console.error("Failed to delete snippet:", err);
-        return NextResponse.json({ error: "Failed to delete snippet" }, { status: 500 });
+        return createErrorResponse(err);
     }
 }

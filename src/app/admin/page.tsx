@@ -1,4 +1,5 @@
 import { AdminUserList } from "@/components/admin/AdminUserList";
+import Link from "next/link";
 
 export default function AdminPage() {
     return (
@@ -10,6 +11,12 @@ export default function AdminPage() {
                         Manage users and impersonate accounts for support.
                     </p>
                 </div>
+                <Link
+                    href="/admin/builder-2"
+                    className="rounded-md border px-3 py-2 text-sm hover:bg-muted"
+                >
+                    Open Builder v2
+                </Link>
             </div>
             <AdminUserList />
         </div>

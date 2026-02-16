@@ -19,7 +19,7 @@ export type BuilderMode = (typeof BUILDER_MODE)[keyof typeof BUILDER_MODE]
 export function useBuilderMode(): BuilderMode {
   const pathname = usePathname()
 
-  return pathname.includes("/canva/")
+  return pathname.includes("/canva/") || pathname.includes("/builder/")
     ? BUILDER_MODE.EDITOR
     : BUILDER_MODE.PREVIEW
 }
@@ -43,7 +43,7 @@ export function useIsPreviewMode(): boolean {
  * Use this in non-component contexts (like API routes or utilities).
  */
 export function isEditorModeFromPath(pathname: string): boolean {
-  return pathname.includes("/canva/")
+  return pathname.includes("/canva/") || pathname.includes("/builder/")
 }
 
 /**
@@ -51,5 +51,5 @@ export function isEditorModeFromPath(pathname: string): boolean {
  * Basically anything that isn’t the editor.
  */
 export function isPreviewModeFromPath(pathname: string): boolean {
-  return !pathname.includes("/canva/")
+  return !pathname.includes("/canva/") && !pathname.includes("/builder/")
 }

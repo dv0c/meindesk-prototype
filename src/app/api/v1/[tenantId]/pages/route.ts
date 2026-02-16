@@ -4,12 +4,12 @@ import { NextRequest, NextResponse } from "next/server";
 // GET /api/sites/:siteId/pages -> list all pages
 // POST /api/sites/:siteId/pages -> create a new page
 // ------------------------------------------------------
-export async function GET(req: NextRequest, { params }: { params: { siteId: string } }) {
-  const { siteId } = await params;
+export async function GET(req: NextRequest, { params }: { params: Promise<{ tenantId: string }> }) {
+  const { tenantId } = await params;
 
   try {
     const pages = await db.page.findMany({
-      where: { siteId },
+      where: { siteId: tenantId },
       orderBy: { order: "asc" },
     });
 

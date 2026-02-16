@@ -17,7 +17,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
     const params = useParams()
     const siteId = params.siteId as string
 
-    const hideHeader = pathname.includes("projects/website/canva/") || pathname.includes("projects/website/rss/builder") || pathname.includes("projects/website/snippets/") || pathname.includes("projects/website/craftjs-editor") || pathname.includes("projects/website/rss/feed/") || pathname.includes("/articles/") && pathname.includes("/editor")
+    const hideHeader = pathname.includes("projects/website/canva/") || pathname.includes("projects/website/builder/") || pathname.includes("projects/website/rss/builder") || pathname.includes("projects/website/snippets/") || pathname.includes("projects/website/craftjs-editor") || pathname.includes("projects/website/rss/feed/") || pathname.includes("/articles/") && pathname.includes("/editor")
 
     return (
         <SiteProvider>

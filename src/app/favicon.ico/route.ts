@@ -31,10 +31,20 @@ export async function GET(req: NextRequest) {
             subdomain = null;
         }
 
-        let siteId = "prototype"; // Default fallback if needed
+        let siteId: string | null = null;
         if (subdomain) {
             const resolvedId = await getCachedSiteIdBySubdomain(subdomain);
-            if (resolvedId) siteId = resolvedId;
+            if (resolvedId) {
+                siteId = resolvedId;
+            }
+        }
+
+        if (!siteId) {
+            siteId = await getCachedSiteIdBySubdomain("prototype");
+        }
+
+        if (!siteId) {
+            return new NextResponse(null, { status: 404 });
         }
 
         // 2. Fetch Site Details (includes smart fallback logic we added)

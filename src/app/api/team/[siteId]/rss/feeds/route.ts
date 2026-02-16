@@ -1,10 +1,13 @@
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
+import { createErrorResponse, requireSiteAccess } from "@/lib/security/route-auth";
 
 export async function GET(
   req: NextRequest,
+  { params }: { params: Promise<{ siteId: string }> }
 ) {
+  const { siteId } = await params;
 
   try {
     const session = await getAuthSession();
@@ -12,7 +15,10 @@ export async function GET(
       return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
+    await requireSiteAccess(siteId, session.user.id);
+
     const rss = await db.rss.findMany({
+      where: { siteId },
     });
 
     if (!rss || rss.length === 0) {
@@ -21,10 +27,6 @@ export async function GET(
 
     return NextResponse.json(rss);
   } catch (error) {
-    console.error("Error fetching rss feed:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    return createErrorResponse(error);
   }
 }

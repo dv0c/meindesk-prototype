@@ -6,6 +6,8 @@ import { resolverWithFallback } from "@/app/dashboard/[siteId]/projects/website/
 import { PageData } from "@/lib/types"
 import { DesignSystemStyles } from "@/components/DesignSystemStyles"
 import { DesignSettings } from "@/lib/design-system"
+import { RuntimeRenderer } from "@/builder-v2/components/RuntimeRenderer"
+import { isBuilderDocument } from "@/builder-v2/serialize"
 
 import { EditorThemeProvider } from "@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ThemeContext"
 
@@ -26,7 +28,7 @@ function ClientPreview({ tenantId, page, headerContent, footerContent }: ClientP
   }, [tenantId])
 
   // CraftJS stores layout as [craftState] where craftState is the serialized editor state
-  const craftStateObj = page.layout?.[0]
+  const craftStateObj = (page.layout?.[0] as any) || null
 
   // Sanitize the Page ROOT node to ensure it's never hidden (prevents White Screen issues)
   const pageRoot = craftStateObj?.nodes?.ROOT || craftStateObj?.ROOT
@@ -38,6 +40,8 @@ function ClientPreview({ tenantId, page, headerContent, footerContent }: ClientP
 
   // Extract design settings from page metadata
   const designSettings = (page as any).meta?.design as DesignSettings | undefined
+  const builderV2Document = (page as any).meta?.builderV2
+  const hasBuilderV2 = isBuilderDocument(builderV2Document)
 
 
 
@@ -64,7 +68,11 @@ function ClientPreview({ tenantId, page, headerContent, footerContent }: ClientP
 
         {/* Page Content */}
         <div className="flex-1">
-          {craftStateJson ? (
+          {hasBuilderV2 ? (
+            <div className="w-full">
+              <RuntimeRenderer document={builderV2Document} />
+            </div>
+          ) : craftStateJson ? (
             <Editor enabled={false} resolver={resolverWithFallback}>
               <Frame json={craftStateJson} />
             </Editor>
