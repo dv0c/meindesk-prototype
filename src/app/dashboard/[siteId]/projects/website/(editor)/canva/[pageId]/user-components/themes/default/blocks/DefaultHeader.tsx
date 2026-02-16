@@ -4,7 +4,7 @@ import React from "react"
 import { defineBlock, useBlockStyles } from "@/lib/block-api"
 import { Spacing } from "../styles/spacing"
 import { Element } from "@craftjs/core"
-import { EditableImage, EditableText } from "../../../lib/withCraftComponent"
+import { EditableImage, EditableText } from "../../../../lib/editor-primitives"
 import { NavigationLinks } from "../../NavigationLinks"
 import { PanelTop } from "lucide-react"
 

@@ -325,8 +325,15 @@ export function useBlockStyles(props: {
     }, [nodeId, localId])
 
     const generatedCss = React.useMemo(() => {
-        return generateResponsiveCss(resolvedNodeId, style, tabletStyle, mobileStyle, responsive)
-    }, [resolvedNodeId, style, tabletStyle, mobileStyle, responsive])
+        return generateResponsiveCss(
+            resolvedNodeId,
+            style,
+            tabletStyle,
+            mobileStyle,
+            responsive,
+            { disableHiddenOn: Boolean(isEditing) }
+        )
+    }, [resolvedNodeId, style, tabletStyle, mobileStyle, responsive, isEditing])
 
     const uniqueClassName = `c-${resolvedNodeId}`
 
@@ -375,6 +382,89 @@ export function defineBlock<P extends object>(config: BlockConfig<P>): BlockAPI<
         })
     }
 
+    const applyResponsiveRoot = (
+        rendered: React.ReactElement | null,
+        responsive: { hiddenOn?: string[] } | undefined,
+        isEditing: boolean,
+        deviceMode: DeviceMode | null | undefined,
+    ) => {
+        if (!rendered || !React.isValidElement(rendered)) return rendered
+
+        const hiddenOn = responsive?.hiddenOn || []
+        const hiddenClasses = !isEditing
+            ? [
+                hiddenOn.includes('mobile') ? 'max-md:hidden' : '',
+                hiddenOn.includes('tablet') ? 'md:max-lg:hidden' : '',
+                hiddenOn.includes('desktop') ? 'lg:hidden' : '',
+            ].filter(Boolean).join(' ')
+            : ''
+
+        const isHiddenOnCurrentDevice = Boolean(
+            isEditing && deviceMode && hiddenOn.includes(deviceMode)
+        )
+
+        const previewStyle = isHiddenOnCurrentDevice
+            ? {
+                opacity: 0.25,
+                outline: '1px dashed #fb7185',
+                outlineOffset: -1,
+            }
+            : {}
+
+        const existingProps = (rendered.props || {}) as any
+
+        const voidTags = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'])
+        const canHaveChildren = !(typeof rendered.type === 'string' && voidTags.has(rendered.type))
+
+        const badge = isHiddenOnCurrentDevice && canHaveChildren ? (
+            <span
+                data-builder-hidden-badge="true"
+                style={{
+                    position: 'absolute',
+                    top: 6,
+                    right: 6,
+                    zIndex: 2147483647,
+                    pointerEvents: 'none',
+                    background: '#1f2937',
+                    color: '#f8fafc',
+                    border: '1px solid #475569',
+                    borderRadius: 999,
+                    padding: '2px 8px',
+                    fontSize: 10,
+                    lineHeight: 1.2,
+                    fontWeight: 600,
+                    letterSpacing: '0.02em',
+                    textTransform: 'uppercase',
+                    boxShadow: '0 2px 10px rgba(0,0,0,0.18)',
+                }}
+            >
+                Hidden on {deviceMode}
+            </span>
+        ) : null
+
+        const existingChildren = existingProps.children
+        const mergedChildren = badge
+            ? (
+                <>
+                    {existingChildren}
+                    {badge}
+                </>
+            )
+            : existingChildren
+
+        const ensureRelativeForBadge = badge && (!existingProps.style?.position || existingProps.style?.position === 'static')
+
+        return React.cloneElement(rendered, {
+            className: cn(existingProps.className, hiddenClasses),
+            style: {
+                ...(existingProps.style || {}),
+                ...(ensureRelativeForBadge ? { position: 'relative' } : {}),
+                ...previewStyle,
+            },
+            children: mergedChildren,
+        } as any)
+    }
+
     const Component: React.FC<P> = (props) => {
         const { theme } = useEditorTheme()
         const { enabled } = useEditor((state) => ({ enabled: state.options.enabled }))
@@ -384,11 +474,13 @@ export function defineBlock<P extends object>(config: BlockConfig<P>): BlockAPI<
         // This effectively "inlines" the user's component logic into this wrapper,
         // allowing us to inject refs into the returned generic HTML element (e.g. div).
         const rendered = config.render({ ...props, theme, isEditing: enabled, deviceMode: deviceContext?.deviceMode })
+        const responsive = (props as any)?.responsive as { hiddenOn?: string[] } | undefined
+        const patchedRendered = applyResponsiveRoot(rendered, responsive, enabled, deviceContext?.deviceMode)
 
         // Internal BlockWrapper integration
         return (
             <BlockWrapper>
-                {rendered}
+                {patchedRendered}
             </BlockWrapper>
         )
     }
@@ -398,8 +490,9 @@ export function defineBlock<P extends object>(config: BlockConfig<P>): BlockAPI<
         const { theme } = useEditorTheme()
         const deviceContext = useDevice()
         const Render = config.render
-        // Render directly without BlockWrapper
-        return <Render {...props} theme={theme} isEditing={false} deviceMode={deviceContext?.deviceMode} />
+        const rendered = <Render {...props} theme={theme} isEditing={false} deviceMode={deviceContext?.deviceMode} />
+        const responsive = (props as any)?.responsive as { hiddenOn?: string[] } | undefined
+        return applyResponsiveRoot(rendered, responsive, false, deviceContext?.deviceMode)
     }
 
     // Attach Craft.js static properties

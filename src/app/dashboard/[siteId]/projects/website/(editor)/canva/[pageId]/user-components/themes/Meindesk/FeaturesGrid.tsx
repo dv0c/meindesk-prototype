@@ -2,13 +2,12 @@
 
 import React, { forwardRef, useRef } from "react"
 import {
-    withCraftComponent,
-    CraftComponentProps,
     EditableText,
     propsToStyle,
-} from "../../../lib/withCraftComponent"
+} from "../../../lib/editor-primitives"
 import { motion, useInView } from "framer-motion"
 import { cn } from "@/lib/utils"
+import { defineBlock, useBlockStyles, type BlockStyle } from "@/lib/block-api"
 
 interface Feature {
     id: string
@@ -19,11 +18,17 @@ interface Feature {
     rowSpan: '1' | '2'
 }
 
-interface FeaturesGridProps extends CraftComponentProps {
+interface FeaturesGridProps {
     sectionLabel?: string
     sectionTitle?: string
     sectionDescription?: string
     features?: Feature[]
+    style?: BlockStyle
+    className?: string
+    responsive?: { hiddenOn?: string[] }
+    isEditing?: boolean
+    deviceMode?: "desktop" | "tablet" | "mobile" | null
+    [key: string]: any
 }
 
 const FeaturesGridBase = forwardRef<HTMLElement, FeaturesGridProps>(
@@ -34,6 +39,9 @@ const FeaturesGridBase = forwardRef<HTMLElement, FeaturesGridProps>(
             sectionDescription = "Everything you need to build, manage, and grow your blog or website.",
             features = [],
             className = "",
+            responsive,
+            isEditing,
+            deviceMode,
             ...styleProps
         },
         ref
@@ -56,8 +64,16 @@ const FeaturesGridBase = forwardRef<HTMLElement, FeaturesGridProps>(
             ...baseStyle,
         }
 
+        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+            style: sectionStyle as any,
+            className: cn("features-grid-section", className),
+            responsive,
+            isEditing,
+            deviceMode,
+        })
+
         return (
-            <section ref={ref} className={cn("features-grid-section", className)} style={sectionStyle}>
+            <section ref={ref} className={computedClassName} style={computedStyle}>
                 {/* Section header */}
                 <motion.div
                     ref={headerRef}
@@ -112,7 +128,7 @@ const FeaturesGridBase = forwardRef<HTMLElement, FeaturesGridProps>(
                     ref={gridRef}
                     className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 auto-rows-[180px] md:auto-rows-[200px]"
                 >
-                    {features.map((feature, index) => (
+                    {features.map((feature: Feature, index: number) => (
                         <motion.div
                             key={feature.id}
                             initial={{ y: 60, opacity: 0 }}
@@ -307,43 +323,29 @@ const defaultProps: Partial<FeaturesGridProps> = {
     features: defaultFeatures,
     paddingTop: 128,
     paddingBottom: 128,
+    responsive: { hiddenOn: [] },
 }
 
-export const FeaturesGrid = withCraftComponent<FeaturesGridProps, HTMLElement>(
-    FeaturesGridBase,
-    {
-        displayName: "Features Grid",
-        defaultProps,
-        sectionTitle: "Features Settings",
-        settingsConfig: {
-            sectionLabel: { type: "text", label: "Section Label" },
-            sectionTitle: { type: "text", label: "Section Title" },
-            sectionDescription: { type: "textarea", label: "Section Description" },
-            features: {
-                type: "array",
-                label: "Features",
-                arrayFields: {
-                    title: { type: "text", label: "Title" },
-                    medium: { type: "text", label: "Category" },
-                    description: { type: "textarea", label: "Description" },
-                    colSpan: {
-                        type: "select",
-                        label: "Column Span",
-                        options: [
-                            { label: "1 Column", value: "1" },
-                            { label: "2 Columns", value: "2" },
-                        ],
-                    },
-                    rowSpan: {
-                        type: "select",
-                        label: "Row Span",
-                        options: [
-                            { label: "1 Row", value: "1" },
-                            { label: "2 Rows", value: "2" },
-                        ],
-                    },
-                },
+export const FeaturesGrid = defineBlock<FeaturesGridProps>({
+    name: "FeaturesGrid",
+    category: "Meindesk Theme",
+    description: "Asymmetric feature grid",
+    defaultProps,
+    settingsConfig: {
+        sectionLabel: { type: "text", label: "Section Label" },
+        sectionTitle: { type: "text", label: "Section Title" },
+        sectionDescription: { type: "textarea", label: "Section Description" },
+        features: {
+            type: "array",
+            label: "Features",
+            arrayFields: {
+                title: { type: "text", label: "Title" },
+                medium: { type: "text", label: "Category" },
+                description: { type: "textarea", label: "Description" },
+                colSpan: { type: "select", label: "Column Span", options: [{ label: "1 Column", value: "1" }, { label: "2 Columns", value: "2" }] },
+                rowSpan: { type: "select", label: "Row Span", options: [{ label: "1 Row", value: "1" }, { label: "2 Rows", value: "2" }] },
             },
         },
-    }
-)
+    },
+    render: (props) => <FeaturesGridBase {...props} />,
+})

@@ -4,11 +4,7 @@ import React, { forwardRef, useEffect, useState } from "react"
 import { useTeam } from "@/hooks/useTeam"
 import { useParams } from "next/navigation"
 import axios from "axios"
-import {
-    withCraftComponent,
-    CraftComponentProps,
-} from "../../../lib/withCraftComponent"
-import { useEditor } from "@craftjs/core"
+import { defineBlock, useBlockStyles, type BlockStyle } from "@/lib/block-api"
 
 interface Author {
     id: string
@@ -40,7 +36,7 @@ interface ArticleData {
     }
 }
 
-interface SophiaArticleProps extends CraftComponentProps {
+interface SophiaArticleProps {
     // Layout options
     showCover?: boolean
     showAuthor?: boolean
@@ -56,6 +52,12 @@ interface SophiaArticleProps extends CraftComponentProps {
 
     // Server-side pre-fetched article data (for SSR)
     articleData?: ArticleData
+    style?: BlockStyle
+    className?: string
+    responsive?: { hiddenOn?: string[] }
+    isEditing?: boolean
+    deviceMode?: "desktop" | "tablet" | "mobile" | null
+    [key: string]: any
 }
 
 // Helper to map color names to CSS variables
@@ -107,6 +109,8 @@ const SophiaArticleBase = forwardRef<HTMLDivElement, SophiaArticleProps>(
             previewArticleId,
             articleData,
             className = "",
+            responsive,
+            isEditing,
         },
         ref
     ) => {
@@ -118,14 +122,7 @@ const SophiaArticleBase = forwardRef<HTMLDivElement, SophiaArticleProps>(
         const { team, loading: teamLoading } = useTeam(undefined, 'tenant')
         const params = useParams()
 
-        // Check if we're in the editor
-        let isEditor = false
-        try {
-            const { enabled } = useEditor((state) => ({ enabled: state.options.enabled }))
-            isEditor = enabled
-        } catch {
-            isEditor = false
-        }
+        const isEditor = Boolean(isEditing)
 
         // Get article slug from URL
         const articleSlug = params?.slug as string
@@ -223,8 +220,15 @@ const SophiaArticleBase = forwardRef<HTMLDivElement, SophiaArticleProps>(
             )
         }
 
+        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+            style: { backgroundColor: getColorVar(backgroundColor) },
+            className: `w-full ${className}`,
+            responsive,
+            isEditing,
+        })
+
         return (
-            <div ref={ref} className={`w-full ${className}`} style={{ backgroundColor: getColorVar(backgroundColor) }}>
+            <div ref={ref} className={computedClassName} style={computedStyle}>
                 {/* Hero Section - Cover with Title Overlay */}
                 {showCover && article.cover && (
                     <div
@@ -339,16 +343,15 @@ const defaultProps: Partial<SophiaArticleProps> = {
     titleColor: 'primary',
     contentColor: 'primary',
     backgroundColor: 'background',
+    responsive: { hiddenOn: [] },
 }
 
-// Wrap with CraftJS functionality
-export const SophiaArticle = withCraftComponent<SophiaArticleProps, HTMLDivElement>(
-    SophiaArticleBase,
-    {
-        displayName: "SophiaArticle",
-        defaultProps,
-        sectionTitle: "Article",
-        settingsConfig: {
+export const SophiaArticle = defineBlock<SophiaArticleProps>({
+    name: "SophiaArticle",
+    category: "Sophia Content",
+    description: "Sophia article detail view",
+    defaultProps,
+    settingsConfig: {
             // Display Section
             showCover: { label: "Show Cover Image", type: "checkbox", section: "Display" },
             showAuthor: { label: "Show Author", type: "checkbox", section: "Display" },
@@ -391,8 +394,8 @@ export const SophiaArticle = withCraftComponent<SophiaArticleProps, HTMLDivEleme
                     { label: "Background", value: "background" },
                 ]
             },
-        },
-    }
-)
+    },
+    render: (props) => <SophiaArticleBase {...props} />,
+})
 
 export default SophiaArticle

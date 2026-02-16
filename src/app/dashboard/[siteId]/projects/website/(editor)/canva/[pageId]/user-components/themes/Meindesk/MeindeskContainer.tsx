@@ -2,18 +2,23 @@
 
 import React, { forwardRef } from "react"
 import {
-    withCraftComponent,
-    CraftComponentProps,
     propsToStyle,
-} from "../../../lib/withCraftComponent"
+} from "../../../lib/editor-primitives"
 import { AnimatedNoise } from "./animated-noise"
+import { defineBlock, useBlockStyles, type BlockStyle } from "@/lib/block-api"
 
-interface MeindeskContainerProps extends CraftComponentProps {
+interface MeindeskContainerProps {
     children?: React.ReactNode
     enableGrid?: boolean
     gridOpacity?: number
     enableNoise?: boolean
     noiseOpacity?: number
+    style?: BlockStyle
+    className?: string
+    responsive?: { hiddenOn?: string[] }
+    isEditing?: boolean
+    deviceMode?: "desktop" | "tablet" | "mobile" | null
+    [key: string]: any
 }
 
 const MeindeskContainerBase = forwardRef<HTMLDivElement, MeindeskContainerProps>(
@@ -25,6 +30,9 @@ const MeindeskContainerBase = forwardRef<HTMLDivElement, MeindeskContainerProps>
             enableNoise = true,
             noiseOpacity = 3,
             className = "",
+            responsive,
+            isEditing,
+            deviceMode,
             ...styleProps
         },
         ref
@@ -41,8 +49,16 @@ const MeindeskContainerBase = forwardRef<HTMLDivElement, MeindeskContainerProps>
             ...baseStyle,
         }
 
+        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+            style: containerStyle as any,
+            className,
+            responsive,
+            isEditing,
+            deviceMode,
+        })
+
         return (
-            <div ref={ref} className={className} style={containerStyle}>
+            <div ref={ref} className={computedClassName} style={computedStyle}>
                 {/* Grid background overlay */}
                 {enableGrid && (
                     <div
@@ -78,31 +94,20 @@ const defaultProps: Partial<MeindeskContainerProps> = {
     minHeight: "100vh",
     paddingTop: 0,
     paddingBottom: 0,
+    responsive: { hiddenOn: [] },
 }
 
-export const MeindeskContainer = withCraftComponent<MeindeskContainerProps, HTMLDivElement>(
-    MeindeskContainerBase,
-    {
-        displayName: "Meindesk Container",
-        defaultProps,
-        sectionTitle: "Background Settings",
-        settingsConfig: {
-            enableGrid: { type: "checkbox", label: "Enable Grid Background" },
-            gridOpacity: {
-                type: "slider",
-                label: "Grid Opacity (%)",
-                min: 0,
-                max: 100,
-                step: 1,
-            },
-            enableNoise: { type: "checkbox", label: "Enable Noise Animation" },
-            noiseOpacity: {
-                type: "slider",
-                label: "Noise Opacity (%)",
-                min: 0,
-                max: 20,
-                step: 1,
-            },
-        },
-    }
-)
+export const MeindeskContainer = defineBlock<MeindeskContainerProps>({
+    name: "MeindeskContainer",
+    category: "Meindesk Theme",
+    description: "Container with optional grid/noise overlays",
+    defaultProps,
+    settingsConfig: {
+        enableGrid: { type: "checkbox", label: "Enable Grid Background" },
+        gridOpacity: { type: "slider", label: "Grid Opacity (%)", min: 0, max: 100, step: 1 },
+        enableNoise: { type: "checkbox", label: "Enable Noise Animation" },
+        noiseOpacity: { type: "slider", label: "Noise Opacity (%)", min: 0, max: 20, step: 1 },
+    },
+    childrenAllowed: true,
+    render: (props) => <MeindeskContainerBase {...props} />,
+})

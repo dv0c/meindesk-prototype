@@ -74,7 +74,7 @@ export const Section = defineBlock<SectionProps>({
         const isEmpty = !children || (Array.isArray(children) && children.length === 0) || (React.Children.count(children) === 0)
 
         return (
-            <section className={isEmpty && enabled ? "" : computedClassName} style={isEmpty && enabled ? {} : computedStyle}>
+            <section className={computedClassName} style={computedStyle}>
                 {isEmpty && enabled ? (
                     <div className="w-full h-full min-h-[200px] flex-1 flex flex-col items-center justify-center border-2 border-dashed border-gray-200 bg-gray-50/50 text-sm text-gray-400 p-8 gap-2 transition-colors hover:border-gray-300 hover:bg-gray-100/50">
                         <span className="font-medium text-gray-500">Empty Section</span>

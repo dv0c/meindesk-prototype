@@ -3,7 +3,7 @@
 import React from "react"
 import { defineBlock, useBlockStyles } from "@/lib/block-api"
 import { FileText } from "lucide-react"
-import { EditableText, EditableImage } from "../../../lib/withCraftComponent" // Reusing helpers but inside defineBlock
+import { EditableText, EditableImage } from "../../../../lib/editor-primitives"
 
 export const CardPost = defineBlock({
     name: "Card Post",

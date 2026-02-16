@@ -5,7 +5,7 @@ import { defineBlock, useBlockStyles } from "@/lib/block-api"
 import { Spacing } from "../styles/spacing"
 import { Element } from "@craftjs/core"
 import { PanelBottom } from "lucide-react"
-import { EditableText } from "../../../lib/withCraftComponent"
+import { EditableText } from "../../../../lib/editor-primitives"
 import { Container } from "../../Container"
 
 export const DefaultFooter = defineBlock({

@@ -108,22 +108,27 @@ export function generateResponsiveCss(
     desktopStyle?: BlockStyle,
     tabletStyle?: BlockStyle,
     mobileStyle?: BlockStyle,
-    responsive?: { hiddenOn?: string[] }
+    responsive?: { hiddenOn?: string[] },
+    options?: {
+        disableHiddenOn?: boolean
+    }
 ): string {
     if (!nodeId) return ''
 
     let css = ''
     const className = `c-${nodeId}`
 
+    const disableHiddenOn = Boolean(options?.disableHiddenOn)
+
     // Desktop (Default / Base)
-    if (responsive?.hiddenOn?.includes('desktop')) {
+    if (!disableHiddenOn && responsive?.hiddenOn?.includes('desktop')) {
         css += `@media (min-width: 1024px) { .${className} { display: none !important; } }\n`
     } else if (desktopStyle) {
         // Base styles (no media query)
     }
 
     // Tablet (768px - 1023.98px)
-    if (responsive?.hiddenOn?.includes('tablet')) {
+    if (!disableHiddenOn && responsive?.hiddenOn?.includes('tablet')) {
         css += `@media (min-width: 768px) and (max-width: 1023.98px) { .${className} { display: none !important; } }\n`
     } else if (tabletStyle) {
         const rules = styleToCss(tabletStyle)
@@ -133,7 +138,7 @@ export function generateResponsiveCss(
     }
 
     // Mobile (< 768px)
-    if (responsive?.hiddenOn?.includes('mobile')) {
+    if (!disableHiddenOn && responsive?.hiddenOn?.includes('mobile')) {
         css += `@media (max-width: 767.98px) { .${className} { display: none !important; } }\n`
     } else if (mobileStyle) {
         const rules = styleToCss(mobileStyle)

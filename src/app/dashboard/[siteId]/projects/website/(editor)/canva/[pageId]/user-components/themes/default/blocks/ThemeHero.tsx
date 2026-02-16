@@ -3,7 +3,7 @@
 import React from "react"
 import { defineBlock, useBlockStyles } from "@/lib/block-api"
 import { Spacing } from "../styles/spacing"
-import { EditableText, EditableImage } from "../../../lib/withCraftComponent"
+import { EditableText, EditableImage } from "../../../../lib/editor-primitives"
 import { Monitor } from "lucide-react"
 
 export const ThemeHero = defineBlock({

@@ -2,6 +2,7 @@ import { useNode, useEditor, UserComponent } from '@craftjs/core'
 import React, { useState, useRef, useEffect, useCallback, type JSX } from 'react'
 import { generateSettings, SettingsConfig } from './generateSettings'
 import { useSite } from '@/components/Contexts/site-id-context'
+import { useDevice } from '../components/DeviceContext'
 import MediaLibraryDialog, { MediaItem } from '@/components/MediaGallery/media-select'
 import { STANDARD_DEFAULTS, StandardStyleSettings, createCombinedSettings } from './StandardStyleSettings'
 
@@ -563,14 +564,30 @@ export function withCraftComponent<P extends CraftComponentProps, E extends HTML
         const { enabled } = useEditor((state) => ({
             enabled: state.options.enabled
         }))
+        const deviceContext = useDevice()
+        const currentDevice = deviceContext?.deviceMode
 
         const responsive = (nodeProps as any)?.responsive
         const hiddenOn = responsive?.hiddenOn || []
-        const responsiveClasses = [
-            hiddenOn.includes('mobile') ? (enabled ? 'max-md:opacity-25 max-md:outline-dashed max-md:outline-1 max-md:outline-rose-400' : 'max-md:hidden') : '',
-            hiddenOn.includes('tablet') ? (enabled ? 'md:max-lg:opacity-25 md:max-lg:outline-dashed md:max-lg:outline-1 md:max-lg:outline-rose-400' : 'md:max-lg:hidden') : '',
-            hiddenOn.includes('desktop') ? (enabled ? 'lg:opacity-25 lg:outline-dashed lg:outline-1 lg:outline-rose-400' : 'lg:hidden') : '',
-        ].filter(Boolean).join(' ')
+        const responsiveClasses = enabled
+            ? ''
+            : [
+                hiddenOn.includes('mobile') ? 'max-md:hidden' : '',
+                hiddenOn.includes('tablet') ? 'md:max-lg:hidden' : '',
+                hiddenOn.includes('desktop') ? 'lg:hidden' : '',
+            ].filter(Boolean).join(' ')
+
+        const isHiddenOnCurrentDevice = Boolean(
+            enabled && currentDevice && hiddenOn.includes(currentDevice)
+        )
+
+        const stylePreviewOverride = isHiddenOnCurrentDevice
+            ? {
+                opacity: 0.25,
+                outline: '1px dashed #fb7185',
+                outlineOffset: -1,
+            }
+            : {}
 
         const mergedClassName = cn(
             (props as any).className,
@@ -578,11 +595,18 @@ export function withCraftComponent<P extends CraftComponentProps, E extends HTML
             responsiveClasses
         )
 
+        const mergedStyle = {
+            ...((props as any).style || {}),
+            ...((nodeProps as any)?.style || {}),
+            ...stylePreviewOverride,
+        }
+
         return (
             <Component
                 {...props}
                 {...(nodeProps as Partial<P>)}
                 className={mergedClassName as any}
+                style={mergedStyle as any}
                 ref={(el: E | null) => {
                     if (el) {
                         connect(drag(el))

@@ -8,6 +8,7 @@ import { DesignSystemStyles } from "@/components/DesignSystemStyles"
 import { DesignSettings } from "@/lib/design-system"
 import { RuntimeRenderer } from "@/builder-v2/components/RuntimeRenderer"
 import { isBuilderDocument } from "@/builder-v2/serialize"
+import { RenderCraftTree, canRenderCraftTreeStatic } from "@/lib/rendering/render-craft-node"
 
 import { EditorThemeProvider } from "@/app/dashboard/[siteId]/projects/website/(editor)/canva/[pageId]/components/ThemeContext"
 
@@ -37,6 +38,7 @@ function ClientPreview({ tenantId, page, headerContent, footerContent }: ClientP
   }
 
   const craftStateJson = craftStateObj ? JSON.stringify(craftStateObj) : null
+  const canStaticRenderPage = craftStateObj ? canRenderCraftTreeStatic(craftStateObj as any) : false
 
   // Extract design settings from page metadata
   const designSettings = (page as any).meta?.design as DesignSettings | undefined
@@ -50,6 +52,8 @@ function ClientPreview({ tenantId, page, headerContent, footerContent }: ClientP
   // we can safely use the standard ROOT node. Renaming it likely breaks CraftJS which expects "ROOT".
   const processedHeader = headerContent
   const processedFooter = footerContent
+  const canStaticRenderHeader = processedHeader ? canRenderCraftTreeStatic(processedHeader as any) : false
+  const canStaticRenderFooter = processedFooter ? canRenderCraftTreeStatic(processedFooter as any) : false
 
   return (
     <main className="min-h-screen flex flex-col">
@@ -60,9 +64,13 @@ function ClientPreview({ tenantId, page, headerContent, footerContent }: ClientP
         {/* Header */}
         {processedHeader && (
           <div className="w-full z-50 relative">
-            <Editor enabled={false} resolver={resolverWithFallback}>
-              <Frame json={JSON.stringify(processedHeader)} />
-            </Editor>
+            {canStaticRenderHeader ? (
+              <RenderCraftTree state={processedHeader as any} />
+            ) : (
+              <Editor enabled={false} resolver={resolverWithFallback}>
+                <Frame json={JSON.stringify(processedHeader)} />
+              </Editor>
+            )}
           </div>
         )}
 
@@ -72,10 +80,14 @@ function ClientPreview({ tenantId, page, headerContent, footerContent }: ClientP
             <div className="w-full">
               <RuntimeRenderer document={builderV2Document} />
             </div>
-          ) : craftStateJson ? (
-            <Editor enabled={false} resolver={resolverWithFallback}>
-              <Frame json={craftStateJson} />
-            </Editor>
+          ) : craftStateObj ? (
+            canStaticRenderPage ? (
+              <RenderCraftTree state={craftStateObj as any} />
+            ) : (
+              <Editor enabled={false} resolver={resolverWithFallback}>
+                <Frame json={craftStateJson!} />
+              </Editor>
+            )
           ) : (
             <div className="flex items-center justify-center min-h-[400px]">
               <div className="text-center">
@@ -89,9 +101,13 @@ function ClientPreview({ tenantId, page, headerContent, footerContent }: ClientP
         {/* Footer */}
         {processedFooter && (
           <div className="w-full relative mt-auto">
-            <Editor enabled={false} resolver={resolverWithFallback}>
-              <Frame json={JSON.stringify(processedFooter)} />
-            </Editor>
+            {canStaticRenderFooter ? (
+              <RenderCraftTree state={processedFooter as any} />
+            ) : (
+              <Editor enabled={false} resolver={resolverWithFallback}>
+                <Frame json={JSON.stringify(processedFooter)} />
+              </Editor>
+            )}
           </div>
         )}
 

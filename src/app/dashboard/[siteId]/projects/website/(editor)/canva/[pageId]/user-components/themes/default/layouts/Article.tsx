@@ -10,7 +10,7 @@ import { DefaultHeader } from "../blocks/DefaultHeader"
 import { DefaultFooter } from "../blocks/DefaultFooter"
 import { Section } from "../blocks/Section"
 import { ArticleCover } from "../../../article/ArticleCover" // Reuse core
-import { EditableText } from "../../../lib/withCraftComponent"
+import { EditableText } from "../../../../lib/editor-primitives"
 
 export const ArticleLayout = defineBlock({
     name: "Article Template",

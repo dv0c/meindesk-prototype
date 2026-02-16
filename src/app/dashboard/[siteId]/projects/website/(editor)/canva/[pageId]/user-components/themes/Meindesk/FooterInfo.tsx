@@ -2,13 +2,12 @@
 
 import React, { forwardRef, useRef } from "react"
 import {
-    withCraftComponent,
-    CraftComponentProps,
     EditableText,
     propsToStyle,
-} from "../../../lib/withCraftComponent"
+} from "../../../lib/editor-primitives"
 import { motion, useInView } from "framer-motion"
 import { cn } from "@/lib/utils"
+import { defineBlock, useBlockStyles, type BlockStyle } from "@/lib/block-api"
 
 interface FooterLink {
     id: string
@@ -22,13 +21,19 @@ interface FooterColumn {
     links: FooterLink[]
 }
 
-interface FooterInfoProps extends CraftComponentProps {
+interface FooterInfoProps {
     sectionLabel?: string
     sectionTitle?: string
     columns?: FooterColumn[]
     copyrightText?: string
     taglineText?: string
     showTopBorder?: boolean
+    style?: BlockStyle
+    className?: string
+    responsive?: { hiddenOn?: string[] }
+    isEditing?: boolean
+    deviceMode?: "desktop" | "tablet" | "mobile" | null
+    [key: string]: any
 }
 
 const FooterInfoBase = forwardRef<HTMLElement, FooterInfoProps>(
@@ -41,6 +46,9 @@ const FooterInfoBase = forwardRef<HTMLElement, FooterInfoProps>(
             taglineText = "Build your vision. Own your content.",
             showTopBorder = true,
             className = "",
+            responsive,
+            isEditing,
+            deviceMode,
             ...styleProps
         },
         ref
@@ -66,8 +74,16 @@ const FooterInfoBase = forwardRef<HTMLElement, FooterInfoProps>(
             ...baseStyle,
         }
 
+        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+            style: sectionStyle as any,
+            className: cn("footer-info-section", className),
+            responsive,
+            isEditing,
+            deviceMode,
+        })
+
         return (
-            <section ref={ref} className={cn("footer-info-section", className)} style={sectionStyle}>
+            <section ref={ref} className={computedClassName} style={computedStyle}>
                 {/* Section header */}
                 <motion.div
                     ref={headerRef}
@@ -105,7 +121,7 @@ const FooterInfoBase = forwardRef<HTMLElement, FooterInfoProps>(
 
                 {/* Multi-column layout */}
                 <div ref={gridRef} className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 md:gap-12">
-                    {columns.map((column, index) => (
+                    {columns.map((column: FooterColumn, index: number) => (
                         <motion.div
                             key={column.id}
                             initial={{ y: 40, opacity: 0 }}
@@ -123,7 +139,7 @@ const FooterInfoBase = forwardRef<HTMLElement, FooterInfoProps>(
                                 {column.title}
                             </h4>
                             <ul className="space-y-2">
-                                {column.links.map((link) => (
+                                {column.links.map((link: FooterLink) => (
                                     <li key={link.id}>
                                         {link.url ? (
                                             <a
@@ -178,7 +194,6 @@ const FooterInfoBase = forwardRef<HTMLElement, FooterInfoProps>(
                     style={{
                         borderTop: `1px solid`,
                         borderColor: "var(--design-neutral, #000000)",
-                        borderOpacity: 0.2,
                     }}
                 >
                     <EditableText
@@ -277,35 +292,35 @@ const defaultProps: Partial<FooterInfoProps> = {
     showTopBorder: true,
     paddingTop: 128,
     paddingBottom: 128,
+    responsive: { hiddenOn: [] },
 }
 
-export const FooterInfo = withCraftComponent<FooterInfoProps, HTMLElement>(
-    FooterInfoBase,
-    {
-        displayName: "Footer Info",
-        defaultProps,
-        sectionTitle: "Footer Settings",
-        settingsConfig: {
-            sectionLabel: { type: "text", label: "Section Label" },
-            sectionTitle: { type: "text", label: "Section Title" },
-            copyrightText: { type: "text", label: "Copyright Text" },
-            taglineText: { type: "text", label: "Tagline Text" },
-            showTopBorder: { type: "checkbox", label: "Show Top Border" },
-            columns: {
-                type: "array",
-                label: "Footer Columns",
-                arrayFields: {
-                    title: { type: "text", label: "Column Title" },
-                    links: {
-                        type: "array",
-                        label: "Links",
-                        arrayFields: {
-                            text: { type: "text", label: "Link Text" },
-                            url: { type: "text", label: "Link URL" },
-                        },
+export const FooterInfo = defineBlock<FooterInfoProps>({
+    name: "FooterInfo",
+    category: "Meindesk Theme",
+    description: "Footer columns and metadata",
+    defaultProps,
+    settingsConfig: {
+        sectionLabel: { type: "text", label: "Section Label" },
+        sectionTitle: { type: "text", label: "Section Title" },
+        copyrightText: { type: "text", label: "Copyright Text" },
+        taglineText: { type: "text", label: "Tagline Text" },
+        showTopBorder: { type: "checkbox", label: "Show Top Border" },
+        columns: {
+            type: "array",
+            label: "Footer Columns",
+            arrayFields: {
+                title: { type: "text", label: "Column Title" },
+                links: {
+                    type: "array",
+                    label: "Links",
+                    arrayFields: {
+                        text: { type: "text", label: "Link Text" },
+                        url: { type: "text", label: "Link URL" },
                     },
                 },
             },
         },
-    }
-)
+    },
+    render: (props) => <FooterInfoBase {...props} />,
+})

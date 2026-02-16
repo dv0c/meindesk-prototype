@@ -2,15 +2,13 @@
 
 import React, { forwardRef, useRef, useState, useEffect } from "react"
 import {
-    withCraftComponent,
-    CraftComponentProps,
     EditableText,
     propsToStyle,
-} from "../../../lib/withCraftComponent"
+} from "../../../lib/editor-primitives"
 import { motion, useInView, PanInfo, useAnimation } from "framer-motion"
-import { useEditor } from "@craftjs/core"
 import { cn } from "@/lib/utils"
 import { AnimatedNoise } from "./animated-noise"
+import { defineBlock, useBlockStyles, type BlockStyle } from "@/lib/block-api"
 
 interface Update {
     id: string
@@ -19,7 +17,7 @@ interface Update {
     note: string
 }
 
-interface UpdatesCarouselProps extends CraftComponentProps {
+interface UpdatesCarouselProps {
     sectionLabel?: string
     sectionTitle?: string
     updates?: Update[]
@@ -29,6 +27,12 @@ interface UpdatesCarouselProps extends CraftComponentProps {
     slidesPerView?: '1' | '2' | '3'
     enableNoise?: boolean
     noiseOpacity?: number
+    style?: BlockStyle
+    className?: string
+    responsive?: { hiddenOn?: string[] }
+    isEditing?: boolean
+    deviceMode?: "desktop" | "tablet" | "mobile" | null
+    [key: string]: any
 }
 
 function UpdateCard({
@@ -112,6 +116,9 @@ const UpdatesCarouselBase = forwardRef<HTMLElement, UpdatesCarouselProps>(
             enableNoise = true,
             noiseOpacity = 5,
             className = "",
+            responsive,
+            isEditing,
+            deviceMode,
             ...styleProps
         },
         ref
@@ -124,10 +131,7 @@ const UpdatesCarouselBase = forwardRef<HTMLElement, UpdatesCarouselProps>(
         const [isDragging, setIsDragging] = useState(false)
         const controls = useAnimation()
 
-        // Detect if we're in the editor
-        const { enabled: isEditorEnabled } = useEditor((state) => ({
-            enabled: state.options.enabled
-        }))
+        const isEditorEnabled = Boolean(isEditing)
 
         const headerInView = useInView(headerRef, { once: false, amount: 0.3 })
 
@@ -229,8 +233,16 @@ const UpdatesCarouselBase = forwardRef<HTMLElement, UpdatesCarouselProps>(
             ...baseStyle,
         }
 
+        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+            style: sectionStyle as any,
+            className: cn("updates-carousel-section", className),
+            responsive,
+            isEditing,
+            deviceMode,
+        })
+
         return (
-            <section ref={ref} className={cn("updates-carousel-section", className)} style={sectionStyle}>
+            <section ref={ref} className={computedClassName} style={computedStyle}>
                 {/* Section header */}
                 <motion.div
                     ref={headerRef}
@@ -277,7 +289,7 @@ const UpdatesCarouselBase = forwardRef<HTMLElement, UpdatesCarouselProps>(
                                 WebkitOverflowScrolling: 'touch'
                             }}
                         >
-                            {updates.map((update, index) => (
+                    {updates.map((update: Update, index: number) => (
                                 <div
                                     className="pt-4 pb-12 px-6 flex-shrink-0 w-[85vw] snap-center"
                                     key={index}
@@ -311,7 +323,7 @@ const UpdatesCarouselBase = forwardRef<HTMLElement, UpdatesCarouselProps>(
                                 animate={controls}
                                 className="flex"
                             >
-                                {updates.map((update, index) => (
+                            {updates.map((update: Update, index: number) => (
                                     <div
                                         key={update.id}
                                         className="flex-shrink-0 px-3"
@@ -468,51 +480,40 @@ const defaultProps: Partial<UpdatesCarouselProps> = {
     noiseOpacity: 5,
     paddingTop: 128,
     paddingBottom: 128,
+    responsive: { hiddenOn: [] },
 }
 
-export const UpdatesCarousel = withCraftComponent<UpdatesCarouselProps, HTMLElement>(
-    UpdatesCarouselBase,
-    {
-        displayName: "Updates Carousel",
-        defaultProps,
-        sectionTitle: "Carousel Settings",
-        settingsConfig: {
-            sectionLabel: { type: "text", label: "Section Label" },
-            sectionTitle: { type: "text", label: "Section Title" },
-            autoPlayInterval: {
-                type: "slider",
-                label: "Auto-play Interval (ms)",
-                min: 1000,
-                max: 10000,
-            },
-            slidesPerView: {
-                type: "select",
-                label: "Slides Per View",
-                options: [
-                    { value: '1', label: '1 Slide' },
-                    { value: '2', label: '2 Slides' },
-                    { value: '3', label: '3 Slides' },
-                ]
-            },
-            enableNoise: { type: "checkbox", label: "Enable Noise on Cards" },
-            noiseOpacity: {
-                type: "slider",
-                label: "Noise Opacity (%)",
-                min: 0,
-                max: 20,
-                step: 1,
-            },
-            showArrows: { type: "checkbox", label: "Show Navigation Arrows" },
-            showDots: { type: "checkbox", label: "Show Dots Indicator" },
-            updates: {
-                type: "array",
-                label: "Updates",
-                arrayFields: {
-                    date: { type: "text", label: "Date" },
-                    title: { type: "text", label: "Title" },
-                    note: { type: "textarea", label: "Description" },
-                },
+export const UpdatesCarousel = defineBlock<UpdatesCarouselProps>({
+    name: "UpdatesCarousel",
+    category: "Meindesk Theme",
+    description: "Carousel with latest updates",
+    defaultProps,
+    settingsConfig: {
+        sectionLabel: { type: "text", label: "Section Label" },
+        sectionTitle: { type: "text", label: "Section Title" },
+        autoPlayInterval: { type: "slider", label: "Auto-play Interval (ms)", min: 1000, max: 10000 },
+        slidesPerView: {
+            type: "select",
+            label: "Slides Per View",
+            options: [
+                { value: '1', label: '1 Slide' },
+                { value: '2', label: '2 Slides' },
+                { value: '3', label: '3 Slides' },
+            ]
+        },
+        enableNoise: { type: "checkbox", label: "Enable Noise on Cards" },
+        noiseOpacity: { type: "slider", label: "Noise Opacity (%)", min: 0, max: 20, step: 1 },
+        showArrows: { type: "checkbox", label: "Show Navigation Arrows" },
+        showDots: { type: "checkbox", label: "Show Dots Indicator" },
+        updates: {
+            type: "array",
+            label: "Updates",
+            arrayFields: {
+                date: { type: "text", label: "Date" },
+                title: { type: "text", label: "Title" },
+                note: { type: "textarea", label: "Description" },
             },
         },
-    }
-)
+    },
+    render: (props) => <UpdatesCarouselBase {...props} />,
+})

@@ -2,13 +2,12 @@
 
 import React, { forwardRef, useRef } from "react"
 import {
-    withCraftComponent,
-    CraftComponentProps,
     EditableText,
     propsToStyle,
-} from "../../../lib/withCraftComponent"
+} from "../../../lib/editor-primitives"
 import { motion, useInView, useScroll, useTransform } from "framer-motion"
 import { cn } from "@/lib/utils"
+import { defineBlock, useBlockStyles, type BlockStyle } from "@/lib/block-api"
 
 interface Principle {
     id: string
@@ -19,10 +18,16 @@ interface Principle {
     align: 'left' | 'right'
 }
 
-interface PrinciplesSectionProps extends CraftComponentProps {
+interface PrinciplesSectionProps {
     sectionLabel?: string
     sectionTitle?: string
     principles?: Principle[]
+    style?: BlockStyle
+    className?: string
+    responsive?: { hiddenOn?: string[] }
+    isEditing?: boolean
+    deviceMode?: "desktop" | "tablet" | "mobile" | null
+    [key: string]: any
 }
 
 // HighlightText component with parallax effect
@@ -133,6 +138,9 @@ const PrinciplesSectionBase = forwardRef<HTMLElement, PrinciplesSectionProps>(
             sectionTitle = "WHY PROTOTYPE",
             principles = [],
             className = "",
+            responsive,
+            isEditing,
+            deviceMode,
             ...styleProps
         },
         ref
@@ -152,8 +160,16 @@ const PrinciplesSectionBase = forwardRef<HTMLElement, PrinciplesSectionProps>(
             ...baseStyle,
         }
 
+        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+            style: sectionStyle as any,
+            className: cn("principles-section", className),
+            responsive,
+            isEditing,
+            deviceMode,
+        })
+
         return (
-            <section ref={ref} className={cn("principles-section", className)} style={sectionStyle}>
+            <section ref={ref} className={computedClassName} style={computedStyle}>
                 {/* Section header */}
                 <motion.div
                     ref={headerRef}
@@ -191,7 +207,7 @@ const PrinciplesSectionBase = forwardRef<HTMLElement, PrinciplesSectionProps>(
 
                 {/* Staggered principles */}
                 <div className="space-y-24 md:space-y-32">
-                    {principles.map((principle) => (
+                    {principles.map((principle: Principle) => (
                         <PrincipleItem key={principle.id} principle={principle} />
                     ))}
                 </div>
@@ -249,35 +265,28 @@ const defaultProps: Partial<PrinciplesSectionProps> = {
     principles: defaultPrinciples,
     paddingTop: 128,
     paddingBottom: 128,
+    responsive: { hiddenOn: [] },
 }
 
-export const PrinciplesSection = withCraftComponent<PrinciplesSectionProps, HTMLElement>(
-    PrinciplesSectionBase,
-    {
-        displayName: "Principles Section",
-        defaultProps,
-        sectionTitle: "Principles Settings",
-        settingsConfig: {
-            sectionLabel: { type: "text", label: "Section Label" },
-            sectionTitle: { type: "text", label: "Section Title" },
-            principles: {
-                type: "array",
-                label: "Principles",
-                arrayFields: {
-                    number: { type: "text", label: "Number" },
-                    title: { type: "text", label: "Title" },
-                    highlightedWord: { type: "text", label: "Highlighted Word" },
-                    description: { type: "textarea", label: "Description" },
-                    align: {
-                        type: "select",
-                        label: "Alignment",
-                        options: [
-                            { label: "Left", value: "left" },
-                            { label: "Right", value: "right" },
-                        ],
-                    },
-                },
+export const PrinciplesSection = defineBlock<PrinciplesSectionProps>({
+    name: "PrinciplesSection",
+    category: "Meindesk Theme",
+    description: "Philosophy section with highlighted text",
+    defaultProps,
+    settingsConfig: {
+        sectionLabel: { type: "text", label: "Section Label" },
+        sectionTitle: { type: "text", label: "Section Title" },
+        principles: {
+            type: "array",
+            label: "Principles",
+            arrayFields: {
+                number: { type: "text", label: "Number" },
+                title: { type: "text", label: "Title" },
+                highlightedWord: { type: "text", label: "Highlighted Word" },
+                description: { type: "textarea", label: "Description" },
+                align: { type: "select", label: "Alignment", options: [{ label: "Left", value: "left" }, { label: "Right", value: "right" }] },
             },
         },
-    }
-)
+    },
+    render: (props) => <PrinciplesSectionBase {...props} />,
+})

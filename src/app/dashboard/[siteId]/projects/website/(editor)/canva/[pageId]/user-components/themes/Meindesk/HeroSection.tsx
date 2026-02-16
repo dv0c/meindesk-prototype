@@ -4,18 +4,17 @@ import { cn } from "@/lib/utils"
 import { motion, useScroll, useTransform } from "framer-motion"
 import React, { forwardRef, useRef } from "react"
 import {
-    CraftComponentProps,
     EditableText,
     propsToStyle,
-    withCraftComponent,
-} from "../../../lib/withCraftComponent"
+} from "../../../lib/editor-primitives"
+import { defineBlock, useBlockStyles, type BlockStyle } from "@/lib/block-api"
 import { BackgroundOverlay } from "./BackgroundOverlay"
 import { BitmapChevron } from "./bitmap-chevron"
 import { ScrambleTextOnHover } from "./scramble-text"
 import { SplitFlapAudioProvider, SplitFlapMuteToggle, SplitFlapText } from "./split-flap-text"
 import { AnimatedNoise } from "./animated-noise"
 
-interface HeroSectionProps extends CraftComponentProps {
+interface HeroSectionProps {
     mainTitle?: string
     subtitle?: string
     description?: string
@@ -32,6 +31,15 @@ interface HeroSectionProps extends CraftComponentProps {
     noiseOpacity?: number
     splitFlapSpeed?: number
     minHeight?: string
+    style?: BlockStyle
+    className?: string
+    responsive?: { hiddenOn?: string[] }
+    isEditing?: boolean
+    deviceMode?: "desktop" | "tablet" | "mobile" | null
+    paddingTop?: number
+    paddingBottom?: number
+    backgroundColor?: string
+    [key: string]: any
 }
 
 const HeroSectionBase = forwardRef<HTMLElement, HeroSectionProps>(
@@ -54,6 +62,9 @@ const HeroSectionBase = forwardRef<HTMLElement, HeroSectionProps>(
             splitFlapSpeed = 1,
             minHeight = "100vh",
             className = "",
+            responsive,
+            isEditing,
+            deviceMode,
             ...styleProps
         },
         ref
@@ -82,6 +93,14 @@ const HeroSectionBase = forwardRef<HTMLElement, HeroSectionProps>(
             ...baseStyle,
         }
 
+        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+            style: sectionStyle as any,
+            className: cn("hero-section", className),
+            responsive,
+            isEditing,
+            deviceMode,
+        })
+
         return (
             <section
                 ref={(el) => {
@@ -92,8 +111,8 @@ const HeroSectionBase = forwardRef<HTMLElement, HeroSectionProps>(
                     }
                     (sectionRef as React.MutableRefObject<HTMLElement | null>).current = el
                 }}
-                className={cn("hero-section", className)}
-                style={sectionStyle}
+                className={computedClassName}
+                style={computedStyle}
             >
                 {/* Animated Noise Background */}
                 {enableNoise && <AnimatedNoise opacity={noiseOpacity / 100} />}
@@ -285,43 +304,31 @@ const defaultProps: Partial<HeroSectionProps> = {
     minHeight: "100vh",
     paddingTop: 0,
     paddingBottom: 0,
+    responsive: { hiddenOn: [] },
 }
 
-export const HeroSection = withCraftComponent<HeroSectionProps, HTMLElement>(
-    HeroSectionBase,
-    {
-        displayName: "Hero Section",
-        defaultProps,
-        sectionTitle: "Hero Settings",
-        settingsConfig: {
-            mainTitle: { type: "text", label: "Main Title" },
-            subtitle: { type: "text", label: "Subtitle" },
-            description: { type: "textarea", label: "Description" },
-            primaryButtonText: { type: "text", label: "Primary Button Text" },
-            primaryButtonLink: { type: "text", label: "Primary Button Link" },
-            secondaryButtonText: { type: "text", label: "Secondary Button Text" },
-            secondaryButtonLink: { type: "text", label: "Secondary Button Link" },
-            leftLabel: { type: "text", label: "Left Vertical Label" },
-            infoTag: { type: "text", label: "Info Tag Text" },
-            minHeight: { type: "text", label: "Min Height" },
-            enableParallax: { type: "checkbox", label: "Enable Parallax Effect" },
-            enableSplitFlap: { type: "checkbox", label: "Enable Split-Flap Title" },
-            enableScramble: { type: "checkbox", label: "Enable Scramble on Button" },
-            enableNoise: { type: "checkbox", label: "Enable Noise Animation" },
-            noiseOpacity: {
-                type: "slider",
-                label: "Noise Opacity (%)",
-                min: 0,
-                max: 20,
-                step: 1,
-            },
-            splitFlapSpeed: {
-                type: "slider",
-                label: "Split-Flap Speed (ms)",
-                min: 10,
-                max: 200,
-                step: 5
-            },
-        },
-    }
-)
+export const HeroSection = defineBlock<HeroSectionProps>({
+    name: "HeroSection",
+    category: "Meindesk Theme",
+    description: "Animated hero section",
+    defaultProps,
+    settingsConfig: {
+        mainTitle: { type: "text", label: "Main Title" },
+        subtitle: { type: "text", label: "Subtitle" },
+        description: { type: "textarea", label: "Description" },
+        primaryButtonText: { type: "text", label: "Primary Button Text" },
+        primaryButtonLink: { type: "text", label: "Primary Button Link" },
+        secondaryButtonText: { type: "text", label: "Secondary Button Text" },
+        secondaryButtonLink: { type: "text", label: "Secondary Button Link" },
+        leftLabel: { type: "text", label: "Left Vertical Label" },
+        infoTag: { type: "text", label: "Info Tag Text" },
+        minHeight: { type: "text", label: "Min Height" },
+        enableParallax: { type: "checkbox", label: "Enable Parallax Effect" },
+        enableSplitFlap: { type: "checkbox", label: "Enable Split-Flap Title" },
+        enableScramble: { type: "checkbox", label: "Enable Scramble on Button" },
+        enableNoise: { type: "checkbox", label: "Enable Noise Animation" },
+        noiseOpacity: { type: "slider", label: "Noise Opacity (%)", min: 0, max: 20, step: 1 },
+        splitFlapSpeed: { type: "slider", label: "Split-Flap Speed (ms)", min: 10, max: 200, step: 5 },
+    },
+    render: (props) => <HeroSectionBase {...props} />,
+})

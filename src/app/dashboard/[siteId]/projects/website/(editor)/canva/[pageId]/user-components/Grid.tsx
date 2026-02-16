@@ -375,7 +375,8 @@ export const Grid = defineBlock<GridProps>({
         mobileStyle: {},
         tabletStyle: {},
         columns: 2,
-        rows: 0
+        rows: 0,
+        responsive: { hiddenOn: [] }
     },
 
     settings: GridSettings,

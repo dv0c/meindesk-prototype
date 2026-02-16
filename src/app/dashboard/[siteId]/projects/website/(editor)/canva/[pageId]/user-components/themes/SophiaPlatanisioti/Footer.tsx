@@ -1,14 +1,21 @@
 'use client'
 import React from "react";
-import { CraftComponentProps, propsToStyle, withCraftComponent, EditableText } from "../../../lib/withCraftComponent";
+import { propsToStyle, EditableText } from "../../../lib/editor-primitives";
 import { cn } from "@/lib/utils";
+import { defineBlock, useBlockStyles, type BlockStyle } from "@/lib/block-api";
 
-interface FooterProps extends CraftComponentProps {
+interface FooterProps {
     heading?: string
     phone?: string
     email?: string
     facebook?: string
     showCreatedBy?: boolean
+    style?: BlockStyle
+    className?: string
+    responsive?: { hiddenOn?: string[] }
+    isEditing?: boolean
+    deviceMode?: "desktop" | "tablet" | "mobile" | null
+    [key: string]: any
 }
 
 const FooterBase = React.forwardRef<HTMLDivElement, FooterProps>(({
@@ -17,12 +24,22 @@ const FooterBase = React.forwardRef<HTMLDivElement, FooterProps>(({
     email = "platanisiotisophia@gmail.com",
     facebook = "https://www.facebook.com/PlatanisiotiSophia",
     showCreatedBy = true,
+    responsive,
+    isEditing,
+    deviceMode,
     ...props
 }, ref) => {
     const style = propsToStyle(props)
+    const { style: computedStyle, className: computedClassName } = useBlockStyles({
+        style: style as any,
+        className: cn("w-full", props.className),
+        responsive,
+        isEditing,
+        deviceMode,
+    })
 
     return (
-        <div ref={ref} style={style} className={cn("w-full", props.className)}>
+        <div ref={ref} style={computedStyle} className={computedClassName}>
             {/* Main Footer Section */}
             <div className="bg-[#ccc0a8] truncate px-3 space-y-5 text-center py-10 text-[100%] font-normal text-[#5a5933]">
                 <EditableText propName="heading" value={heading || ""} as="h1" />
@@ -73,36 +90,24 @@ const FooterBase = React.forwardRef<HTMLDivElement, FooterProps>(({
 
 FooterBase.displayName = "Footer"
 
-export const Footer = withCraftComponent(FooterBase, {
-    displayName: "Footer",
+export const Footer = defineBlock<FooterProps>({
+    name: "Footer",
+    category: "Sophia Navigation",
+    description: "Sophia footer",
     defaultProps: {
         heading: "Σοφία Πλατανησιώτη - Σύμβουλος Ψυχικής Υγείας",
         phone: "+30 6947777532",
         email: "platanisiotisophia@gmail.com",
         facebook: "https://www.facebook.com/PlatanisiotiSophia",
         showCreatedBy: true,
+        responsive: { hiddenOn: [] },
     },
     settingsConfig: {
-        heading: {
-            label: "Heading",
-            type: "text",
-        },
-        phone: {
-            label: "Phone",
-            type: "text",
-        },
-        email: {
-            label: "Email",
-            type: "text",
-        },
-        facebook: {
-            label: "Facebook URL",
-            type: "text",
-        },
-        showCreatedBy: {
-            label: "Show 'Created By' Section",
-            type: "checkbox",
-        },
+        heading: { label: "Heading", type: "text" },
+        phone: { label: "Phone", type: "text" },
+        email: { label: "Email", type: "text" },
+        facebook: { label: "Facebook URL", type: "text" },
+        showCreatedBy: { label: "Show 'Created By' Section", type: "checkbox" },
     },
-    sectionTitle: 'Footer Settings'
+    render: (props) => <FooterBase {...props} />,
 })
