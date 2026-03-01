@@ -39,13 +39,25 @@ export async function GET(
 
     if (nextCursor) options.next_cursor = nextCursor;
 
-    let expression = `resource_type:image AND folder:${siteId}/*`;
-    if (searchQuery) {
-      expression += ` AND (filename:${searchQuery}* OR tags:${searchQuery}* OR context.alt:${searchQuery}* OR context.caption:${searchQuery}*)`;
-    }
-    options.expression = expression;
+    let results;
 
-    const results = await cloudinary.v2.api.resources(options);
+    if (searchQuery) {
+      let expression = `resource_type:image AND folder:${siteId}/*`;
+      expression += ` AND (filename:${searchQuery}* OR tags:${searchQuery}* OR context.alt:${searchQuery}* OR context.caption:${searchQuery}*)`;
+
+      let searchReq = cloudinary.v2.search()
+        .expression(expression)
+        .max_results(24)
+        .with_field("context");
+
+      if (nextCursor) {
+        searchReq = searchReq.next_cursor(nextCursor);
+      }
+
+      results = await searchReq.execute();
+    } else {
+      results = await cloudinary.v2.api.resources(options);
+    }
 
     const mediaItems: Media[] = (results.resources || []).map(
       (resource: any) => ({
