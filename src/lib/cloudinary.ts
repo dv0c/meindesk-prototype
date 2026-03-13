@@ -1,8 +1,8 @@
 import cloudinary from "cloudinary";
 
 const cloudName = process.env.CLOUDINARY_CLOUD_NAME || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-const cloudinaryApiKey = process.env.CLOUDINARY_API_KEY;
-const cloudinaryApiSecret = process.env.CLOUDINARY_API_SECRET;
+const cloudinaryApiKey = process.env.CLOUDINARY_API_KEY || process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY;
+const cloudinaryApiSecret = process.env.CLOUDINARY_API_SECRET || process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET;
 
 if (!cloudName || !cloudinaryApiKey || !cloudinaryApiSecret) {
   console.warn("Cloudinary server credentials are incomplete. Upload and media actions may fail.");
@@ -12,6 +12,7 @@ cloudinary.v2.config({
   cloud_name: cloudName,
   api_key: cloudinaryApiKey,
   api_secret: cloudinaryApiSecret,
+  secure: true,
 });
 
 /**
