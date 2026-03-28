@@ -67,25 +67,6 @@ export default function ThemeEditorPage({ params }: { params: Promise<{ themeId:
     // Check admin access
     useEffect(() => {
         if (status === "loading") return
-        // #region agent log
-        fetch("http://127.0.0.1:7522/ingest/208e7945-e1e7-47e3-85ca-5854801504d4", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "02c233" },
-            body: JSON.stringify({
-                sessionId: "02c233",
-                location: "admin/marketplace/[themeId]/page.tsx:admin-effect",
-                message: "admin gate session shape",
-                data: {
-                    status,
-                    hasSession: !!session,
-                    hasUser: !!session?.user,
-                    role: session?.user?.role ?? null,
-                },
-                timestamp: Date.now(),
-                hypothesisId: "H1",
-            }),
-        }).catch(() => {})
-        // #endregion
         const user = session?.user
         if (!user || user.role !== "ADMIN") {
             router.push("/")
