@@ -3,13 +3,13 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { unauthorizedUnlessAdminSession } from "@/lib/security/route-auth";
 
 export async function GET(req: Request) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session || session.user.role !== "ADMIN") {
-            return new NextResponse("Unauthorized", { status: 401 });
-        }
+        const denied = unauthorizedUnlessAdminSession(session);
+        if (denied) return denied;
 
         const themes = await db.theme.findMany({
             orderBy: { createdAt: "desc" },
@@ -28,9 +28,8 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session || session.user.role !== "ADMIN") {
-            return new NextResponse("Unauthorized", { status: 401 });
-        }
+        const denied = unauthorizedUnlessAdminSession(session);
+        if (denied) return denied;
 
         const body = await req.json();
         const { name, description, price, isPremium, thumbnail } = body;

@@ -3,7 +3,9 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { ComponentDefinition } from "@/lib/types";
+import { unauthorizedUnlessAdminSession } from "@/lib/security/route-auth";
+
+type BlockPayload = { name: string }
 
 export async function POST(
     req: Request,
@@ -12,12 +14,11 @@ export async function POST(
     try {
         const { themeId } = await params;
         const session = await getServerSession(authOptions);
-        if (!session || session.user.role !== "ADMIN") {
-            return new NextResponse("Unauthorized", { status: 401 });
-        }
+        const denied = unauthorizedUnlessAdminSession(session);
+        if (denied) return denied;
 
         const body = await req.json();
-        const { blocks } = body; // Array of ComponentDefinition
+        const { blocks } = body; // Array of BlockPayload
 
         if (!Array.isArray(blocks)) {
             return new NextResponse("Invalid blocks data", { status: 400 });
@@ -35,7 +36,7 @@ export async function POST(
             // 2. Create new blocks
             if (blocks.length > 0) {
                 await tx.themeBlock.createMany({
-                    data: blocks.map((block: ComponentDefinition) => ({
+                    data: blocks.map((block: BlockPayload) => ({
                         themeId: themeId,
                         componentName: block.name,
                         componentDefinition: block as any, // casting to specific json type if needed or just any

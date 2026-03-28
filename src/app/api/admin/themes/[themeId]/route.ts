@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { unauthorizedUnlessAdminSession } from "@/lib/security/route-auth";
 
 export async function GET(
     req: Request,
@@ -11,9 +12,8 @@ export async function GET(
     try {
         const { themeId } = await params;
         const session = await getServerSession(authOptions);
-        if (!session || session.user.role !== "ADMIN") {
-            return new NextResponse("Unauthorized", { status: 401 });
-        }
+        const denied = unauthorizedUnlessAdminSession(session);
+        if (denied) return denied;
 
         const theme = await db.theme.findUnique({
             where: {
@@ -42,9 +42,8 @@ export async function PUT(
     try {
         const { themeId } = await params;
         const session = await getServerSession(authOptions);
-        if (!session || session.user.role !== "ADMIN") {
-            return new NextResponse("Unauthorized", { status: 401 });
-        }
+        const denied = unauthorizedUnlessAdminSession(session);
+        if (denied) return denied;
 
         const body = await req.json();
         const { name, description, price, isPremium, thumbnail, fonts } = body;
@@ -77,9 +76,8 @@ export async function DELETE(
     try {
         const { themeId } = await params;
         const session = await getServerSession(authOptions);
-        if (!session || session.user.role !== "ADMIN") {
-            return new NextResponse("Unauthorized", { status: 401 });
-        }
+        const denied = unauthorizedUnlessAdminSession(session);
+        if (denied) return denied;
 
         const theme = await db.theme.delete({
             where: {

@@ -1,15 +1,15 @@
 import { db } from "@/lib/db"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
+import { unauthorizedUnlessAdminSession } from "@/lib/security/route-auth"
 import { NextRequest, NextResponse } from "next/server"
 
 // GET /api/admin/marketplace - List all themes (admin only)
 export async function GET() {
     try {
         const session = await getServerSession(authOptions)
-        if (!session || session.user.role !== "ADMIN") {
-            return new NextResponse("Unauthorized", { status: 401 })
-        }
+        const denied = unauthorizedUnlessAdminSession(session)
+        if (denied) return denied
 
         const themes = await db.theme.findMany({
             include: {
@@ -38,9 +38,8 @@ export async function GET() {
 export async function POST(request: NextRequest) {
     try {
         const session = await getServerSession(authOptions)
-        if (!session || session.user.role !== "ADMIN") {
-            return new NextResponse("Unauthorized", { status: 401 })
-        }
+        const denied = unauthorizedUnlessAdminSession(session)
+        if (denied) return denied
 
         const body = await request.json()
         const { name, description, thumbnail, price, isPremium, blocks } = body

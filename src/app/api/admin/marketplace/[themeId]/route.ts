@@ -1,26 +1,18 @@
 import { db } from "@/lib/db"
 import { getServerSession } from "next-auth"
-import type { Session } from "next-auth"
 import { authOptions } from "@/lib/auth"
+import { unauthorizedUnlessAdminSession } from "@/lib/security/route-auth"
 import { NextRequest, NextResponse } from "next/server"
 
 interface RouteParams {
     params: Promise<{ themeId: string }>
 }
 
-function unauthorizedAdminResponse(session: Session | null): NextResponse | null {
-    const user = session?.user
-    if (!user || user.role !== "ADMIN") {
-        return new NextResponse("Unauthorized", { status: 401 })
-    }
-    return null
-}
-
 // GET /api/admin/marketplace/[themeId] - Get a single theme
 export async function GET(request: NextRequest, { params }: RouteParams) {
     try {
         const session = await getServerSession(authOptions)
-        const denied = unauthorizedAdminResponse(session)
+        const denied = unauthorizedUnlessAdminSession(session)
         if (denied) return denied
 
         const { themeId } = await params
@@ -56,7 +48,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 export async function PUT(request: NextRequest, { params }: RouteParams) {
     try {
         const session = await getServerSession(authOptions)
-        const denied = unauthorizedAdminResponse(session)
+        const denied = unauthorizedUnlessAdminSession(session)
         if (denied) return denied
 
         const { themeId } = await params
@@ -103,7 +95,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
     try {
         const session = await getServerSession(authOptions)
-        const denied = unauthorizedAdminResponse(session)
+        const denied = unauthorizedUnlessAdminSession(session)
         if (denied) return denied
 
         const { themeId } = await params

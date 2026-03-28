@@ -6,7 +6,19 @@
 import { getAuthSession } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { Role } from "@prisma/client"
+import type { Session } from "next-auth"
 import { NextResponse } from "next/server"
+
+/**
+ * For routes that use getServerSession: returns 401 NextResponse if there is no user or user is not admin.
+ */
+export function unauthorizedUnlessAdminSession(session: Session | null): NextResponse | null {
+    const user = session?.user
+    if (!user || user.role !== Role.ADMIN) {
+        return new NextResponse("Unauthorized", { status: 401 })
+    }
+    return null
+}
 
 /**
  * Require authenticated user
@@ -28,8 +40,8 @@ export async function requireAuth() {
  */
 export async function requireAdmin() {
     const session = await requireAuth()
-
-    if (session.user.role !== Role.ADMIN) {
+    const user = session.user
+    if (!user || user.role !== Role.ADMIN) {
         throw new Error("Forbidden: Admin access required")
     }
 
