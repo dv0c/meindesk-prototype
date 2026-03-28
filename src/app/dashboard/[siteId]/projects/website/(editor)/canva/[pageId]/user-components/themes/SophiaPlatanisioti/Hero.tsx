@@ -3,6 +3,7 @@
 import { useEditorContent } from "@/hooks/useEditorContent"
 import { defineBlock } from "@/lib/block-api"
 import { cn } from "@/lib/utils"
+import { sanitizeRichHtml } from "@/lib/security/sanitize-html"
 import { useNode } from "@craftjs/core"
 import { LayoutTemplate } from "lucide-react"
 import {
@@ -137,7 +138,7 @@ export const HeroView = ({
                         <div
                             className={cn(`prose-sm homepage prose-p:pt-0 prose-p:leading-snug max-w-full text-muted-foreground prose-headings:text-primary prose-a:text-primary`)}
                             style={{ fontFamily: 'inherit', fontSize: 'inherit' }}
-                            dangerouslySetInnerHTML={{ __html: htmlContent }}
+                            dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(htmlContent) }}
                         />
                     )}
 

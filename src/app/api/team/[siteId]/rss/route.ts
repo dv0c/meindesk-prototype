@@ -1,94 +1,56 @@
 import { NextRequest, NextResponse } from "next/server";
-import { normalizeUrl } from "@/lib/rss/url-utils";
-import { fetchSiteMetadata } from "@/lib/rss/site-metadata";
-import { detectRealFeed } from "@/lib/rss/feed-detection";
-import { scrapeVirtualFeed } from "@/lib/rss/scraper";
-import { fetchFromFeedSearchAPI } from "@/lib/rss/feed-search-api";
+import { getAuthSession } from "@/lib/auth";
+import { requireSiteAccess, createErrorResponse } from "@/lib/security/route-auth";
+import { verifyInternalCronRequest } from "@/lib/security/internal-cron";
+import { fetchTeamRssFeedData } from "@/lib/rss/team-rss-feed-data";
+import { db } from "@/lib/db";
 
 export const runtime = "nodejs";
 
-const cache = new Map<string, { data: any; expires: number }>();
-const CACHE_TTL = 1000 * 60 * 60 * 3; // 3 hours
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ siteId: string }> }
+) {
+  const { siteId } = await params;
 
-export async function GET(req: NextRequest) {
+  const cronOk = verifyInternalCronRequest(req);
+  if (!cronOk) {
+    try {
+      const session = await getAuthSession();
+      if (!session?.user?.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+      await requireSiteAccess(siteId, session.user.id);
+    } catch (err) {
+      return createErrorResponse(err);
+    }
+  } else {
+    const site = await db.site.findUnique({
+      where: { id: siteId },
+      select: { id: true },
+    });
+    if (!site) {
+      return NextResponse.json({ error: "Site not found" }, { status: 404 });
+    }
+  }
+
   const { searchParams } = new URL(req.url);
   const rawUrl = searchParams.get("url");
   const fetchContent = searchParams.get("content") === "true";
-  const maxItems = parseInt(searchParams.get("maxItems") || "20", 10); // default 20
-  const target = normalizeUrl(rawUrl || "");
-  if (!target)
-    return NextResponse.json({ error: "Invalid ?url" }, { status: 400 });
+  const maxItems = Math.min(
+    Math.max(parseInt(searchParams.get("maxItems") || "20", 10) || 20, 1),
+    100
+  );
 
-  const cacheKey = target + (fetchContent ? "_content" : "_meta") + `_${maxItems}`;
-  const cached = cache.get(cacheKey);
-  if (cached && cached.expires > Date.now())
-    return NextResponse.json(cached.data);
+  const result = await fetchTeamRssFeedData({
+    rawUrl: rawUrl || "",
+    fetchContent,
+    maxItems,
+  });
 
-  try {
-    // Always fetch metadata from the original target URL first
-    const siteMeta = await fetchSiteMetadata(target);
-    let feedData = null;
-
-    // 1️⃣ FeedSearch.dev API
-    const externalFeeds = await fetchFromFeedSearchAPI(target);
-    if (externalFeeds && externalFeeds.length > 0) {
-      console.error("[RSS Scraper]: Detection=FeedSearchAPI");
-      const topFeed = externalFeeds[0];
-      feedData = await detectRealFeed(topFeed.url, fetchContent, siteMeta, maxItems);
-    }
-
-    // 2️⃣ Local detection
-    if (!feedData) {
-      console.error("[RSS Scraper]: Detection=Local Detection");
-      feedData = await detectRealFeed(target, fetchContent, siteMeta, maxItems);
-    }
-
-    // 3️⃣ Fallback: scrape
-    if (!feedData) {
-      console.error("[RSS Scraper]: Detection=Fallback");
-      const items = await scrapeVirtualFeed(target, fetchContent, maxItems); // pass maxItems
-      if (!items || items.length === 0)
-        return NextResponse.json({
-          found: false,
-          message: "No feed could be generated",
-        });
-      feedData = {
-        feedUrl: target,
-        baseUrl: target,
-        type: "Generator",
-        title: siteMeta.title,
-        description: null,
-        image: null,
-        items,
-      };
-    }
-
-    // If feed was detected at a different URL, fetch metadata from the baseUrl (original site)
-    let finalSiteMeta = siteMeta;
-    if (feedData.baseUrl && feedData.baseUrl !== target) {
-      console.log(`[RSS Scraper]: Fetching metadata from baseUrl: ${feedData.baseUrl}`);
-      finalSiteMeta = await fetchSiteMetadata(feedData.baseUrl);
-    }
-
-    const data = {
-      found: true,
-      feedUrl: feedData.feedUrl,
-      type: feedData.type,
-      title: feedData.title || finalSiteMeta.title,
-      description: feedData.description || finalSiteMeta.description,
-      image: feedData.image || finalSiteMeta.logo || finalSiteMeta.favicon,
-      itemCount: feedData.items.length,
-      site: finalSiteMeta,
-      items: feedData.items,
-    };
-
-    cache.set(cacheKey, { data, expires: Date.now() + CACHE_TTL });
-    return NextResponse.json(data);
-  } catch (err: any) {
-    console.error("Route error:", err.message);
-    return NextResponse.json(
-      { error: err.message || "Unknown error" },
-      { status: 500 }
-    );
+  if (!result.ok) {
+    return NextResponse.json(result.body, { status: result.status });
   }
+
+  return NextResponse.json(result.data);
 }

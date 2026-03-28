@@ -89,7 +89,7 @@ export async function sendNotification(data: {
     // If called from Server Action (system event) -> bypass auth check if internal?
     // For now, assume this is called from Admin UI.
 
-    if (session && session.user.role !== "ADMIN") {
+    if (session?.user && session.user.role !== "ADMIN") {
         return { error: "Unauthorized" }
     }
 

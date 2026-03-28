@@ -23,13 +23,14 @@ import { SaveFeed } from "@/lib/actions/helpers/save-feed"
 import { SaveRssToArticles } from "@/lib/actions/helpers/save-rss-to-articles"
 import { ImportSingleRssItem } from "@/lib/actions/helpers/import-single-rss-item"
 import { RemoveRssArticle } from "@/lib/actions/helpers/remove-rss-article"
+import { sanitizeRichHtml } from "@/lib/security/sanitize-html"
 import { ArrowLeft, ArrowUpRight, Check, Edit, Grid3X3, Link2, List, MoreHorizontal, RssIcon, Trash2, Upload, X } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { use, useCallback, useEffect, useState } from "react"
 import { toast } from "sonner"
 
-const FeedPage = ({ params }: { params: { siteId: string, url: string } }) => {
+const FeedPage = ({ params }: { params: Promise<{ siteId: string; url: string }> }) => {
     const router = useRouter()
     const isMobile = useIsMobile()
     const { siteId, url } = use(params as any) as any
@@ -378,7 +379,9 @@ const FeedPage = ({ params }: { params: { siteId: string, url: string } }) => {
                                                         {/* Description */}
                                                         <div
                                                             className="text-sm text-muted-foreground line-clamp-2 [&_a]:text-primary [&_a]:underline"
-                                                            dangerouslySetInnerHTML={{ __html: item.description || "No description" }}
+                                                            dangerouslySetInnerHTML={{
+                                                                __html: sanitizeRichHtml(item.description || "No description"),
+                                                            }}
                                                         />
                                                     </div>
 

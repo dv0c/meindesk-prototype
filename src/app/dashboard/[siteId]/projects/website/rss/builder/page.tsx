@@ -21,7 +21,7 @@ interface SelectorField {
     icon: React.ReactNode;
 }
 
-const RSSBuilderPage = ({ params }: { params: { siteId: string } }) => {
+const RSSBuilderPage = ({ params }: { params: Promise<{ siteId: string }> }) => {
     const router = useRouter()
     const { siteId } = use(params as any) as any
 

@@ -11,7 +11,7 @@ import { getActiveTeam } from "@/lib/actions/helpers/team";
 
 export async function POST(
     req: Request,
-    { params }: { params: { siteId: string } }
+    { params }: { params: Promise<{ siteId: string }> }
 ) {
     const { domain } = await req.json();
     const { siteId } = await params;
@@ -50,7 +50,7 @@ export async function POST(
 
 export async function DELETE(
     req: Request,
-    { params }: { params: { siteId: string } }
+    { params }: { params: Promise<{ siteId: string }> }
 ) {
     const { siteId } = await params;
     const { searchParams } = new URL(req.url);
@@ -88,7 +88,7 @@ export async function DELETE(
 
 export async function GET(
     req: Request,
-    { params }: { params: { siteId: string } }
+    { params }: { params: Promise<{ siteId: string }> }
 ) {
     const { searchParams } = new URL(req.url);
     const domain = searchParams.get("domain");

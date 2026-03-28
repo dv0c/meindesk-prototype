@@ -5,7 +5,7 @@ export const metadata = {
   title: "Overview | PROTOTYPE — Blog Builder & Drag-Drop CMS",
 }
 
-export default async function Page({ params }: { params: { siteId: string } }) {
+export default async function Page({ params }: { params: Promise<{ siteId: string }> }) {
   const { siteId } = await params
   const site = await getActiveTeam(siteId)
   if (!site) return redirect('/')

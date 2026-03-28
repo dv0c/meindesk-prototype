@@ -5,7 +5,7 @@ import { requireAuth, requireSiteAccess, requireSiteOwnership, createErrorRespon
 
 export async function GET(
     req: Request,
-    { params }: { params: { siteId: string; category: string } }
+    { params }: { params: Promise<{ siteId: string; category: string }> }
 ) {
     try {
         const session = await requireAuth();
@@ -43,7 +43,7 @@ export async function GET(
 
 export async function PUT(
     req: Request,
-    { params }: { params: { siteId: string; category: string } }
+    { params }: { params: Promise<{ siteId: string; category: string }> }
 ) {
     try {
         const session = await requireAuth();

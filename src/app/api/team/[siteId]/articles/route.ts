@@ -4,15 +4,15 @@ import { requireAuth, requireSiteAccess, createErrorResponse } from "@/lib/secur
 
 export const runtime = "nodejs"
 
+/** Dashboard list uses limit=0; cap fetch size to keep DB and payloads bounded. */
+const DASHBOARD_LIST_MAX = 2000
+
 // -------------------------------------------------------
-// GET – Fetch all articles for a specific site by ID (with optional limit)
-// -------------------------------------------------------
-// -------------------------------------------------------
-// GET – Fetch all articles for a specific site by ID (with optional limit)
+// GET – Fetch articles for a site (optional limit; limit=0 = recent up to DASHBOARD_LIST_MAX)
 // -------------------------------------------------------
 export async function GET(
   req: NextRequest,
-  { params }: { params: { siteId: string } }
+  { params }: { params: Promise<{ siteId: string }> }
 ) {
   try {
     const session = await requireAuth();
@@ -25,40 +25,45 @@ export async function GET(
     const limitParam = searchParams.get("limit");
     const parsedLimit = limitParam ? parseInt(limitParam, 10) : 20;
 
-    const articles = await db.article.findMany({
-      where: { siteId },
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-        excerpt: true,
-        cover: true,
-        createdAt: true,
-        updateAt: true,
-        status: true,
-        siteId: true,
-        authorId: true,
-        authorIds: true,
-        categories: true,
-        metadata: true,
-        author: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
+    const [totalCount, articles] = await Promise.all([
+      db.article.count({ where: { siteId } }),
+      db.article.findMany({
+        where: { siteId },
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          excerpt: true,
+          cover: true,
+          createdAt: true,
+          updateAt: true,
+          status: true,
+          siteId: true,
+          authorId: true,
+          authorIds: true,
+          categories: true,
+          metadata: true,
+          author: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+          authors: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
           },
         },
-        authors: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-          },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-      ...(parsedLimit > 0 ? { take: parsedLimit } : {}), // no limit if 0
-    })
+        orderBy: { createdAt: "desc" },
+        ...(parsedLimit > 0
+          ? { take: parsedLimit }
+          : { take: DASHBOARD_LIST_MAX }),
+      }),
+    ])
 
     // NEW: Fetch all categories referenced by these articles
     // 1. Collect all unique category IDs
@@ -94,7 +99,14 @@ export async function GET(
       }
     })
 
-    return NextResponse.json(enrichedArticles);
+    const truncated = parsedLimit === 0 && totalCount > articles.length
+
+    return NextResponse.json(enrichedArticles, {
+      headers: {
+        "X-Total-Count": String(totalCount),
+        "X-Articles-Truncated": truncated ? "1" : "0",
+      },
+    })
   } catch (error) {
     return createErrorResponse(error);
   }
@@ -104,7 +116,7 @@ export async function GET(
 // -------------------------------------------------------
 export async function POST(
   req: NextRequest,
-  { params }: { params: { siteId: string } }
+  { params }: { params: Promise<{ siteId: string }> }
 ) {
   try {
     const session = await requireAuth();

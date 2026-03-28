@@ -61,7 +61,12 @@ export async function GET(request: Request) {
 
                   const response = await fetch(apiUrl, {
                     cache: "no-store",
-                    headers: { "User-Agent": "RSS-Sync-Bot/1.0" }
+                    headers: {
+                      "User-Agent": "RSS-Sync-Bot/1.0",
+                      ...(process.env.CRON_SECRET
+                        ? { Authorization: `Bearer ${process.env.CRON_SECRET}` }
+                        : {}),
+                    },
                   });
 
                   if (!response.ok) {

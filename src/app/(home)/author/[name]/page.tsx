@@ -96,7 +96,7 @@ export default async function AuthorPage({ params }: Props) {
 
     return (
         <>
-            <ProjectNavigation />
+            <ProjectNavigation siteId={site.id} />
             <SiteContainer className="py-12">
                 <div className="flex flex-col md:flex-row gap-8 items-center md:items-start mb-12 bg-muted/30 p-8 rounded-2xl">
                     <div className="relative w-32 h-32 shrink-0">

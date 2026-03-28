@@ -143,7 +143,7 @@ function getItemImage(item: any, fields: any[]): string | null {
 export async function generateMetadata({
     params,
 }: {
-    params: { tenantId: string; collectionSlug: string; itemSlug: string }
+    params: Promise<{ tenantId: string; collectionSlug: string; itemSlug: string }>
 }): Promise<Metadata> {
     const { tenantId, collectionSlug, itemSlug } = await params
     const data = await getCollectionItemData(tenantId, collectionSlug, itemSlug)
@@ -172,7 +172,7 @@ export async function generateMetadata({
 export default async function CollectionItemPage({
     params,
 }: {
-    params: { tenantId: string; collectionSlug: string; itemSlug: string }
+    params: Promise<{ tenantId: string; collectionSlug: string; itemSlug: string }>
 }) {
     const { tenantId, collectionSlug, itemSlug } = await params
     const data = await getCollectionItemData(tenantId, collectionSlug, itemSlug)

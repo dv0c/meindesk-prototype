@@ -3,7 +3,7 @@ import { DeleteWebsite } from "@/components/Settings/DeleteSite"
 import { getActiveTeam } from "@/lib/actions/helpers/team"
 import { getAuthSession } from "@/lib/auth"
 
-export default async function SettingsGeneralPage({ params }: { params: { siteId: string } }) {
+export default async function SettingsGeneralPage({ params }: { params: Promise<{ siteId: string }> }) {
   const { siteId } = await params
   const team = await getActiveTeam(siteId)
   if (!team) return <div>Site not found</div>

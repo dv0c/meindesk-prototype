@@ -28,7 +28,7 @@ import {
 import { useArticle } from "@/hooks/use-article"
 import { useTeam } from "@/hooks/useTeam"
 import { useMediaQuery } from "@/hooks/use-media-query"
-import { MoreHorizontal, Search, Loader2, FileText, Trash, Edit, ChevronLeft, ChevronRight, Lock } from "lucide-react"
+import { MoreHorizontal, Search, Loader2, FileText, Trash, Edit, ChevronLeft, ChevronRight } from "lucide-react"
 import Image from "next/image"
 import { useRouter, useParams } from "next/navigation"
 import { useEffect, useMemo, useState } from "react"
@@ -46,6 +46,7 @@ const statusColors = {
 }
 
 const ITEMS_PER_PAGE = 10
+const TABLE_COLUMN_COUNT = 7
 
 interface ArticleTableProps {
     siteId?: string;
@@ -54,9 +55,13 @@ interface ArticleTableProps {
 export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
     const router = useRouter()
     const params = useParams()
-    const siteId = propSiteId || (params.siteId as string)
-    const { articles, getArticles, deleteArticle, loading } = useArticle()
+    const { articles, articlesListMeta, getArticles, deleteArticle, loading } = useArticle()
     const { team } = useTeam()
+
+    const effectiveSiteId = useMemo(
+        () => propSiteId || (params.siteId as string) || team?.id || "",
+        [propSiteId, params.siteId, team?.id]
+    )
 
     // Local state
     const [searchQuery, setSearchQuery] = useState("")
@@ -65,10 +70,12 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
 
     const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null)
     const [deleteId, setDeleteId] = useState<string | null>(null)
+    const [isDeleting, setIsDeleting] = useState(false)
 
     useEffect(() => {
-        if (team) getArticles(team.id)
-    }, [team, getArticles])
+        if (!effectiveSiteId) return
+        getArticles(effectiveSiteId)
+    }, [effectiveSiteId, getArticles])
 
     // Filter Logic
     const filteredArticles = useMemo(() => {
@@ -100,25 +107,33 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
     const isDesktop = useMediaQuery("(min-width: 768px)")
 
     const handleArticleClick = (articleId: string) => {
+        if (!effectiveSiteId) return
         if (isDesktop) {
             setSelectedArticleId(articleId)
         } else {
-            router.push(`/dashboard/${team?.id}/projects/website/articles/${articleId}/editor`)
+            router.push(`/dashboard/${effectiveSiteId}/projects/website/articles/${articleId}/editor`)
         }
     }
 
     const handleDelete = async () => {
-        if (!team || !deleteId) return
-        await deleteArticle(team.id, deleteId)
-        toast.success("Article deleted")
-        setDeleteId(null)
-        if (selectedArticleId === deleteId) {
-            setSelectedArticleId(null)
+        const toDelete = deleteId
+        if (!effectiveSiteId || !toDelete) return
+        setIsDeleting(true)
+        try {
+            await deleteArticle(effectiveSiteId, toDelete)
+            toast.success("Article deleted")
+            setDeleteId(null)
+            if (selectedArticleId === toDelete) {
+                setSelectedArticleId(null)
+            }
+        } catch {
+            // Error toast from useArticle
+        } finally {
+            setIsDeleting(false)
         }
-        getArticles(team.id)
     }
 
-    if (loading && !articles) {
+    if (loading && articles.length === 0) {
         return (
             <div className="flex items-center justify-center h-64 w-full">
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -135,10 +150,16 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
                         Manage your website articles
                     </p>
                 </div>
-                <CreateArticleButton siteId={siteId || (team?.id as string)} />
+                <CreateArticleButton siteId={effectiveSiteId || (team?.id as string)} disabled={!effectiveSiteId} />
             </div>
 
             <div className="space-y-4 w-full">
+                {articlesListMeta?.truncated && (
+                    <p className="rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-950 dark:text-amber-100">
+                        Showing the {articles.length} most recent articles of {articlesListMeta.total} total.
+                        Filters apply only to this loaded set.
+                    </p>
+                )}
                 {/* Toolbar */}
                 <div className="flex flex-col sm:flex-row items-center justify-end gap-4">
                     <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -182,8 +203,10 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
                         <TableBody>
                             {paginatedArticles.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
-                                        No articles found.
+                                    <TableCell colSpan={TABLE_COLUMN_COUNT} className="h-24 text-center text-muted-foreground">
+                                        {(articles?.length ?? 0) > 0
+                                            ? "No articles match your search or filters."
+                                            : "No articles yet. Create one to get started."}
                                     </TableCell>
                                 </TableRow>
                             ) : (
@@ -288,7 +311,13 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
                                             <div className="flex items-center justify-end">
                                                 <DropdownMenu>
                                                     <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            aria-label="Article actions"
+                                                            className="h-8 w-8 text-muted-foreground opacity-100 transition-opacity focus-visible:opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
+                                                        >
                                                             <MoreHorizontal className="h-4 w-4" />
                                                         </Button>
                                                     </DropdownMenuTrigger>
@@ -355,14 +384,14 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
                     <SheetTitle className="sr-only">Article Editor</SheetTitle>
                     <SheetDescription className="sr-only">Edit article content</SheetDescription>
 
-                    {selectedArticleId && (
+                    {selectedArticleId && effectiveSiteId && (
                         <div className="flex-1 h-full bg-background relative flex flex-col min-w-0">
                             <ArticleEditor
                                 articleId={selectedArticleId}
-                                siteId={siteId || (team?.id as string)}
+                                siteId={effectiveSiteId}
                                 onClose={() => setSelectedArticleId(null)}
                                 onUpdate={() => {
-                                    if (team) getArticles(team.id)
+                                    getArticles(effectiveSiteId)
                                 }}
                             />
                         </div>
@@ -372,9 +401,13 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
 
             <DeleteConfirmDialog
                 open={!!deleteId}
-                onOpenChange={(open) => !open && setDeleteId(null)}
+                onOpenChange={(open) => {
+                    if (!open && !isDeleting) setDeleteId(null)
+                }}
                 onConfirm={handleDelete}
                 title="Delete Article"
+                description="This article will be permanently removed from your site."
+                loading={isDeleting}
             />
         </div >
     )

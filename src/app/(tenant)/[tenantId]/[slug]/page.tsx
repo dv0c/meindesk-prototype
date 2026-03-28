@@ -47,7 +47,7 @@ async function getPageData(tenantId: string, slug: string) {
 export async function generateMetadata({
   params,
 }: {
-  params: { tenantId: string; slug: string }
+  params: Promise<{ tenantId: string; slug: string }>
 }): Promise<Metadata> {
   const { tenantId, slug } = await params
   const data = await getPageData(tenantId, slug)
@@ -90,7 +90,7 @@ export async function generateMetadata({
 export default async function TenantPage({
   params,
 }: {
-  params: { tenantId: string; slug: string }
+  params: Promise<{ tenantId: string; slug: string }>
 }) {
   const { tenantId, slug } = await params
   const data = await getPageData(tenantId, slug)

@@ -6,7 +6,7 @@ import { requireAuth, requireSiteAccess, createErrorResponse } from "@/lib/secur
 // GET: List all saved components for a site
 export async function GET(
     req: Request,
-    { params }: { params: { siteId: string } }
+    { params }: { params: Promise<{ siteId: string }> }
 ) {
     try {
         const session = await requireAuth();
@@ -38,7 +38,7 @@ export async function GET(
 // POST: Save a new component
 export async function POST(
     req: Request,
-    { params }: { params: { siteId: string } }
+    { params }: { params: Promise<{ siteId: string }> }
 ) {
     try {
         const session = await requireAuth();

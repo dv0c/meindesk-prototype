@@ -2,6 +2,7 @@
 
 import React from "react"
 import { cn } from "@/lib/utils"
+import { sanitizeRichHtml } from "@/lib/security/sanitize-html"
 import { useCollectionField } from "./CollectionItemContext"
 import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
 
@@ -199,7 +200,7 @@ export const CollectionField = defineBlock<CollectionFieldProps>({
                     <div
                         className={cn("prose prose-sm max-w-none", computedClassName)}
                         style={computedStyle}
-                        dangerouslySetInnerHTML={{ __html: value }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(String(value ?? "")) }}
                     />
                 )
             }

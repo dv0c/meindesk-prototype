@@ -7,7 +7,7 @@ import { notFound } from "next/navigation"
 import ClientPreview from "./ClientPreview"
 
 interface PreviewPageProps {
-  params: { tenantId: string }
+  params: Promise<{ tenantId: string }>
 }
 
 async function getPageData(tenantId: string) {

@@ -5,10 +5,10 @@ import React, { FC } from 'react'
 
 interface layoutProps {
     children: React.ReactNode
-    params: {
-        siteId: string;
+    params: Promise<{
+        siteId: string
         id: string
-    }
+    }>
 }
 
 export const metadata = {
@@ -20,7 +20,7 @@ const layout: FC<layoutProps> = async ({ children, params }) => {
     const session = await getAuthSession()
     const team = await getActiveTeam(siteId)
 
-    if (!session?.user.id) redirect('/login')
+    if (!session?.user?.id) redirect('/login')
     if (!team) redirect('/dashboard')
 
     return <div className='bg-neutral-950 h-screen overflow-auto pb-5'>

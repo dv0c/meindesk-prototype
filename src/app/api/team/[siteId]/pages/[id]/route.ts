@@ -48,7 +48,7 @@ async function fetchChildren(parentId: string): Promise<PageWithChildren[]> {
 // ------------------------------------
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ siteId: string; id: string }> }
 ) {
   const { id } = await params;
 
@@ -73,7 +73,7 @@ export async function GET(
 // ------------------------------------
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string; siteId: string } }
+  { params }: { params: Promise<{ siteId: string; id: string }> }
 ) {
   const { id, siteId } = await params;
   const session = await getAuthSession();
@@ -179,7 +179,7 @@ export async function PUT(
 // ------------------------------------
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string; siteId: string } }
+  { params }: { params: Promise<{ siteId: string; id: string }> }
 ) {
   const { id, siteId } = await params;
   const session = await getAuthSession();

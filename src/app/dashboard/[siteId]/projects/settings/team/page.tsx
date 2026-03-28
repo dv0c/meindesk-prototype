@@ -20,7 +20,7 @@ import { Mail, Plus, Trash2, Shield } from "lucide-react"
 import { global_blur } from "@/lib/utils"
 import { InviteMemberForm } from "@/components/dashboard/settings/InviteMemberForm"
 
-export default async function TeamSettingsPage({ params }: { params: { siteId: string } }) {
+export default async function TeamSettingsPage({ params }: { params: Promise<{ siteId: string }> }) {
     const session = await getAuthSession()
     if (!session?.user) return redirect("/login")
 

@@ -4,7 +4,7 @@ import { NextResponse } from "next/server"
 
 export async function DELETE(
     req: Request,
-    { params }: { params: { siteId: string } }
+    { params }: { params: Promise<{ siteId: string }> }
 ) {
     try {
         const session = await getAuthSession()

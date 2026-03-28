@@ -5,6 +5,7 @@ import { useTeam } from "@/hooks/useTeam"
 import { useParams } from "next/navigation"
 import axios from "axios"
 import { defineBlock, useBlockStyles, type BlockStyle } from "@/lib/block-api"
+import { sanitizeRichHtml } from "@/lib/security/sanitize-html"
 
 interface Author {
     id: string
@@ -324,7 +325,12 @@ const SophiaArticleBase = forwardRef<HTMLDivElement, SophiaArticleProps>(
                                 lineHeight: '32px',
                                 color: getColorVar(contentColor),
                             }}
-                            dangerouslySetInnerHTML={{ __html: article.html || article.content }}
+                            dangerouslySetInnerHTML={{
+                                __html: sanitizeRichHtml(
+                                    article.html ??
+                                        (typeof article.content === "string" ? article.content : "")
+                                ),
+                            }}
                         />
                     </div>
                 </article>

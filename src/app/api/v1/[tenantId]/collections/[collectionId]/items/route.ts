@@ -8,7 +8,7 @@ export const runtime = "nodejs"
 // -------------------------------------------------------
 export async function GET(
     req: NextRequest,
-    { params }: { params: { tenantId: string; collectionId: string } }
+    { params }: { params: Promise<{ tenantId: string; collectionId: string }> }
 ) {
     const { tenantId, collectionId } = await params
     const { searchParams } = new URL(req.url)

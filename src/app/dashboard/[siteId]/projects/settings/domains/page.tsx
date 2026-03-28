@@ -1,7 +1,7 @@
 import { DomainsSettings } from "@/components/Settings/DomainsSettings"
 import { getActiveTeam } from "@/lib/actions/helpers/team"
 
-export default async function SettingsDomainsPage({ params }: { params: { siteId: string } }) {
+export default async function SettingsDomainsPage({ params }: { params: Promise<{ siteId: string }> }) {
     const { siteId } = await params
     const team = await getActiveTeam(siteId)
     if (!team) return <div>Site not found</div>

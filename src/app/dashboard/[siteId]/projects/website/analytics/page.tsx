@@ -15,9 +15,9 @@ export const metadata = {
     title: "Analytics | PROTOTYPE — Blog Builder & Drag-Drop CMS",
 }
 
-export default async function Page({ params }: { params: { siteId: string } }) {
+export default async function Page({ params }: { params: Promise<{ siteId: string }> }) {
     const { siteId } = await params
-    const site = await getActiveTeam(siteId, "analytics")
+    const site = await getActiveTeam(siteId)
 
     if (!site) {
         return <div className="flex flex-1 items-center justify-center p-4">

@@ -11,7 +11,7 @@ const IMPERSONATION_COOKIE_NAME = "impersonation_token"
 export async function impersonateUser(targetUserId: string) {
   const session = await getServerSession(authOptions)
 
-  if (!session || session.user.role !== "ADMIN") {
+  if (!session?.user || session.user.role !== "ADMIN") {
     throw new Error("Unauthorized")
   }
 
@@ -20,7 +20,7 @@ export async function impersonateUser(targetUserId: string) {
   // Store the original admin ID and the target user ID
   const payload = JSON.stringify({
     targetUserId,
-    originalAdminId: session.user.id
+    originalAdminId: session.user.id,
   })
 
   cookieStore.set(IMPERSONATION_COOKIE_NAME, payload, {
@@ -42,7 +42,7 @@ export async function stopImpersonating() {
 export async function getAdminUsers(query: string = "") {
   const session = await getServerSession(authOptions)
 
-  if (!session || session.user.role !== "ADMIN") {
+  if (!session?.user || session.user.role !== "ADMIN") {
     throw new Error("Unauthorized")
   }
 

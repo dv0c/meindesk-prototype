@@ -35,7 +35,7 @@ export default function AdminMarketplacePage() {
     // Check admin access
     useEffect(() => {
         if (status === "loading") return
-        if (!session || session.user.role !== "ADMIN") {
+        if (!session?.user || session.user.role !== "ADMIN") {
             router.push("/")
             return
         }

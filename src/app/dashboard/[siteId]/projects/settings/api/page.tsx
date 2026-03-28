@@ -3,7 +3,7 @@ import { getActiveTeam } from "@/lib/actions/helpers/team"
 import { ApiPlayground } from "@/components/Settings/ApiPlayground"
 import { redirect } from "next/navigation"
 
-export default async function ApiSettingsPage({ params }: { params: { siteId: string } }) {
+export default async function ApiSettingsPage({ params }: { params: Promise<{ siteId: string }> }) {
     const { siteId } = await params
     const team = await getActiveTeam(siteId)
 

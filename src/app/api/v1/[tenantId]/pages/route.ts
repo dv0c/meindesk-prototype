@@ -20,23 +20,3 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ tena
   }
 }
 
-// ------------------------------------------------------
-// GET / PUT / DELETE single page by id
-// Route: /api/sites/:siteId/pages/:id
-// ------------------------------------------------------
-export async function GETSingle(req: NextRequest, { params }: { params: { siteId: string; id: string } }) {
-  const { siteId, id } = params;
-
-  try {
-    const page = await db.page.findFirst({
-      where: { id, siteId },
-    });
-
-    if (!page) return NextResponse.json({ error: "Page not found" }, { status: 404 });
-
-    return NextResponse.json(page);
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: "Failed to fetch page" }, { status: 500 });
-  }
-}

@@ -122,13 +122,28 @@ export const authOptions: NextAuthOptions = {
       delete token.isImpersonating
       delete token.originalAdminId
 
-      // --- Standard user population ---
+      const SYNC_INTERVAL_MS = 120_000
+      const nowMs = Date.now()
+
       if (user) {
         token.id = user.id
         token.name = user.name
         token.email = user.email
         token.picture = user.image
-        token.role = (user as any).role || Role.USER
+        token.username = user.username
+        token.role = user.role ?? Role.USER
+        token.developerMode = user.developerMode
+      }
+
+      const lastSync = typeof token.dbLastSync === "number" ? token.dbLastSync : 0
+      const canSkipDbSync =
+        !user &&
+        Boolean(token.id) &&
+        Boolean(token.username) &&
+        nowMs - lastSync < SYNC_INTERVAL_MS
+
+      if (canSkipDbSync) {
+        return token
       }
 
       const dbUser = token.id
@@ -137,23 +152,19 @@ export const authOptions: NextAuthOptions = {
           ? await db.user.findFirst({ where: { email: token.email as string } })
           : null
 
-      // --- KEY FIX: invalidate ghost sessions ---
       if (!dbUser) {
-        // user no longer exists → wipe token
         return {}
       }
 
-      // update user info in token
       token.id = dbUser.id
       token.name = dbUser.name
       token.email = dbUser.email
       token.picture = dbUser.image
       token.username = dbUser.username
       token.role = dbUser.role
-      // @ts-ignore
       token.developerMode = dbUser.developerMode
+      token.dbLastSync = nowMs
 
-      // ensure username exists
       if (!dbUser.username) {
         const newUsername = nanoid(10)
         await db.user.update({
@@ -167,22 +178,21 @@ export const authOptions: NextAuthOptions = {
     },
 
     async session({ session, token }) {
-      if (!token || !token.id) {
-        // make sure session is empty if user is gone
-        return null as any
+      if (!token?.id) {
+        return { ...session, user: null }
       }
 
-      session.user.id = token.id as string
-      session.user.name = token.name
-      session.user.email = token.email
-      session.user.image = token.picture as string | null | undefined
-      session.user.username = token.username as string | null | undefined
-      session.user.role = token.role as Role
-      session.user.role = token.role as Role
-      session.user.isImpersonating = token.isImpersonating as boolean | undefined
-      session.user.originalAdminId = token.originalAdminId as string | undefined
-      // @ts-ignore
-      session.user.developerMode = token.developerMode as boolean
+      session.user = {
+        id: token.id as string,
+        name: token.name,
+        email: token.email,
+        image: token.picture as string | null | undefined,
+        username: token.username as string | null | undefined,
+        role: token.role as Role,
+        isImpersonating: token.isImpersonating,
+        originalAdminId: token.originalAdminId as string | undefined,
+        developerMode: token.developerMode,
+      }
       return session
     },
 

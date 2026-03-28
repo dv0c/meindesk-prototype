@@ -7,6 +7,7 @@ import axios from "axios"
 import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
 import { useEditor } from "@craftjs/core"
 import { cn } from "@/lib/utils"
+import { sanitizeRichHtml } from "@/lib/security/sanitize-html"
 
 interface Author {
     id: string
@@ -336,7 +337,7 @@ export const SingleArticle = defineBlock<SingleArticleProps>({
                     {/* Excerpt - styled lead paragraph */}
                     {article.excerpt && (
                         <div
-                            dangerouslySetInnerHTML={{ __html: article.excerpt }}
+                            dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(article.excerpt) }}
                             className="text-xl md:text-2xl text-muted-foreground leading-relaxed mb-10 font-light italic border-l-4 border-primary/30 pl-6"
                         />
                     )}
@@ -359,7 +360,7 @@ export const SingleArticle = defineBlock<SingleArticleProps>({
                             first-letter:text-5xl first-letter:font-bold first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:text-primary
                         "
                         style={{ fontFamily: 'var(--design-font-base, Georgia, serif)' }}
-                        dangerouslySetInnerHTML={{ __html: article.html }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(article.html) }}
                     />
                 </article>
             </div>

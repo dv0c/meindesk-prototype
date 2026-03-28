@@ -9,7 +9,7 @@ import ClientPreview from "../../ClientPreview";
 export default async function TenantPage({
   params,
 }: {
-  params: { tenantId: string; slug: string }
+  params: Promise<{ tenantId: string; slug: string }>
 }) {
   const { tenantId, slug } = await params
 

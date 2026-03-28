@@ -6,7 +6,7 @@ export default async function SettingsLayoutWrapper({
     params,
 }: {
     children: React.ReactNode
-    params: { siteId: string }
+    params: Promise<{ siteId: string }>
 }) {
     const { siteId } = await params
     const team = await getActiveTeam(siteId)

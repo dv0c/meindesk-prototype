@@ -16,7 +16,7 @@ export default async function AdminRedirectPage({
 
     // 1. Auth Check - Redirect to login if not authenticated
     const session = await getAuthSession()
-    if (!session) {
+    if (!session?.user) {
         redirect(baseUrl + "/login")
     }
 

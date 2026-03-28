@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { ChevronDown, ChevronRight, AlignCenter, AlignLeft, AlignRight, AlignJustify, ArrowDown, ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { sanitizeRichHtml } from "@/lib/security/sanitize-html"
 import { motion, AnimatePresence } from "framer-motion"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
@@ -680,7 +681,7 @@ export function PropertyRichText({ value, onChange, label, description }: Proper
                 {htmlContent ? (
                     <div
                         className="text-xs text-muted-foreground prose prose-sm max-w-none overflow-hidden"
-                        dangerouslySetInnerHTML={{ __html: htmlContent }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(htmlContent) }}
                         style={{ maxHeight: '100px', overflow: 'hidden' }}
                     />
                 ) : (

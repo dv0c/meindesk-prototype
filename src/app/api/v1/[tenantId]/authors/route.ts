@@ -8,7 +8,7 @@ export const runtime = "nodejs"
 // -------------------------------------------------------
 export async function GET(
     req: NextRequest,
-    { params }: { params: { tenantId: string } }
+    { params }: { params: Promise<{ tenantId: string }> }
 ) {
     const { tenantId } = await params
 
@@ -20,16 +20,16 @@ export async function GET(
                     select: {
                         id: true,
                         name: true,
-                        email: true,
                         image: true,
+                        username: true,
                     },
                 },
                 members: {
                     select: {
                         id: true,
                         name: true,
-                        email: true,
                         image: true,
+                        username: true,
                     },
                 },
             },

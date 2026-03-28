@@ -15,9 +15,6 @@ const nextConfig: NextConfig = {
       hostname,
     })),
   },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
 };
 
 export default nextConfig;

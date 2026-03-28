@@ -11,19 +11,36 @@ export interface LayoutNode {
 export interface WebsiteSettings {
     title: string
     description?: string
+    favicon?: string
+    /** Custom CSS stored in site settings (sanitized at render) */
+    globalCss?: string
     theme?: {
-        mode: 'light' | 'dark'
+        mode?: 'light' | 'dark'
         primaryColor?: string
         secondaryColor?: string
         fontFamily?: string
         backgroundColor?: string
         textColor?: string
+        headingFont?: string
+        bodyFont?: string
     }
     seo?: {
         title?: string
         description?: string
         ogImage?: string
         favicon?: string
+        metaTitle?: string
+        metaDescription?: string
+        keywords?: string
+        author?: string
+        robots?: string
+        canonical?: string
+        ogTitle?: string
+        ogDescription?: string
+        ogType?: string
+        twitterCard?: string
+        twitterSite?: string
+        twitterCreator?: string
     }
 }
 

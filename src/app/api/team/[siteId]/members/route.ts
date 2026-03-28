@@ -8,7 +8,7 @@ export const runtime = "nodejs";
 
 export async function GET(
     req: NextRequest,
-    { params }: { params: { siteId: string } }
+    { params }: { params: Promise<{ siteId: string }> }
 ) {
     try {
         const session = await getAuthSession();

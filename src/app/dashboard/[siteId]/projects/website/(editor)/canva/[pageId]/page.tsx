@@ -29,8 +29,8 @@ import { DeviceProvider } from "./components/DeviceContext"
 // This automatically handles missing components (e.g., from uninstalled themes)
 const resolver = resolverWithFallback
 
-export default function CraftJSEditorPage({ params }: { params: { siteId: string; pageId: string } }) {
-    const { siteId, pageId } = use(params as unknown as Promise<{ siteId: string; pageId: string }>)
+export default function CraftJSEditorPage({ params }: { params: Promise<{ siteId: string; pageId: string }> }) {
+    const { siteId, pageId } = use(params)
     const [pageName, setPageName] = useState("Untitled Page")
     const [pageStatus, setPageStatus] = useState<"DRAFT" | "PUBLISHED" | "ARCHIVED">("DRAFT")
     const [isLocked, setIsLocked] = useState(false)

@@ -4,6 +4,7 @@ import React from "react"
 import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
 import { useArticle } from "./ArticleContext"
 import { cn } from "@/lib/utils"
+import { sanitizeRichHtml } from "@/lib/security/sanitize-html"
 
 export interface ArticleContentProps {
     maxWidth?: string
@@ -88,11 +89,15 @@ export const ArticleContent = defineBlock<ArticleContentProps>({
             )
         }
 
+        const bodyRaw =
+            article.html ??
+            (typeof article.content === "string" ? article.content : "")
+
         return (
             <div
                 className={computedClassName}
                 style={computedStyle}
-                dangerouslySetInnerHTML={{ __html: article.html || article.content }}
+                dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(bodyRaw) }}
             />
         )
     }

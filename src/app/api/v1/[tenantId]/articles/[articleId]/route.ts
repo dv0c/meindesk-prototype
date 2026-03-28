@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { v1PublicAuthorSelect } from "@/lib/api/v1-public-fields";
 
 export const runtime = "nodejs";
 
@@ -8,7 +9,7 @@ export const runtime = "nodejs";
 // -------------------------------------------------------
 export async function GET(
   req: NextRequest,
-  { params }: { params: { tenantId: string; articleId: string } }
+  { params }: { params: Promise<{ tenantId: string; articleId: string }> }
 ) {
   try {
     const { articleId, tenantId } = await params;
@@ -26,12 +27,8 @@ export async function GET(
           // status: "PUBLISHED" // temporarily allow all statuses
         },
         include: {
-          author: {
-            select: { id: true, name: true, email: true, image: true, username: true, role: true },
-          },
-          authors: {
-            select: { id: true, name: true, email: true, image: true, username: true, role: true },
-          },
+          author: { select: { ...v1PublicAuthorSelect } },
+          authors: { select: { ...v1PublicAuthorSelect } },
           site: {
             select: { id: true, title: true },
           },
@@ -47,12 +44,8 @@ export async function GET(
           // status: "PUBLISHED" 
         },
         include: {
-          author: {
-            select: { id: true, name: true, email: true, image: true, username: true, role: true },
-          },
-          authors: {
-            select: { id: true, name: true, email: true, image: true, username: true, role: true },
-          },
+          author: { select: { ...v1PublicAuthorSelect } },
+          authors: { select: { ...v1PublicAuthorSelect } },
           site: {
             select: { id: true, title: true },
           },

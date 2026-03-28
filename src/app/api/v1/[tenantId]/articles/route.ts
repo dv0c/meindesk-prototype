@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { getAuthSession } from "@/lib/auth"
+import { Prisma } from "@/generated/client"
+import { v1PublicAuthorSelect } from "@/lib/api/v1-public-fields"
 
 export const runtime = "nodejs"
 
@@ -9,16 +10,19 @@ export const runtime = "nodejs"
 // -------------------------------------------------------
 export async function GET(
   req: NextRequest,
-  { params }: { params: { tenantId: string } }
+  { params }: { params: Promise<{ tenantId: string }> }
 ) {
   const { tenantId } = await params
   const { searchParams } = new URL(req.url)
   const limitParam = searchParams.get("limit")
   const categoriesParam = searchParams.get("categories")
-  const limit = limitParam ? parseInt(limitParam, 10) : 10 // default to 10 results
+  const parsedLimit = limitParam ? parseInt(limitParam, 10) : 10
+  const limit = Number.isFinite(parsedLimit)
+    ? Math.min(Math.max(parsedLimit, 1), 100)
+    : 10
 
   try {
-    let whereClause: any = { siteId: tenantId }
+    let whereClause: Prisma.ArticleWhereInput = { siteId: tenantId }
 
     if (categoriesParam) {
       const categoryNames = categoriesParam.split(",").map((c) => c.trim())
@@ -50,22 +54,8 @@ export async function GET(
         createdAt: true,
         categories: true,
         metadata: true,
-        author: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            image: true,
-          },
-        },
-        authors: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            image: true,
-          },
-        },
+        author: { select: { ...v1PublicAuthorSelect } },
+        authors: { select: { ...v1PublicAuthorSelect } },
       },
       orderBy: { createdAt: "desc" },
       take: limit, // here's your limit

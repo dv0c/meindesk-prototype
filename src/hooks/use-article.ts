@@ -13,6 +13,10 @@ export function useArticle({ onSuccess, onError }: UseArticleOptions = {}) {
   const [loading, setLoading] = useState(false)
   const [article, setArticle] = useState<any>(null)
   const [articles, setArticles] = useState<any[]>([])
+  const [articlesListMeta, setArticlesListMeta] = useState<{
+    total: number
+    truncated: boolean
+  } | null>(null)
 
   // ----------------------------------------
   // GET all articles
@@ -28,6 +32,13 @@ export function useArticle({ onSuccess, onError }: UseArticleOptions = {}) {
       try {
         const res = await axios.get(`/api/team/${teamId}/articles?limit=0`)
         setArticles(res.data)
+        const total = parseInt(res.headers["x-total-count"] || "0", 10)
+        const truncated = res.headers["x-articles-truncated"] === "1"
+        if (Number.isFinite(total)) {
+          setArticlesListMeta({ total, truncated })
+        } else {
+          setArticlesListMeta(null)
+        }
         onSuccess?.(res.data)
         return res.data
       } catch (error: any) {
@@ -115,8 +126,7 @@ export function useArticle({ onSuccess, onError }: UseArticleOptions = {}) {
       setLoading(true)
       try {
         await axios.delete(`/api/team/${teamId}/articles/${articleId}`)
-        toast.success("Article deleted successfully!")
-        // Remove from local list
+        // Remove from local list (success toast left to the UI layer)
         setArticles((prev) => prev.filter((a) => a.id !== articleId))
         // Clear current if it was deleted
         if (article?.id === articleId) setArticle(null)
@@ -136,6 +146,7 @@ export function useArticle({ onSuccess, onError }: UseArticleOptions = {}) {
   return {
     article,
     articles,
+    articlesListMeta,
     getArticle,
     getArticles,
     updateArticle,

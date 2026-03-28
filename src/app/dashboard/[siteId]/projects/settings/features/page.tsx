@@ -1,7 +1,7 @@
 import { FeaturesSettings } from "@/components/Settings/FeaturesSettings"
 import { getActiveTeam } from "@/lib/actions/helpers/team"
 
-export default async function SettingsFeaturesPage({ params }: { params: { siteId: string } }) {
+export default async function SettingsFeaturesPage({ params }: { params: Promise<{ siteId: string }> }) {
     const { siteId } = await params
     const team = await getActiveTeam(siteId)
     if (!team) return <div>Site not found</div>

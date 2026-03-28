@@ -11,17 +11,20 @@ import type { WebsiteSettings } from "@/lib/types";
 
 // Define the shape of the site data we need (matching Prisma's return type)
 type SiteData = {
+  id: string;
   title: string;
   description: string | null;
   logo: string | null;
   theme: any;
   defaultThemePreference: string;
   settings: any; // JsonValue from Prisma, will be converted to WebsiteSettings
-  url: string | null; // For analytics tracking
+  url: string | null;
 };
 
 import { PrototypeBadge } from "@/components/PrototypeBadge";
 import { AnalyticsTracker } from "@/components/AnalyticsTracker";
+import { TenantDbErrorFallback } from "@/components/TenantDbErrorFallback";
+import { createAnalyticsIngestToken } from "@/lib/security/analytics-ingest-token";
 
 // --- Main Layout Component ---
 
@@ -53,64 +56,7 @@ export default async function TenantLayout({ children }: { children: React.React
     }
   } catch (error) {
     console.error("Database query failed in TenantLayout:", error);
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-        <div className="max-w-md w-full mx-4">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 text-center">
-            {/* Icon */}
-            <div className="mb-6 flex justify-center">
-              <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
-                <svg
-                  className="w-10 h-10 text-red-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                  />
-                </svg>
-              </div>
-            </div>
-
-            {/* Heading */}
-            <h1 className="text-2xl font-bold text-gray-900 mb-3">
-              Database Connection Error
-            </h1>
-
-            {/* Description */}
-            <p className="text-gray-600 mb-6 leading-relaxed">
-              We're having trouble connecting to the database. This is usually temporary.
-              Please try again in a moment.
-            </p>
-
-            {/* Actions */}
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <button
-                onClick={() => window.location.reload()}
-                className="px-6 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg"
-              >
-                Try Again
-              </button>
-              <a
-                href="/"
-                className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors"
-              >
-                Go Home
-              </a>
-            </div>
-
-            {/* Support */}
-            <p className="text-sm text-gray-500 mt-6">
-              If this problem persists, please contact support.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
+    return <TenantDbErrorFallback />;
   }
 
   // 3. Handle Not Found
@@ -121,10 +67,8 @@ export default async function TenantLayout({ children }: { children: React.React
   // 5. Extract Global Settings
   // Convert JsonValue from Prisma to WebsiteSettings (null becomes empty object)
   const settings: WebsiteSettings = (site.settings && typeof site.settings === 'object' ? site.settings : {}) as WebsiteSettings;
-  const {
-    theme: settingsTheme = {} as WebsiteSettings['theme'],
-    globalCss = ''
-  } = settings;
+  const settingsTheme: NonNullable<WebsiteSettings["theme"]> = settings.theme ?? {};
+  const globalCss = settings.globalCss ?? "";
 
   // **SECURITY**: Re-sanitize for defense in depth
   const safeGlobalCss = sanitizeCSS(globalCss);
@@ -157,6 +101,7 @@ export default async function TenantLayout({ children }: { children: React.React
   // Apply theme mode class
   const themeMode = settingsTheme.mode || 'light';
   const themeClassName = themeMode === 'dark' ? 'dark' : '';
+  const analyticsIngestToken = createAnalyticsIngestToken(site.id);
 
   // 6. Render with Global Settings
   return (
@@ -205,7 +150,11 @@ export default async function TenantLayout({ children }: { children: React.React
       {/* Wrapper with background and text color */}
       <div style={wrapperStyle} className={`min-h-screen ${themeClassName}`}>
         {children}
-        {site.url && <AnalyticsTracker siteUrl={site.url} />}
+        <AnalyticsTracker
+          siteId={site.id}
+          dedupeKey={site.url}
+          ingestToken={analyticsIngestToken}
+        />
         <PrototypeBadge />
       </div>
     </>
@@ -244,6 +193,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
 
   // Build metadata object
+  const twitterCard: "summary" | "summary_large_image" =
+    seo.twitterCard === "summary_large_image" ? "summary_large_image" : "summary";
+
   const metadata: Metadata = {
     title: seo.metaTitle || settings.title || site?.title || 'Website',
     description: seo.metaDescription || settings.description || '',
@@ -260,7 +212,7 @@ export async function generateMetadata(): Promise<Metadata> {
       type: (seo.ogType as any) || 'website',
     },
     twitter: {
-      card: seo.twitterCard || 'summary',
+      card: twitterCard,
       site: seo.twitterSite,
       creator: seo.twitterCreator,
       title: seo.ogTitle || seo.metaTitle || settings.title || site?.title,

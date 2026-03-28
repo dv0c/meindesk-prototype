@@ -47,7 +47,7 @@ const entityIcons: Record<string, React.ReactNode> = {
     member: <UserPlus className="w-4 h-4 text-muted-foreground" />,
 }
 
-export default async function LogsPage({ params }: { params: { siteId: string } }) {
+export default async function LogsPage({ params }: { params: Promise<{ siteId: string }> }) {
     const { siteId } = await params
     const site = await getActiveTeam(siteId)
 

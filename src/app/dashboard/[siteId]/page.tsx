@@ -11,7 +11,7 @@ import { Activity, CheckCircle2, Database, ExternalLink, FileText, Globe, Layers
 import Link from "next/link"
 import { redirect } from "next/navigation"
 
-export default async function ProjectDashboard({ params }: { params: { siteId: string } }) {
+export default async function ProjectDashboard({ params }: { params: Promise<{ siteId: string }> }) {
   const { siteId } = await params
   const site = await getActiveTeam(siteId)
 

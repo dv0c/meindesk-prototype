@@ -14,7 +14,7 @@ export const metadata = {
     title: "Articles | PROTOTYPE — Blog Builder & Drag-Drop CMS",
 }
 
-export default async function Page({ params }: { params: { siteId: string } }) {
+export default async function Page({ params }: { params: Promise<{ siteId: string }> }) {
     const { siteId } = await params;
     if (!siteId) {
         return <div className="flex flex-1 items-center justify-center p-4">

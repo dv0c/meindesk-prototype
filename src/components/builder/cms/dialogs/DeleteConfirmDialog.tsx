@@ -29,7 +29,13 @@ export function DeleteConfirmDialog({
     loading = false,
 }: DeleteConfirmDialogProps) {
     return (
-        <AlertDialog open={open} onOpenChange={onOpenChange}>
+        <AlertDialog
+            open={open}
+            onOpenChange={(next) => {
+                if (loading && !next) return
+                onOpenChange(next)
+            }}
+        >
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>{title}</AlertDialogTitle>

@@ -7,6 +7,7 @@ import axios from "axios"
 import { useNode } from "@craftjs/core"
 import { defineBlock, useBlockStyles, BlockStyle } from "@/lib/block-api"
 import { cn } from "@/lib/utils"
+import { sanitizeRichHtml } from "@/lib/security/sanitize-html"
 import { CollectionItemProvider } from "./CollectionItemContext"
 import {
     PropertySection,
@@ -296,7 +297,7 @@ export const CollectionItem = defineBlock<CollectionItemProps>({
                 return new Date(value).toLocaleDateString()
             }
             if (fieldType === 'richtext' && value) {
-                return <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: value }} />
+                return <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(String(value ?? "")) }} />
             }
             if (fieldType === 'image' && value) {
                 return <img src={value} alt="" className="max-w-full h-auto rounded" />
