@@ -99,7 +99,10 @@ export function InviteMemberForm({ siteId }: InviteMemberFormProps) {
 
             <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
                 <div className="relative w-full sm:w-[300px] z-20">
-                    <Command className="rounded-lg border shadow-sm overflow-visible bg-background">
+                    <Command
+                        shouldFilter={false}
+                        className="rounded-lg border shadow-sm overflow-visible bg-background"
+                    >
                         <CommandInput
                             placeholder="Search by name or email..."
                             value={selectedUser ? selectedUser.name : query}
