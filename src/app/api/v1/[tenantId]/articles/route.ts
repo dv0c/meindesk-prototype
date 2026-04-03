@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { Prisma } from "@/generated/client"
+import { ArticleStatus, Prisma } from "@/generated/client"
 import { v1PublicAuthorSelect } from "@/lib/api/v1-public-fields"
 
 export const runtime = "nodejs"
@@ -16,6 +16,7 @@ export async function GET(
   const { searchParams } = new URL(req.url)
   const limitParam = searchParams.get("limit")
   const categoriesParam = searchParams.get("categories")
+  const statusParam = searchParams.get("status")?.trim().toLowerCase() ?? null
   const parsedLimit = limitParam ? parseInt(limitParam, 10) : 10
   const limit = Number.isFinite(parsedLimit)
     ? Math.min(Math.max(parsedLimit, 1), 100)
@@ -23,6 +24,17 @@ export async function GET(
 
   try {
     let whereClause: Prisma.ArticleWhereInput = { siteId: tenantId }
+
+    if (statusParam === "published") {
+      whereClause.status = ArticleStatus.PUBLISHED
+    } else if (statusParam === "draft") {
+      whereClause.status = ArticleStatus.DRAFT
+    } else if (statusParam) {
+      return NextResponse.json(
+        { error: "Invalid status. Use published or draft." },
+        { status: 400 }
+      )
+    }
 
     if (categoriesParam) {
       const categoryNames = categoriesParam.split(",").map((c) => c.trim())
@@ -51,6 +63,7 @@ export async function GET(
         slug: true,
         excerpt: true,
         cover: true,
+        status: true,
         createdAt: true,
         categories: true,
         metadata: true,
