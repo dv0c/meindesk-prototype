@@ -35,7 +35,7 @@ export function CMSModal({ open, onOpenChange, siteId }: CMSModalProps) {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="min-w-screen w-full h-screen p-0 gap-0 overflow-hidden flex bg-background focus:outline-none z-[101]">
+            <DialogContent className="min-w-screen w-full h-screen p-0 gap-0 overflow-hidden flex bg-background focus:outline-none">
                 <CMSSidebar
                     activeView={activeView}
                     setActiveView={setActiveView}

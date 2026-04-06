@@ -739,10 +739,17 @@ const EditorRightSection = ({
                                 id="cat-name"
                                 value={newCategoryForm.name}
                                 onChange={(e) => {
-                                    setNewCategoryForm({ ...newCategoryForm, name: e.target.value })
-                                    if (!newCategoryForm.slug) {
-                                        setNewCategoryForm({ ...newCategoryForm, name: e.target.value, slug: generateSlug(e.target.value) })
-                                    }
+                                    const name = e.target.value
+                                    setNewCategoryForm((prev) => {
+                                        const autoSlug =
+                                            !prev.slug ||
+                                            prev.slug === generateSlug(prev.name)
+                                        return {
+                                            ...prev,
+                                            name,
+                                            slug: autoSlug ? generateSlug(name) : prev.slug,
+                                        }
+                                    })
                                 }}
                                 placeholder="Technology"
                             />

@@ -257,7 +257,7 @@ export default function MediaLibraryDialog({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-        <DialogContent className="!max-w-5xl w-full h-[80vh] flex flex-col p-0 z-[150]">
+        <DialogContent className="!max-w-5xl w-full h-[80vh] flex flex-col p-0">
           <DialogHeader className="p-6 pb-0">
             <DialogTitle>Select Media</DialogTitle>
           </DialogHeader>

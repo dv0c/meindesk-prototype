@@ -112,6 +112,8 @@ const SophiaArticleBase = forwardRef<HTMLDivElement, SophiaArticleProps>(
             className = "",
             responsive,
             isEditing,
+            deviceMode,
+            nodeId,
         },
         ref
     ) => {
@@ -127,6 +129,15 @@ const SophiaArticleBase = forwardRef<HTMLDivElement, SophiaArticleProps>(
 
         // Get article slug from URL
         const articleSlug = params?.slug as string
+
+        const { style: computedStyle, className: computedClassName } = useBlockStyles({
+            style: { backgroundColor: getColorVar(backgroundColor) },
+            className: `w-full ${className}`,
+            responsive,
+            isEditing,
+            deviceMode,
+            nodeId,
+        })
 
         useEffect(() => {
             // If article data was provided via props (SSR), skip fetching
@@ -182,7 +193,7 @@ const SophiaArticleBase = forwardRef<HTMLDivElement, SophiaArticleProps>(
         // Loading state
         if (loading || teamLoading) {
             return (
-                <div ref={ref} className={`w-full ${className}`} style={{ backgroundColor: getColorVar(backgroundColor) }}>
+                <div ref={ref} className={computedClassName} style={computedStyle}>
                     <div className="py-12 px-6">
                         <div className="max-w-4xl mx-auto">
                             <div className="h-12 bg-muted/50 animate-pulse rounded w-2/3 mx-auto mb-12" />
@@ -201,7 +212,7 @@ const SophiaArticleBase = forwardRef<HTMLDivElement, SophiaArticleProps>(
         // Error state
         if (error) {
             return (
-                <div ref={ref} className={`w-full ${className}`} style={{ backgroundColor: getColorVar(backgroundColor) }}>
+                <div ref={ref} className={computedClassName} style={computedStyle}>
                     <div className="py-16 text-center">
                         <h2 className="text-2xl font-bold text-destructive mb-2">Article Not Found</h2>
                         <p className="text-muted-foreground">{error}</p>
@@ -213,20 +224,13 @@ const SophiaArticleBase = forwardRef<HTMLDivElement, SophiaArticleProps>(
         // No article
         if (!article) {
             return (
-                <div ref={ref} className={`w-full ${className}`} style={{ backgroundColor: getColorVar(backgroundColor) }}>
+                <div ref={ref} className={computedClassName} style={computedStyle}>
                     <div className="py-16 text-center">
                         <p className="text-muted-foreground">No article to display</p>
                     </div>
                 </div>
             )
         }
-
-        const { style: computedStyle, className: computedClassName } = useBlockStyles({
-            style: { backgroundColor: getColorVar(backgroundColor) },
-            className: `w-full ${className}`,
-            responsive,
-            isEditing,
-        })
 
         return (
             <div ref={ref} className={computedClassName} style={computedStyle}>

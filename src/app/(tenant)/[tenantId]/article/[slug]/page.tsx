@@ -4,7 +4,8 @@ import { notFound } from "next/navigation"
 import { db } from "@/lib/db"
 import type { PageData } from "@/lib/types"
 import { isValidObjectId } from "@/lib/actions/helpers/cached-tenant"
-import ClientPreview from "../../ClientPreview";
+import { getPageWithChildrenJson } from "@/lib/server/get-page-with-children"
+import ClientPreview from "../../ClientPreview"
 
 export default async function TenantPage({
   params,
@@ -32,15 +33,10 @@ export default async function TenantPage({
   })
   if (!articlePageRecord) notFound()
 
-  // 3. Fetch through API for consistent rendering logic
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
-  const response = await fetch(`${baseUrl}/api/v1/${tenant.id}/pages/${articlePageRecord.id}`, {
-    cache: "no-store",
-  })
+  const raw = await getPageWithChildrenJson(tenant.id, articlePageRecord.id)
+  if (!raw) notFound()
 
-  if (!response.ok) notFound()
-  const page: PageData = await response.json()
+  const page = raw as unknown as PageData
 
-  // 4. Reuse your client renderer
   return <ClientPreview tenantId={tenant.id} page={page} />
 }
