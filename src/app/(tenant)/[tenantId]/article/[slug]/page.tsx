@@ -1,4 +1,4 @@
-// app/(tenant)/[tenantId]/[slug]/page.tsx
+// app/(tenant)/[tenantId]/article/[slug]/page.tsx
 
 import { notFound } from "next/navigation"
 import { db } from "@/lib/db"
@@ -38,5 +38,22 @@ export default async function TenantPage({
 
   const page = raw as unknown as PageData
 
-  return <ClientPreview tenantId={tenant.id} page={page} />
+  const headerSnippet = await db.snippet.findFirst({
+    where: { siteId: tenantId, category: "header" },
+    select: { content: true },
+  })
+
+  const footerSnippet = await db.snippet.findFirst({
+    where: { siteId: tenantId, category: "footer" },
+    select: { content: true },
+  })
+
+  return (
+    <ClientPreview
+      tenantId={tenant.id}
+      page={page}
+      headerContent={headerSnippet?.content}
+      footerContent={footerSnippet?.content}
+    />
+  )
 }
