@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import React, { FC } from 'react'
 import { GlobalHeader } from "@/components/nav/GlobalHeader"
-import { DashboardFooter } from "@/components/nav/DashboardFooter"
+import { ConditionalDashboardFooter } from "@/components/nav/ConditionalDashboardFooter"
 
 interface layoutProps {
     children: React.ReactNode
@@ -35,10 +35,10 @@ export const metadata: Metadata = {
 const layout: FC<layoutProps> = ({ children }) => {
     return <main className='min-h-screen bg-background text-foreground flex flex-col'>
         <GlobalHeader />
-        <div className="flex-1">
+        <div className="flex-1 flex flex-col min-h-0">
             {children}
         </div>
-        <DashboardFooter />
+        <ConditionalDashboardFooter />
     </main>
 }
 

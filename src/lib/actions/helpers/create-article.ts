@@ -7,8 +7,8 @@ import { logActivity } from "@/lib/actions/activity-log";
 export async function CreateArticle({ siteId }: { siteId: string }) {
   const session = await getAuthSession();
   const slug = await generateSlug("Untitled", "article", siteId);
-
-  if (!session?.user.id) {
+  const userId = session?.user?.id;
+  if (!userId) {
     return "Not authorized";
   }
 
@@ -16,9 +16,9 @@ export async function CreateArticle({ siteId }: { siteId: string }) {
     data: {
       title: "Untitled",
       slug,
-      authorId: session.user.id,
+      authorId: userId,
+      authorIds: [userId],
       siteId,
-
     },
   });
 

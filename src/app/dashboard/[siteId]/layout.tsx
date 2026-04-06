@@ -23,7 +23,7 @@ const Layout: FC<LayoutProps> = ({ children }) => {
         <SiteProvider>
             {!hideHeader && <ProjectNavigation siteId={siteId} />}
 
-            <main className="bg-muted/5 min-h-[calc(100vh-64px)]">
+            <main className="bg-muted/5 flex flex-1 flex-col min-h-0">
                 <RouterRefresh>
                     <LoadingOverlay />
                     {children}

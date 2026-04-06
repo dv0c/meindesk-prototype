@@ -387,6 +387,7 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
                     {selectedArticleId && effectiveSiteId && (
                         <div className="flex-1 h-full bg-background relative flex flex-col min-w-0">
                             <ArticleEditor
+                                variant="sheet"
                                 articleId={selectedArticleId}
                                 siteId={effectiveSiteId}
                                 onClose={() => setSelectedArticleId(null)}

@@ -23,9 +23,11 @@ const layout: FC<layoutProps> = async ({ children, params }) => {
     if (!session?.user?.id) redirect('/login')
     if (!team) redirect('/dashboard')
 
-    return <div className='bg-neutral-950 h-screen overflow-auto pb-5'>
-        {children}
-    </div>
+    return (
+        <div className="bg-neutral-950 flex flex-col flex-1 min-h-0 overflow-hidden">
+            {children}
+        </div>
+    )
 }
 
 export default layout

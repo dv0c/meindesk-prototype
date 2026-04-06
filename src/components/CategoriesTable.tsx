@@ -1,10 +1,9 @@
 "use client"
 
 import { useState, useMemo, useEffect } from "react"
-import { Search, Plus, Edit, Trash, MoreHorizontal, Loader2, ChevronLeft, ChevronRight } from "lucide-react"
+import { Search, Edit, Trash, MoreHorizontal, Loader2, ChevronLeft, ChevronRight } from "lucide-react"
 import { toast } from "sonner"
 import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import {
     Table,
     TableBody,
@@ -24,10 +23,12 @@ import {
 import { useFetch } from "@/hooks/useFetch"
 import { useTeam } from "@/hooks/useTeam"
 import { CreateCategoryDialog } from "./builder/cms/dialogs/CreateCategoryDialog"
+import { EditCategoryDialog, type EditCategoryRow } from "./builder/cms/dialogs/EditCategoryDialog"
 import { DeleteConfirmDialog } from "./builder/cms/dialogs/DeleteConfirmDialog"
 import { useParams } from "next/navigation"
 
 const ITEMS_PER_PAGE = 10
+const TABLE_COLUMN_COUNT = 4
 
 interface CategoriesTableProps {
     siteId?: string
@@ -45,6 +46,8 @@ export function CategoriesTable({ siteId: propSiteId }: CategoriesTableProps = {
     )
 
     const [deleteId, setDeleteId] = useState<string | null>(null)
+    const [editCategory, setEditCategory] = useState<EditCategoryRow | null>(null)
+    const [editOpen, setEditOpen] = useState(false)
 
     const filteredCategories = useMemo(() => {
         if (!categories) return []
@@ -74,7 +77,8 @@ export function CategoriesTable({ siteId: propSiteId }: CategoriesTableProps = {
                 toast.success("Category deleted")
                 refetch()
             } else {
-                toast.error("Failed to delete category")
+                const err = await res.json().catch(() => ({}))
+                toast.error(err.error || "Failed to delete category")
             }
         } catch (e) {
             toast.error("Error deleting category")
@@ -124,13 +128,13 @@ export function CategoriesTable({ siteId: propSiteId }: CategoriesTableProps = {
                         <TableBody>
                             {loading ? (
                                 <TableRow>
-                                    <TableCell colSpan={4} className="h-24 text-center">
+                                    <TableCell colSpan={TABLE_COLUMN_COUNT} className="h-24 text-center">
                                         <div className="flex justify-center"><Loader2 className="animate-spin h-6 w-6 text-muted-foreground" /></div>
                                     </TableCell>
                                 </TableRow>
                             ) : paginatedCategories.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                                    <TableCell colSpan={TABLE_COLUMN_COUNT} className="h-24 text-center text-muted-foreground">
                                         No categories found.
                                     </TableCell>
                                 </TableRow>
@@ -154,11 +158,32 @@ export function CategoriesTable({ siteId: propSiteId }: CategoriesTableProps = {
                                         <TableCell className="text-right py-3">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <Button
+                                                        type="button"
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        aria-label="Category actions"
+                                                        className="h-8 w-8 text-muted-foreground opacity-100 transition-opacity focus-visible:opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
+                                                    >
                                                         <MoreHorizontal className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem
+                                                        onClick={() => {
+                                                            setEditCategory({
+                                                                id: cat.id,
+                                                                name: cat.name,
+                                                                slug: cat.slug,
+                                                                description: cat.description,
+                                                                published: cat.published,
+                                                            })
+                                                            setEditOpen(true)
+                                                        }}
+                                                    >
+                                                        <Edit className="mr-2 h-3.5 w-3.5" />
+                                                        Edit
+                                                    </DropdownMenuItem>
                                                     <DropdownMenuItem onClick={() => setDeleteId(cat.id)} className="text-destructive focus:text-destructive">
                                                         <Trash className="mr-2 h-3.5 w-3.5" />
                                                         Delete
@@ -203,11 +228,23 @@ export function CategoriesTable({ siteId: propSiteId }: CategoriesTableProps = {
                 )}
             </div>
 
+            <EditCategoryDialog
+                siteId={(siteId || team?.id) as string}
+                category={editCategory}
+                open={editOpen && !!editCategory}
+                onOpenChange={(o) => {
+                    setEditOpen(o)
+                    if (!o) setEditCategory(null)
+                }}
+                onSuccess={refetch}
+            />
+
             <DeleteConfirmDialog
                 open={!!deleteId}
                 onOpenChange={(open) => !open && setDeleteId(null)}
                 onConfirm={handleDelete}
-                title="Delete Category"
+                title="Delete category"
+                description="This category will be removed from all articles that use it, then deleted. This cannot be undone."
             />
         </div>
     )

@@ -25,25 +25,26 @@ export async function DeleteCategory({
 
     if (!category) throw new Error("Category not found or not yours");
 
-    // Check if any articles are using this category
-    const articlesUsingCategory = await db.article.findFirst({
-        where: {
-            siteId,
-            categories: {
-                has: categoryId,
+    await db.$transaction(async (tx) => {
+        const linked = await tx.article.findMany({
+            where: {
+                siteId,
+                categories: { has: categoryId },
             },
-        },
-    });
+            select: { id: true, categories: true },
+        });
 
-    if (articlesUsingCategory) {
-        throw new Error(
-            "Cannot delete category that is being used by articles. Please remove the category from all articles first."
-        );
-    }
+        for (const a of linked) {
+            const next = a.categories.filter((c) => c !== categoryId);
+            await tx.article.update({
+                where: { id: a.id },
+                data: { categories: next },
+            });
+        }
 
-    // Delete the category
-    await db.category.delete({
-        where: { id: categoryId },
+        await tx.category.delete({
+            where: { id: categoryId },
+        });
     });
 
     return { success: true, message: "Category deleted successfully" };

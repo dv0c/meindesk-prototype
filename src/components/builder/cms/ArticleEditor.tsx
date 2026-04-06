@@ -13,9 +13,10 @@ import { Spinner } from "@/components/ui/spinner"
 import { useArticle } from "@/hooks/use-article"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import EditorRightSection from "./EditorRightSection"
-import { ArrowLeft, ChevronDown, PanelRight, Save, X, Maximize2, ExternalLink } from "lucide-react"
+import { ArrowLeft, ChevronDown, PanelRight, Save, X, ExternalLink } from "lucide-react"
 import { toast } from "sonner"
 import Link from "next/link"
+import { isLikelyAutoSlug, slugifyTitle } from "@/lib/slugify-title"
 
 import { $generateNodesFromDOM } from "@lexical/html"
 import { $getRoot, $insertNodes } from "lexical"
@@ -47,9 +48,17 @@ interface ArticleEditorProps {
     siteId: string
     onClose?: () => void
     onUpdate?: () => void
+    /** `page` = full-route editor (hide open-in-tab). `sheet` = list sheet. */
+    variant?: "sheet" | "page"
 }
 
-export default function ArticleEditor({ articleId, siteId, onClose, onUpdate }: ArticleEditorProps) {
+export default function ArticleEditor({
+    articleId,
+    siteId,
+    onClose,
+    onUpdate,
+    variant = "sheet",
+}: ArticleEditorProps) {
     const [title, setTitle] = useState("")
     const [editorState, setEditorState] = useState<SerializedEditorState>()
     const [html, setHtml] = useState("")
@@ -67,6 +76,7 @@ export default function ArticleEditor({ articleId, siteId, onClose, onUpdate }: 
     const [showSidebar, setShowSidebar] = useState(false)
     const isDesktop = useMediaQuery("(min-width: 768px)")
     const titleRef = useRef<HTMLTextAreaElement>(null)
+    const slugManuallyEditedRef = useRef(false)
 
     useEffect(() => {
         if (isDesktop) {
@@ -82,22 +92,29 @@ export default function ArticleEditor({ articleId, siteId, onClose, onUpdate }: 
     }, [articleId, siteId, getArticle])
 
     useEffect(() => {
-        if (!article || (loaded && article.id === articleId)) return
-        // Reset state when article changes or initially loads
+        setLoaded(false)
+        slugManuallyEditedRef.current = false
+    }, [articleId])
+
+    useEffect(() => {
+        if (!article || article.id !== articleId || loaded) return
         setTitle(article.title || "")
         const content = article.content
         const hasContent = content && Object.keys(content).length > 0 && content.root
         setEditorState(hasContent ? content : undefined)
-        setHtml(article.html || "") // Ensure html is set from article
+        setHtml(article.html || "")
         setSlug(article.slug || "")
         setExcerpt(article.excerpt || "")
         setCategories(article.categories || [])
-        // Handle authors: if authorIds exists use it, else fallback to [authorId] or empty
         setAuthors(article.authorIds || (article.authorId ? [article.authorId] : []))
+
+        slugManuallyEditedRef.current = !isLikelyAutoSlug(
+            article.title || "",
+            article.slug || ""
+        )
 
         setLoaded(true)
         setThumbnail(article.cover || "")
-        // Load SEO from metadata
         const articleMeta = article.metadata as any
         if (articleMeta?.seo) {
             setSeo({
@@ -106,7 +123,7 @@ export default function ArticleEditor({ articleId, siteId, onClose, onUpdate }: 
                 ogImage: articleMeta.seo.ogImage || ""
             })
         }
-    }, [article, loaded, articleId])
+    }, [article, articleId, loaded])
 
     // Auto-resize title on load and when title changes
     useEffect(() => {
@@ -116,55 +133,57 @@ export default function ArticleEditor({ articleId, siteId, onClose, onUpdate }: 
         }
     }, [title])
 
+    const buildMetadata = () => ({
+        ...((article?.metadata as any) || {}),
+        seo,
+        readingTime: Math.ceil((html?.replace(/<[^>]*>/g, "").split(/\s+/).length || 0) / 200),
+        seoScore: (() => {
+            let score = 0
+            if (title.length > 5 && title.length <= 60) score += 30
+            else if (title.length > 0) score += 10
+            const desc = seo.metaDescription || excerpt
+            if (desc.length > 10 && desc.length <= 160) score += 30
+            else if (desc.length > 0) score += 10
+            if (thumbnail) score += 20
+            const wordCount = (html?.replace(/<[^>]*>/g, "").split(/\s+/).length || 0)
+            if (wordCount > 300) score += 20
+            else if (wordCount > 100) score += 10
+            return score
+        })(),
+    })
+
+    const buildArticleBody = () => ({
+        title,
+        content: editorState,
+        html,
+        slug,
+        excerpt,
+        cover: thumbnail,
+        categories,
+        authorIds: authors,
+        metadata: buildMetadata(),
+    })
+
     const handleSave = async () => {
-        if (!articleId || !siteId) return
+        if (!articleId || !siteId || !unsavedChanges) return
         try {
-            await updateArticle(siteId, articleId, {
-                title,
-                content: editorState,
-                html,
-                slug,
-                excerpt,
-                cover: thumbnail,
-                categories,
-                authorIds: authors,
-                metadata: {
-                    ...((article?.metadata as any) || {}),
-                    seo,
-                    readingTime: Math.ceil((html?.replace(/<[^>]*>/g, '').split(/\s+/).length || 0) / 200),
-                    seoScore: (() => {
-                        let score = 0;
-                        if (title.length > 5 && title.length <= 60) score += 30; // Optimal title length
-                        else if (title.length > 0) score += 10;
-
-                        const desc = seo.metaDescription || excerpt;
-                        if (desc.length > 10 && desc.length <= 160) score += 30; // Optimal description length
-                        else if (desc.length > 0) score += 10;
-
-                        if (thumbnail) score += 20; // Has cover image
-
-                        const wordCount = (html?.replace(/<[^>]*>/g, '').split(/\s+/).length || 0);
-                        if (wordCount > 300) score += 20; // Good content length
-                        else if (wordCount > 100) score += 10;
-
-                        return score;
-                    })()
-                }
-            })
-            // toast.success("Saved!")
+            await updateArticle(siteId, articleId, buildArticleBody())
+            toast.success("Draft saved")
             if (onUpdate) onUpdate()
         } catch (error) {
             toast.error("Failed to save")
         }
     }
 
-    const handleStatus = async ({ status }: { status: string }) => {
+    const persistThenSetStatus = async (status: "DRAFT" | "PUBLISHED") => {
         if (!articleId || !siteId) return
         try {
-            await updateArticle(siteId, articleId, { status })
-            toast.success(`Status: ${status}`)
+            const body = unsavedChanges ? buildArticleBody() : {}
+            await updateArticle(siteId, articleId, { ...body, status })
+            toast.success(status === "PUBLISHED" ? "Published" : "Moved to draft")
+            if (onUpdate) onUpdate()
         } catch (error) {
-            toast.error("Failed to update status")
+            toast.error("Could not update article")
         }
     }
 
@@ -181,10 +200,23 @@ export default function ArticleEditor({ articleId, siteId, onClose, onUpdate }: 
         const savedAuthors = [...(article.authorIds || (article.authorId ? [article.authorId] : []))].sort()
         const authorsChanged = JSON.stringify(currentAuthors) !== JSON.stringify(savedAuthors)
 
-        // If html is loaded from article.html but editorState was empty, contentChanged might be tricky.
-        // But usually saving will update both.
-        return titleChanged || contentChanged || slugChanged || excerptChanged || thumbnailChanged || categoriesChanged || authorsChanged
-    }, [title, editorState, slug, excerpt, article, thumbnail, categories, authors])
+        const prevSeo = (article.metadata as any)?.seo || {}
+        const seoChanged =
+            seo.metaTitle !== (prevSeo.metaTitle || "") ||
+            seo.metaDescription !== (prevSeo.metaDescription || "") ||
+            seo.ogImage !== (prevSeo.ogImage || "")
+
+        return (
+            titleChanged ||
+            contentChanged ||
+            slugChanged ||
+            excerptChanged ||
+            thumbnailChanged ||
+            categoriesChanged ||
+            authorsChanged ||
+            seoChanged
+        )
+    }, [title, editorState, slug, excerpt, article, thumbnail, categories, authors, seo])
 
     if (!loaded && loading) {
         return (
@@ -205,7 +237,7 @@ export default function ArticleEditor({ articleId, siteId, onClose, onUpdate }: 
             {!editorState && article.html && (
                 <HtmlLoaderPlugin html={article.html} />
             )}
-            <div className="h-full flex flex-col bg-background">
+            <div className="h-full min-h-0 flex flex-col bg-background">
                 {/* Header */}
                 {/* Header */}
                 <header className="sticky top-0 z-50 h-14 shrink-0 flex items-center justify-between px-4 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
@@ -224,20 +256,26 @@ export default function ArticleEditor({ articleId, siteId, onClose, onUpdate }: 
                             <span className="text-sm font-semibold truncate leading-none tracking-tight">
                                 {title || "Untitled Article"}
                             </span>
-                            {unsavedChanges && (
+                            {unsavedChanges ? (
                                 <Badge variant="outline" className="text-[10px] h-5 px-1.5 py-0 border-orange-500/50 text-orange-500 bg-orange-500/10 shrink-0">
                                     Unsaved
                                 </Badge>
+                            ) : (
+                                <span className="text-[10px] text-muted-foreground shrink-0 hidden sm:inline">
+                                    All changes saved
+                                </span>
                             )}
                         </div>
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0">
-                        <Link href={`/dashboard/${siteId}/projects/website/articles/${articleId}/editor`} target="_blank">
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
-                                <ExternalLink className="h-4 w-4" />
-                            </Button>
-                        </Link>
+                        {variant === "sheet" && (
+                            <Link href={`/dashboard/${siteId}/projects/website/articles/${articleId}/editor`} target="_blank">
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                                    <ExternalLink className="h-4 w-4" />
+                                </Button>
+                            </Link>
+                        )}
 
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -248,11 +286,11 @@ export default function ArticleEditor({ articleId, siteId, onClose, onUpdate }: 
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => handleStatus({ status: 'DRAFT' })}>
+                                <DropdownMenuItem onClick={() => persistThenSetStatus("DRAFT")}>
                                     <div className="h-1.5 w-1.5 rounded-full bg-yellow-500 mr-2" />
                                     Draft
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleStatus({ status: 'PUBLISHED' })}>
+                                <DropdownMenuItem onClick={() => persistThenSetStatus("PUBLISHED")}>
                                     <div className="h-1.5 w-1.5 rounded-full bg-green-500 mr-2" />
                                     Published
                                 </DropdownMenuItem>
@@ -288,23 +326,29 @@ export default function ArticleEditor({ articleId, siteId, onClose, onUpdate }: 
                 </header>
 
                 {/* Main Content */}
-                <div className="flex-1 flex overflow-hidden bg-muted/5">
+                <div className="flex-1 flex min-h-0 overflow-hidden bg-muted/5">
                     {/* Editor Column */}
-                    <div className="flex-1 flex flex-col min-w-0">
+                    <div className="flex-1 flex flex-col min-w-0 min-h-0">
                         {/* Editor Area */}
-                        <ScrollArea className="flex-1 h-full">
+                        <ScrollArea className="flex-1 min-h-0 h-full">
                             {/* Toolbar */}
                             <div className="w-full border-b bg-background z-10">
                                 <EditorToolbar />
                             </div>
 
-                            <div className="min-h-full w-full py-8 px-4 sm:px-6 md:px-8 flex justify-center">
-                                <div className="w-full max-w-3xl space-y-8 bg-background rounded-xl border-none sm:border shadow-sm p-8 sm:p-12 min-h-[calc(100vh-12rem)]">
+                            <div className="min-h-full w-full py-8 px-4 sm:px-6 md:px-8 flex justify-center pb-16">
+                                <div className="w-full max-w-3xl space-y-8 bg-background rounded-xl border-none sm:border shadow-sm p-8 sm:p-12 min-h-[min(100%,32rem)]">
                                     {/* Title */}
                                     <textarea
                                         ref={titleRef}
                                         value={title}
-                                        onChange={(e) => setTitle(e.target.value)}
+                                        onChange={(e) => {
+                                            const v = e.target.value
+                                            setTitle(v)
+                                            if (!slugManuallyEditedRef.current) {
+                                                setSlug(slugifyTitle(v))
+                                            }
+                                        }}
                                         placeholder="Article Title"
                                         rows={1}
                                         className="w-full bg-transparent text-4xl font-extrabold tracking-tight placeholder:text-muted-foreground/30 focus:outline-none resize-none overflow-hidden leading-tight"
@@ -328,8 +372,8 @@ export default function ArticleEditor({ articleId, siteId, onClose, onUpdate }: 
                     </div>
 
                     {/* Desktop Sidebar */}
-                    <aside className={`hidden md:flex w-80 border-l bg-background/50 backdrop-blur-sm flex-col z-40 transition-all duration-300 ${showSidebar ? 'mr-0' : '-mr-80'}`}>
-                        <ScrollArea className="h-full">
+                    <aside className={`hidden md:flex w-80 border-l bg-background/50 backdrop-blur-sm flex-col z-40 transition-all duration-300 min-h-0 ${showSidebar ? 'mr-0' : '-mr-80'}`}>
+                        <ScrollArea className="h-full min-h-0">
                             <div className="p-6">
                                 <EditorRightSection
                                     setThumbnail={setThumbnail}
@@ -346,6 +390,13 @@ export default function ArticleEditor({ articleId, siteId, onClose, onUpdate }: 
                                     setSeo={setSeo}
                                     authors={authors}
                                     setAuthors={setAuthors}
+                                    onSlugUserEdit={() => {
+                                        slugManuallyEditedRef.current = true
+                                    }}
+                                    onResetSlugFromTitle={() => {
+                                        slugManuallyEditedRef.current = false
+                                        setSlug(slugifyTitle(title))
+                                    }}
                                 />
                             </div>
                         </ScrollArea>

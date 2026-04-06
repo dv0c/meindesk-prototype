@@ -111,6 +111,20 @@ export async function PATCH(
       if (data[key] !== undefined) updateData[key] = data[key];
     }
 
+    if (
+      updateData.authorIds !== undefined &&
+      Array.isArray(updateData.authorIds) &&
+      updateData.authorIds.length === 0
+    ) {
+      const cur = await db.article.findUnique({
+        where: { id: articleId },
+        select: { authorId: true },
+      });
+      if (cur?.authorId) {
+        updateData.authorIds = [cur.authorId];
+      }
+    }
+
     // -------------------------------
     // SLUG uniqueness check
     // -------------------------------

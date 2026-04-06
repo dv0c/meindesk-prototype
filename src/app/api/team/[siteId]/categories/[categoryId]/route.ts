@@ -12,12 +12,13 @@ export async function GET(
     const { siteId, categoryId } = await params;
     const session = await getAuthSession();
 
-    if (!session?.user.id) {
+    const userId = session?.user?.id;
+    if (!userId) {
         return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
     // Verify site access
-    await requireSiteAccess(siteId, session.user.id);
+    await requireSiteAccess(siteId, userId);
 
     const category = await db.category.findFirst({
         where: {
@@ -44,12 +45,13 @@ export async function PATCH(
     const { siteId, categoryId } = await params;
     const session = await getAuthSession();
 
-    if (!session?.user.id) {
+    const userId = session?.user?.id;
+    if (!userId) {
         return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
     // Verify site access
-    await requireSiteAccess(siteId, session.user.id);
+    await requireSiteAccess(siteId, userId);
 
     const category = await db.category.findFirst({
         where: {
@@ -126,12 +128,13 @@ export async function DELETE(
     const { siteId, categoryId } = await params;
     const session = await getAuthSession();
 
-    if (!session?.user.id) {
+    const userId = session?.user?.id;
+    if (!userId) {
         return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
     // Verify site access
-    await requireSiteAccess(siteId, session.user.id);
+    await requireSiteAccess(siteId, userId);
 
     const category = await db.category.findFirst({
         where: {
@@ -147,29 +150,27 @@ export async function DELETE(
         );
     }
 
-    // Check if any articles are using this category
-    const articlesUsingCategory = await db.article.findFirst({
-        where: {
-            siteId,
-            categories: {
-                has: categoryId,
-            },
-        },
-    });
-
-    if (articlesUsingCategory) {
-        return NextResponse.json(
-            {
-                error:
-                    "Cannot delete category that is being used by articles. Please remove the category from all articles first.",
-            },
-            { status: 409 }
-        );
-    }
-
     try {
-        await db.category.delete({
-            where: { id: categoryId },
+        await db.$transaction(async (tx) => {
+            const linked = await tx.article.findMany({
+                where: {
+                    siteId,
+                    categories: { has: categoryId },
+                },
+                select: { id: true, categories: true },
+            });
+
+            for (const a of linked) {
+                const next = a.categories.filter((c) => c !== categoryId);
+                await tx.article.update({
+                    where: { id: a.id },
+                    data: { categories: next },
+                });
+            }
+
+            await tx.category.delete({
+                where: { id: categoryId },
+            });
         });
 
         // Log the activity

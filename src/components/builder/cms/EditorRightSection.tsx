@@ -114,7 +114,9 @@ const EditorRightSection = ({
     aiGenerated,
     setAiGenerated,
     authors = [],
-    setAuthors
+    setAuthors,
+    onSlugUserEdit,
+    onResetSlugFromTitle,
 }: {
     article: Article
     slug: string
@@ -132,6 +134,8 @@ const EditorRightSection = ({
     setAiGenerated?: (val: boolean) => void;
     authors?: string[];
     setAuthors?: (val: string[]) => void;
+    onSlugUserEdit?: () => void;
+    onResetSlugFromTitle?: () => void;
 }) => {
     const { siteId } = useSite()
     const [isOpen, setOpen] = useState<boolean>()
@@ -364,19 +368,35 @@ const EditorRightSection = ({
 
                 {/* Slug Section */}
                 <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                        <Link2 className="h-4 w-4 text-muted-foreground" />
-                        <Label htmlFor="slug" className="text-sm font-medium">URL Slug</Label>
+                    <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                            <Link2 className="h-4 w-4 text-muted-foreground" />
+                            <Label htmlFor="slug" className="text-sm font-medium">URL Slug</Label>
+                        </div>
+                        {onResetSlugFromTitle && (
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 text-xs text-muted-foreground"
+                                onClick={onResetSlugFromTitle}
+                            >
+                                Sync from title
+                            </Button>
+                        )}
                     </div>
                     <Input
                         id="slug"
                         placeholder="article-url-slug"
                         value={slug || ""}
-                        onChange={e => setSlug(e.target.value)}
+                        onChange={(e) => {
+                            onSlugUserEdit?.()
+                            setSlug(e.target.value)
+                        }}
                         className="font-mono text-sm"
                     />
                     <p className="text-xs text-muted-foreground">
-                        This will be the URL for your article
+                        Auto-updates from the title until you edit this field.
                     </p>
                 </div>
 
