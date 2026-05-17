@@ -3,17 +3,9 @@
  *
  * Usage: npx tsx scripts/seed-sophia-site-collections.ts <siteId>
  */
+import "./lib/bootstrap"
 import { ensureSophiaFrontendCollections } from "../src/lib/site-collections/ensure"
 import { disconnectScriptDb } from "./lib/prisma-script"
-
-// Patch server-only for CLI scripts
-import { createRequire } from "module"
-const require = createRequire(import.meta.url)
-try {
-  require.resolve("server-only")
-} catch {
-  require.cache[require.resolve("server-only")] = { exports: {} } as NodeModule
-}
 
 async function main() {
   const siteId = process.argv[2]

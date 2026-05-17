@@ -2,9 +2,9 @@
  * Import legacy-export.json into Meindesk (collections, categories, articles, webhook settings).
  *
  * Usage:
- *   DATABASE_URL="mongodb://..." \
  *   npx tsx scripts/import-sophia-legacy-content.ts <siteId> [path-to-legacy-export.json] [revalidateSecret]
  */
+import "./lib/bootstrap"
 import { readFileSync } from "fs"
 import { resolve } from "path"
 import { ArticleStatus } from "../src/generated/client"
