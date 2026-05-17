@@ -34,6 +34,7 @@
     function detectArticleSlug() {
         const path = window.location.pathname;
         const articlePatterns = [
+            /^\/article\/([^\/]+)\/?$/,
             /^\/articles\/([^\/]+)\/?$/,
             /^\/blog\/([^\/]+)\/?$/,
             /^\/news\/([^\/]+)\/?$/,

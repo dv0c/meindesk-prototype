@@ -120,7 +120,9 @@ export function AnalyticsContainer({ siteId, analyticsConnected = true }: { site
                                         <h3 className="font-semibold">Verify</h3>
                                     </div>
                                     <p className="text-sm text-muted-foreground">
-                                        After deploying your changes, run this check. We&apos;ll look for the script on your live site.
+                                        After deploying your public site, run this check. We fetch your production URL
+                                        (from site settings → frontend.publicUrl or revalidate URL), not the Meindesk
+                                        preview subdomain.
                                     </p>
                                 </div>
                                 <Button onClick={handleVerify} disabled={verifying} className="w-full" size="lg">

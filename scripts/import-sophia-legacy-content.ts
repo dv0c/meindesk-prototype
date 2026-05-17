@@ -229,6 +229,7 @@ async function main() {
         ? (site.settings as Record<string, unknown>)
         : {}
     const frontend = {
+      publicUrl: "https://sophiaplatanisioti.gr",
       revalidateUrl: "https://sophiaplatanisioti.gr/api/revalidate-all",
       revalidateSecret,
     }
@@ -238,10 +239,11 @@ async function main() {
         settings: {
           ...currentSettings,
           frontend,
+          analyticsConnected: true,
         },
       },
     })
-    console.log("  site.settings.frontend webhook configured")
+    console.log("  site.settings: frontend webhook + analyticsConnected")
   } else {
     console.warn("  skipped webhook settings (no revalidateSecret provided)")
   }
