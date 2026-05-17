@@ -1,4 +1,4 @@
-import { db } from "@/lib/db"
+import { prismaClient as db } from "@/lib/prisma-client"
 import {
   NAVIGATION_LINKS_FIELDS,
   NAVIGATION_LINKS_SEED,

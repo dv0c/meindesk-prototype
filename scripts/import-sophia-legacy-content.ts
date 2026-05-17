@@ -16,6 +16,8 @@ import {
 import { ensureSophiaFrontendCollections } from "../src/lib/site-collections/ensure"
 import { disconnectScriptDb, getScriptDb } from "./lib/prisma-script"
 
+// ensure.ts uses @/lib/db; scripts use prisma-client via getScriptDb for import body only
+
 type LegacyExport = {
   siteSections: Array<{
     slug: string
