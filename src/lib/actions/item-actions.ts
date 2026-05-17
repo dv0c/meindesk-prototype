@@ -4,6 +4,20 @@ import { db } from "@/lib/db"
 import { getAuthSession } from "@/lib/auth"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
+import { triggerFrontendRevalidate } from "@/lib/frontend-revalidate"
+import { NAVIGATION_LINKS_SLUG, SITE_SECTIONS_SLUG } from "@/lib/site-collections/schemas"
+
+const FRONTEND_COLLECTION_SLUGS = new Set([SITE_SECTIONS_SLUG, NAVIGATION_LINKS_SLUG])
+
+async function maybeTriggerFrontendRevalidate(collectionId: string) {
+    const collection = await db.collection.findUnique({
+        where: { id: collectionId },
+        select: { siteId: true, slug: true },
+    })
+    if (collection && FRONTEND_COLLECTION_SLUGS.has(collection.slug)) {
+        void triggerFrontendRevalidate(collection.siteId)
+    }
+}
 
 const CreateItemSchema = z.object({
     collectionId: z.string(),
@@ -75,6 +89,7 @@ export async function createItem(payload: z.infer<typeof CreateItemSchema>) {
         const collection = await db.collection.findUnique({ where: { id: collectionId } })
         if (collection) {
             revalidatePath(`/dashboard/${collection.siteId}/collections/${collectionId}`)
+            await maybeTriggerFrontendRevalidate(collectionId)
         }
 
         return { success: true, item }
@@ -99,6 +114,7 @@ export async function updateItem(id: string, data: any, status?: string) {
         })
 
         revalidatePath(`/dashboard/${item.collection.siteId}/collections/${item.collectionId}`)
+        await maybeTriggerFrontendRevalidate(item.collectionId)
         return { success: true, item }
     } catch (error: any) {
         return { error: "Failed to update item" }
@@ -157,6 +173,7 @@ export async function deleteItem(id: string, relationAction?: 'CASCADE' | 'SET_N
         await db.collectionItem.delete({ where: { id } })
 
         revalidatePath(`/dashboard/${item.collection.siteId}/collections/${item.collectionId}`)
+        await maybeTriggerFrontendRevalidate(item.collectionId)
         return { success: true }
     } catch (error) {
         console.error("Delete item error:", error)

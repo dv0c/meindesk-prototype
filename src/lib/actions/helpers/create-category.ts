@@ -1,6 +1,8 @@
 "use server";
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { mergeCategoryMetadata, type NavPlacement } from "@/lib/category-metadata";
+import { triggerFrontendRevalidate } from "@/lib/frontend-revalidate";
 
 export async function CreateCategory({
     siteId,
@@ -13,6 +15,8 @@ export async function CreateCategory({
         slug: string;
         thumbnail?: string;
         published?: boolean;
+        navPlacement?: NavPlacement;
+        navOrder?: number;
     };
 }) {
     const session = await getAuthSession();
@@ -43,6 +47,11 @@ export async function CreateCategory({
     }
 
     // Create the category
+    const metadata =
+        data.navPlacement !== undefined || data.navOrder !== undefined
+            ? mergeCategoryMetadata({}, { navPlacement: data.navPlacement, navOrder: data.navOrder })
+            : undefined;
+
     const category = await db.category.create({
         data: {
             name: data.name,
@@ -52,8 +61,11 @@ export async function CreateCategory({
             published: data.published ?? true,
             siteId,
             userId: session.user.id,
+            ...(metadata ? { metadata } : {}),
         },
     });
+
+    void triggerFrontendRevalidate(siteId);
 
     return category;
 }

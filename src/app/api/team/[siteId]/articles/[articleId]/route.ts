@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { getAuthSession } from "@/lib/auth";
 import { requireSiteAccess } from "@/lib/security/route-auth";
 import { logActivity } from "@/lib/actions/activity-log";
+import { triggerFrontendRevalidate } from "@/lib/frontend-revalidate";
 
 export const runtime = "nodejs";
 
@@ -161,6 +162,8 @@ export async function PATCH(
       metadata: { updatedFields: Object.keys(updateData) },
     });
 
+    void triggerFrontendRevalidate(siteId);
+
     return NextResponse.json(updated);
   } catch (error: any) {
     console.error("Error updating article:", error);
@@ -202,6 +205,8 @@ export async function DELETE(
       entityId: articleId,
       entityName: article?.title || "Unknown",
     });
+
+    void triggerFrontendRevalidate(siteId);
 
     return NextResponse.json(deleted);
   } catch (error: any) {

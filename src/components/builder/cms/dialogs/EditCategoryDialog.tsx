@@ -13,9 +13,17 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 import { Loader2 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
+import { parseCategoryMetadata, type NavPlacement } from "@/lib/category-metadata"
 
 export type EditCategoryRow = {
     id: string
@@ -23,6 +31,7 @@ export type EditCategoryRow = {
     slug: string
     description?: string | null
     published?: boolean
+    metadata?: unknown
 }
 
 interface EditCategoryDialogProps {
@@ -45,14 +54,19 @@ export function EditCategoryDialog({
     const [slug, setSlug] = useState("")
     const [description, setDescription] = useState("")
     const [published, setPublished] = useState(true)
+    const [navPlacement, setNavPlacement] = useState<NavPlacement>("none")
+    const [navOrder, setNavOrder] = useState(0)
     const [slugTouched, setSlugTouched] = useState(false)
 
     useEffect(() => {
         if (!category) return
+        const meta = parseCategoryMetadata(category.metadata)
         setName(category.name || "")
         setSlug(category.slug || "")
         setDescription(category.description || "")
         setPublished(category.published !== false)
+        setNavPlacement(meta.navPlacement ?? "none")
+        setNavOrder(meta.navOrder ?? 0)
         setSlugTouched(false)
     }, [category])
 
@@ -77,6 +91,8 @@ export function EditCategoryDialog({
                     slug,
                     description,
                     published,
+                    navPlacement,
+                    navOrder,
                 }),
             })
             const data = await res.json().catch(() => ({}))
@@ -128,6 +144,31 @@ export function EditCategoryDialog({
                             id="edit-cat-desc"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Navigation placement</Label>
+                        <Select value={navPlacement} onValueChange={(v) => setNavPlacement(v as NavPlacement)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select placement" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="header">Header link (top level)</SelectItem>
+                                <SelectItem value="hidden">Articles dropdown</SelectItem>
+                                <SelectItem value="none">Not in navigation</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground">
+                            Controls how this category appears in the site header menu.
+                        </p>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="edit-cat-nav-order">Nav sort order</Label>
+                        <Input
+                            id="edit-cat-nav-order"
+                            type="number"
+                            value={navOrder}
+                            onChange={(e) => setNavOrder(parseInt(e.target.value, 10) || 0)}
                         />
                     </div>
                     <div className="flex items-center justify-between rounded-lg border p-3">

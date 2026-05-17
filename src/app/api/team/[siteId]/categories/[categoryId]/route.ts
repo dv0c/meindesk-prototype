@@ -3,6 +3,8 @@ import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { requireSiteAccess } from "@/lib/security/route-auth";
 import { logActivity } from "@/lib/actions/activity-log";
+import { mergeCategoryMetadata, parseCategoryMetadata, type NavPlacement } from "@/lib/category-metadata";
+import { triggerFrontendRevalidate } from "@/lib/frontend-revalidate";
 
 // GET - Get a specific category
 export async function GET(
@@ -69,7 +71,7 @@ export async function PATCH(
 
     try {
         const body = await req.json();
-        const { name, description, slug, thumbnail, published } = body;
+        const { name, description, slug, thumbnail, published, navPlacement, navOrder } = body;
 
         // If slug is being updated, check for duplicates
         if (slug && slug !== category.slug) {
@@ -89,7 +91,14 @@ export async function PATCH(
             }
         }
 
-        // Update category
+        const metadataPatch =
+            navPlacement !== undefined || navOrder !== undefined
+                ? mergeCategoryMetadata(category.metadata, {
+                      navPlacement: navPlacement as NavPlacement | undefined,
+                      navOrder: typeof navOrder === "number" ? navOrder : undefined,
+                  })
+                : undefined;
+
         const updatedCategory = await db.category.update({
             where: { id: categoryId },
             data: {
@@ -98,6 +107,7 @@ export async function PATCH(
                 ...(slug && { slug }),
                 ...(thumbnail !== undefined && { thumbnail }),
                 ...(published !== undefined && { published }),
+                ...(metadataPatch ? { metadata: metadataPatch } : {}),
             },
         });
 
@@ -110,7 +120,12 @@ export async function PATCH(
             entityName: updatedCategory.name,
         });
 
-        return NextResponse.json(updatedCategory);
+        void triggerFrontendRevalidate(siteId);
+
+        return NextResponse.json({
+            ...updatedCategory,
+            metadata: parseCategoryMetadata(updatedCategory.metadata),
+        });
     } catch (error: any) {
         console.error("Error updating category:", error);
         return NextResponse.json(
@@ -181,6 +196,8 @@ export async function DELETE(
             entityId: categoryId,
             entityName: category.name,
         });
+
+        void triggerFrontendRevalidate(siteId);
 
         return NextResponse.json({
             success: true,

@@ -14,6 +14,14 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { CreateCategory } from "@/lib/actions/helpers/create-category"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import type { NavPlacement } from "@/lib/category-metadata"
 import { Loader2, Plus } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
@@ -29,6 +37,8 @@ export function CreateCategoryDialog({ siteId, onSuccess }: CreateCategoryDialog
     const [name, setName] = useState("")
     const [slug, setSlug] = useState("")
     const [description, setDescription] = useState("")
+    const [navPlacement, setNavPlacement] = useState<NavPlacement>("none")
+    const [navOrder, setNavOrder] = useState(0)
 
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value
@@ -49,7 +59,9 @@ export function CreateCategoryDialog({ siteId, onSuccess }: CreateCategoryDialog
                     name,
                     slug,
                     description,
-                    published: true
+                    published: true,
+                    navPlacement,
+                    navOrder,
                 }
             })
             toast.success("Category created")
@@ -57,6 +69,8 @@ export function CreateCategoryDialog({ siteId, onSuccess }: CreateCategoryDialog
             setName("")
             setSlug("")
             setDescription("")
+            setNavPlacement("none")
+            setNavOrder(0)
             onSuccess?.()
         } catch (error: any) {
             toast.error(error.message || "Failed to create category")
@@ -108,6 +122,28 @@ export function CreateCategoryDialog({ siteId, onSuccess }: CreateCategoryDialog
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             placeholder="Optional description..."
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Navigation placement</Label>
+                        <Select value={navPlacement} onValueChange={(v) => setNavPlacement(v as NavPlacement)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select placement" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="header">Header link (top level)</SelectItem>
+                                <SelectItem value="hidden">Articles dropdown</SelectItem>
+                                <SelectItem value="none">Not in navigation</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="nav-order">Nav sort order</Label>
+                        <Input
+                            id="nav-order"
+                            type="number"
+                            value={navOrder}
+                            onChange={(e) => setNavOrder(parseInt(e.target.value, 10) || 0)}
                         />
                     </div>
                     <DialogFooter>

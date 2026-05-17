@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { ArticleStatus } from "@/generated/client";
 import { v1PublicAuthorSelect } from "@/lib/api/v1-public-fields";
 
 export const runtime = "nodejs";
@@ -24,7 +25,7 @@ export async function GET(
         where: {
           id: articleId,
           siteId: tenantId,
-          // status: "PUBLISHED" // temporarily allow all statuses
+          status: ArticleStatus.PUBLISHED,
         },
         include: {
           author: { select: { ...v1PublicAuthorSelect } },
@@ -41,7 +42,7 @@ export async function GET(
         where: {
           slug: articleId,
           siteId: tenantId,
-          // status: "PUBLISHED" 
+          status: ArticleStatus.PUBLISHED,
         },
         include: {
           author: { select: { ...v1PublicAuthorSelect } },

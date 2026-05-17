@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { requireAuth, requireSiteAccess, createErrorResponse } from "@/lib/security/route-auth"
+import { triggerFrontendRevalidate } from "@/lib/frontend-revalidate"
 
 export const runtime = "nodejs"
 
@@ -163,6 +164,8 @@ export async function POST(
         cover: body.cover || "",
       }
     });
+
+    void triggerFrontendRevalidate(siteId);
 
     return NextResponse.json(article);
   } catch (error) {

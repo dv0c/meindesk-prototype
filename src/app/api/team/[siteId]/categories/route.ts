@@ -3,6 +3,8 @@ import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { requireSiteAccess } from "@/lib/security/route-auth";
 import { logActivity } from "@/lib/actions/activity-log";
+import { mergeCategoryMetadata, type NavPlacement } from "@/lib/category-metadata";
+import { triggerFrontendRevalidate } from "@/lib/frontend-revalidate";
 
 // GET - List all categories for a site
 export async function GET(
@@ -47,6 +49,7 @@ export async function GET(
             slug: true,
             thumbnail: true,
             published: true,
+            metadata: true,
             createdAt: true,
             updatedAt: true,
         },
@@ -72,7 +75,7 @@ export async function POST(
 
     try {
         const body = await req.json();
-        const { name, description, slug, thumbnail, published } = body;
+        const { name, description, slug, thumbnail, published, navPlacement, navOrder } = body;
 
         if (!name || !slug) {
             return NextResponse.json(
@@ -94,6 +97,14 @@ export async function POST(
         }
 
         // Create category
+        const metadata =
+            navPlacement !== undefined || navOrder !== undefined
+                ? mergeCategoryMetadata({}, {
+                      navPlacement: navPlacement as NavPlacement | undefined,
+                      navOrder: typeof navOrder === "number" ? navOrder : undefined,
+                  })
+                : undefined;
+
         const category = await db.category.create({
             data: {
                 name,
@@ -103,6 +114,7 @@ export async function POST(
                 published: published ?? true,
                 siteId,
                 userId: session.user.id,
+                ...(metadata ? { metadata } : {}),
             },
         });
 
@@ -114,6 +126,8 @@ export async function POST(
             entityId: category.id,
             entityName: category.name,
         });
+
+        void triggerFrontendRevalidate(siteId);
 
         return NextResponse.json(category, { status: 201 });
     } catch (error: any) {
