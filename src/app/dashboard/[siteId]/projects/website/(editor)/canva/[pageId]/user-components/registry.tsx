@@ -65,6 +65,7 @@ import {
 import { MeindeskContainer } from './themes/Meindesk/MeindeskContainer'
 import { Footer } from './themes/SophiaPlatanisioti/Footer'
 import { Hero } from './themes/SophiaPlatanisioti/Hero'
+import { SophiaPageAside } from './themes/SophiaPlatanisioti/SophiaPageAside'
 import { SophiaArticle } from './themes/SophiaPlatanisioti/SophiaArticle'
 import { TIGArticleGrid } from './themes/TimeIsGolden/TIGArticleGrid'
 import { TIGFooter } from './themes/TimeIsGolden/TIGFooter'
@@ -241,6 +242,13 @@ export const componentRegistry: ComponentRegistration[] = [
         component: Hero,
         category: 'Sophia Content',
         description: 'A rich text hero section with floating image',
+        icon: <LayoutGrid className="h-5 w-5" />,
+    },
+    {
+        name: 'SophiaPageAside',
+        component: SophiaPageAside,
+        category: 'Sophia Content',
+        description: 'Services-style page with side image and rich HTML body',
         icon: <LayoutGrid className="h-5 w-5" />,
     },
     {
@@ -495,7 +503,7 @@ export {
     DividerSettings, FeaturesGrid, FooterInfo, Grid, Heading, Hero,
     // Meindesk Theme Components
     HeroSection, Image, MeindeskContainer, Navbar, PrinciplesSection, Search, Section, SingleArticle,
-    SophiaArticle, Spacer,
+    SophiaArticle, SophiaPageAside, Spacer,
     SpacerSettings, Text, TIGArticleGrid,
     TIGFooter, TIGHero,
     // Time is Golden
