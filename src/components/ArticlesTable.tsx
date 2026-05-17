@@ -147,32 +147,16 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
                         Filters apply only to this loaded set.
                     </p>
                 )}
-                {/* Toolbar */}
-                <div className="flex flex-col sm:flex-row items-center justify-end gap-4">
-                    <div className="flex items-center gap-2 w-full sm:w-auto">
-                        <div className="relative flex-1 sm:w-64">
-                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input
-                                placeholder="Search articles..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-9 h-9 bg-background"
-                            />
-                        </div>
-                        <Select value={statusFilter} onValueChange={setStatusFilter}>
-                            <SelectTrigger className="w-[130px] h-9 text-xs">
-                                <SelectValue placeholder="Status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="ALL">All Status</SelectItem>
-                                <SelectItem value="PUBLISHED">Published</SelectItem>
-                                <SelectItem value="DRAFT">Draft</SelectItem>
-                                <SelectItem value="BANNED">Banned</SelectItem>
-                                <SelectItem value="DELETED">Deleted</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                </div>
+                <ArticleFilters
+                    filters={filters}
+                    onFiltersChange={updateFilters}
+                    onClear={clearFilters}
+                    availableMonths={availableMonths}
+                    categoryOptions={categoryOptions}
+                    authorOptions={authorOptions}
+                    resultCount={filteredArticles.length}
+                    totalCount={articles.length}
+                />
 
                 <div className="rounded-md border bg-background text-sm shadow-sm overflow-hidden">
                     <Table>
