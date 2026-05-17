@@ -9,7 +9,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ tena
 
   try {
     const pages = await db.page.findMany({
-      where: { siteId: tenantId },
+      where: {
+        siteId: tenantId,
+        status: "PUBLISHED",
+        locked: false,
+      },
       orderBy: { order: "asc" },
     });
 

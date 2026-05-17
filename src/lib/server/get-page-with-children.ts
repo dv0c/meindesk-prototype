@@ -1,4 +1,5 @@
 import { db } from "@/lib/db"
+import { isValidObjectId } from "@/lib/actions/helpers/cached-tenant"
 
 export type PageWithChildren = {
   id: string
@@ -47,7 +48,11 @@ export async function getPageWithChildrenJson(
   const page = await db.page.findFirst({
     where: {
       siteId: tenantId,
-      OR: [{ id: idOrSlug }, { slug: idOrSlug }],
+      status: "PUBLISHED",
+      locked: false,
+      ...(isValidObjectId(idOrSlug)
+        ? { OR: [{ id: idOrSlug }, { slug: idOrSlug }] }
+        : { slug: idOrSlug }),
     },
   })
 

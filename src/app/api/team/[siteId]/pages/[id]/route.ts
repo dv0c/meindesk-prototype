@@ -1,6 +1,7 @@
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import generateSlug from "@/lib/generateSlug";
+import { triggerFrontendRevalidate } from "@/lib/frontend-revalidate";
 import { requireSiteAccess } from "@/lib/security/route-auth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -163,6 +164,8 @@ export async function PUT(
         authorId: body.authorId,
       },
     });
+
+    void triggerFrontendRevalidate(siteId);
 
     return NextResponse.json(updatedPage, { status: 200 });
   } catch (err) {
