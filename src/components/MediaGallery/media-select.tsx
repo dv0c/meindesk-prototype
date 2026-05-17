@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useState } from "react"
 import axios from "axios"
 import { toast } from "sonner"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -16,11 +16,16 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
-import { UploadCloud, ImageIcon, Search, Trash2, Check } from "lucide-react"
+import { UploadCloud, ImageIcon, Trash2, Check } from "lucide-react"
 import { CldUploadButton } from "next-cloudinary"
+import { useMediaGallery } from "@/hooks/use-media-gallery"
+import { useMediaGalleryUsage } from "@/hooks/use-media-gallery-usage"
+import { useMediaGalleryFilters } from "@/hooks/use-media-gallery-filters"
+import { MediaGalleryFilters } from "@/components/MediaGallery/media-gallery-filters"
+import { hasActiveFilters } from "@/lib/media-gallery-filters"
+import type { Media } from "@/types/media-gallery"
 
 export interface MediaItem {
   id: string
@@ -33,6 +38,21 @@ export interface MediaItem {
   width?: number
   height?: number
   type?: string
+}
+
+function toMediaItem(media: Media): MediaItem {
+  return {
+    id: media.id,
+    url: media.url,
+    alt: media.alt ?? undefined,
+    createdAt: media.createdAt,
+    public_id: media.public_id,
+    name: media.name,
+    size: media.size,
+    width: media.width,
+    height: media.height,
+    type: media.type,
+  }
 }
 
 interface MediaLibraryDialogProps {
@@ -60,7 +80,7 @@ function MediaItemCard({
   const handleMouseEnter = () => {
     const timer = setTimeout(() => {
       setShowTooltip(true)
-    }, 500) // Show tooltip after 500ms hover
+    }, 500)
     setHoverTimer(timer)
   }
 
@@ -89,10 +109,11 @@ function MediaItemCard({
 
   return (
     <div
-      className={`relative aspect-square rounded-lg overflow-hidden cursor-pointer border-2 transition-all duration-200 group ${isSelected
-        ? "border-primary shadow-lg scale-[1.02] ring-2 ring-primary/20"
-        : "border-transparent hover:border-primary/40 hover:shadow-md hover:scale-[1.02]"
-        }`}
+      className={`relative aspect-square rounded-lg overflow-hidden cursor-pointer border-2 transition-all duration-200 group ${
+        isSelected
+          ? "border-primary shadow-lg scale-[1.02] ring-2 ring-primary/20"
+          : "border-transparent hover:border-primary/40 hover:shadow-md hover:scale-[1.02]"
+      }`}
       onClick={onSelect}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -103,7 +124,6 @@ function MediaItemCard({
         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
       />
 
-      {/* Selected overlay */}
       {isSelected && (
         <div className="absolute inset-0 bg-primary/20 backdrop-blur-[1px] rounded-lg transition-opacity duration-200">
           <div className="absolute top-2 left-2 w-7 h-7 bg-primary rounded-full flex items-center justify-center shadow-lg animate-in zoom-in-50 duration-200">
@@ -112,7 +132,6 @@ function MediaItemCard({
         </div>
       )}
 
-      {/* Delete button - always visible on hover */}
       <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
         <Button
           onClick={(e) => {
@@ -120,15 +139,14 @@ function MediaItemCard({
             onDelete()
           }}
           className="!bg-destructive hover:!bg-destructive/90 shadow-lg"
-          variant={'destructive'}
-          size={'icon-sm'}
+          variant="destructive"
+          size="icon-sm"
           aria-label="Delete media"
         >
           <Trash2 className="h-3.5 w-3.5" />
         </Button>
       </div>
 
-      {/* Hover tooltip with media details */}
       {showTooltip && (
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent text-white p-3 flex flex-col justify-end text-xs space-y-1 z-20 pointer-events-none animate-in fade-in-0 duration-200">
           <p className="font-semibold truncate text-sm">{media.name || "Untitled"}</p>
@@ -155,47 +173,27 @@ export default function MediaLibraryDialog({
   onSelect,
   multiSelect = false,
 }: MediaLibraryDialogProps) {
-  const [mediaItems, setMediaItems] = useState<MediaItem[]>([])
-  const [filteredMediaItems, setFilteredMediaItems] = useState<MediaItem[]>([])
+  const { media: mediaItems, isLoading, refetch, removeMedia } = useMediaGallery(siteId, { enabled: isOpen })
+  const { usageIndex } = useMediaGalleryUsage(siteId, { enabled: isOpen })
+  const {
+    filters,
+    updateFilters,
+    clearFilters,
+    filteredMedia,
+    availableMonths,
+    articleOptions,
+    categoryOptions,
+  } = useMediaGalleryFilters(mediaItems, usageIndex)
+
+  const filteredMediaItems = filteredMedia.map(toMediaItem)
+
   const [selectedItems, setSelectedItems] = useState<MediaItem[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [searchTerm, setSearchTerm] = useState("")
   const [activeTab, setActiveTab] = useState("library")
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [mediaToDelete, setMediaToDelete] = useState<MediaItem | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
-  const fetchMedia = useCallback(async () => {
-    setIsLoading(true)
-    try {
-      const response = await axios.get(`/api/team/${siteId}/media-gallery`)
-      const media = response.data.media || []
-      setMediaItems(media)
-      setFilteredMediaItems(media)
-    } catch (error) {
-      console.error("Failed to fetch media:", error)
-      toast.error("Failed to load media library.")
-    } finally {
-      setIsLoading(false)
-    }
-  }, [siteId])
-
-  useEffect(() => {
-    if (isOpen) fetchMedia()
-  }, [isOpen, fetchMedia])
-
-  useEffect(() => {
-    // Improved search: search across name, alt, and URL
-    const filtered = mediaItems.filter((m) => {
-      const searchLower = searchTerm.toLowerCase()
-      return (
-        m.name?.toLowerCase().includes(searchLower) ||
-        m.alt?.toLowerCase().includes(searchLower) ||
-        m.url.toLowerCase().includes(searchLower)
-      )
-    })
-    setFilteredMediaItems(filtered)
-  }, [searchTerm, mediaItems])
+  const filtersActive = hasActiveFilters(filters)
 
   const handleSelectMedia = (media: MediaItem) => {
     if (multiSelect) {
@@ -223,14 +221,12 @@ export default function MediaLibraryDialog({
       await axios.delete(`/api/team/${siteId}/media-gallery?public_id=${encodeURIComponent(mediaToDelete.public_id)}`)
       toast.success("Media deleted successfully")
 
-      // Remove from selected items if it was selected
       setSelectedItems((prev) => prev.filter((item) => item.id !== mediaToDelete.id))
-
-      // Refresh media list
-      await fetchMedia()
-    } catch (error: any) {
+      removeMedia(mediaToDelete.public_id)
+    } catch (error: unknown) {
       console.error("Failed to delete media:", error)
-      const errorMessage = error.response?.data?.error || "Failed to delete media"
+      const err = error as { response?: { data?: { error?: string } } }
+      const errorMessage = err.response?.data?.error || "Failed to delete media"
       toast.error(errorMessage)
     } finally {
       setIsDeleting(false)
@@ -239,10 +235,10 @@ export default function MediaLibraryDialog({
     }
   }
 
-  const handleUploadSuccess = async (result: any) => {
+  const handleUploadSuccess = async () => {
     setActiveTab("library")
     toast.success("Upload successful!")
-    fetchMedia()
+    refetch()
   }
 
   const handleSubmit = () => {
@@ -292,16 +288,18 @@ export default function MediaLibraryDialog({
               </CldUploadButton>
             </div>
 
-            <TabsContent value="library" className="flex-grow overflow-hidden flex flex-col mt-0">
-              <div className="relative mb-4 shrink-0">
-                <Input
-                  placeholder="Search by name, description, or URL..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              </div>
+            <TabsContent value="library" className="flex-grow overflow-hidden flex flex-col mt-0 gap-3">
+              <MediaGalleryFilters
+                compact
+                filters={filters}
+                onFiltersChange={updateFilters}
+                onClear={clearFilters}
+                availableMonths={availableMonths}
+                articleOptions={articleOptions}
+                categoryOptions={categoryOptions}
+                resultCount={filteredMediaItems.length}
+                totalCount={mediaItems.length}
+              />
               <ScrollArea className="flex-grow">
                 {isLoading ? (
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 p-1">
@@ -312,8 +310,12 @@ export default function MediaLibraryDialog({
                 ) : filteredMediaItems.length === 0 ? (
                   <div className="text-center py-10">
                     <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
-                    <p className="text-muted-foreground">No media found.</p>
-                    {searchTerm && <p className="text-xs text-muted-foreground">Try a different search term.</p>}
+                    <p className="text-muted-foreground">
+                      {filtersActive ? "No media matches your filters." : "No media found."}
+                    </p>
+                    {filtersActive && (
+                      <p className="text-xs text-muted-foreground mt-1">Try adjusting your filters.</p>
+                    )}
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 p-1">
@@ -348,7 +350,7 @@ export default function MediaLibraryDialog({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Media</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{mediaToDelete?.name || "this media"}"? This action cannot be undone.
+              Are you sure you want to delete &quot;{mediaToDelete?.name || "this media"}&quot;? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

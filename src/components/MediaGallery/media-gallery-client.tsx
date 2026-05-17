@@ -1,16 +1,15 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState } from "react"
 import { useParams } from "next/navigation"
 import NextImage from "next/image"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 // @ts-ignore
 import { CldUploadButton, type CldUploadWidgetResults, type CldErrorEvent } from "next-cloudinary"
 import {
   UploadCloud,
-  Search,
   MoreVertical,
   Trash2,
   Download,
@@ -21,7 +20,6 @@ import {
   Grid3X3,
   List,
 } from "lucide-react"
-import { formatTimeLeft } from "@/lib/utils"
 import type { Media } from "@/types/media-gallery"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
@@ -39,7 +37,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Skeleton } from "@/components/ui/skeleton"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -50,6 +47,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { useMediaGallery } from "@/hooks/use-media-gallery"
+import { useMediaGalleryUsage } from "@/hooks/use-media-gallery-usage"
+import { useMediaGalleryFilters } from "@/hooks/use-media-gallery-filters"
+import { MediaGalleryFilters } from "@/components/MediaGallery/media-gallery-filters"
+import { findUsageForMediaUrl } from "@/lib/media-gallery-usage"
+import { hasActiveFilters } from "@/lib/media-gallery-filters"
 
 interface MediaGalleryClientProps {
   onSelect?: (url: string) => void
@@ -59,64 +62,32 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
   const params = useParams()
   const siteId = params.siteId as string
 
-  const [mediaItems, setMediaItems] = useState<Media[]>([])
-  const [filteredItems, setFilteredItems] = useState<Media[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const { media: mediaItems, isLoading, refetch, removeMedia } = useMediaGallery(siteId)
+  const { usageIndex } = useMediaGalleryUsage(siteId)
+  const {
+    filters,
+    updateFilters,
+    clearFilters,
+    filteredMedia: filteredItems,
+    availableMonths,
+    articleOptions,
+    categoryOptions,
+  } = useMediaGalleryFilters(mediaItems, usageIndex)
+
   const [isUploading, setIsUploading] = useState(false)
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
-  const [searchTerm, setSearchTerm] = useState("")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  const [itemToDelete, setItemToDelete] = useState<any | null>(null)
+  const [itemToDelete, setItemToDelete] = useState<Media | null>(null)
 
-  const fetchMedia = useCallback(async () => {
-    if (!siteId) return
-
-    setIsLoading(true)
-    try {
-      const response = await fetch(`/api/team/${siteId}/media-gallery/`)
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        if (response.status === 429) {
-          const retryAfter = errorData.retryAfterSeconds ? formatTimeLeft(errorData.retryAfterSeconds) : "a moment"
-          throw new Error(`Rate limit exceeded. Please try again in ${retryAfter}.`)
-        }
-        throw new Error(errorData.error || `Failed to fetch media: ${response.statusText}`)
-      }
-
-      const data = await response.json()
-      const fetchedMedia: Media[] = data.media || []
-      setMediaItems(fetchedMedia)
-    } catch (error) {
-      console.error("Error fetching media:", error)
-      toast.error(error instanceof Error ? error.message : "Failed to load media")
-    } finally {
-      setIsLoading(false)
-    }
-  }, [siteId])
-
-  useEffect(() => {
-    fetchMedia()
-  }, [fetchMedia])
-
-  useEffect(() => {
-    const filtered = mediaItems.filter((item) => {
-      const searchableName = item.name || ""
-      const searchablePublicId = item.public_id || ""
-      return (
-        searchableName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        searchablePublicId.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    })
-    setFilteredItems(filtered)
-  }, [mediaItems, searchTerm])
+  const filtersActive = hasActiveFilters(filters)
 
   const handleUploadSuccess = (result: CldUploadWidgetResults) => {
     setIsUploading(false)
     if (result.event === "success" && typeof result.info === "object" && result.info !== null) {
       const info = result.info as { original_filename?: string; public_id: string; secure_url: string }
       toast.success(`Image "${info.original_filename || info.public_id}" uploaded successfully!`)
-      fetchMedia()
+      refetch()
     }
   }
 
@@ -138,7 +109,7 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
   }
 
   const confirmDelete = async () => {
-    if (!itemToDelete || !siteId) {
+    if (!itemToDelete?.public_id || !siteId) {
       toast.error("Cannot delete image: Missing image data or Site ID.")
       return
     }
@@ -158,7 +129,7 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
       }
 
       toast.success(`Image "${itemToDelete.name || itemToDelete.public_id}" deleted successfully.`)
-      setMediaItems((prev) => prev.filter((item) => item.public_id !== itemToDelete.public_id))
+      removeMedia(itemToDelete.public_id)
     } catch (error) {
       console.error("Delete error:", error)
       toast.error(error instanceof Error ? error.message : "Failed to delete image")
@@ -198,7 +169,17 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
     })
   }
 
-  // --- Render Helpers ---
+  const getUsageBadges = (item: Media) => {
+    const usage = findUsageForMediaUrl(item.url, item.public_id, usageIndex)
+    const badges: string[] = []
+    for (const article of usage.articles) {
+      badges.push(`Article: ${article.title}`)
+    }
+    for (const category of usage.categories) {
+      badges.push(`Category: ${category.name}`)
+    }
+    return badges
+  }
 
   const EmptyState = () => (
     <div className="flex max-h-[60vh] flex-col items-center justify-center py-20 text-center border border-dashed rounded-lg bg-muted/10 m-6">
@@ -207,9 +188,11 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
       </div>
       <h3 className="text-base font-medium mb-1">No assets found</h3>
       <p className="text-sm text-muted-foreground mb-6 max-w-xs mx-auto">
-        {searchTerm ? "Try adjusting your search terms." : "Upload your first image to get started."}
+        {filtersActive
+          ? "Try adjusting your filters or search terms."
+          : "Upload your first image to get started."}
       </p>
-      {!searchTerm && (
+      {!filtersActive && (
         <CldUploadButton
           options={{
             maxFiles: 10,
@@ -237,7 +220,7 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
           <div
             className={cn(
               "relative aspect-square w-full rounded-md border bg-muted/20 overflow-hidden shadow-sm transition-all duration-200 hover:shadow-md",
-              onSelect && "cursor-pointer ring-offset-2 hover:ring-2 ring-primary/20"
+              onSelect && "cursor-pointer ring-offset-2 hover:ring-2 ring-primary/20",
             )}
             onClick={() => onSelect && onSelect(item.url)}
           >
@@ -247,7 +230,6 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
-            {/* Overlay Actions */}
             {!onSelect && (
               <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                 <DropdownMenu>
@@ -286,7 +268,7 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
               {item.name || item.public_id}
             </p>
             <div className="flex items-center justify-between text-[10px] text-muted-foreground uppercase tracking-wide">
-              <span>{item.format}</span>
+              <span>{item.type?.split("/")[1] || "—"}</span>
               <span>{formatFileSize(item.size)}</span>
             </div>
           </div>
@@ -303,6 +285,7 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
             <TableRow className="hover:bg-transparent border-b">
               <TableHead className="w-[100px]">Preview</TableHead>
               <TableHead>Name</TableHead>
+              <TableHead>Usage</TableHead>
               <TableHead>Dimensions</TableHead>
               <TableHead>Size</TableHead>
               <TableHead>Created</TableHead>
@@ -310,48 +293,69 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredItems.map((item) => (
-              <TableRow key={item.public_id} className="group border-b last:border-0 hover:bg-muted/40">
-                <TableCell className="py-2">
-                  <div className="relative h-12 w-12 rounded-md overflow-hidden bg-muted border">
-                    <NextImage src={item.url} alt={item.name || "Image"} fill className="object-cover" />
-                  </div>
-                </TableCell>
-                <TableCell className="font-medium">
-                  <span className="truncate max-w-[200px] block" title={item.name || item.public_id}>
-                    {item.name || item.public_id}
-                  </span>
-                </TableCell>
-                <TableCell className="text-muted-foreground text-xs">
-                  {item.width} x {item.height}
-                </TableCell>
-                <TableCell className="text-muted-foreground text-xs font-mono">
-                  {formatFileSize(item.size)}
-                </TableCell>
-                <TableCell className="text-muted-foreground text-xs">
-                  {formatDate(item.createdAt)}
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex items-center justify-end gap-2">
-                    <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100" onClick={() => copyToClipboard(item.url)}>
-                      <Copy className="h-4 w-4 text-muted-foreground" />
-                    </Button>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreVertical className="h-4 w-4 text-muted-foreground" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleDeleteClick(item)} className="text-destructive">
-                          <Trash2 className="mr-2 h-4 w-4" /> Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
+            {filteredItems.map((item) => {
+              const usageBadges = getUsageBadges(item)
+              return (
+                <TableRow key={item.public_id} className="group border-b last:border-0 hover:bg-muted/40">
+                  <TableCell className="py-2">
+                    <div className="relative h-12 w-12 rounded-md overflow-hidden bg-muted border">
+                      <NextImage src={item.url} alt={item.name || "Image"} fill className="object-cover" />
+                    </div>
+                  </TableCell>
+                  <TableCell className="font-medium">
+                    <span className="truncate max-w-[200px] block" title={item.name || item.public_id}>
+                      {item.name || item.public_id}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1 max-w-[200px]">
+                      {usageBadges.length === 0 ? (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      ) : (
+                        usageBadges.slice(0, 2).map((label) => (
+                          <Badge key={label} variant="secondary" className="text-[10px] font-normal truncate max-w-full">
+                            {label}
+                          </Badge>
+                        ))
+                      )}
+                      {usageBadges.length > 2 && (
+                        <Badge variant="outline" className="text-[10px]">
+                          +{usageBadges.length - 2}
+                        </Badge>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground text-xs">
+                    {item.width} x {item.height}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground text-xs font-mono">
+                    {formatFileSize(item.size)}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground text-xs">
+                    {formatDate(item.createdAt)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100" onClick={() => copyToClipboard(item.url)}>
+                        <Copy className="h-4 w-4 text-muted-foreground" />
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleDeleteClick(item)} className="text-destructive">
+                            <Trash2 className="mr-2 h-4 w-4" /> Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )
+            })}
           </TableBody>
         </Table>
       </div>
@@ -368,20 +372,9 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
 
   return (
     <div className="flex max-w-7xl mx-auto h-full w-full flex-col bg-background/50">
-      {/* Toolbar */}
-      <div className="flex items-center justify-between px-6 py-4 border-b bg-background/95 backdrop-blur z-10">
-        <div className="flex items-center gap-2 flex-1">
-          <div className="relative w-full max-w-sm">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search assets..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 h-9"
-            />
-          </div>
-          <div className="flex items-center border rounded-md bg-muted/20 p-0.5 ml-2">
+      <div className="px-6 py-4 border-b bg-background/95 backdrop-blur z-10 space-y-4">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center border rounded-md bg-muted/20 p-0.5 shrink-0">
             <Button
               variant={viewMode === "grid" ? "secondary" : "ghost"}
               size="icon"
@@ -399,31 +392,41 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
               <List className="h-4 w-4" />
             </Button>
           </div>
+
+          <CldUploadButton
+            options={{
+              maxFiles: 10,
+              folder: `${siteId}/uploads/`,
+              cropping: true,
+              tags: ["gallery_image", siteId, "user_upload"],
+            }}
+            onOpen={() => setIsUploading(true)}
+            onUploadAdded={() => setIsUploading(true)}
+            onSuccess={handleUploadSuccess}
+            onError={handleUploadError}
+            onClose={() => setIsUploading(false)}
+            uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "prototype"}
+            className="w-auto"
+          >
+            <Button disabled={isUploading} size="sm" className="h-9">
+              {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UploadCloud className="mr-2 h-4 w-4" />}
+              Upload
+            </Button>
+          </CldUploadButton>
         </div>
 
-        <CldUploadButton
-          options={{
-            maxFiles: 10,
-            folder: `${siteId}/uploads/`,
-            cropping: true,
-            tags: ["gallery_image", siteId, "user_upload"],
-          }}
-          onOpen={() => setIsUploading(true)}
-          onUploadAdded={() => setIsUploading(true)}
-          onSuccess={handleUploadSuccess}
-          onError={handleUploadError}
-          onClose={() => setIsUploading(false)}
-          uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "prototype"}
-          className="w-auto"
-        >
-          <Button disabled={isUploading} size="sm" className="h-9">
-            {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UploadCloud className="mr-2 h-4 w-4" />}
-            Upload
-          </Button>
-        </CldUploadButton>
+        <MediaGalleryFilters
+          filters={filters}
+          onFiltersChange={updateFilters}
+          onClear={clearFilters}
+          availableMonths={availableMonths}
+          articleOptions={articleOptions}
+          categoryOptions={categoryOptions}
+          resultCount={filteredItems.length}
+          totalCount={mediaItems.length}
+        />
       </div>
 
-      {/* Content */}
       <ScrollArea className="flex-1">
         {filteredItems.length === 0 ? (
           <EmptyState />
@@ -434,7 +437,6 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
         )}
       </ScrollArea>
 
-      {/* Delete Confirmation Dialog */}
       <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>

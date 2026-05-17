@@ -95,8 +95,7 @@ export async function GET(
 
     const response: MediaGalleryResponse = {
       media: mediaItems,
-      // @ts-ignore
-      nextPageCursor: results.next_cursor,
+      nextPageCursor: results.next_cursor ?? null,
       totalPages: Math.ceil((results.total_count || results.resources?.length || 0) / 24),
       currentPage: 1,
     };

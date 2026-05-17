@@ -18,6 +18,52 @@ export interface MediaGalleryResponse {
   media: Media[]
   totalPages: number
   currentPage: number
+  nextPageCursor?: string | null
+}
+
+export type MediaUsageFilter = "all" | "used" | "unused"
+
+export type MediaSortOption = "newest" | "oldest" | "name-asc" | "name-desc"
+
+export interface MediaGalleryFilterState {
+  search: string
+  month: string | null
+  articleId: string | null
+  categoryId: string | null
+  usage: MediaUsageFilter
+  sort: MediaSortOption
+}
+
+export interface MediaUsageArticleRef {
+  id: string
+  title: string
+  cover: string | null
+}
+
+export interface MediaUsageCategoryRef {
+  id: string
+  name: string
+  thumbnail: string | null
+}
+
+export interface MediaUsageEntry {
+  articles: { id: string; title: string }[]
+  categories: { id: string; name: string }[]
+}
+
+export interface MediaUsageIndex {
+  byUrl: Record<string, MediaUsageEntry>
+  articles: MediaUsageArticleRef[]
+  categories: MediaUsageCategoryRef[]
+}
+
+export const DEFAULT_MEDIA_GALLERY_FILTERS: MediaGalleryFilterState = {
+  search: "",
+  month: null,
+  articleId: null,
+  categoryId: null,
+  usage: "all",
+  sort: "newest",
 }
 
 export interface UploadedFile {
