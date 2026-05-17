@@ -24,10 +24,19 @@ import {
 import { Code2, Copy, Check } from "lucide-react"
 
 import { verifyAnalyticsInstallation } from "@/lib/actions/site/verify-analytics"
+import { AnalyticsResetControl } from "@/components/AnalyticsResetControl"
 import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
 
-export function AnalyticsContainer({ siteId, analyticsConnected = true }: { siteId: string, analyticsConnected?: boolean }) {
+export function AnalyticsContainer({
+    siteId,
+    analyticsConnected = true,
+    isGlobalAdmin = false,
+}: {
+    siteId: string
+    analyticsConnected?: boolean
+    isGlobalAdmin?: boolean
+}) {
     const [range, setRange] = useState("lastMonth")
     const [copied, setCopied] = useState(false)
     const [verifying, setVerifying] = useState(false)
@@ -139,9 +148,8 @@ export function AnalyticsContainer({ siteId, analyticsConnected = true }: { site
 
     return (
         <div className="flex flex-1 flex-col gap-4 p-5">
-            <div className="flex justify-between items-center">
-                {/* Range selector */}
-                <div className="flex gap-2">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-wrap gap-2">
                     {RANGE_OPTIONS.map((opt) => (
                         <Button
                             key={opt.value}
@@ -154,49 +162,10 @@ export function AnalyticsContainer({ siteId, analyticsConnected = true }: { site
                     ))}
                 </div>
 
-                {/* Reset Data Button */}
+                <div className="flex items-center gap-2 shrink-0">
                 <Dialog>
                     <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" className="gap-2 text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20">
-                            <span className="h-2 w-2 rounded-full bg-destructive animate-pulse" />
-                            Reset Data
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Reset Analytics Data?</DialogTitle>
-                            <DialogDescription>
-                                This will permanently delete all analytics events and reset view counts for this site. This action cannot be undone.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="flex justify-end gap-2 mt-4">
-                            <Button variant="outline" onClick={() => document.getElementById("close-reset-dialog")?.click()}>Cancel</Button>
-                            <Button
-                                variant="destructive"
-                                onClick={async () => {
-                                    try {
-                                        const res = await fetch(`/api/analytics/${siteId}/reset`, { method: "DELETE" })
-                                        if (res.ok) {
-                                            toast.success("Analytics data reset successfully")
-                                            window.location.reload()
-                                        } else {
-                                            toast.error("Failed to reset data")
-                                        }
-                                    } catch (e) {
-                                        toast.error("Error resetting data")
-                                    }
-                                }}
-                            >
-                                Confirm Reset
-                            </Button>
-                        </div>
-                    </DialogContent>
-                </Dialog>
-
-                {/* Installation Dialog */}
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" className="gap-2">
+                        <Button variant="outline" size="sm" className="gap-2 h-9">
                             <Code2 className="h-4 w-4" />
                             Script
                         </Button>
@@ -218,6 +187,9 @@ export function AnalyticsContainer({ siteId, analyticsConnected = true }: { site
                         </div>
                     </DialogContent>
                 </Dialog>
+
+                    {isGlobalAdmin && <AnalyticsResetControl siteId={siteId} />}
+                </div>
             </div>
 
             {/* Analytics Cards */}

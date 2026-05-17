@@ -8,7 +8,9 @@ import {
     EmptyMedia,
     EmptyTitle,
 } from "@/components/ui/empty";
+import { getAuthSession } from "@/lib/auth";
 import { getActiveTeam } from "@/lib/actions/helpers/team";
+import { Role } from "@prisma/client";
 import { X } from "lucide-react";
 
 export const metadata = {
@@ -29,7 +31,16 @@ export default async function Page({ params }: { params: Promise<{ siteId: strin
     const settings = (site.settings as any) || {}
     const analyticsConnected = settings.analyticsConnected ?? true
 
-    return <AnalyticsContainer siteId={site.id} analyticsConnected={analyticsConnected} />
+    const session = await getAuthSession()
+    const isGlobalAdmin = session?.user?.role === Role.ADMIN
+
+    return (
+        <AnalyticsContainer
+            siteId={site.id}
+            analyticsConnected={analyticsConnected}
+            isGlobalAdmin={isGlobalAdmin}
+        />
+    )
 }
 
 

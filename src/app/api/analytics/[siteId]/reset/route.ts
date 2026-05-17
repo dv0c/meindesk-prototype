@@ -1,51 +1,37 @@
 import { db } from "@/lib/db"
-import { getAuthSession } from "@/lib/auth"
 import { NextResponse } from "next/server"
+import { createErrorResponse, requireAdmin } from "@/lib/security/route-auth"
 
 export async function DELETE(
-    req: Request,
+    _req: Request,
     { params }: { params: Promise<{ siteId: string }> }
 ) {
     try {
-        const session = await getAuthSession()
-        if (!session?.user?.id) {
-            return new NextResponse("Unauthorized", { status: 401 })
-        }
+        await requireAdmin()
 
         const { siteId } = await params
 
-        // Verify ownership/admin status
-        const site = await db.site.findFirst({
-            where: {
-                id: siteId,
-                OR: [
-                    { userId: session.user.id },
-                    { members: { some: { id: session.user.id } } } // Assuming members can reset? Probably only owner/admin
-                ]
-            }
+        const site = await db.site.findUnique({
+            where: { id: siteId },
+            select: { id: true },
         })
 
         if (!site) {
-            return new NextResponse("Unauthorized", { status: 403 })
+            return NextResponse.json({ error: "Site not found" }, { status: 404 })
         }
 
-        // Delete all analytics events for this site
         await db.analyticsEvent.deleteMany({
-            where: {
-                siteId: siteId
-            }
+            where: { siteId },
         })
 
-        // Reset views count
         await db.site.update({
             where: { id: siteId },
-            data: { views: 0 }
+            data: { views: 0 },
         })
 
-        return new NextResponse("Analytics reset successfully", { status: 200 })
-
+        return NextResponse.json({ message: "Analytics reset successfully" })
     } catch (error) {
         console.error("[ANALYTICS_RESET]", error)
-        return new NextResponse("Internal Error", { status: 500 })
+        return createErrorResponse(error)
     }
 }
