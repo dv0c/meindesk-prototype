@@ -1,11 +1,15 @@
 "use client"
 
+import MediaLibraryDialog, { type MediaItem } from "@/components/MediaGallery/media-select"
+import { Button } from "@/components/ui/button"
 import { useEditorContent } from "@/hooks/useEditorContent"
 import { defineBlock } from "@/lib/block-api"
 import { sanitizeRichHtml } from "@/lib/security/sanitize-html"
 import { cn } from "@/lib/utils"
 import { useNode } from "@craftjs/core"
-import { PanelLeft } from "lucide-react"
+import { ImageIcon, PanelLeft } from "lucide-react"
+import { useParams } from "next/navigation"
+import { useState } from "react"
 import {
   PropertyInput,
   PropertyRichText,
@@ -50,6 +54,23 @@ const SophiaPageAsideSettings = () => {
     htmlContent: node.data.props.htmlContent as string,
   }))
 
+  const params = useParams()
+  const siteId = params.siteId as string
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+
+  const handleMediaSelect = (items: MediaItem[]) => {
+    if (items.length === 0) return
+    const selected = items[0]
+    setProp((props: SophiaPageAsideProps) => {
+      props.imageSrc = selected.url
+      if (selected.alt?.trim()) {
+        props.imageAlt = selected.alt.trim()
+      } else if (selected.name?.trim()) {
+        props.imageAlt = selected.name.trim()
+      }
+    })
+  }
+
   return (
     <div className="space-y-4 pt-2">
       <PropertySection title="Page header" defaultOpen>
@@ -74,10 +95,46 @@ const SophiaPageAsideSettings = () => {
       </PropertySection>
 
       <PropertySection title="Aside image" defaultOpen>
+        <PropertyRow label="Media library">
+          <div className="flex w-full flex-col gap-2">
+            {imageSrc ? (
+              <div className="group relative aspect-square w-full overflow-hidden rounded-md border border-border bg-muted">
+                <img
+                  src={imageSrc}
+                  alt={imageAlt || "Preview"}
+                  className="h-full w-full object-cover"
+                />
+                <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    className="h-8 text-xs"
+                    onClick={() => setIsDialogOpen(true)}
+                  >
+                    Change image
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="flex h-10 w-full items-center justify-center gap-2 border-dashed"
+                onClick={() => setIsDialogOpen(true)}
+              >
+                <ImageIcon className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">Select from library</span>
+              </Button>
+            )}
+          </div>
+        </PropertyRow>
         <PropertyRow label="Image URL">
           <PropertyInput
             value={imageSrc || ""}
             onChange={(val) => setProp((props: SophiaPageAsideProps) => (props.imageSrc = val))}
+            placeholder="https://..."
           />
         </PropertyRow>
         <PropertyRow label="Image alt">
@@ -95,6 +152,14 @@ const SophiaPageAsideSettings = () => {
           onChange={(val) => setProp((props: SophiaPageAsideProps) => (props.htmlContent = val))}
         />
       </PropertySection>
+
+      <MediaLibraryDialog
+        siteId={siteId}
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onSelect={handleMediaSelect}
+        multiSelect={false}
+      />
     </div>
   )
 }
