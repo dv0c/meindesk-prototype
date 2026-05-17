@@ -10,6 +10,7 @@ import { NavbarView } from "./Navbar"
 import { NavigationLinks } from "./NavigationLinks"
 import { CardView } from "./ExampleCard"
 import { HeroView } from "./themes/SophiaPlatanisioti/Hero"
+import { SophiaHomepageView } from "./themes/SophiaPlatanisioti/SophiaHomepage"
 import { SophiaPageAsideView } from "./themes/SophiaPlatanisioti/SophiaPageAside"
 import { FooterView } from "./themes/SophiaPlatanisioti/Footer"
 import { ArticlesView } from "./Articles"
@@ -57,6 +58,7 @@ export const staticComponentMap: Record<string, React.ComponentType<any>> = {
     NavigationLinks: NavigationLinks,
     Card: CardView,
     Hero: HeroView,
+    SophiaHomepage: SophiaHomepageView,
     SophiaPageAside: SophiaPageAsideView,
     Footer: FooterView,
     Articles: ArticlesView,

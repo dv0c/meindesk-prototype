@@ -7,58 +7,47 @@ import { defineBlock } from "@/lib/block-api"
 import { sanitizeRichHtml } from "@/lib/security/sanitize-html"
 import { cn } from "@/lib/utils"
 import { useNode } from "@craftjs/core"
-import { ImageIcon, PanelLeft } from "lucide-react"
+import { Home, ImageIcon } from "lucide-react"
 import { useParams } from "next/navigation"
 import { useState } from "react"
 import {
-  PropertyCheckbox,
   PropertyInput,
   PropertyRichText,
   PropertyRow,
   PropertySection,
 } from "../../../components/PropertySection"
 
-export interface SophiaPageAsideProps {
+export interface SophiaHomepageProps {
   eyebrow?: string
   title?: string
   lead?: string
-  imageSrc?: string
-  imageAlt?: string
+  thumbnail?: string
   htmlContent?: string
-  showConsultationCta?: boolean
-  proseClassName?: string
   className?: string
 }
 
-const defaultProps: SophiaPageAsideProps = {
-  eyebrow: "Τι προσφέρω",
-  title: "Υπηρεσίες",
-  lead: "",
-  imageSrc: "https://sophiaplatanisioti.gr/SIMA_1-02%20.webp",
-  imageAlt: "Υπηρεσίες",
-  htmlContent: "<p>Page content goes here.</p>",
-  showConsultationCta: false,
-  proseClassName: "",
+const defaultProps: SophiaHomepageProps = {
+  eyebrow: "Καλώς ήρθατε",
+  title: "Σοφία Πλατανησιώτη",
+  lead: "Σύμβουλος Ψυχικής Υγείας — υποστήριξη με σεβασμό, κατανόηση και επαγγελματική φροντίδα.",
+  thumbnail: "https://sophiaplatanisioti.gr/sophia-1.webp",
+  htmlContent: "<p>Welcome content goes here.</p>",
 }
 
-const SophiaPageAsideSettings = () => {
+const SophiaHomepageSettings = () => {
   const {
     actions: { setProp },
     eyebrow,
     title,
     lead,
-    imageSrc,
-    imageAlt,
+    thumbnail,
     htmlContent,
-    showConsultationCta,
   } = useNode((node) => ({
     eyebrow: node.data.props.eyebrow as string,
     title: node.data.props.title as string,
     lead: node.data.props.lead as string,
-    imageSrc: node.data.props.imageSrc as string,
-    imageAlt: node.data.props.imageAlt as string,
+    thumbnail: node.data.props.thumbnail as string,
     htmlContent: node.data.props.htmlContent as string,
-    showConsultationCta: Boolean(node.data.props.showConsultationCta),
   }))
 
   const params = useParams()
@@ -67,14 +56,8 @@ const SophiaPageAsideSettings = () => {
 
   const handleMediaSelect = (items: MediaItem[]) => {
     if (items.length === 0) return
-    const selected = items[0]
-    setProp((props: SophiaPageAsideProps) => {
-      props.imageSrc = selected.url
-      if (selected.alt?.trim()) {
-        props.imageAlt = selected.alt.trim()
-      } else if (selected.name?.trim()) {
-        props.imageAlt = selected.name.trim()
-      }
+    setProp((props: SophiaHomepageProps) => {
+      props.thumbnail = items[0].url
     })
   }
 
@@ -84,31 +67,31 @@ const SophiaPageAsideSettings = () => {
         <PropertyRow label="Eyebrow">
           <PropertyInput
             value={eyebrow || ""}
-            onChange={(val) => setProp((props: SophiaPageAsideProps) => (props.eyebrow = val))}
+            onChange={(val) => setProp((props: SophiaHomepageProps) => (props.eyebrow = val))}
           />
         </PropertyRow>
         <PropertyRow label="Title">
           <PropertyInput
             value={title || ""}
-            onChange={(val) => setProp((props: SophiaPageAsideProps) => (props.title = val))}
+            onChange={(val) => setProp((props: SophiaHomepageProps) => (props.title = val))}
           />
         </PropertyRow>
         <PropertyRow label="Lead">
           <PropertyInput
             value={lead || ""}
-            onChange={(val) => setProp((props: SophiaPageAsideProps) => (props.lead = val))}
+            onChange={(val) => setProp((props: SophiaHomepageProps) => (props.lead = val))}
           />
         </PropertyRow>
       </PropertySection>
 
-      <PropertySection title="Aside image" defaultOpen>
+      <PropertySection title="Portrait image" defaultOpen>
         <PropertyRow label="Media library">
           <div className="flex w-full flex-col gap-2">
-            {imageSrc ? (
-              <div className="group relative aspect-square w-full overflow-hidden rounded-md border border-border bg-muted">
+            {thumbnail ? (
+              <div className="group relative aspect-[380/460] w-full overflow-hidden rounded-md border border-border bg-muted">
                 <img
-                  src={imageSrc}
-                  alt={imageAlt || "Preview"}
+                  src={thumbnail}
+                  alt="Portrait preview"
                   className="h-full w-full object-cover"
                 />
                 <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
@@ -139,15 +122,9 @@ const SophiaPageAsideSettings = () => {
         </PropertyRow>
         <PropertyRow label="Image URL">
           <PropertyInput
-            value={imageSrc || ""}
-            onChange={(val) => setProp((props: SophiaPageAsideProps) => (props.imageSrc = val))}
+            value={thumbnail || ""}
+            onChange={(val) => setProp((props: SophiaHomepageProps) => (props.thumbnail = val))}
             placeholder="https://..."
-          />
-        </PropertyRow>
-        <PropertyRow label="Image alt">
-          <PropertyInput
-            value={imageAlt || ""}
-            onChange={(val) => setProp((props: SophiaPageAsideProps) => (props.imageAlt = val))}
           />
         </PropertyRow>
       </PropertySection>
@@ -156,18 +133,8 @@ const SophiaPageAsideSettings = () => {
         <PropertyRichText
           label="HTML content"
           value={htmlContent || ""}
-          onChange={(val) => setProp((props: SophiaPageAsideProps) => (props.htmlContent = val))}
+          onChange={(val) => setProp((props: SophiaHomepageProps) => (props.htmlContent = val))}
         />
-        <PropertyRow label="Consultation CTA">
-          <PropertyCheckbox
-            id="show-consultation-cta"
-            label="Show consultation callout below content"
-            checked={showConsultationCta}
-            onChange={(checked) =>
-              setProp((props: SophiaPageAsideProps) => (props.showConsultationCta = checked))
-            }
-          />
-        </PropertyRow>
       </PropertySection>
 
       <MediaLibraryDialog
@@ -181,23 +148,20 @@ const SophiaPageAsideSettings = () => {
   )
 }
 
-export function SophiaPageAsideView({
+export function SophiaHomepageView({
   eyebrow = defaultProps.eyebrow,
   title = defaultProps.title,
   lead = defaultProps.lead,
-  imageSrc = defaultProps.imageSrc,
-  imageAlt = defaultProps.imageAlt,
+  thumbnail = defaultProps.thumbnail,
   htmlContent = defaultProps.htmlContent,
-  showConsultationCta = defaultProps.showConsultationCta,
-  proseClassName = defaultProps.proseClassName,
   className,
-}: SophiaPageAsideProps) {
+}: SophiaHomepageProps) {
   const safeHtml = useEditorContent(htmlContent)
 
   return (
     <div className={cn("w-full py-8 sm:py-12", className)}>
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-        <header className="mb-10 sm:mb-14">
+      <div className="site-container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <header className="mb-10 max-w-2xl sm:mb-14">
           {eyebrow ? (
             <p className="mb-3 text-[0.7rem] font-medium uppercase tracking-[0.22em] text-muted-foreground">
               {eyebrow}
@@ -215,34 +179,29 @@ export function SophiaPageAsideView({
           ) : null}
         </header>
 
-        <div className="grid items-start gap-10 lg:grid-cols-[minmax(280px,360px)_minmax(0,1fr)] lg:gap-14">
-          {imageSrc ? (
-            <figure className="overflow-hidden rounded-lg border border-border bg-card">
-              <img
-                src={imageSrc}
-                alt={imageAlt || title || "Page image"}
-                width={440}
-                height={440}
-                className="h-auto w-full object-cover"
-                loading="lazy"
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)] lg:items-start lg:gap-14">
+          <div className="order-2 lg:order-1">
+            {safeHtml ? (
+              <div
+                className="prose-sm homepage max-w-none text-muted-foreground prose-p:leading-relaxed prose-headings:font-serif prose-headings:text-foreground prose-a:text-primary"
+                dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(safeHtml) }}
               />
-            </figure>
-          ) : null}
+            ) : null}
+          </div>
 
-          {safeHtml ? (
-            <div
-              className={cn(
-                "prose-sm max-w-none text-muted-foreground prose-headings:font-serif prose-headings:text-foreground prose-p:leading-relaxed prose-a:text-primary",
-                proseClassName,
-              )}
-              dangerouslySetInnerHTML={{ __html: sanitizeRichHtml(safeHtml) }}
-            />
-          ) : null}
-          {showConsultationCta ? (
-            <aside className="mt-12 rounded-lg border border-border bg-muted/40 p-6 text-sm text-muted-foreground">
-              <p>Είμαι στη διάθεσή σας για μια διαδικτυακή συνάντηση,</p>
-              <p className="mt-2">για να γνωριστούμε και να απαντήσω σε ό,τι σας απασχολεί.</p>
-            </aside>
+          {thumbnail ? (
+            <figure className="order-1 lg:order-2">
+              <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
+                <img
+                  src={thumbnail}
+                  alt={title || "Σοφία Πλατανησιώτη"}
+                  width={380}
+                  height={460}
+                  className="h-auto w-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+            </figure>
           ) : null}
         </div>
       </div>
@@ -250,12 +209,12 @@ export function SophiaPageAsideView({
   )
 }
 
-export const SophiaPageAside = defineBlock<SophiaPageAsideProps>({
-  name: "SophiaPageAside",
+export const SophiaHomepage = defineBlock<SophiaHomepageProps>({
+  name: "SophiaHomepage",
   category: "Sophia Platanisioti",
-  icon: <PanelLeft className="w-4 h-4" />,
-  description: "Services-style page: header, side image, rich HTML body",
+  icon: <Home className="w-4 h-4" />,
+  description: "Homepage: welcome header, prose left, portrait right",
   defaultProps,
-  settings: SophiaPageAsideSettings,
-  render: SophiaPageAsideView,
+  settings: SophiaHomepageSettings,
+  render: SophiaHomepageView,
 })
