@@ -3,7 +3,6 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { CreateArticleButton } from "@/components/CreateArticleButton"
-import { Input } from "@/components/ui/input"
 import {
     Table,
     TableBody,
@@ -13,13 +12,6 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
@@ -28,7 +20,10 @@ import {
 import { useArticle } from "@/hooks/use-article"
 import { useTeam } from "@/hooks/useTeam"
 import { useMediaQuery } from "@/hooks/use-media-query"
-import { MoreHorizontal, Search, Loader2, FileText, Trash, Edit, ChevronLeft, ChevronRight } from "lucide-react"
+import { MoreHorizontal, Loader2, FileText, Trash, Edit, ChevronLeft, ChevronRight } from "lucide-react"
+import { ArticleFilters } from "@/components/articles/article-filters"
+import { useArticleFilters } from "@/hooks/use-article-filters"
+import type { ArticleListItem } from "@/types/article-filters"
 import Image from "next/image"
 import { useRouter, useParams } from "next/navigation"
 import { useEffect, useMemo, useState } from "react"
@@ -63,10 +58,17 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
         [propSiteId, params.siteId, team?.id]
     )
 
-    // Local state
-    const [searchQuery, setSearchQuery] = useState("")
-    const [statusFilter, setStatusFilter] = useState("ALL")
     const [currentPage, setCurrentPage] = useState(1)
+
+    const {
+        filters,
+        updateFilters,
+        clearFilters,
+        filteredArticles,
+        availableMonths,
+        authorOptions,
+        categoryOptions,
+    } = useArticleFilters(articles as ArticleListItem[], effectiveSiteId)
 
     const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null)
     const [deleteId, setDeleteId] = useState<string | null>(null)
@@ -76,21 +78,6 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
         if (!effectiveSiteId) return
         getArticles(effectiveSiteId)
     }, [effectiveSiteId, getArticles])
-
-    // Filter Logic
-    const filteredArticles = useMemo(() => {
-        if (!articles) return []
-        let filtered = articles.filter((article: any) => {
-            const matchesSearch =
-                article.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                article.slug?.toLowerCase().includes(searchQuery.toLowerCase())
-
-            const matchesStatus = statusFilter === "ALL" || article.status === statusFilter
-
-            return matchesSearch && matchesStatus
-        })
-        return filtered
-    }, [articles, searchQuery, statusFilter])
 
     // Pagination Logic
     const totalPages = Math.ceil(filteredArticles.length / ITEMS_PER_PAGE)
@@ -102,7 +89,7 @@ export function ArticleTable({ siteId: propSiteId }: ArticleTableProps = {}) {
     // Reset page when filter changes
     useEffect(() => {
         setCurrentPage(1)
-    }, [searchQuery, statusFilter])
+    }, [filters])
 
     const isDesktop = useMediaQuery("(min-width: 768px)")
 

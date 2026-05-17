@@ -334,6 +334,7 @@ export default function CreateItemPage() {
                     isOpen={isMediaDialogOpen}
                     onClose={() => setIsMediaDialogOpen(false)}
                     onSelect={handleMediaSelect}
+                    suggestedAspectRatio={16 / 9}
                 />
             </main>
 

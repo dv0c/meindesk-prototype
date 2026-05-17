@@ -365,6 +365,7 @@ export function SEOPanel({ onBack }: { onBack: () => void }) {
                 onClose={() => setIsMediaOpen(false)}
                 onSelect={handleMediaSelect}
                 multiSelect={false}
+                suggestedAspectRatio={1.91}
             />
         </div >
     )

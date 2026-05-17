@@ -19,7 +19,9 @@ import {
   ImageIcon,
   Grid3X3,
   List,
+  Pencil,
 } from "lucide-react"
+import { MediaImageEditor } from "@/components/MediaGallery/media-image-editor"
 import type { Media } from "@/types/media-gallery"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
@@ -62,7 +64,7 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
   const params = useParams()
   const siteId = params.siteId as string
 
-  const { media: mediaItems, isLoading, refetch, removeMedia } = useMediaGallery(siteId)
+  const { media: mediaItems, isLoading, refetch, removeMedia, setMedia } = useMediaGallery(siteId)
   const { usageIndex } = useMediaGalleryUsage(siteId)
   const {
     filters,
@@ -79,8 +81,34 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [itemToDelete, setItemToDelete] = useState<Media | null>(null)
+  const [editingItem, setEditingItem] = useState<Media | null>(null)
+  const [editorOpen, setEditorOpen] = useState(false)
 
   const filtersActive = hasActiveFilters(filters)
+
+  const handleEditClick = (item: Media) => {
+    setEditingItem(item)
+    setEditorOpen(true)
+  }
+
+  const handleEditorComplete = (result: { url: string; public_id?: string }) => {
+    const wasReplace =
+      editingItem?.public_id && result.public_id === editingItem.public_id
+
+    if (wasReplace && editingItem?.public_id) {
+      setMedia((prev) =>
+        prev.map((m) =>
+          m.public_id === editingItem.public_id
+            ? { ...m, url: result.url }
+            : m,
+        ),
+      )
+    } else {
+      refetch()
+    }
+    setEditingItem(null)
+    setEditorOpen(false)
+  }
 
   const handleUploadSuccess = (result: CldUploadWidgetResults) => {
     setIsUploading(false)
@@ -243,6 +271,10 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
                       <Eye className="mr-2 h-3.5 w-3.5" />
                       View
                     </DropdownMenuItem>
+                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEditClick(item) }}>
+                      <Pencil className="mr-2 h-3.5 w-3.5" />
+                      Edit
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={(e) => { e.stopPropagation(); copyToClipboard(item.url) }}>
                       <Copy className="mr-2 h-3.5 w-3.5" />
                       Copy link
@@ -345,11 +377,14 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
                             <MoreVertical className="h-4 w-4 text-muted-foreground" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleDeleteClick(item)} className="text-destructive">
-                            <Trash2 className="mr-2 h-4 w-4" /> Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleEditClick(item)}>
+                          <Pencil className="mr-2 h-4 w-4" /> Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleDeleteClick(item)} className="text-destructive">
+                          <Trash2 className="mr-2 h-4 w-4" /> Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
                   </TableCell>
@@ -453,6 +488,17 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {editingItem && (
+        <MediaImageEditor
+          open={editorOpen}
+          onOpenChange={setEditorOpen}
+          imageUrl={editingItem.url}
+          publicId={editingItem.public_id}
+          siteId={siteId}
+          onComplete={handleEditorComplete}
+        />
+      )}
     </div>
   )
 }

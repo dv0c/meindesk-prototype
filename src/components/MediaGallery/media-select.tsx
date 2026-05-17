@@ -18,7 +18,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
-import { UploadCloud, ImageIcon, Trash2, Check } from "lucide-react"
+import { UploadCloud, ImageIcon, Trash2, Check, Pencil } from "lucide-react"
+import { MediaImageEditor } from "@/components/MediaGallery/media-image-editor"
 import { CldUploadButton } from "next-cloudinary"
 import { useMediaGallery } from "@/hooks/use-media-gallery"
 import { useMediaGalleryUsage } from "@/hooks/use-media-gallery-usage"
@@ -61,6 +62,8 @@ interface MediaLibraryDialogProps {
   onClose: () => void
   onSelect: (items: MediaItem[]) => void
   multiSelect?: boolean
+  allowEdit?: boolean
+  suggestedAspectRatio?: number
 }
 
 function MediaItemCard({
@@ -172,6 +175,8 @@ export default function MediaLibraryDialog({
   onClose,
   onSelect,
   multiSelect = false,
+  allowEdit = true,
+  suggestedAspectRatio,
 }: MediaLibraryDialogProps) {
   const { media: mediaItems, isLoading, refetch, removeMedia } = useMediaGallery(siteId, { enabled: isOpen })
   const { usageIndex } = useMediaGalleryUsage(siteId, { enabled: isOpen })
@@ -192,6 +197,8 @@ export default function MediaLibraryDialog({
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [mediaToDelete, setMediaToDelete] = useState<MediaItem | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [editorOpen, setEditorOpen] = useState(false)
+  const [editingItem, setEditingItem] = useState<MediaItem | null>(null)
 
   const filtersActive = hasActiveFilters(filters)
 
@@ -248,11 +255,40 @@ export default function MediaLibraryDialog({
     }
     onSelect(selectedItems)
     onClose()
+    setSelectedItems([])
+  }
+
+  const handleOpenEditor = () => {
+    if (selectedItems.length !== 1) return
+    setEditingItem(selectedItems[0])
+    setEditorOpen(true)
+  }
+
+  const handleEditorComplete = (result: { url: string; public_id?: string }) => {
+    const updated: MediaItem = {
+      ...selectedItems[0],
+      url: result.url,
+      public_id: result.public_id ?? selectedItems[0].public_id,
+      id: result.public_id ?? selectedItems[0].id,
+    }
+    onSelect([updated])
+    setEditorOpen(false)
+    setEditingItem(null)
+    setSelectedItems([])
+    onClose()
+    refetch()
+  }
+
+  const handleDialogClose = () => {
+    setSelectedItems([])
+    setEditorOpen(false)
+    setEditingItem(null)
+    onClose()
   }
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <Dialog open={isOpen} onOpenChange={(open) => !open && handleDialogClose()}>
         <DialogContent className="!max-w-5xl w-full h-[80vh] flex flex-col p-0">
           <DialogHeader className="p-6 pb-0">
             <DialogTitle>Select Media</DialogTitle>
@@ -269,6 +305,7 @@ export default function MediaLibraryDialog({
               <CldUploadButton
                 options={{
                   folder: `${siteId}/uploads/`,
+                  cropping: true,
                   clientAllowedFormats: ["png", "gif", "jpeg", "webp"],
                   maxFileSize: 5 * 1024 * 1024,
                   tags: siteId
@@ -335,11 +372,26 @@ export default function MediaLibraryDialog({
           </Tabs>
           <DialogFooter className="p-6 pt-4 border-t shrink-0">
             <p className="text-sm text-muted-foreground mr-auto">{selectedItems.length} item(s) selected</p>
-            <Button variant="outline" className="cursor-pointer" onClick={onClose}>
+            <Button variant="outline" className="cursor-pointer" onClick={handleDialogClose}>
               Cancel
             </Button>
-            <Button onClick={handleSubmit} className="cursor-pointer" disabled={selectedItems.length === 0 && multiSelect}>
-              {multiSelect ? `Insert ${selectedItems.length} Item(s)` : "Insert Item"}
+            {allowEdit && (
+              <Button
+                variant="secondary"
+                className="cursor-pointer"
+                disabled={selectedItems.length !== 1}
+                onClick={handleOpenEditor}
+              >
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit
+              </Button>
+            )}
+            <Button
+              onClick={handleSubmit}
+              className="cursor-pointer"
+              disabled={selectedItems.length === 0}
+            >
+              {multiSelect ? `Use ${selectedItems.length} selected` : "Use selected"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -365,6 +417,18 @@ export default function MediaLibraryDialog({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {editingItem && (
+        <MediaImageEditor
+          open={editorOpen}
+          onOpenChange={setEditorOpen}
+          imageUrl={editingItem.url}
+          publicId={editingItem.public_id}
+          siteId={siteId}
+          defaultAspectRatio={suggestedAspectRatio}
+          onComplete={handleEditorComplete}
+        />
+      )}
     </>
   )
 }

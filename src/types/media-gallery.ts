@@ -73,3 +73,11 @@ export interface UploadedFile {
   type: string
   // any other relevant fields Cloudinary or your upload service returns
 }
+
+export interface MediaImageEditResult {
+  secure_url: string
+  public_id: string
+  width?: number
+  height?: number
+  bytes?: number
+}

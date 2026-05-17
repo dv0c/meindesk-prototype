@@ -784,7 +784,13 @@ const EditorRightSection = ({
                 </DialogContent>
             </Dialog>
 
-            <MediaLibraryDialog isOpen={!!isOpen} onClose={() => setOpen(!isOpen)} onSelect={(e) => setThumbnail(e[0].url)} siteId={siteId} />
+            <MediaLibraryDialog
+                isOpen={!!isOpen}
+                onClose={() => setOpen(false)}
+                onSelect={(e) => setThumbnail(e[0].url)}
+                siteId={siteId}
+                suggestedAspectRatio={16 / 9}
+            />
 
             {/* SEO OG Image Media Dialog */}
             {setSeo && (
@@ -796,6 +802,7 @@ const EditorRightSection = ({
                         setSeoMediaOpen(false)
                     }}
                     siteId={siteId}
+                    suggestedAspectRatio={1.91}
                 />
             )}
         </>
