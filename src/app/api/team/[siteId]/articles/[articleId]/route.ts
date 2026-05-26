@@ -106,10 +106,15 @@ export async function PATCH(
       "categories",
       "metadata",
       "authorIds",
+      "createdAt",
     ];
     const updateData: Record<string, any> = {};
     for (const key of allowed) {
       if (data[key] !== undefined) updateData[key] = data[key];
+    }
+
+    if (updateData.createdAt) {
+      updateData.createdAt = new Date(updateData.createdAt);
     }
 
     if (

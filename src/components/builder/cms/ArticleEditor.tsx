@@ -72,6 +72,7 @@ export default function ArticleEditor({
         metaDescription: "",
         ogImage: ""
     })
+    const [createdAt, setCreatedAt] = useState<Date | undefined>(undefined)
     const [loaded, setLoaded] = useState(false)
     const [showSidebar, setShowSidebar] = useState(false)
     const isDesktop = useMediaQuery("(min-width: 768px)")
@@ -113,6 +114,7 @@ export default function ArticleEditor({
             article.slug || ""
         )
 
+        setCreatedAt(article.createdAt ? new Date(article.createdAt) : undefined)
         setLoaded(true)
         setThumbnail(article.cover || "")
         const articleMeta = article.metadata as any
@@ -162,6 +164,7 @@ export default function ArticleEditor({
         categories,
         authorIds: authors,
         metadata: buildMetadata(),
+        createdAt: createdAt?.toISOString(),
     })
 
     const handleSave = async () => {
@@ -206,6 +209,10 @@ export default function ArticleEditor({
             seo.metaDescription !== (prevSeo.metaDescription || "") ||
             seo.ogImage !== (prevSeo.ogImage || "")
 
+        const createdAtChanged = createdAt
+            ? new Date(article.createdAt).getTime() !== createdAt.getTime()
+            : false
+
         return (
             titleChanged ||
             contentChanged ||
@@ -214,9 +221,10 @@ export default function ArticleEditor({
             thumbnailChanged ||
             categoriesChanged ||
             authorsChanged ||
-            seoChanged
+            seoChanged ||
+            createdAtChanged
         )
-    }, [title, editorState, slug, excerpt, article, thumbnail, categories, authors, seo])
+    }, [title, editorState, slug, excerpt, article, thumbnail, categories, authors, seo, createdAt])
 
     if (!loaded && loading) {
         return (
@@ -390,6 +398,8 @@ export default function ArticleEditor({
                                     setSeo={setSeo}
                                     authors={authors}
                                     setAuthors={setAuthors}
+                                    createdAt={createdAt}
+                                    setCreatedAt={setCreatedAt}
                                     onSlugUserEdit={() => {
                                         slugManuallyEditedRef.current = true
                                     }}

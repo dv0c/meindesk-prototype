@@ -24,7 +24,8 @@ import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { useFetch } from "@/hooks/useFetch"
 import { Article } from "@prisma/client"
-import { Check, ChevronsUpDown, Image as ImageIcon, Link2, Plus, Tag, Type, Upload, X, AlertCircle, CheckCircle2, Search } from "lucide-react"
+import { Calendar } from "@/components/ui/calendar"
+import { Check, ChevronsUpDown, CalendarIcon, Image as ImageIcon, Link2, Plus, Tag, Type, Upload, X, AlertCircle, CheckCircle2, Search } from "lucide-react"
 import Image from "next/image"
 import { useState, useMemo } from "react"
 import { toast } from "sonner"
@@ -115,6 +116,8 @@ const EditorRightSection = ({
     setAiGenerated,
     authors = [],
     setAuthors,
+    createdAt,
+    setCreatedAt,
     onSlugUserEdit,
     onResetSlugFromTitle,
 }: {
@@ -134,6 +137,8 @@ const EditorRightSection = ({
     setAiGenerated?: (val: boolean) => void;
     authors?: string[];
     setAuthors?: (val: string[]) => void;
+    createdAt?: Date;
+    setCreatedAt?: (val: Date | undefined) => void;
     onSlugUserEdit?: () => void;
     onResetSlugFromTitle?: () => void;
 }) => {
@@ -401,6 +406,86 @@ const EditorRightSection = ({
                 </div>
 
                 <Separator />
+
+                {/* Publish Date Section */}
+                {setCreatedAt && (
+                    <>
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between gap-2">
+                                <div className="flex items-center gap-2">
+                                    <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                                    <Label className="text-sm font-medium">Publish Date</Label>
+                                </div>
+                                {createdAt && new Date(article.createdAt).getTime() !== createdAt.getTime() && (
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-7 text-xs text-muted-foreground"
+                                        onClick={() => setCreatedAt(new Date(article.createdAt))}
+                                    >
+                                        Reset
+                                    </Button>
+                                )}
+                            </div>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        className={cn(
+                                            "w-full justify-start text-left font-normal h-9",
+                                            !createdAt && "text-muted-foreground"
+                                        )}
+                                    >
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {createdAt
+                                            ? createdAt.toLocaleDateString("en-US", {
+                                                year: "numeric",
+                                                month: "long",
+                                                day: "numeric",
+                                            })
+                                            : "Pick a date"}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar
+                                        mode="single"
+                                        selected={createdAt}
+                                        onSelect={(date) => {
+                                            if (!date) return
+                                            const prev = createdAt || new Date()
+                                            date.setHours(prev.getHours(), prev.getMinutes(), prev.getSeconds())
+                                            setCreatedAt(date)
+                                        }}
+                                        initialFocus
+                                    />
+                                    <div className="border-t px-3 py-2">
+                                        <div className="flex items-center gap-2">
+                                            <Label className="text-xs text-muted-foreground whitespace-nowrap">Time</Label>
+                                            <Input
+                                                type="time"
+                                                value={createdAt
+                                                    ? `${String(createdAt.getHours()).padStart(2, "0")}:${String(createdAt.getMinutes()).padStart(2, "0")}`
+                                                    : ""}
+                                                onChange={(e) => {
+                                                    const [h, m] = e.target.value.split(":").map(Number)
+                                                    const next = new Date(createdAt || new Date())
+                                                    next.setHours(h, m, 0, 0)
+                                                    setCreatedAt(next)
+                                                }}
+                                                className="h-8 text-sm font-mono"
+                                            />
+                                        </div>
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
+                            <p className="text-xs text-muted-foreground">
+                                Override the date shown on the published article
+                            </p>
+                        </div>
+                        <Separator />
+                    </>
+                )}
 
                 {/* Authors Section */}
                 {setAuthors && (
