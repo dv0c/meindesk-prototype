@@ -26,6 +26,7 @@ type ExportArticle = {
   cover: string | null
   categoryName: string | null
   published: boolean
+  createdAt?: string
 }
 
 type LegacyExport = {
@@ -86,6 +87,19 @@ async function main() {
   const stillEmpty: string[] = []
   const unmappedCategories = new Set<string>()
 
+  // Build slug→createdAt map from the legacy Post collection
+  const postDateResult = (await db.$runCommandRaw({
+    find: "Post",
+    filter: {},
+    projection: { slug: 1, createdAt: 1 },
+  })) as any
+  const postDateBySlug = new Map<string, Date>(
+    (postDateResult?.cursor?.firstBatch ?? []).map((p: any) => [
+      p.slug as string,
+      new Date(p.createdAt?.$date ?? p.createdAt),
+    ]),
+  )
+
   console.log(`Importing ${rows.length} articles into site ${siteId}...`)
 
   for (const row of rows) {
@@ -125,7 +139,11 @@ async function main() {
       }
     }
 
-    const articleData = {
+    const originalDate = row.createdAt
+      ? new Date(row.createdAt)
+      : postDateBySlug.get(row.slug)
+
+    const articleData: Record<string, any> = {
       title: row.title,
       slug: row.slug,
       excerpt,
@@ -134,6 +152,7 @@ async function main() {
       status: published ? ArticleStatus.PUBLISHED : ArticleStatus.DRAFT,
       categories: categoryIds,
       content: EMPTY_CONTENT,
+      ...(originalDate ? { createdAt: originalDate } : {}),
     }
 
     const existing = await db.article.findFirst({

@@ -41,6 +41,7 @@ type LegacyExport = {
     cover: string | null
     categoryName: string | null
     published: boolean
+    createdAt?: string
   }>
 }
 
@@ -177,6 +178,19 @@ async function main() {
   }
   console.log(`  categories: ${categoriesUpdated} updated/created`)
 
+  // Build slug→createdAt map from the legacy Post collection
+  const postDateResult = (await db.$runCommandRaw({
+    find: "Post",
+    filter: {},
+    projection: { slug: 1, createdAt: 1 },
+  })) as any
+  const postDateBySlug = new Map<string, Date>(
+    (postDateResult?.cursor?.firstBatch ?? []).map((p: any) => [
+      p.slug as string,
+      new Date(p.createdAt?.$date ?? p.createdAt),
+    ]),
+  )
+
   let articlesCreated = 0
   let articlesUpdated = 0
   for (const row of data.articles) {
@@ -188,11 +202,15 @@ async function main() {
       if (cat) categoryIds.push(cat.id)
     }
 
+    const originalDate = row.createdAt
+      ? new Date(row.createdAt)
+      : postDateBySlug.get(row.slug)
+
     const existing = await db.article.findFirst({
       where: { siteId, slug: row.slug },
     })
 
-    const articleData = {
+    const articleData: Record<string, any> = {
       title: row.title,
       slug: row.slug,
       excerpt: row.excerpt ?? "",
@@ -201,6 +219,7 @@ async function main() {
       status: row.published ? ArticleStatus.PUBLISHED : ArticleStatus.DRAFT,
       categories: categoryIds,
       content: EMPTY_CONTENT,
+      ...(originalDate ? { createdAt: originalDate } : {}),
     }
 
     if (existing) {
