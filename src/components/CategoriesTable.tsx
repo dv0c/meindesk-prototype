@@ -177,6 +177,7 @@ export function CategoriesTable({ siteId: propSiteId }: CategoriesTableProps = {
                                                                 slug: cat.slug,
                                                                 description: cat.description,
                                                                 published: cat.published,
+                                                                metadata: cat.metadata,
                                                             })
                                                             setEditOpen(true)
                                                         }}

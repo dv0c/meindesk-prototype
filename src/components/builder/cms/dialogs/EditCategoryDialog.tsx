@@ -13,13 +13,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
+import { Separator } from "@/components/ui/separator"
+import { NavPlacementPicker } from "@/components/builder/cms/NavPlacementPicker"
 import { Loader2 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
@@ -111,32 +106,35 @@ export function EditCategoryDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[480px]">
                 <DialogHeader>
                     <DialogTitle>Edit category</DialogTitle>
                     <DialogDescription>Update name, slug, description, and visibility.</DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4 py-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="edit-cat-name">Name</Label>
-                        <Input
-                            id="edit-cat-name"
-                            value={name}
-                            onChange={(e) => handleNameChange(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="edit-cat-slug">Slug</Label>
-                        <Input
-                            id="edit-cat-slug"
-                            value={slug}
-                            onChange={(e) => {
-                                setSlugTouched(true)
-                                setSlug(e.target.value)
-                            }}
-                            required
-                        />
+                <form onSubmit={handleSubmit} className="space-y-5 py-2">
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-2">
+                            <Label htmlFor="edit-cat-name">Name</Label>
+                            <Input
+                                id="edit-cat-name"
+                                value={name}
+                                onChange={(e) => handleNameChange(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="edit-cat-slug">Slug</Label>
+                            <Input
+                                id="edit-cat-slug"
+                                value={slug}
+                                onChange={(e) => {
+                                    setSlugTouched(true)
+                                    setSlug(e.target.value)
+                                }}
+                                className="font-mono text-sm"
+                                required
+                            />
+                        </div>
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="edit-cat-desc">Description</Label>
@@ -144,33 +142,36 @@ export function EditCategoryDialog({
                             id="edit-cat-desc"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
+                            rows={2}
+                            className="resize-none"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label>Navigation placement</Label>
-                        <Select value={navPlacement} onValueChange={(v) => setNavPlacement(v as NavPlacement)}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select placement" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="header">Header link (top level)</SelectItem>
-                                <SelectItem value="hidden">Articles dropdown</SelectItem>
-                                <SelectItem value="none">Not in navigation</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <p className="text-xs text-muted-foreground">
-                            Controls how this category appears in the site header menu.
-                        </p>
+
+                    <Separator />
+
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                            <Label>Navigation placement</Label>
+                            {navPlacement !== "none" && (
+                                <div className="flex items-center gap-2">
+                                    <Label htmlFor="edit-cat-nav-order" className="text-xs text-muted-foreground font-normal">
+                                        Sort order
+                                    </Label>
+                                    <Input
+                                        id="edit-cat-nav-order"
+                                        type="number"
+                                        value={navOrder}
+                                        onChange={(e) => setNavOrder(parseInt(e.target.value, 10) || 0)}
+                                        className="h-7 w-16 text-xs text-center"
+                                    />
+                                </div>
+                            )}
+                        </div>
+                        <NavPlacementPicker value={navPlacement} onChange={setNavPlacement} />
                     </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="edit-cat-nav-order">Nav sort order</Label>
-                        <Input
-                            id="edit-cat-nav-order"
-                            type="number"
-                            value={navOrder}
-                            onChange={(e) => setNavOrder(parseInt(e.target.value, 10) || 0)}
-                        />
-                    </div>
+
+                    <Separator />
+
                     <div className="flex items-center justify-between rounded-lg border p-3">
                         <div className="space-y-0.5">
                             <Label htmlFor="edit-cat-published">Published</Label>
