@@ -26,6 +26,11 @@ const getSidebarNavItems = (siteId: string, mode: string) => {
             show: true,
         },
         {
+            title: "Webhooks",
+            href: `/dashboard/${siteId}/projects/settings/webhooks`,
+            show: mode === 'cms',
+        },
+        {
             title: "Team",
             href: `/dashboard/${siteId}/projects/settings/team`,
             show: true,
