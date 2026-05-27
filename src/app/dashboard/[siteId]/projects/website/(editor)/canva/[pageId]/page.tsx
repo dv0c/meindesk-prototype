@@ -24,6 +24,7 @@ import { EditorThemeProvider } from "./components/ThemeContext"
 import { ReadOnlySection } from "./components/ReadOnlySection"
 import { CraftCanvas } from "./components/CraftCanvas"
 import { DeviceProvider } from "./components/DeviceContext"
+import { stableStringify } from "@/lib/stableStringify"
 
 // Resolver for all user components - now using resolverWithFallback from registry
 // This automatically handles missing components (e.g., from uninstalled themes)
@@ -421,22 +422,9 @@ function EditorContent({ pageName, setPageName, pageStatus, setPageStatus, isLoc
     const handleSave = useCallback(async (statusOverride?: "DRAFT" | "PUBLISHED" | "ARCHIVED") => {
         setIsSaving(true)
         try {
-            // Serialize current state safely handling circular references
+            // Serialize current state deterministically + cycle-safe
             const nodes = query.getSerializedNodes()
-            const safeStringify = (obj: any) => {
-                const seen = new WeakSet()
-                return JSON.stringify(obj, (key, value) => {
-                    if (typeof value === "object" && value !== null) {
-                        if (seen.has(value)) {
-                            return
-                        }
-                        seen.add(value)
-                    }
-                    return value
-                })
-            }
-
-            const json = safeStringify(nodes)
+            const json = stableStringify(nodes)
             const content = JSON.parse(json)
 
             if (editorMode === "page") {

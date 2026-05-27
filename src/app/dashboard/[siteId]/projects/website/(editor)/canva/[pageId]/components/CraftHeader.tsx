@@ -29,6 +29,7 @@ import { RawHtmlDialog } from "@/components/builder/RawHtmlDialog"
 import { generateFullHtml } from "@/components/builder/htmlGenerator"
 import { Code } from "lucide-react"
 import { useSearchParams, useRouter, usePathname } from "next/navigation"
+import { stableStringify } from "@/lib/stableStringify"
 
 import { useSession } from "next-auth/react"
 import { resolverWithFallback } from "../user-components"
@@ -152,35 +153,16 @@ export function CraftHeader({
     const shouldBlockNavigation = useRef(true)
     const isTrapped = useRef(false)
 
-    // Safe stringify helper to handle circular references in props (e.g. Context Providers)
-    const safeStringify = (obj: any) => {
-        try {
-            const seen = new WeakSet()
-            return JSON.stringify(obj, (key, value) => {
-                if (typeof value === "object" && value !== null) {
-                    if (seen.has(value)) {
-                        return
-                    }
-                    seen.add(value)
-                }
-                return value
-            })
-        } catch (e) {
-            console.warn("safeStringify failed:", e)
-            return "ERROR_STRINGIFY"
-        }
-    }
-
     // Calculate Dirty State
     const nodes = query.getSerializedNodes()
-    const currentStringState = safeStringify(nodes)
+    const currentStringState = stableStringify(nodes)
 
     // Logic update: If we can't undo (history empty), we must be at a clean state.
     // Ideally, we treat this as "no changes made".
     // Also, align savedState with current state when !canUndo.
     useEffect(() => {
         if (!canUndo && nodes && Object.keys(nodes).length > 0) {
-            setSavedState(safeStringify(nodes))
+            setSavedState(stableStringify(nodes))
         }
     }, [canUndo, nodes]) // Depend on canUndo so "undo to start" resets dirty state
 
@@ -188,7 +170,7 @@ export function CraftHeader({
     useEffect(() => {
         const nodes = query.getSerializedNodes()
         if (!savedState && nodes && Object.keys(nodes).length > 0) {
-            setSavedState(safeStringify(nodes))
+            setSavedState(stableStringify(nodes))
         }
     }, [query, savedState])
 
@@ -197,12 +179,10 @@ export function CraftHeader({
     // Update saved state when save completes
     useEffect(() => {
         if (prevIsSaving.current && !isSaving) {
-            setSavedState(safeStringify(query.getSerializedNodes()))
-            // If we were trapped, untrap since we are clean
-            if (isTrapped.current) {
-                isTrapped.current = false
-                history.back() // Remove the trap state
-            }
+            setSavedState(stableStringify(query.getSerializedNodes()))
+            // Mark as untrapped; we intentionally don't navigate history here.
+            isTrapped.current = false
+            shouldBlockNavigation.current = true
         }
         prevIsSaving.current = isSaving
     }, [isSaving, query])
@@ -289,7 +269,7 @@ export function CraftHeader({
         if (isDirty) {
             setShowUnsavedDialog(true)
         } else {
-            history.back()
+            router.push('/dashboard/' + siteId + '/projects/website/pages')
         }
     }
 
@@ -643,7 +623,17 @@ export function CraftHeader({
                     </div>
 
                     <AlertDialogFooter className="p-4 bg-zinc-900/50 border-t border-zinc-900 flex-row gap-2 justify-end">
-                        <AlertDialogCancel onClick={() => setShowUnsavedDialog(false)} className="rounded-none h-8 text-[10px] font-mono uppercase bg-transparent border-zinc-700 text-zinc-400 hover:bg-zinc-800 hover:text-white mt-0">
+                        <AlertDialogCancel
+                            onClick={async (e) => {
+                                e.preventDefault()
+                                if (!isSaving) {
+                                    await onSave()
+                                }
+                                setShowUnsavedDialog(false)
+                            }}
+                            disabled={isSaving}
+                            className="rounded-none h-8 text-[10px] font-mono uppercase bg-transparent border-zinc-700 text-zinc-400 hover:bg-zinc-800 hover:text-white mt-0"
+                        >
                             Stay & Save
                         </AlertDialogCancel>
                         <AlertDialogAction onClick={handleDiscard} className="rounded-none h-8 text-[10px] font-mono uppercase bg-rose-600 hover:bg-rose-700 text-white border-none">

@@ -1,6 +1,9 @@
 import { db } from "@/lib/db"
 import { isValidObjectId } from "@/lib/actions/helpers/cached-tenant"
 
+/** Headless static routes (Sophia frontend) — returned even when locked. */
+const HEADLESS_SYSTEM_PAGE_SLUGS = ["home", "biography", "contact", "ypiresies"] as const
+
 export type PageWithChildren = {
   id: string
   title: string
@@ -45,14 +48,23 @@ export async function getPageWithChildrenJson(
   tenantId: string,
   idOrSlug: string
 ): Promise<Record<string, unknown> | null> {
+  const identityClause = isValidObjectId(idOrSlug)
+    ? { OR: [{ id: idOrSlug }, { slug: idOrSlug }] }
+    : { slug: idOrSlug }
+
   const page = await db.page.findFirst({
     where: {
       siteId: tenantId,
       status: "PUBLISHED",
-      locked: false,
-      ...(isValidObjectId(idOrSlug)
-        ? { OR: [{ id: idOrSlug }, { slug: idOrSlug }] }
-        : { slug: idOrSlug }),
+      AND: [
+        identityClause,
+        {
+          OR: [
+            { locked: false },
+            { slug: { in: [...HEADLESS_SYSTEM_PAGE_SLUGS] } },
+          ],
+        },
+      ],
     },
   })
 

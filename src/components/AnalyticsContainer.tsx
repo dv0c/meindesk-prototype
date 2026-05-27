@@ -4,6 +4,7 @@ import { AnalyticsCards } from "@/components/AnalyticsCards"
 import { AnalyticsCharts } from "@/components/AnalyticsChart"
 import { AnalyticsLogs } from "@/components/AnalyticsLogs"
 import { Button } from "@/components/ui/button"
+import SiteContainer from "@/components/SiteContainer"
 import { useState } from "react"
 
 const RANGE_OPTIONS = [
@@ -138,8 +139,8 @@ export function AnalyticsContainer({ siteId, analyticsConnected = true }: { site
     }
 
     return (
-        <div className="flex flex-1 flex-col gap-4 p-5">
-            <div className="flex justify-between items-center">
+        <SiteContainer className="flex flex-1 flex-col gap-4 p-5">
+            <div className="flex items-center justify-between gap-3">
                 {/* Range selector */}
                 <div className="flex gap-2">
                     {RANGE_OPTIONS.map((opt) => (
@@ -154,70 +155,73 @@ export function AnalyticsContainer({ siteId, analyticsConnected = true }: { site
                     ))}
                 </div>
 
-                {/* Reset Data Button */}
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" className="gap-2 text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20">
-                            <span className="h-2 w-2 rounded-full bg-destructive animate-pulse" />
-                            Reset Data
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Reset Analytics Data?</DialogTitle>
-                            <DialogDescription>
-                                This will permanently delete all analytics events and reset view counts for this site. This action cannot be undone.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="flex justify-end gap-2 mt-4">
-                            <Button variant="outline" onClick={() => document.getElementById("close-reset-dialog")?.click()}>Cancel</Button>
-                            <Button
-                                variant="destructive"
-                                onClick={async () => {
-                                    try {
-                                        const res = await fetch(`/api/analytics/${siteId}/reset`, { method: "DELETE" })
-                                        if (res.ok) {
-                                            toast.success("Analytics data reset successfully")
-                                            window.location.reload()
-                                        } else {
-                                            toast.error("Failed to reset data")
+                {/* Right actions */}
+                <div className="flex items-center gap-2">
+                    {/* Reset Data Button */}
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button variant="outline" size="sm" className="gap-2 text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20">
+                                <span className="h-2 w-2 rounded-full bg-destructive animate-pulse" />
+                                Reset Data
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Reset Analytics Data?</DialogTitle>
+                                <DialogDescription>
+                                    This will permanently delete all analytics events and reset view counts for this site. This action cannot be undone.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="flex justify-end gap-2 mt-4">
+                                <Button variant="outline" onClick={() => document.getElementById("close-reset-dialog")?.click()}>Cancel</Button>
+                                <Button
+                                    variant="destructive"
+                                    onClick={async () => {
+                                        try {
+                                            const res = await fetch(`/api/analytics/${siteId}/reset`, { method: "DELETE" })
+                                            if (res.ok) {
+                                                toast.success("Analytics data reset successfully")
+                                                window.location.reload()
+                                            } else {
+                                                toast.error("Failed to reset data")
+                                            }
+                                        } catch (e) {
+                                            toast.error("Error resetting data")
                                         }
-                                    } catch (e) {
-                                        toast.error("Error resetting data")
-                                    }
-                                }}
-                            >
-                                Confirm Reset
-                            </Button>
-                        </div>
-                    </DialogContent>
-                </Dialog>
+                                    }}
+                                >
+                                    Confirm Reset
+                                </Button>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
 
-                {/* Installation Dialog */}
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" className="gap-2">
-                            <Code2 className="h-4 w-4" />
-                            Script
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Tracking Script</DialogTitle>
-                            <DialogDescription>
-                                Add this script to any external page to track visitors.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="flex items-center gap-2 rounded-md border bg-muted p-2 mt-2">
-                            <code className="text-sm flex-1 font-mono break-all relative">
-                                &lt;script src=&quot;{typeof window !== 'undefined' ? window.location.origin : '...'}/tracker.js&quot; defer&gt;&lt;/script&gt;
-                            </code>
-                            <Button size="icon" variant="ghost" className="h-8 w-8" onClick={copyToClipboard}>
-                                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    {/* Installation Dialog */}
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button variant="outline" size="sm" className="gap-2">
+                                <Code2 className="h-4 w-4" />
+                                Script
                             </Button>
-                        </div>
-                    </DialogContent>
-                </Dialog>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Tracking Script</DialogTitle>
+                                <DialogDescription>
+                                    Add this script to any external page to track visitors.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="flex items-center gap-2 rounded-md border bg-muted p-2 mt-2">
+                                <code className="text-sm flex-1 font-mono break-all relative">
+                                    &lt;script src=&quot;{typeof window !== 'undefined' ? window.location.origin : '...'}/tracker.js&quot; defer&gt;&lt;/script&gt;
+                                </code>
+                                <Button size="icon" variant="ghost" className="h-8 w-8" onClick={copyToClipboard}>
+                                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                                </Button>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+                </div>
             </div>
 
             {/* Analytics Cards */}
@@ -228,6 +232,6 @@ export function AnalyticsContainer({ siteId, analyticsConnected = true }: { site
 
             {/* Event Logs */}
             <AnalyticsLogs siteId={siteId} range={range} />
-        </div>
+        </SiteContainer>
     )
 }

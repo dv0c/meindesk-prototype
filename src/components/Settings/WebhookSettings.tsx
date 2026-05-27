@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 type WebhookData = {
   revalidateUrl: string
@@ -126,89 +127,92 @@ export function WebhookSettings({ siteId }: { siteId: string }) {
 
   if (loading) {
     return (
-      <div className="border rounded-lg p-6 bg-card">
-        <p className="text-sm text-muted-foreground">Loading webhook settings...</p>
-      </div>
+      <Card>
+        <CardContent className="p-6">
+          <p className="text-sm text-muted-foreground">Loading webhook settings...</p>
+        </CardContent>
+      </Card>
     )
   }
 
   return (
     <div className="space-y-6">
       {/* Status */}
-      <div className="border rounded-lg p-6 bg-card">
-        <div className="flex items-center gap-3 mb-1">
-          <div
-            className={`h-2.5 w-2.5 rounded-full ${configured ? "bg-green-500" : "bg-yellow-500"}`}
-          />
-          <h4 className="text-sm font-medium">
-            {configured ? "Webhook configured" : "Webhook not configured"}
-          </h4>
-        </div>
-        <p className="text-xs text-muted-foreground ml-5.5">
-          {configured
-            ? "Your frontend will be notified when content changes."
-            : "Set a URL and secret below to enable automatic cache revalidation."}
-        </p>
-      </div>
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-3">
+            <div
+              className={`h-2.5 w-2.5 rounded-full ${configured ? "bg-green-500" : "bg-yellow-500"}`}
+            />
+            <CardTitle className="text-base">
+              {configured ? "Webhook is active" : "Webhook is not set up"}
+            </CardTitle>
+          </div>
+          <CardDescription>
+            {configured
+              ? "When you change content, we’ll ping your frontend to refresh cached pages."
+              : "Add a revalidation URL (and secret) to refresh your frontend when content changes."}
+          </CardDescription>
+        </CardHeader>
+      </Card>
 
       {/* Form */}
-      <div className="border rounded-lg p-6 bg-card space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="webhook-url">Revalidation URL</Label>
-          <Input
-            id="webhook-url"
-            type="url"
-            placeholder="https://yoursite.com/api/revalidate-all"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-          />
-          <p className="text-xs text-muted-foreground">
-            The endpoint on your frontend that handles cache revalidation.
-          </p>
-        </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Configuration</CardTitle>
+          <CardDescription>
+            Point this to an endpoint on your frontend (Next.js / any framework) that triggers cache revalidation.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="webhook-url">Revalidation URL</Label>
+            <Input
+              id="webhook-url"
+              type="url"
+              placeholder="https://yoursite.com/api/revalidate-all"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+            />
+            <p className="text-sm text-muted-foreground">
+              Example: <code className="bg-muted px-1 rounded">/api/revalidate-all</code>
+            </p>
+          </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="webhook-secret">
-            Revalidation Secret {configured && "(leave blank to keep current)"}
-          </Label>
-          <Input
-            id="webhook-secret"
-            type="password"
-            placeholder={configured ? "••••••••" : "Enter a secret token"}
-            value={secret}
-            onChange={(e) => setSecret(e.target.value)}
-          />
-          <p className="text-xs text-muted-foreground">
-            Appended to the revalidation URL as <code className="bg-muted px-1 rounded">?secret=</code>.
-            Must match REVALIDATION_SECRET_TOKEN on your frontend. Do not put the secret in the URL field.
-          </p>
-        </div>
+          <div className="space-y-2">
+            <Label htmlFor="webhook-secret">
+              Secret {configured && "(leave blank to keep current)"}
+            </Label>
+            <Input
+              id="webhook-secret"
+              type="password"
+              placeholder={configured ? "••••••••" : "Create a secret token"}
+              value={secret}
+              onChange={(e) => setSecret(e.target.value)}
+            />
+            <p className="text-sm text-muted-foreground">
+              We call your URL like <code className="bg-muted px-1 rounded">?secret=…</code>. Keep it private and validate it on your frontend.
+            </p>
+          </div>
 
-        <div className="flex items-center gap-3 pt-2">
-          <Button onClick={handleSave} disabled={saving}>
-            {saving ? "Saving..." : "Save"}
-          </Button>
+          <div className="flex flex-wrap items-center gap-3 pt-2">
+            <Button onClick={handleSave} disabled={saving}>
+              {saving ? "Saving..." : "Save"}
+            </Button>
 
-          {configured && (
-            <>
-              <Button
-                variant="outline"
-                onClick={handleTest}
-                disabled={testing}
-              >
-                {testing ? "Testing..." : "Test Webhook"}
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={handleDelete}
-                disabled={deleting}
-              >
-                {deleting ? "Removing..." : "Remove"}
-              </Button>
-            </>
-          )}
-        </div>
-      </div>
+            {configured && (
+              <>
+                <Button variant="outline" onClick={handleTest} disabled={testing}>
+                  {testing ? "Testing..." : "Send test"}
+                </Button>
+                <Button variant="destructive" onClick={handleDelete} disabled={deleting}>
+                  {deleting ? "Removing..." : "Remove"}
+                </Button>
+              </>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Feedback */}
       {message && (
@@ -242,22 +246,34 @@ export function WebhookSettings({ siteId }: { siteId: string }) {
       )}
 
       {/* Help */}
-      <div className="border rounded-lg p-6 bg-card space-y-3">
-        <h4 className="text-sm font-medium">How it works</h4>
-        <ul className="text-xs text-muted-foreground space-y-1.5 list-disc list-inside">
-          <li>
-            When you publish, update, or delete content (pages, articles, categories,
-            collection items), Meindesk sends a GET request to your revalidation URL.
-          </li>
-          <li>
-            The request appends <code className="bg-muted px-1 rounded">?secret=&lt;token&gt;</code> to your revalidation URL (no Bearer header).
-          </li>
-          <li>
-            Your frontend should call <code className="bg-muted px-1 rounded">revalidateTag</code> / <code className="bg-muted px-1 rounded">revalidatePath</code> to
-            purge its cache so visitors see the latest content.
-          </li>
-        </ul>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>How it works</CardTitle>
+          <CardDescription>
+            Simple flow — one request from Meindesk, one revalidation on your frontend.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3 text-sm text-muted-foreground">
+          <ol className="space-y-2 list-decimal list-inside">
+            <li>
+              You publish or update content in Meindesk.
+            </li>
+            <li>
+              We send a <span className="text-foreground/90">GET</span> request to your revalidation URL and add{" "}
+              <code className="bg-muted px-1 rounded">?secret=…</code>.
+            </li>
+            <li>
+              Your endpoint checks the secret, then calls{" "}
+              <code className="bg-muted px-1 rounded">revalidatePath</code> or{" "}
+              <code className="bg-muted px-1 rounded">revalidateTag</code> (Next.js) to refresh cached pages.
+            </li>
+          </ol>
+          <p>
+            Tip: don’t bake the secret into the URL field — keep it in your frontend env (for example{" "}
+            <code className="bg-muted px-1 rounded">REVALIDATION_SECRET_TOKEN</code>).
+          </p>
+        </CardContent>
+      </Card>
     </div>
   )
 }
