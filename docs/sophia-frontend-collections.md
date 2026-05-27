@@ -59,6 +59,14 @@ In **Site settings** (JSON) or env on meindesk.gr:
 
 Or env: `FRONTEND_REVALIDATE_URL`, `FRONTEND_REVALIDATE_SECRET`.
 
+On publish, Meindesk calls the frontend with **query-param auth** (not Bearer):
+
+```
+GET {revalidateUrl}?secret={revalidateSecret}
+```
+
+Store the base URL without `?secret=` in `revalidateUrl`; the secret belongs only in `revalidateSecret`. Configure the same token as `REVALIDATION_SECRET_TOKEN` on the headless site.
+
 ## Seed
 
 ```bash

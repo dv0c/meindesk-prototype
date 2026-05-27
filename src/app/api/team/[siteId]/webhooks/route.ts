@@ -6,6 +6,7 @@ import {
   createErrorResponse,
 } from "@/lib/security/route-auth"
 import type { SiteSettingsJson } from "@/lib/site-frontend-settings"
+import { stripSecretFromRevalidateUrl } from "@/lib/frontend-revalidate-url"
 
 /**
  * GET /api/team/:siteId/webhooks
@@ -91,9 +92,12 @@ export async function PUT(
     const existingSettings = (site.settings ?? {}) as SiteSettingsJson
     const existingFrontend = existingSettings.frontend ?? {}
 
+    const trimmedUrl = revalidateUrl?.trim()
     const updatedFrontend = {
       ...existingFrontend,
-      revalidateUrl: revalidateUrl?.trim() || existingFrontend.revalidateUrl,
+      revalidateUrl: trimmedUrl
+        ? stripSecretFromRevalidateUrl(trimmedUrl)
+        : existingFrontend.revalidateUrl,
       revalidateSecret:
         revalidateSecret?.trim() || existingFrontend.revalidateSecret,
     }

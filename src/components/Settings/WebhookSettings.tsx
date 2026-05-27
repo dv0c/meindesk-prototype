@@ -179,8 +179,8 @@ export function WebhookSettings({ siteId }: { siteId: string }) {
             onChange={(e) => setSecret(e.target.value)}
           />
           <p className="text-xs text-muted-foreground">
-            Sent as a Bearer token in the Authorization header. Must match the
-            REVALIDATION_SECRET_TOKEN on your frontend.
+            Appended to the revalidation URL as <code className="bg-muted px-1 rounded">?secret=</code>.
+            Must match REVALIDATION_SECRET_TOKEN on your frontend. Do not put the secret in the URL field.
           </p>
         </div>
 
@@ -250,7 +250,7 @@ export function WebhookSettings({ siteId }: { siteId: string }) {
             collection items), Meindesk sends a GET request to your revalidation URL.
           </li>
           <li>
-            The request includes an <code className="bg-muted px-1 rounded">Authorization: Bearer &lt;secret&gt;</code> header.
+            The request appends <code className="bg-muted px-1 rounded">?secret=&lt;token&gt;</code> to your revalidation URL (no Bearer header).
           </li>
           <li>
             Your frontend should call <code className="bg-muted px-1 rounded">revalidateTag</code> / <code className="bg-muted px-1 rounded">revalidatePath</code> to

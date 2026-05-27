@@ -1,4 +1,5 @@
 import { readFileSync } from "fs"
+import { buildRevalidateRequestUrl } from "../../src/lib/frontend-revalidate-url"
 import { SITE_SECTIONS_SLUG } from "../../src/lib/site-collections/schemas"
 import { getScriptDb } from "./prisma-script"
 
@@ -158,9 +159,8 @@ export async function triggerRevalidate(siteId: string): Promise<void> {
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 10_000)
 
-  await fetch(url, {
+  await fetch(buildRevalidateRequestUrl(url, secret), {
     method: "GET",
-    headers: { Authorization: `Bearer ${secret}` },
     signal: controller.signal,
   }).catch((err) => {
     console.warn("[frontend-revalidate] failed:", err)

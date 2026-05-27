@@ -1,4 +1,5 @@
 import { db } from "@/lib/db"
+import { buildRevalidateRequestUrl } from "@/lib/frontend-revalidate-url"
 
 type SiteSettings = {
   frontend?: {
@@ -33,11 +34,8 @@ export async function triggerFrontendRevalidate(siteId: string): Promise<void> {
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), 10_000)
 
-    await fetch(url, {
+    await fetch(buildRevalidateRequestUrl(url, secret), {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${secret}`,
-      },
       signal: controller.signal,
     }).catch((err) => {
       console.warn("[frontend-revalidate] failed:", err)

@@ -6,6 +6,7 @@ import {
   createErrorResponse,
 } from "@/lib/security/route-auth"
 import type { SiteSettingsJson } from "@/lib/site-frontend-settings"
+import { buildRevalidateRequestUrl } from "@/lib/frontend-revalidate-url"
 
 /**
  * POST /api/team/:siteId/webhooks/test
@@ -47,9 +48,8 @@ export async function POST(
     const timeout = setTimeout(() => controller.abort(), 10_000)
 
     try {
-      const response = await fetch(url, {
+      const response = await fetch(buildRevalidateRequestUrl(url, secret), {
         method: "GET",
-        headers: { Authorization: `Bearer ${secret}` },
         signal: controller.signal,
       })
 
