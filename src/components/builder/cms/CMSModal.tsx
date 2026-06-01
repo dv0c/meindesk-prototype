@@ -7,6 +7,7 @@ import { CMSSidebar, CMSView } from "./CMSSidebar"
 import { ArticleTable } from "@/components/ArticlesTable"
 import { CategoriesTable } from "@/components/CategoriesTable"
 import { CollectionsView } from "@/components/CollectionsView"
+import { NavigationLinksTable } from "@/components/NavigationLinksTable"
 import { MediaGalleryClient } from "@/components/MediaGallery/media-gallery-client"
 
 interface CMSModalProps {
@@ -26,6 +27,8 @@ export function CMSModal({ open, onOpenChange, siteId }: CMSModalProps) {
                 return <MediaGalleryClient />
             case "categories":
                 return <CategoriesTable siteId={siteId} />
+            case "navigation":
+                return <NavigationLinksTable siteId={siteId} />
             case "collections":
                 return <CollectionsView siteId={siteId} />
             default:

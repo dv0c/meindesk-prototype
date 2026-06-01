@@ -1,4 +1,5 @@
 import {
+    $applyNodeReplacement,
     DecoratorNode,
     DOMConversionMap,
     DOMConversionOutput,
@@ -11,6 +12,11 @@ import {
     Spread,
 } from "lexical";
 import { ReactElement, Suspense, lazy } from "react";
+import {
+    buildCarouselElement,
+    isCarouselContainerElement,
+    parseCarouselElement,
+} from "@/lib/editor/carousel-dom";
 
 export type CarouselImage = {
     src: string;
@@ -31,6 +37,17 @@ export type SerializedCarouselNode = Spread<
 >;
 
 const CarouselComponent = lazy(() => import("./carousel-component"));
+
+function $convertCarouselElement(domNode: Node): DOMConversionOutput | null {
+    if (!isCarouselContainerElement(domNode)) return null;
+    const parsed = parseCarouselElement(domNode);
+    const node = $createCarouselNode(parsed.images, {
+        width: "inherit",
+        imagesPerSlide: parsed.imagesPerSlide ?? 1,
+        loop: parsed.loop ?? false,
+    });
+    return { node };
+}
 
 export class CarouselNode extends DecoratorNode<ReactElement> {
     __images: CarouselImage[];
@@ -65,6 +82,29 @@ export class CarouselNode extends DecoratorNode<ReactElement> {
             serializedNode.height,
             serializedNode.gap
         );
+    }
+
+    static importDOM(): DOMConversionMap | null {
+        return {
+            div: (node: Node) => {
+                if (!isCarouselContainerElement(node)) return null;
+                return {
+                    conversion: $convertCarouselElement,
+                    priority: 2,
+                };
+            },
+        };
+    }
+
+    exportDOM(): DOMExportOutput {
+        const element = buildCarouselElement({
+            images: this.__images,
+            imagesPerSlide: this.__imagesPerSlide,
+            loop: this.__loop,
+            navigation: this.__images.length > 0,
+            pagination: this.__images.length > 0,
+        });
+        return { element };
     }
 
     constructor(
@@ -185,8 +225,24 @@ export class CarouselNode extends DecoratorNode<ReactElement> {
 
 export function $createCarouselNode(
     images: CarouselImage[],
+    options?: {
+        width?: string
+        imagesPerSlide?: number
+        loop?: boolean
+        height?: string
+        gap?: string
+    },
 ): CarouselNode {
-    return new CarouselNode(images);
+    return $applyNodeReplacement(
+        new CarouselNode(
+            images,
+            options?.width,
+            options?.imagesPerSlide,
+            options?.loop,
+            options?.height,
+            options?.gap,
+        ),
+    );
 }
 
 export function $isCarouselNode(

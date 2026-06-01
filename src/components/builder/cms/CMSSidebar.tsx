@@ -2,9 +2,9 @@
 
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { FileText, FolderOpen, ImageIcon, LayoutTemplate, X } from "lucide-react"
+import { FileText, FolderOpen, ImageIcon, LayoutTemplate, Menu, X } from "lucide-react"
 
-export type CMSView = "articles" | "categories" | "collections" | "media"
+export type CMSView = "articles" | "categories" | "navigation" | "collections" | "media"
 
 interface CMSSidebarProps {
     activeView: CMSView
@@ -23,6 +23,11 @@ export function CMSSidebar({ activeView, setActiveView, onClose }: CMSSidebarPro
             id: "categories" as const,
             label: "Categories",
             icon: FolderOpen
+        },
+        {
+            id: "navigation" as const,
+            label: "Navigation",
+            icon: Menu
         },
         {
             id: "collections" as const,

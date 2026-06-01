@@ -16,10 +16,11 @@ export async function GET(
   const { searchParams } = new URL(req.url)
   const limitParam = searchParams.get("limit")
   const categoriesParam = searchParams.get("categories")
+  const categorySlugParam = searchParams.get("category_slug")?.trim() ?? null
   const statusParam = searchParams.get("status")?.trim().toLowerCase() ?? null
   const parsedLimit = limitParam ? parseInt(limitParam, 10) : 10
   const limit = Number.isFinite(parsedLimit)
-    ? Math.min(Math.max(parsedLimit, 1), 100)
+    ? Math.min(Math.max(parsedLimit, 1), 500)
     : 10
 
   try {
@@ -36,7 +37,21 @@ export async function GET(
       )
     }
 
-    if (categoriesParam) {
+    if (categorySlugParam) {
+      const category = await db.category.findFirst({
+        where: {
+          siteId: tenantId,
+          slug: categorySlugParam,
+        },
+        select: { id: true },
+      })
+
+      if (!category) {
+        return NextResponse.json([])
+      }
+
+      whereClause.categories = { hasSome: [category.id] }
+    } else if (categoriesParam) {
       const categoryNames = categoriesParam.split(",").map((c) => c.trim())
       const foundCategories = await db.category.findMany({
         where: {
@@ -50,7 +65,6 @@ export async function GET(
         const categoryIds = foundCategories.map((c) => c.id)
         whereClause.categories = { hasSome: categoryIds }
       } else {
-        // If specific categories were requested but none matched, return empty result
         return NextResponse.json([])
       }
     }
@@ -70,8 +84,8 @@ export async function GET(
         author: { select: { ...v1PublicAuthorSelect } },
         authors: { select: { ...v1PublicAuthorSelect } },
       },
-      orderBy: { createdAt: "desc" },
-      take: limit, // here's your limit
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      take: limit,
     })
 
     if (!articles.length) {

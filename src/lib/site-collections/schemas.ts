@@ -32,6 +32,12 @@ export const NAVIGATION_LINKS_FIELDS: CollectionFieldDef[] = [
     options: ["header", "mobile", "footer"],
   },
   { name: "order", type: "number", label: "Sort order", required: true },
+  {
+    name: "headerPosition",
+    type: "select",
+    label: "Header position",
+    options: ["start", "end"],
+  },
   { name: "visible", type: "boolean", label: "Visible", required: true },
   { name: "openInNewTab", type: "boolean", label: "Open in new tab" },
 ]
@@ -44,8 +50,8 @@ export const SITE_SECTIONS_SEED = [
 ] as const
 
 export const NAVIGATION_LINKS_SEED = [
-  { label: "ΑΡΧΙΚΗ", href: "/", placement: "header", order: 0, visible: true },
-  { label: "ΥΠΗΡΕΣΙΕΣ", href: "/ypiresies", placement: "header", order: 1, visible: true },
-  { label: "ΕΠΙΚΟΙΝΩΝΙΑ", href: "/contact", placement: "header", order: 2, visible: true },
-  { label: "ΒΙΟΓΡΑΦΙΚΟ", href: "/biography", placement: "header", order: 3, visible: true },
+  { label: "ΑΡΧΙΚΗ", href: "/", placement: "header", order: 0, headerPosition: "start", visible: true },
+  { label: "ΥΠΗΡΕΣΙΕΣ", href: "/ypiresies", placement: "header", order: 1, headerPosition: "start", visible: true },
+  { label: "ΒΙΟΓΡΑΦΙΚΟ", href: "/biography", placement: "header", order: 2, headerPosition: "start", visible: true },
+  { label: "ΕΠΙΚΟΙΝΩΝΙΑ", href: "/contact", placement: "header", order: 0, headerPosition: "end", visible: true },
 ] as const

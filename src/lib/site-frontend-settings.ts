@@ -38,7 +38,9 @@ export function getPublicSiteUrlForVerification(site: {
 export function hasAnalyticsTrackerInHtml(html: string): boolean {
   return (
     html.includes("tracker.js") ||
+    html.includes("meindesk-analytics.js") ||
     html.includes("meindesk-analytics-tracker") ||
+    html.includes("__MEINDESK_ANALYTICS__") ||
     html.includes("data-site-id")
   )
 }

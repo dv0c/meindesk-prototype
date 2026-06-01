@@ -26,8 +26,11 @@ Custom nav items (not category-driven).
 | href | text | `/path` or full URL |
 | placement | select | `header`, `mobile`, `footer` |
 | order | number | Sort order |
+| headerPosition | select | `start` (before categories) or `end` (after categories & Άρθρα) — header only |
 | visible | boolean | |
 | openInNewTab | boolean | |
+
+Manage links in the CMS under **Navigation** (same manager as category nav order under **Categories**).
 
 ## Category navigation
 

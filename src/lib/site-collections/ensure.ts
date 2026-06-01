@@ -89,6 +89,7 @@ export async function ensureNavigationLinksCollection(siteId: string) {
             href: link.href,
             placement: link.placement,
             order: link.order,
+            headerPosition: link.headerPosition,
             visible: link.visible,
             openInNewTab: false,
           },
