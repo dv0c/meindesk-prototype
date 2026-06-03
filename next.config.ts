@@ -5,6 +5,10 @@ const imageHostAllowlist = (process.env.NEXT_IMAGE_HOSTS || "res.cloudinary.com"
   .map((host) => host.trim())
   .filter(Boolean);
 
+const frameAncestors =
+  process.env.CMS_FRAME_ANCESTORS?.trim() ||
+  "'self' https://efindly.gr https://*.efindly.gr http://localhost:3000 http://127.0.0.1:3000";
+
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: false, //causing issues with Builder, haven't found a solution yet
@@ -17,6 +21,19 @@ const nextConfig: NextConfig = {
   },
   typescript: {
     ignoreBuildErrors: true,
+  },
+  async headers() {
+    return [
+      {
+        source: "/dashboard/:path*",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value: `frame-ancestors ${frameAncestors}`,
+          },
+        ],
+      },
+    ];
   },
 };
 
