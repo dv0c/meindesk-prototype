@@ -11,10 +11,66 @@ import { Role } from "@prisma/client"
 
 const IMPERSONATION_COOKIE_NAME = "impersonation_token"
 
+/** Cross-site iframe embed (Efindly admin) needs SameSite=None + Secure session cookies. */
+function useEmbedAuthCookies(): boolean {
+  return (
+    process.env.AUTH_EMBED_SAMESITE_NONE === "true" ||
+    process.env.NODE_ENV === "production"
+  )
+}
+
+function embedCookieOptions() {
+  const embed = useEmbedAuthCookies()
+  return {
+    httpOnly: true,
+    sameSite: (embed ? "none" : "lax") as "none" | "lax",
+    path: "/",
+    secure: embed || process.env.NODE_ENV === "production",
+  }
+}
+
+const cookieOpts = embedCookieOptions()
+const embedAuthCookies = useEmbedAuthCookies()
+const useSecureCookies = cookieOpts.secure
+
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(db),
   session: {
     strategy: "jwt",
+  },
+  useSecureCookies,
+  cookies: {
+    sessionToken: {
+      name: useSecureCookies
+        ? "__Secure-next-auth.session-token"
+        : "next-auth.session-token",
+      options: { ...cookieOpts },
+    },
+    callbackUrl: {
+      name: useSecureCookies
+        ? "__Secure-next-auth.callback-url"
+        : "next-auth.callback-url",
+      options: {
+        sameSite: cookieOpts.sameSite,
+        path: "/",
+        secure: cookieOpts.secure,
+      },
+    },
+    csrfToken: {
+      // __Host- cookies cannot be used with cross-site iframe (SameSite=None).
+      name:
+        useSecureCookies && embedAuthCookies
+          ? "__Secure-next-auth.csrf-token"
+          : useSecureCookies
+            ? "__Host-next-auth.csrf-token"
+            : "next-auth.csrf-token",
+      options: {
+        httpOnly: true,
+        sameSite: cookieOpts.sameSite,
+        path: "/",
+        secure: cookieOpts.secure,
+      },
+    },
   },
   pages: {
     signIn: "/login",

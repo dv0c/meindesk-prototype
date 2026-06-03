@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { LoginForm } from "@/components/login-form"
 import { getAuthSession } from "@/lib/auth";
 import { sanitizeLoginCallbackUrl } from "@/lib/auth/safe-callback-url";
@@ -63,7 +64,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           </p>
         </div>
 
-        <LoginForm callbackUrl={callbackUrl} />
+        <Suspense fallback={<div className="font-mono text-xs text-muted-foreground">Loading…</div>}>
+          <LoginForm callbackUrl={callbackUrl} />
+        </Suspense>
 
         {/* Footer matching homepage style */}
         {!embedMode ? (

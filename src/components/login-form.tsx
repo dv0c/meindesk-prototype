@@ -1,16 +1,39 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { signIn } from "next-auth/react"
+import { signIn, getSession } from "next-auth/react"
 
 type LoginFormProps = React.ComponentProps<"div"> & {
   callbackUrl?: string;
 };
 
+async function requestEmbedStorageAccess(): Promise<void> {
+  if (typeof document === "undefined") return
+  if (window.self === window.top) return
+
+  const doc = document as Document & {
+    requestStorageAccess?: () => Promise<void>
+    hasStorageAccess?: () => Promise<boolean>
+  }
+
+  try {
+    if (doc.hasStorageAccess) {
+      const has = await doc.hasStorageAccess()
+      if (has) return
+    }
+    if (doc.requestStorageAccess) {
+      await doc.requestStorageAccess()
+    }
+  } catch {
+    /* user denied or API unavailable */
+  }
+}
+
 export function LoginForm({ className, callbackUrl = "/dashboard", ...props }: LoginFormProps) {
-  const router = useRouter()
+  const searchParams = useSearchParams()
+  const embedMode = searchParams.get("embed") === "1"
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
@@ -22,6 +45,10 @@ export function LoginForm({ className, callbackUrl = "/dashboard", ...props }: L
     setError(null)
 
     try {
+      if (embedMode || window.self !== window.top) {
+        await requestEmbedStorageAccess()
+      }
+
       const result = await signIn("credentials", {
         email,
         password,
@@ -34,13 +61,20 @@ export function LoginForm({ className, callbackUrl = "/dashboard", ...props }: L
         return
       }
 
-      if (result?.ok) {
-        router.push(callbackUrl)
-        router.refresh()
+      if (!result?.ok) {
+        setError("Login failed. Please try again.")
         return
       }
 
-      setError("Login failed. Please try again.")
+      const session = await getSession()
+      if (!session?.user) {
+        setError(
+          "Sign-in succeeded but the session was not saved. Try “Open login in new tab” or allow cookies for this site.",
+        )
+        return
+      }
+
+      window.location.assign(callbackUrl)
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Login failed")
     } finally {
@@ -52,6 +86,9 @@ export function LoginForm({ className, callbackUrl = "/dashboard", ...props }: L
     setLoading(true)
     setError(null)
     try {
+      if (embedMode || window.self !== window.top) {
+        await requestEmbedStorageAccess()
+      }
       await signIn("google", { callbackUrl })
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Google sign-in failed")
@@ -62,7 +99,6 @@ export function LoginForm({ className, callbackUrl = "/dashboard", ...props }: L
   return (
     <div className={cn("flex flex-col gap-8", className)} {...props}>
       <form onSubmit={handleEmailLogin} className="space-y-6">
-        {/* Email Field */}
         <div className="space-y-2">
           <label
             htmlFor="email"
@@ -82,7 +118,6 @@ export function LoginForm({ className, callbackUrl = "/dashboard", ...props }: L
           />
         </div>
 
-        {/* Password Field */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <label
@@ -109,14 +144,12 @@ export function LoginForm({ className, callbackUrl = "/dashboard", ...props }: L
           />
         </div>
 
-        {/* Error Message */}
         {error && (
           <div className="border border-red-500/30 bg-red-500/5 px-4 py-2 font-mono text-xs text-red-400">
             {error}
           </div>
         )}
 
-        {/* Submit Button */}
         <button
           type="submit"
           disabled={loading}
@@ -125,7 +158,6 @@ export function LoginForm({ className, callbackUrl = "/dashboard", ...props }: L
           {loading ? "Authenticating..." : "Login"}
         </button>
 
-        {/* Divider */}
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-foreground/10"></div>
@@ -137,7 +169,6 @@ export function LoginForm({ className, callbackUrl = "/dashboard", ...props }: L
           </div>
         </div>
 
-        {/* Social Logins */}
         <div className="grid grid-cols-2 gap-4">
           <button
             type="button"
@@ -157,7 +188,6 @@ export function LoginForm({ className, callbackUrl = "/dashboard", ...props }: L
         </div>
       </form>
 
-      {/* Terms */}
       <div className="border-t border-foreground/10 pt-6">
         <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground/60 text-center">
           By continuing, you agree to{" "}

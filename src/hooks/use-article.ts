@@ -3,6 +3,21 @@
 import axios from "axios"
 import { useCallback, useState } from "react"
 import { toast } from "sonner"
+import {
+  notifyCmsEmbedAuthenticated,
+  notifyCmsEmbedAuthFailed,
+} from "@/lib/embed/cms-parent-message"
+
+function articleListErrorMessage(error: { response?: { status?: number; data?: { error?: string } } }): string {
+  const status = error.response?.status
+  if (status === 401) {
+    return "Not signed in to MeinDesk. Sign in again or use Open in new tab."
+  }
+  if (status === 403) {
+    return "This account does not have access to this site. Use the MeinDesk account that owns the blog site."
+  }
+  return error.response?.data?.error || "Failed to load articles"
+}
 
 interface UseArticleOptions {
   onSuccess?: (data: any) => void
@@ -39,10 +54,15 @@ export function useArticle({ onSuccess, onError }: UseArticleOptions = {}) {
         } else {
           setArticlesListMeta(null)
         }
+        notifyCmsEmbedAuthenticated()
         onSuccess?.(res.data)
         return res.data
       } catch (error: any) {
-        const message = error.response?.data?.error || "Failed to load articles"
+        const status = error.response?.status
+        if (status === 401 || status === 403) {
+          notifyCmsEmbedAuthFailed()
+        }
+        const message = articleListErrorMessage(error)
         toast.error(message)
         onError?.(error)
         throw error
