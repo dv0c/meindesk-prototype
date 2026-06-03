@@ -3,10 +3,13 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { login } from "@/lib/actions/authentication/login-actions"
 import { signIn } from "next-auth/react"
 
-export function LoginForm({ className, ...props }: React.ComponentProps<"div">) {
+type LoginFormProps = React.ComponentProps<"div"> & {
+  callbackUrl?: string;
+};
+
+export function LoginForm({ className, callbackUrl = "/dashboard", ...props }: LoginFormProps) {
   const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -19,14 +22,28 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
     setError(null)
 
     try {
-      const formData = new FormData()
-      formData.append("email", email)
-      formData.append("password", password)
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+        callbackUrl,
+      })
 
-      await login(formData)
-      setLoading(false)
-    } catch (err: any) {
-      setError(err.message || "Login failed")
+      if (result?.error) {
+        setError("Invalid email or password")
+        return
+      }
+
+      if (result?.ok) {
+        router.push(callbackUrl)
+        router.refresh()
+        return
+      }
+
+      setError("Login failed. Please try again.")
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Login failed")
+    } finally {
       setLoading(false)
     }
   }
@@ -35,9 +52,9 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
     setLoading(true)
     setError(null)
     try {
-      await signIn("google", { callbackUrl: "/dashboard" })
-    } catch (err: any) {
-      setError(err.message || "Google sign-in failed")
+      await signIn("google", { callbackUrl })
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Google sign-in failed")
       setLoading(false)
     }
   }
@@ -60,6 +77,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
             onChange={(e) => setEmail(e.target.value)}
             placeholder="m@example.com"
             required
+            autoComplete="email"
             className="w-full bg-transparent border border-foreground/20 px-4 py-3 font-mono text-sm text-foreground placeholder:text-muted-foreground/40 focus:border-accent focus:outline-none transition-colors"
           />
         </div>
@@ -86,6 +104,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            autoComplete="current-password"
             className="w-full bg-transparent border border-foreground/20 px-4 py-3 font-mono text-sm text-foreground placeholder:text-muted-foreground/40 focus:border-accent focus:outline-none transition-colors"
           />
         </div>
