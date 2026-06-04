@@ -6,8 +6,7 @@ export type CmsParentMessageType = "meindesk-cms-authenticated" | "meindesk-cms-
 
 export function isCmsEmbedContext(): boolean {
   if (typeof window === "undefined") return false
-  const embed = new URLSearchParams(window.location.search).get("embed") === "1"
-  return embed && window.self !== window.top
+  return window.self !== window.top
 }
 
 function postToEmbedParents(type: CmsParentMessageType): void {
@@ -15,12 +14,23 @@ function postToEmbedParents(type: CmsParentMessageType): void {
 
   const payload = { type }
   const origins = getCmsEmbedParentOrigins()
+  const posted = new Set<string>()
 
   for (const origin of origins) {
     try {
       window.parent.postMessage(payload, origin)
+      posted.add(origin)
     } catch {
       /* ignore invalid target */
+    }
+  }
+
+  // Dev fallback when env is not wired into the client bundle yet.
+  if (posted.size === 0 && process.env.NODE_ENV === "development") {
+    try {
+      window.parent.postMessage(payload, "*")
+    } catch {
+      /* ignore */
     }
   }
 }

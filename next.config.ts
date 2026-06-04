@@ -7,7 +7,7 @@ const imageHostAllowlist = (process.env.NEXT_IMAGE_HOSTS || "res.cloudinary.com"
 
 const frameAncestors =
   process.env.CMS_FRAME_ANCESTORS?.trim() ||
-  "'self' https://efindly.gr https://*.efindly.gr http://localhost:3000 http://127.0.0.1:3000";
+  "'self' https://efindly.gr https://*.efindly.gr";
 
 const nextConfig: NextConfig = {
   /* config options here */

@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { signIn, getSession } from "next-auth/react"
+import { notifyCmsEmbedAuthenticated } from "@/lib/embed/cms-parent-message"
 
 type LoginFormProps = React.ComponentProps<"div"> & {
   callbackUrl?: string;
@@ -74,6 +75,7 @@ export function LoginForm({ className, callbackUrl = "/dashboard", ...props }: L
         return
       }
 
+      notifyCmsEmbedAuthenticated()
       window.location.assign(callbackUrl)
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Login failed")
