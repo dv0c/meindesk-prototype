@@ -30,7 +30,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { signOut, useSession } from "next-auth/react"
-import { useTheme } from "next-themes"
+import { useTheme } from "@/components/Providers/ThemeProvider"
 import { useRouter } from "next/navigation"
 import React from "react"
 import { AccountSettingsDialog } from "./AccountSettings/AccountSettingsDialog"

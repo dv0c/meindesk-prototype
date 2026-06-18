@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs } from "@/components/ui/tabs";
 import { Eye, Loader2, Search } from "lucide-react";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/components/Providers/ThemeProvider";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import placeholder from "../../../../../public/placeholder.svg";

@@ -1,6 +1,6 @@
 "use client"
 import Link from 'next/link'
-import { useTheme } from 'next-themes'
+import { useTheme } from '@/components/Providers/ThemeProvider'
 import { Moon, Sun, Monitor, Github, Twitter } from 'lucide-react'
 import {
     DropdownMenu,

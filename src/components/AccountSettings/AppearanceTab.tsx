@@ -1,6 +1,6 @@
 "use client"
 
-import { useTheme } from "next-themes"
+import { useTheme } from "@/components/Providers/ThemeProvider"
 import { Monitor, Moon, Sun, Sparkles, Zap, Smartphone, Laptop } from "lucide-react"
 
 import { Label } from "@/components/ui/label"

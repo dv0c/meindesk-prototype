@@ -21,7 +21,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { signOut, useSession } from "next-auth/react"
-import { useTheme } from "next-themes"
+import { useTheme } from "@/components/Providers/ThemeProvider"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { AccountSettingsDialog } from "@/components/AccountSettings/AccountSettingsDialog"
