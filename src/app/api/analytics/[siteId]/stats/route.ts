@@ -12,6 +12,7 @@ export async function GET(
   try {
     const { siteId } = await params
     const session = await requireAuth()
+    if (!session.user) throw new Error("Unauthorized")
     await requireSiteAccess(siteId, session.user.id)
 
     if (!siteId) return NextResponse.json({ error: "Missing siteId" }, { status: 400 })

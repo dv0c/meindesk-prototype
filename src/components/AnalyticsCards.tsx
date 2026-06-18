@@ -7,19 +7,21 @@ import {
   ArrowDownIcon,
   EyeIcon,
   UsersIcon,
-  FileTextIcon,
-  MousePointerClickIcon,
+  ActivityIcon,
+  TimerIcon,
 } from "lucide-react"
-import { useAnalytics } from "@/hooks/useAnalytics" // adjust path if needed
+import { useAnalyticsQuery } from "@/hooks/useAnalyticsQuery"
+import { useAnalyticsFilters } from "@/components/analytics/AnalyticsFilterProvider"
 
 interface StatCardProps {
   title: string
   value: string | number
   change: number
   icon: React.ReactNode
+  compareLabel?: string
 }
 
-function StatCard({ title, value, change, icon }: StatCardProps) {
+function StatCard({ title, value, change, icon, compareLabel = "vs previous period" }: StatCardProps) {
   const isPositive = change >= 0
 
   return (
@@ -31,68 +33,55 @@ function StatCard({ title, value, change, icon }: StatCardProps) {
       <CardContent>
         <div className="text-2xl font-bold">{typeof value === "number" ? value.toLocaleString() : value}</div>
         <div className="mt-1 flex items-center text-xs">
-          {isPositive ? (
-            <ArrowUpIcon className="mr-1 h-3 w-3 text-green-600" />
-          ) : (
-            <ArrowDownIcon className="mr-1 h-3 w-3 text-red-600" />
+          {change !== 0 && (
+            isPositive ? (
+              <ArrowUpIcon className="mr-1 h-3 w-3 text-green-600" />
+            ) : (
+              <ArrowDownIcon className="mr-1 h-3 w-3 text-red-600" />
+            )
           )}
-          <span className={isPositive ? "text-green-600" : "text-red-600"}>{Math.abs(change).toFixed(1)}%</span>
-          <span className="ml-1 text-muted-foreground">from last month</span>
+          <span className={change >= 0 ? "text-green-600" : "text-red-600"}>{Math.abs(change).toFixed(1)}%</span>
+          <span className="ml-1 text-muted-foreground">{compareLabel}</span>
         </div>
       </CardContent>
     </Card>
   )
 }
 
-interface AnalyticsCardsProps {
-  siteId: string
-}
+export function AnalyticsCards({ siteId }: { siteId: string }) {
+  const { filters } = useAnalyticsFilters()
+  const { data, loading, error } = useAnalyticsQuery(siteId, filters)
 
-export function AnalyticsCards({ siteId }: AnalyticsCardsProps) {
-  const { data, loading, error } = useAnalytics(siteId)
-
-
-  if (loading) return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {Array.from({ length: 4 }).map((_, idx) => (
-        <Card key={idx}>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <div className="h-4 w-24 bg-muted animate-pulse rounded" />
-            <div className="h-4 w-4 bg-muted animate-pulse rounded" />
-          </CardHeader>
-          <CardContent>
-            <div className="h-8 w-20 bg-muted animate-pulse rounded mb-2" />
-            <div className="flex items-center gap-1">
-              <div className="h-3 w-3 bg-muted animate-pulse rounded" />
-              <div className="h-3 w-12 bg-muted animate-pulse rounded" />
-              <div className="h-3 w-24 bg-muted animate-pulse rounded" />
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  )
+  if (loading && !data?.cardMetrics) {
+    return (
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6">
+        {Array.from({ length: 6 }).map((_, idx) => (
+          <Card key={idx}>
+            <CardHeader className="pb-2">
+              <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+            </CardHeader>
+            <CardContent>
+              <div className="h-8 w-20 bg-muted animate-pulse rounded" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    )
+  }
 
   if (error) return <p className="text-red-600">Error: {error}</p>
-  if (!data || !data.cardMetrics) return <p>No analytics data available</p>
+  if (!data?.cardMetrics) return <p>No analytics data available</p>
 
-  const {
-    totalViews,
-    viewsChange,
-    uniqueVisitors,
-    visitorsChange,
-    pageViews,
-    pageViewsChange,
-    avgSessionDuration,
-    durationChange,
-  } = data.cardMetrics
+  const c = data.cardMetrics
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <StatCard title="Total Views" value={totalViews} change={viewsChange} icon={<EyeIcon className="h-4 w-4" />} />
-      <StatCard title="Unique Visitors" value={uniqueVisitors} change={visitorsChange} icon={<UsersIcon className="h-4 w-4" />} />
-      <StatCard title="Page Views" value={pageViews} change={pageViewsChange} icon={<FileTextIcon className="h-4 w-4" />} />
-      <StatCard title="Avg. Session" value={avgSessionDuration} change={durationChange} icon={<MousePointerClickIcon className="h-4 w-4" />} />
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <StatCard title="Page Views" value={c.totalViews.value} change={c.totalViews.percent} icon={<EyeIcon className="h-4 w-4" />} />
+      <StatCard title="Unique Visitors" value={c.uniqueVisitors.value} change={c.uniqueVisitors.percent} icon={<UsersIcon className="h-4 w-4" />} />
+      <StatCard title="Sessions" value={c.sessions.value} change={c.sessions.percent} icon={<ActivityIcon className="h-4 w-4" />} />
+      <StatCard title="Bounce Rate" value={`${c.bounceRate.value}%`} change={c.bounceRate.percent} icon={<ActivityIcon className="h-4 w-4" />} />
+      <StatCard title="Avg. Session" value={c.avgSessionDuration.value} change={c.avgSessionDuration.comparison.percent} icon={<TimerIcon className="h-4 w-4" />} />
+      <StatCard title="New Visitors" value={c.newVisitors.value} change={c.newVisitors.percent} icon={<UsersIcon className="h-4 w-4" />} />
     </div>
   )
 }

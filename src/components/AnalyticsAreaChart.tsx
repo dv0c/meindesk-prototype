@@ -134,14 +134,12 @@ export function AnalyticsAreaChart({ data }: AnalyticsAreaChartProps) {
               type="natural"
               fill="url(#fillVisitors)"
               stroke="var(--color-visitors)"
-              stackId="a"
             />
             <Area
               dataKey="views"
               type="natural"
               fill="url(#fillViews)"
               stroke="var(--color-views)"
-              stackId="a"
             />
 
             <ChartLegend content={<ChartLegendContent />} />

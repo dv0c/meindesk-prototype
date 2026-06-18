@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils"
 import { getItems } from "@/lib/actions/item-actions"
 import { getCollections } from "@/lib/actions/collection-actions"
 import { getArticles } from "@/lib/actions/article-actions"
+import { trackAnalyticsEvent } from "@/components/AnalyticsTracker"
 
 interface SearchItem {
     id: string
@@ -159,6 +160,25 @@ export function SearchOverlay({ open, onOpenChange, collections = [], siteId, th
             router.push(item.href)
         }
     }
+
+    const filteredCount = React.useMemo(() => {
+        if (!query.trim()) return items.length
+        const q = query.trim().toLowerCase()
+        return items.filter((item) => item.title.toLowerCase().includes(q)).length
+    }, [items, query])
+
+    React.useEffect(() => {
+        if (!siteId || !query.trim() || query.trim().length < 2) return
+
+        const timer = window.setTimeout(() => {
+            void trackAnalyticsEvent(siteId, "search", {
+                query: query.trim(),
+                resultsCount: filteredCount,
+            })
+        }, 400)
+
+        return () => window.clearTimeout(timer)
+    }, [siteId, query, filteredCount])
 
     return (
         <CommandDialog open={open} onOpenChange={onOpenChange}>

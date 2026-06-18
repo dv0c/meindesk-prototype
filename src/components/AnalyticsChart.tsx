@@ -2,15 +2,16 @@
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { useAnalytics } from "@/hooks/useAnalytics"
-import { TrendingUp } from "lucide-react"
+import { useAnalyticsQuery } from "@/hooks/useAnalyticsQuery"
+import { useAnalyticsFilters } from "@/components/analytics/AnalyticsFilterProvider"
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, Pie, PieChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 import { AnalyticsAreaChart } from "./AnalyticsAreaChart"
 
-export function AnalyticsCharts({ siteId, range }: { siteId: string; range: string }) {
-    const { data, loading, error } = useAnalytics(siteId, range)
+export function AnalyticsCharts({ siteId }: { siteId: string }) {
+    const { filters } = useAnalyticsFilters()
+    const { data, loading, error } = useAnalyticsQuery(siteId, filters)
 
-    if (loading) return (
+    if (loading && !data) return (
         <div className="grid gap-6 lg:grid-cols-2">
             {/* Area chart skeleton - full width */}
             <Card className="lg:col-span-2">
@@ -56,7 +57,7 @@ export function AnalyticsCharts({ siteId, range }: { siteId: string; range: stri
     if (error) return <p className="text-destructive">Error: {error}</p>
     if (!data) return <p className="text-muted-foreground">No analytics data available.</p>
 
-    const { viewsOverTime, topPages, trafficSources } = data
+    const { viewsOverTime, topPages, trafficSources, regions, devices } = data
 
     // Dynamic color palette
     const colors = [
@@ -127,13 +128,8 @@ export function AnalyticsCharts({ siteId, range }: { siteId: string; range: stri
                         </BarChart>
                     </ChartContainer>
                 </CardContent>
-                <CardFooter className="flex-col items-start gap-2 text-sm">
-                    <div className="flex gap-2 leading-none font-medium">
-                        Trending up by 0% this month <TrendingUp className="h-4 w-4" />
-                    </div>
-                    <div className="text-muted-foreground leading-none">
-                        Showing total views for top pages
-                    </div>
+                <CardFooter className="text-sm text-muted-foreground">
+                    Top pages by view count in the selected period
                 </CardFooter>
             </Card>
 
@@ -191,13 +187,8 @@ export function AnalyticsCharts({ siteId, range }: { siteId: string; range: stri
                         </BarChart>
                     </ChartContainer>
                 </CardContent>
-                <CardFooter className="flex-col items-start gap-2 text-sm">
-                    <div className="flex gap-2 leading-none font-medium">
-                        Trending up by 0% this month <TrendingUp className="h-4 w-4" />
-                    </div>
-                    <div className="text-muted-foreground leading-none">
-                        Showing total views for top pages
-                    </div>
+                <CardFooter className="text-sm text-muted-foreground">
+                    Visitor counts by geographic region
                 </CardFooter>
             </Card>
 

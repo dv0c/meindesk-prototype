@@ -1,9 +1,23 @@
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { verifyAnalyticsIngestToken } from "@/lib/security/analytics-ingest-token";
 import { rateLimit, getClientIdentifier } from "@/lib/security/rate-limit";
+import {
+  validateIngestPayload,
+  parseUserAgent,
+  classifyTrafficSource,
+  isBotUserAgent,
+  hashIp,
+  shouldAnonymizeIp,
+  buildDedupeKey,
+} from "@/lib/analytics";
 
 export const runtime = "nodejs";
+
+const SESSION_GAP_MS = 30 * 60 * 1000;
+const recentDedupe = new Map<string, number>();
+const DEDUPE_TTL_MS = 60_000;
 
 function corsHeaders(origin: string | null): HeadersInit {
   const h: Record<string, string> = {
@@ -31,9 +45,6 @@ function hostnameFromUrlOrHost(value: string | null | undefined): string | null 
   }
 }
 
-/**
- * Allow request Origin if it matches the site's public URL or subdomain pattern.
- */
 function isOriginAllowedForSite(
   origin: string | null,
   site: { url: string | null; subdomain: string }
@@ -66,23 +77,37 @@ function isOriginAllowedForSite(
   return false;
 }
 
-// Region lookup via ipapi.co (not ip-api.com)
-async function getRegionFromIP(ip: string): Promise<string | null> {
-  if (!ip || ip === "unknown") return null;
+async function getGeoFromIP(ip: string): Promise<{ region: string | null; country: string | null; city: string | null }> {
+  if (!ip || ip === "unknown") return { region: null, country: null, city: null };
   try {
-    const res = await fetch(`https://ipapi.co/${encodeURIComponent(ip)}/json/`);
-    if (!res.ok) return null;
+    const res = await fetch(`https://ipapi.co/${encodeURIComponent(ip)}/json/`, { next: { revalidate: 86400 } });
+    if (!res.ok) return { region: null, country: null, city: null };
     const data = await res.json();
-    return `${data.city || ""}${data.city ? ", " : ""}${data.country_name || ""}`.trim() || null;
+    const city = data.city || null;
+    const country = data.country_name || null;
+    const region = city && country ? `${city}, ${country}` : country;
+    return { region, country, city };
   } catch {
-    return null;
+    return { region: null, country: null, city: null };
   }
+}
+
+function isDuplicate(dedupeKey: string): boolean {
+  const now = Date.now();
+  const last = recentDedupe.get(dedupeKey);
+  if (last && now - last < DEDUPE_TTL_MS) return true;
+  recentDedupe.set(dedupeKey, now);
+  if (recentDedupe.size > 10_000) {
+    for (const [k, t] of recentDedupe) {
+      if (now - t > DEDUPE_TTL_MS) recentDedupe.delete(k);
+    }
+  }
+  return false;
 }
 
 export async function OPTIONS(req: NextRequest) {
   const origin = req.headers.get("origin");
-  const res = new NextResponse(null, { status: 204, headers: corsHeaders(origin) });
-  return res;
+  return new NextResponse(null, { status: 204, headers: corsHeaders(origin) });
 }
 
 export async function POST(req: NextRequest) {
@@ -90,14 +115,16 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { siteId, path, referrer, userAgent, articleSlug, ingestToken } = body;
-
-    if (!siteId || !path) {
+    const validated = validateIngestPayload(body);
+    if (!validated.ok) {
       return NextResponse.json(
-        { error: "siteId and path required" },
+        { error: validated.error },
         { status: 400, headers: corsHeaders(origin) }
       );
     }
+
+    const payload = validated.data;
+    const { siteId, path, referrer, userAgent, articleSlug, ingestToken, eventType, visitorId, sessionId, contentType, contentId, metadata } = payload;
 
     if (process.env.ANALYTICS_INGEST_SECRET && !verifyAnalyticsIngestToken(siteId, ingestToken)) {
       return NextResponse.json(
@@ -106,7 +133,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const ipAddress = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const rawIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
     const rateKey = `analytics:${siteId}:${getClientIdentifier(req, undefined)}`;
     if (!rateLimit(rateKey, 120, 60_000)) {
       return NextResponse.json(
@@ -117,7 +144,15 @@ export async function POST(req: NextRequest) {
 
     const site = await db.site.findUnique({
       where: { id: siteId },
-      select: { id: true, url: true, subdomain: true },
+      select: {
+        id: true,
+        url: true,
+        subdomain: true,
+        views: true,
+        limitViews: true,
+        settings: true,
+        features: { select: { viewslimit: true } },
+      },
     });
 
     if (!site) {
@@ -135,19 +170,34 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const region = await getRegionFromIP(ipAddress);
+    const viewLimit = site.features?.viewslimit ?? site.limitViews;
+    if (viewLimit > 0 && site.views >= viewLimit) {
+      return NextResponse.json(
+        { error: "View limit reached" },
+        { status: 429, headers: corsHeaders(origin) }
+      );
+    }
+
+    const isBot = isBotUserAgent(userAgent);
+    const parsed = parseUserAgent(userAgent);
+    const source = classifyTrafficSource(referrer, path, metadata);
+    const settings = (site.settings as Record<string, unknown>) ?? {};
+    const ipAddress = shouldAnonymizeIp(settings)
+      ? hashIp(rawIp)
+      : rawIp;
+
+    const dedupeKey = buildDedupeKey(visitorId, ipAddress, path, eventType ?? "page_view");
+    if (eventType === "page_view" && isDuplicate(dedupeKey)) {
+      return NextResponse.json({ success: true, deduplicated: true }, { headers: corsHeaders(origin) });
+    }
+
+    const geo = isBot ? { region: null, country: null, city: null } : await getGeoFromIP(rawIp);
 
     let isUniqueArticleView: boolean | undefined;
-
-    if (articleSlug) {
+    if (articleSlug && eventType === "page_view" && !isBot) {
       const existingView = await db.analyticsEvent.findFirst({
-        where: {
-          siteId: site.id,
-          articleSlug,
-          ipAddress,
-        },
+        where: { siteId: site.id, articleSlug, ipAddress },
       });
-
       isUniqueArticleView = !existingView;
 
       if (isUniqueArticleView) {
@@ -156,11 +206,56 @@ export async function POST(req: NextRequest) {
           data: { uniqueViews: { increment: 1 } },
         });
       }
-
       await db.article.updateMany({
         where: { siteId: site.id, slug: articleSlug },
         data: { views: { increment: 1 } },
       });
+    }
+
+    const now = new Date();
+    let activeSessionId = sessionId;
+
+    if (visitorId && eventType === "page_view" && !isBot) {
+      const recentSession = await db.analyticsSession.findFirst({
+        where: {
+          siteId: site.id,
+          visitorId,
+          startedAt: { gte: new Date(now.getTime() - SESSION_GAP_MS) },
+        },
+        orderBy: { startedAt: "desc" },
+      });
+
+      if (recentSession) {
+        activeSessionId = recentSession.id;
+        await db.analyticsSession.update({
+          where: { id: recentSession.id },
+          data: {
+            pageViews: { increment: 1 },
+            endedAt: now,
+            exitPath: path,
+          },
+        });
+      } else {
+        const session = await db.analyticsSession.create({
+          data: {
+            siteId: site.id,
+            visitorId,
+            startedAt: now,
+            pageViews: 1,
+            entryPath: path,
+            exitPath: path,
+            referrer: referrer ?? null,
+            source,
+            device: parsed.device,
+            browser: parsed.browser,
+            os: parsed.os,
+            country: geo.country,
+            city: geo.city,
+            isBot,
+          },
+        });
+        activeSessionId = session.id;
+      }
     }
 
     await db.analyticsEvent.create({
@@ -169,17 +264,32 @@ export async function POST(req: NextRequest) {
         path,
         referrer,
         userAgent,
-        region,
+        region: geo.region,
+        country: geo.country,
+        city: geo.city,
+        device: parsed.device,
+        browser: parsed.browser,
+        os: parsed.os,
         ipAddress,
         articleSlug: articleSlug || undefined,
         isUniqueArticleView,
+        eventType: eventType ?? "page_view",
+        visitorId,
+        sessionId: activeSessionId,
+        source,
+        contentType,
+        contentId,
+        metadata: metadata ? (metadata as Prisma.InputJsonValue) : undefined,
+        isBot,
       },
     });
 
-    await db.site.update({
-      where: { id: site.id },
-      data: { views: { increment: 1 } },
-    });
+    if (!isBot && eventType === "page_view") {
+      await db.site.update({
+        where: { id: site.id },
+        data: { views: { increment: 1 } },
+      });
+    }
 
     const reflectOrigin =
       origin && (!strictOrigin || isOriginAllowedForSite(origin, site)) ? origin : null;

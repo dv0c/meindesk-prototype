@@ -167,6 +167,9 @@ model Site {
   Page                Page[]
   RSS                 Rss[]
   AnalyticsEvent      AnalyticsEvent[]
+  AnalyticsSession    AnalyticsSession[]
+  AnalyticsDailyRollup AnalyticsDailyRollup[]
+  AnalyticsSavedView  AnalyticsSavedView[]
   installedThemes     SiteTheme[]
   snippets            Snippet[]
   customFeedTemplates CustomFeedTemplate[]
@@ -288,22 +291,95 @@ model BillingHistory {
 }
 
 model AnalyticsEvent {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  siteId    String   @db.ObjectId
-  path      String
-  referrer  String?
-  userAgent String?
-  region    String?
-  device    String?
-  ipAddress String?
-  articleSlug String? // If this is an article view, store the slug
-  isUniqueArticleView Boolean? // True if first time this IP viewed this article
-  createdAt DateTime @default(now())
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  siteId              String   @db.ObjectId
+  path                String
+  referrer            String?
+  userAgent           String?
+  region              String?
+  device              String?
+  browser             String?
+  os                  String?
+  ipAddress           String?
+  country             String?
+  city                String?
+  articleSlug         String?
+  isUniqueArticleView Boolean?
+  eventType           String   @default("page_view")
+  visitorId           String?
+  sessionId           String?
+  source              String?
+  contentType         String?
+  contentId           String?
+  metadata            Json?
+  isBot               Boolean  @default(false)
+  createdAt           DateTime @default(now())
 
   Site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
   @@index([siteId, createdAt])
   @@index([siteId, articleSlug])
+  @@index([siteId, articleSlug, ipAddress])
+  @@index([siteId, ipAddress, createdAt])
+  @@index([siteId, path, createdAt])
+  @@index([siteId, eventType, createdAt])
+  @@index([siteId, visitorId, createdAt])
+}
+
+model AnalyticsSession {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  siteId     String    @db.ObjectId
+  visitorId  String
+  startedAt  DateTime
+  endedAt    DateTime?
+  pageViews  Int       @default(0)
+  entryPath  String
+  exitPath   String?
+  referrer   String?
+  source     String?
+  device     String?
+  browser    String?
+  os         String?
+  country    String?
+  city       String?
+  isBot      Boolean   @default(false)
+
+  Site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@index([siteId, startedAt])
+  @@index([siteId, visitorId, startedAt])
+}
+
+model AnalyticsDailyRollup {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  siteId         String   @db.ObjectId
+  date           DateTime
+  views          Int      @default(0)
+  uniqueVisitors Int      @default(0)
+  sessions       Int      @default(0)
+  bounces        Int      @default(0)
+  avgDurationSec Float    @default(0)
+  byDevice       Json?
+  bySource       Json?
+  byCountry      Json?
+  byPath         Json?
+  byArticleSlug  Json?
+
+  Site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@unique([siteId, date])
+}
+
+model AnalyticsSavedView {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  siteId  String @db.ObjectId
+  userId  String @db.ObjectId
+  name    String
+  filters Json
+
+  Site Site @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@index([siteId, userId])
 }
 
 model Article {

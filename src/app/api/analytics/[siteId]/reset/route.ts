@@ -20,13 +20,20 @@ export async function DELETE(
             return NextResponse.json({ error: "Site not found" }, { status: 404 })
         }
 
-        await db.analyticsEvent.deleteMany({
-            where: { siteId },
-        })
+        await Promise.all([
+            db.analyticsEvent.deleteMany({ where: { siteId } }),
+            db.analyticsSession.deleteMany({ where: { siteId } }),
+            db.analyticsDailyRollup.deleteMany({ where: { siteId } }),
+        ])
 
         await db.site.update({
             where: { id: siteId },
             data: { views: 0 },
+        })
+
+        await db.article.updateMany({
+            where: { siteId },
+            data: { views: 0, uniqueViews: 0 },
         })
 
         return NextResponse.json({ message: "Analytics reset successfully" })

@@ -15,6 +15,8 @@ interface AnalyticsEvent {
     userAgent: string | null
     region: string | null
     device: string | null
+    source: string | null
+    eventType: string
     ipAddress: string | null
     createdAt: string
 }
@@ -73,7 +75,8 @@ export function AnalyticsLogs({ siteId, range }: AnalyticsLogsProps) {
         return "Desktop"
     }
 
-    const getTrafficSource = (referrer: string | null) => {
+    const getTrafficSource = (referrer: string | null, source: string | null) => {
+        if (source) return source.charAt(0).toUpperCase() + source.slice(1)
         if (!referrer) return "Direct"
         if (referrer.includes("google")) return "Google"
         if (referrer.includes("facebook") || referrer.includes("instagram")) return "Social Media"
@@ -126,6 +129,7 @@ export function AnalyticsLogs({ siteId, range }: AnalyticsLogsProps) {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Time</TableHead>
+                                <TableHead>Type</TableHead>
                                 <TableHead>Page</TableHead>
                                 <TableHead>Location</TableHead>
                                 <TableHead>Device</TableHead>
@@ -136,7 +140,7 @@ export function AnalyticsLogs({ siteId, range }: AnalyticsLogsProps) {
                         <TableBody>
                             {events.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="text-center text-muted-foreground">
+                                    <TableCell colSpan={7} className="text-center text-muted-foreground">
                                         No events recorded yet
                                     </TableCell>
                                 </TableRow>
@@ -150,6 +154,11 @@ export function AnalyticsLogs({ siteId, range }: AnalyticsLogsProps) {
                                                     <div>{format(new Date(event.createdAt), "MMM d, HH:mm:ss")}</div>
                                                 </div>
                                             </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge variant="outline" className="text-xs capitalize">
+                                                {event.eventType?.replace(/_/g, " ") || "page view"}
+                                            </Badge>
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex items-center gap-2">
@@ -166,19 +175,19 @@ export function AnalyticsLogs({ siteId, range }: AnalyticsLogsProps) {
                                         <TableCell>
                                             <Badge variant="outline" className="gap-1">
                                                 {getDeviceIcon(event.userAgent)}
-                                                {getDeviceType(event.userAgent)}
+                                                {event.device || getDeviceType(event.userAgent)}
                                             </Badge>
                                         </TableCell>
                                         <TableCell>
                                             <Badge variant="secondary" className="gap-1">
                                                 <Globe className="h-3 w-3" />
-                                                {getTrafficSource(event.referrer)}
+                                                {getTrafficSource(event.referrer, event.source)}
                                             </Badge>
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                                 <User className="h-3 w-3" />
-                                                {event.ipAddress ? event.ipAddress.slice(0, 12) + "..." : "Unknown"}
+                                                {event.ipAddress || "Unknown"}
                                             </div>
                                         </TableCell>
                                     </TableRow>
