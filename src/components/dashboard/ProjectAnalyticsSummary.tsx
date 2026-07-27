@@ -6,14 +6,14 @@ import { useAnalytics } from "@/hooks/useAnalytics"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export function ProjectAnalyticsSummary({ siteId }: { siteId: string }) {
-    const { data, loading } = useAnalytics(siteId, "lastMonth") // Default to last month
+    const { data, loading } = useAnalytics(siteId, "last30Days")
 
     return (
         <div className="space-y-6">
             <h2 className="text-lg font-medium">Analytics</h2>
 
             {/* Quick Stats */}
-            <AnalyticsCards siteId={siteId} />
+            <AnalyticsCards siteId={siteId} range="last30Days" />
 
             {/* Main Chart */}
             <Card>

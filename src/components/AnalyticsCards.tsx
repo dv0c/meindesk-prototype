@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   ArrowUpIcon,
@@ -11,7 +11,8 @@ import {
   TimerIcon,
 } from "lucide-react"
 import { useAnalyticsQuery } from "@/hooks/useAnalyticsQuery"
-import { useAnalyticsFilters } from "@/components/analytics/AnalyticsFilterProvider"
+import { useOptionalAnalyticsFilters } from "@/components/analytics/AnalyticsFilterProvider"
+import type { AnalyticsFilterState } from "@/lib/analytics/types"
 
 interface StatCardProps {
   title: string
@@ -48,8 +49,22 @@ function StatCard({ title, value, change, icon, compareLabel = "vs previous peri
   )
 }
 
-export function AnalyticsCards({ siteId }: { siteId: string }) {
-  const { filters } = useAnalyticsFilters()
+export function AnalyticsCards({
+  siteId,
+  range = "last30Days",
+}: {
+  siteId: string
+  range?: string
+}) {
+  const ctx = useOptionalAnalyticsFilters()
+  const filters = useMemo<AnalyticsFilterState>(
+    () =>
+      ctx?.filters ?? {
+        preset: range,
+        compareMode: "previous_period",
+      },
+    [ctx?.filters, range]
+  )
   const { data, loading, error } = useAnalyticsQuery(siteId, filters)
 
   if (loading && !data?.cardMetrics) {

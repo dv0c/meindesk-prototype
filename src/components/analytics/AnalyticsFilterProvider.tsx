@@ -43,3 +43,8 @@ export function useAnalyticsFilters() {
   }
   return ctx
 }
+
+/** Returns null when rendered outside AnalyticsFilterProvider */
+export function useOptionalAnalyticsFilters() {
+  return useContext(AnalyticsFilterContext)
+}
