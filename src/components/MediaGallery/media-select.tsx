@@ -289,14 +289,14 @@ export default function MediaLibraryDialog({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={(open) => !open && handleDialogClose()}>
-        <DialogContent className="!max-w-5xl w-full h-[80vh] flex flex-col p-0">
-          <DialogHeader className="p-6 pb-0">
+        <DialogContent className="!max-w-5xl w-full h-[80vh] min-h-0 flex flex-col overflow-hidden p-0">
+          <DialogHeader className="p-6 pb-0 shrink-0">
             <DialogTitle>Select Media</DialogTitle>
           </DialogHeader>
           <Tabs
             value={activeTab}
             onValueChange={setActiveTab}
-            className="flex-grow flex flex-col overflow-hidden p-6 pt-2"
+            className="flex-1 min-h-0 flex flex-col overflow-hidden p-6 pt-2"
           >
             <div className="flex items-center justify-between mb-4 shrink-0">
               <TabsList>
@@ -325,7 +325,7 @@ export default function MediaLibraryDialog({
               </CldUploadButton>
             </div>
 
-            <TabsContent value="library" className="flex-grow overflow-hidden flex flex-col mt-0 gap-3">
+            <TabsContent value="library" className="flex-1 min-h-0 overflow-hidden flex flex-col mt-0 gap-3">
               <MediaGalleryFilters
                 compact
                 filters={filters}
@@ -337,7 +337,7 @@ export default function MediaLibraryDialog({
                 resultCount={filteredMediaItems.length}
                 totalCount={mediaItems.length}
               />
-              <ScrollArea className="flex-grow">
+              <ScrollArea className="flex-1 min-h-0">
                 {isLoading ? (
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 p-1">
                     {[...Array(12)].map((_, i) => (
