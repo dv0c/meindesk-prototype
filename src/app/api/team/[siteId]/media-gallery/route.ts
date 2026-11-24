@@ -1,8 +1,39 @@
 import { getAuthSession } from "@/lib/auth";
 import cloudinary from "@/lib/cloudinary";
+import {
+  assertSiteFolderPath,
+  getFolderFromPublicId,
+  moveAsset,
+} from "@/lib/media-folders";
 import type { Media, MediaGalleryResponse } from "@/types/media-gallery";
 import { type NextRequest, NextResponse } from "next/server";
 import { createErrorResponse, requireSiteAccess } from "@/lib/security/route-auth";
+
+function mapResource(resource: any, siteId: string): Media {
+  const publicId = resource.public_id as string;
+  return {
+    id: resource.asset_id || publicId,
+    public_id: publicId,
+    name:
+      resource.filename ||
+      publicId.split("/").pop() ||
+      "Untitled",
+    url: resource.secure_url,
+    alt:
+      resource.context?.alt ||
+      resource.context?.caption ||
+      resource.context?.custom?.alt ||
+      null,
+    type: `${resource.resource_type}/${resource.format}`,
+    size: resource.bytes,
+    width: resource.width,
+    height: resource.height,
+    createdAt: resource.created_at,
+    updatedAt: resource.updated_at || resource.created_at,
+    siteId,
+    folder: getFolderFromPublicId(publicId) || undefined,
+  };
+}
 
 export async function GET(
   req: NextRequest,
@@ -17,6 +48,7 @@ export async function GET(
   const { searchParams } = new URL(req.url);
   const nextCursor = searchParams.get("next_cursor");
   const searchQuery = searchParams.get("search") || "";
+  const folderParam = searchParams.get("folder");
 
   try {
     // Validate siteId is a valid 24-char hex MongoDB ObjectId
@@ -30,6 +62,20 @@ export async function GET(
     // Verify site access
     await requireSiteAccess(siteId, session.user.id);
 
+    let listPrefix = `${siteId}/`;
+    let searchFolderExpr = `folder:${siteId}/*`;
+
+    if (folderParam && folderParam !== "all") {
+      const safeFolder = assertSiteFolderPath(siteId, folderParam);
+      if (safeFolder === siteId) {
+        listPrefix = `${siteId}/`;
+        searchFolderExpr = `folder:${siteId}/*`;
+      } else {
+        listPrefix = `${safeFolder}/`;
+        searchFolderExpr = `folder:${safeFolder}/*`;
+      }
+    }
+
     let results: any;
 
     if (!searchQuery) {
@@ -38,7 +84,7 @@ export async function GET(
       try {
         results = await cloudinary.v2.api.resources({
           type: "upload",
-          prefix: `${siteId}/`, // Search all uploads for this site
+          prefix: listPrefix,
           resource_type: "image",
           max_results: 24,
           next_cursor: nextCursor,
@@ -50,7 +96,7 @@ export async function GET(
       }
     } else {
       // Build search expression for filtering
-      let expression = `resource_type:image AND folder:${siteId}/*`;
+      let expression = `resource_type:image AND ${searchFolderExpr}`;
       expression += ` AND (filename:${searchQuery}* OR tags:${searchQuery}* OR context.alt:${searchQuery}* OR context.caption:${searchQuery}*)`;
 
       // Execute search via Cloudinary Search API
@@ -73,24 +119,8 @@ export async function GET(
       }
     }
 
-    const mediaItems: Media[] = (results.resources || []).map(
-      (resource: any) => ({
-        id: resource.asset_id || resource.public_id,
-        public_id: resource.public_id,
-        name:
-          resource.filename ||
-          resource.public_id.split("/").pop() ||
-          "Untitled",
-        url: resource.secure_url,
-        alt: resource.context?.alt || resource.context?.caption || resource.context?.custom?.alt || null,
-        type: `${resource.resource_type}/${resource.format}`,
-        size: resource.bytes,
-        width: resource.width,
-        height: resource.height,
-        createdAt: resource.created_at,
-        updatedAt: resource.updated_at || resource.created_at,
-        siteId: siteId!,
-      })
+    const mediaItems: Media[] = (results.resources || []).map((resource: any) =>
+      mapResource(resource, siteId!)
     );
 
     const response: MediaGalleryResponse = {
@@ -124,7 +154,56 @@ export async function GET(
       );
     }
 
+    const message = error instanceof Error ? error.message : "";
+    if (message.includes("Folder path") || message.includes("Invalid")) {
+      return NextResponse.json({ error: message }, { status: 400 });
+    }
+
     // Standardized error response for other errors (403, 500 etc.)
+    return createErrorResponse(error);
+  }
+}
+
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ siteId: string }> }
+) {
+  const { siteId } = await params;
+  const session = await getAuthSession();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    await requireSiteAccess(siteId, session.user.id);
+    const body = await req.json().catch(() => ({}));
+    const publicId = typeof body.public_id === "string" ? body.public_id : "";
+    const toFolder = typeof body.to_folder === "string" ? body.to_folder : "";
+
+    if (!publicId || !toFolder) {
+      return NextResponse.json(
+        { error: "public_id and to_folder are required" },
+        { status: 400 }
+      );
+    }
+
+    const result = await moveAsset(siteId, publicId, toFolder);
+    return NextResponse.json({
+      public_id: result.public_id,
+      url: result.secure_url,
+      folder: getFolderFromPublicId(result.public_id),
+    });
+  } catch (error: any) {
+    const message = error instanceof Error ? error.message : "Failed to move asset";
+    if (
+      message.includes("Folder") ||
+      message.includes("Invalid") ||
+      message.includes("Choose") ||
+      message.includes("Asset") ||
+      message.includes("already exists")
+    ) {
+      return NextResponse.json({ error: message }, { status: 400 });
+    }
     return createErrorResponse(error);
   }
 }

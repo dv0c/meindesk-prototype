@@ -11,8 +11,19 @@ export interface Media {
   updatedAt: string // ISO date string
   siteId: string
   public_id?: string
+  /** Cloudinary folder path derived from public_id (e.g. siteId/uploads) */
+  folder?: string
   userId?: string // If you track which user uploaded it
 }
+
+export interface MediaFolderNode {
+  name: string
+  path: string
+  children: MediaFolderNode[]
+}
+
+/** null / "all" = show all media; otherwise a site-scoped Cloudinary folder path */
+export type MediaFolderSelection = "all" | string
 
 export interface MediaGalleryResponse {
   media: Media[]

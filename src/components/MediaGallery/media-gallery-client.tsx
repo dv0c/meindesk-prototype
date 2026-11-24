@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useParams } from "next/navigation"
 import NextImage from "next/image"
 import { Button } from "@/components/ui/button"
@@ -20,8 +20,14 @@ import {
   Grid3X3,
   List,
   Pencil,
+  FolderInput,
 } from "lucide-react"
 import { MediaImageEditor } from "@/components/MediaGallery/media-image-editor"
+import {
+  MediaFolderBreadcrumbs,
+  MediaFolderTree,
+} from "@/components/MediaGallery/media-folder-tree"
+import { MediaMoveDialog } from "@/components/MediaGallery/media-move-dialog"
 import type { Media } from "@/types/media-gallery"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
@@ -52,9 +58,11 @@ import {
 import { useMediaGallery } from "@/hooks/use-media-gallery"
 import { useMediaGalleryUsage } from "@/hooks/use-media-gallery-usage"
 import { useMediaGalleryFilters } from "@/hooks/use-media-gallery-filters"
+import { useMediaFolders } from "@/hooks/use-media-folders"
 import { MediaGalleryFilters } from "@/components/MediaGallery/media-gallery-filters"
 import { findUsageForMediaUrl } from "@/lib/media-gallery-usage"
-import { hasActiveFilters } from "@/lib/media-gallery-filters"
+import { filterMediaByFolder, hasActiveFilters } from "@/lib/media-gallery-filters"
+import { getFolderFromPublicId } from "@/lib/media-folder-path"
 
 interface MediaGalleryClientProps {
   onSelect?: (url: string) => void
@@ -67,6 +75,23 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
   const { media: mediaItems, isLoading, refetch, removeMedia, setMedia } = useMediaGallery(siteId)
   const { usageIndex } = useMediaGalleryUsage(siteId)
   const {
+    folders,
+    isLoading: foldersLoading,
+    selectedFolder,
+    setSelectedFolder,
+    uploadFolderPath,
+    createFolder,
+    renameFolder,
+    deleteFolder,
+    refetch: refetchFolders,
+  } = useMediaFolders(siteId)
+
+  const folderScopedMedia = useMemo(
+    () => filterMediaByFolder(mediaItems, selectedFolder),
+    [mediaItems, selectedFolder],
+  )
+
+  const {
     filters,
     updateFilters,
     clearFilters,
@@ -74,7 +99,7 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
     availableMonths,
     articleOptions,
     categoryOptions,
-  } = useMediaGalleryFilters(mediaItems, usageIndex)
+  } = useMediaGalleryFilters(folderScopedMedia, usageIndex)
 
   const [isUploading, setIsUploading] = useState(false)
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
@@ -83,12 +108,45 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
   const [itemToDelete, setItemToDelete] = useState<Media | null>(null)
   const [editingItem, setEditingItem] = useState<Media | null>(null)
   const [editorOpen, setEditorOpen] = useState(false)
+  const [moveItem, setMoveItem] = useState<Media | null>(null)
+  const [moveOpen, setMoveOpen] = useState(false)
 
   const filtersActive = hasActiveFilters(filters)
 
   const handleEditClick = (item: Media) => {
     setEditingItem(item)
     setEditorOpen(true)
+  }
+
+  const handleMoveClick = (item: Media) => {
+    setMoveItem({
+      ...item,
+      folder: item.folder || (item.public_id ? getFolderFromPublicId(item.public_id) : undefined),
+    })
+    setMoveOpen(true)
+  }
+
+  const handleMoved = (result: { public_id: string; url: string; folder: string }) => {
+    if (!moveItem?.public_id) {
+      refetch()
+      return
+    }
+    const oldId = moveItem.public_id
+    setMedia((prev) =>
+      prev.map((m) =>
+        m.public_id === oldId
+          ? {
+              ...m,
+              public_id: result.public_id,
+              id: result.public_id,
+              url: result.url,
+              folder: result.folder,
+              name: result.public_id.split("/").pop() || m.name,
+            }
+          : m,
+      ),
+    )
+    setMoveItem(null)
   }
 
   const handleEditorComplete = (result: { url: string; public_id?: string }) => {
@@ -116,6 +174,7 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
       const info = result.info as { original_filename?: string; public_id: string; secure_url: string }
       toast.success(`Image "${info.original_filename || info.public_id}" uploaded successfully!`)
       refetch()
+      refetchFolders()
     }
   }
 
@@ -209,6 +268,13 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
     return badges
   }
 
+  const uploadOptions = {
+    maxFiles: 10,
+    folder: `${uploadFolderPath}/`,
+    cropping: true,
+    tags: ["gallery_image", siteId, "user_upload"],
+  }
+
   const EmptyState = () => (
     <div className="flex max-h-[60vh] flex-col items-center justify-center py-20 text-center border border-dashed rounded-lg bg-muted/10 m-6">
       <div className="bg-muted/20 p-4 rounded-full mb-4">
@@ -218,16 +284,13 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
       <p className="text-sm text-muted-foreground mb-6 max-w-xs mx-auto">
         {filtersActive
           ? "Try adjusting your filters or search terms."
-          : "Upload your first image to get started."}
+          : selectedFolder !== "all"
+            ? "This folder is empty. Upload images here or create a subfolder."
+            : "Upload your first image to get started."}
       </p>
       {!filtersActive && (
         <CldUploadButton
-          options={{
-            maxFiles: 10,
-            folder: `${siteId}/uploads/`,
-            cropping: true,
-            tags: ["gallery_image", siteId, "user_upload"],
-          }}
+          options={uploadOptions}
           onSuccess={handleUploadSuccess}
           onError={handleUploadError}
           uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "esiln4yu"}
@@ -239,6 +302,38 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
         </CldUploadButton>
       )}
     </div>
+  )
+
+  const itemActions = (item: Media) => (
+    <>
+      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); window.open(item.url, "_blank") }}>
+        <Eye className="mr-2 h-3.5 w-3.5" />
+        View
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEditClick(item) }}>
+        <Pencil className="mr-2 h-3.5 w-3.5" />
+        Edit
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleMoveClick(item) }}>
+        <FolderInput className="mr-2 h-3.5 w-3.5" />
+        Move to folder
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); copyToClipboard(item.url) }}>
+        <Copy className="mr-2 h-3.5 w-3.5" />
+        Copy link
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); downloadImage(item.url, item.name || "image") }}>
+        <Download className="mr-2 h-3.5 w-3.5" />
+        Download
+      </DropdownMenuItem>
+      <DropdownMenuItem
+        onClick={(e) => { e.stopPropagation(); handleDeleteClick(item) }}
+        className="text-destructive focus:text-destructive"
+      >
+        <Trash2 className="mr-2 h-3.5 w-3.5" />
+        Delete
+      </DropdownMenuItem>
+    </>
   )
 
   const GridView = () => (
@@ -266,30 +361,8 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
                       <MoreVertical className="h-3 w-3" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-40">
-                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); window.open(item.url, "_blank") }}>
-                      <Eye className="mr-2 h-3.5 w-3.5" />
-                      View
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEditClick(item) }}>
-                      <Pencil className="mr-2 h-3.5 w-3.5" />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); copyToClipboard(item.url) }}>
-                      <Copy className="mr-2 h-3.5 w-3.5" />
-                      Copy link
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); downloadImage(item.url, item.name || "image") }}>
-                      <Download className="mr-2 h-3.5 w-3.5" />
-                      Download
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={(e) => { e.stopPropagation(); handleDeleteClick(item) }}
-                      className="text-destructive focus:text-destructive"
-                    >
-                      <Trash2 className="mr-2 h-3.5 w-3.5" />
-                      Delete
-                    </DropdownMenuItem>
+                  <DropdownMenuContent align="end" className="w-44">
+                    {itemActions(item)}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -377,14 +450,17 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
                             <MoreVertical className="h-4 w-4 text-muted-foreground" />
                           </Button>
                         </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEditClick(item)}>
-                          <Pencil className="mr-2 h-4 w-4" /> Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDeleteClick(item)} className="text-destructive">
-                          <Trash2 className="mr-2 h-4 w-4" /> Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
+                        <DropdownMenuContent align="end" className="w-44">
+                          <DropdownMenuItem onClick={() => handleEditClick(item)}>
+                            <Pencil className="mr-2 h-4 w-4" /> Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleMoveClick(item)}>
+                            <FolderInput className="mr-2 h-4 w-4" /> Move to folder
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDeleteClick(item)} className="text-destructive">
+                            <Trash2 className="mr-2 h-4 w-4" /> Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
                   </TableCell>
@@ -406,71 +482,88 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
   }
 
   return (
-    <div className="flex max-w-7xl mx-auto h-full w-full flex-col bg-background/50">
-      <div className="px-6 py-4 border-b bg-background/95 backdrop-blur z-10 space-y-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center border rounded-md bg-muted/20 p-0.5 shrink-0">
-            <Button
-              variant={viewMode === "grid" ? "secondary" : "ghost"}
-              size="icon"
-              className="h-7 w-7 rounded-sm"
-              onClick={() => setViewMode("grid")}
+    <div className="flex max-w-7xl mx-auto h-full w-full bg-background/50">
+      <MediaFolderTree
+        siteId={siteId}
+        folders={folders}
+        selectedFolder={selectedFolder}
+        onSelect={setSelectedFolder}
+        onCreate={createFolder}
+        onRename={renameFolder}
+        onDelete={deleteFolder}
+        isLoading={foldersLoading}
+        className="w-44 sm:w-56 shrink-0"
+      />
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="px-6 py-4 border-b bg-background/95 backdrop-blur z-10 space-y-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex min-w-0 flex-1 items-center gap-3">
+              <div className="flex items-center border rounded-md bg-muted/20 p-0.5 shrink-0">
+                <Button
+                  variant={viewMode === "grid" ? "secondary" : "ghost"}
+                  size="icon"
+                  className="h-7 w-7 rounded-sm"
+                  onClick={() => setViewMode("grid")}
+                >
+                  <Grid3X3 className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === "list" ? "secondary" : "ghost"}
+                  size="icon"
+                  className="h-7 w-7 rounded-sm"
+                  onClick={() => setViewMode("list")}
+                >
+                  <List className="h-4 w-4" />
+                </Button>
+              </div>
+              <MediaFolderBreadcrumbs
+                siteId={siteId}
+                selectedFolder={selectedFolder}
+                onSelect={setSelectedFolder}
+                className="min-w-0"
+              />
+            </div>
+
+            <CldUploadButton
+              options={uploadOptions}
+              onOpen={() => setIsUploading(true)}
+              onUploadAdded={() => setIsUploading(true)}
+              onSuccess={handleUploadSuccess}
+              onError={handleUploadError}
+              onClose={() => setIsUploading(false)}
+              uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "prototype"}
+              className="w-auto"
             >
-              <Grid3X3 className="h-4 w-4" />
-            </Button>
-            <Button
-              variant={viewMode === "list" ? "secondary" : "ghost"}
-              size="icon"
-              className="h-7 w-7 rounded-sm"
-              onClick={() => setViewMode("list")}
-            >
-              <List className="h-4 w-4" />
-            </Button>
+              <Button disabled={isUploading} size="sm" className="h-9">
+                {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UploadCloud className="mr-2 h-4 w-4" />}
+                Upload
+              </Button>
+            </CldUploadButton>
           </div>
 
-          <CldUploadButton
-            options={{
-              maxFiles: 10,
-              folder: `${siteId}/uploads/`,
-              cropping: true,
-              tags: ["gallery_image", siteId, "user_upload"],
-            }}
-            onOpen={() => setIsUploading(true)}
-            onUploadAdded={() => setIsUploading(true)}
-            onSuccess={handleUploadSuccess}
-            onError={handleUploadError}
-            onClose={() => setIsUploading(false)}
-            uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "prototype"}
-            className="w-auto"
-          >
-            <Button disabled={isUploading} size="sm" className="h-9">
-              {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UploadCloud className="mr-2 h-4 w-4" />}
-              Upload
-            </Button>
-          </CldUploadButton>
+          <MediaGalleryFilters
+            filters={filters}
+            onFiltersChange={updateFilters}
+            onClear={clearFilters}
+            availableMonths={availableMonths}
+            articleOptions={articleOptions}
+            categoryOptions={categoryOptions}
+            resultCount={filteredItems.length}
+            totalCount={folderScopedMedia.length}
+          />
         </div>
 
-        <MediaGalleryFilters
-          filters={filters}
-          onFiltersChange={updateFilters}
-          onClear={clearFilters}
-          availableMonths={availableMonths}
-          articleOptions={articleOptions}
-          categoryOptions={categoryOptions}
-          resultCount={filteredItems.length}
-          totalCount={mediaItems.length}
-        />
+        <ScrollArea className="flex-1">
+          {filteredItems.length === 0 ? (
+            <EmptyState />
+          ) : viewMode === "grid" ? (
+            <GridView />
+          ) : (
+            <ListView />
+          )}
+        </ScrollArea>
       </div>
-
-      <ScrollArea className="flex-1">
-        {filteredItems.length === 0 ? (
-          <EmptyState />
-        ) : viewMode === "grid" ? (
-          <GridView />
-        ) : (
-          <ListView />
-        )}
-      </ScrollArea>
 
       <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
         <AlertDialogContent>
@@ -482,12 +575,25 @@ export function MediaGalleryClient({ onSelect }: MediaGalleryClientProps) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setItemToDelete(null)}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            <AlertDialogAction
+              onClick={confirmDelete}
+              disabled={!!isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <MediaMoveDialog
+        open={moveOpen}
+        onOpenChange={setMoveOpen}
+        siteId={siteId}
+        item={moveItem}
+        folders={folders}
+        onMoved={handleMoved}
+      />
 
       {editingItem && (
         <MediaImageEditor

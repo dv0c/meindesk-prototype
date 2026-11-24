@@ -1,6 +1,25 @@
+import { getFolderFromPublicId, isDirectChildOfFolder } from "@/lib/media-folder-path"
 import { isMediaUsed, mediaUrlsMatch } from "@/lib/media-gallery-usage"
-import type { Media } from "@/types/media-gallery"
+import type { Media, MediaFolderSelection } from "@/types/media-gallery"
 import type { MediaGalleryFilterState, MediaUsageIndex } from "@/types/media-gallery"
+
+/** When a folder is selected, show only direct children (not nested descendants). */
+export function filterMediaByFolder(
+  media: Media[],
+  selectedFolder: MediaFolderSelection,
+): Media[] {
+  if (!selectedFolder || selectedFolder === "all") return media
+  return media.filter((item) => {
+    const publicId = item.public_id
+    if (!publicId) return false
+    return isDirectChildOfFolder(publicId, selectedFolder)
+  })
+}
+
+export function ensureMediaFolder(item: Media): Media {
+  if (item.folder || !item.public_id) return item
+  return { ...item, folder: getFolderFromPublicId(item.public_id) || undefined }
+}
 
 export function getAvailableMonths(media: Media[]): string[] {
   const months = new Set<string>()

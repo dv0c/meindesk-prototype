@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import axios from "axios"
 import { toast } from "sonner"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -20,12 +20,17 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Skeleton } from "@/components/ui/skeleton"
 import { UploadCloud, ImageIcon, Trash2, Check, Pencil } from "lucide-react"
 import { MediaImageEditor } from "@/components/MediaGallery/media-image-editor"
+import {
+  MediaFolderBreadcrumbs,
+  MediaFolderTree,
+} from "@/components/MediaGallery/media-folder-tree"
 import { CldUploadButton } from "next-cloudinary"
 import { useMediaGallery } from "@/hooks/use-media-gallery"
 import { useMediaGalleryUsage } from "@/hooks/use-media-gallery-usage"
 import { useMediaGalleryFilters } from "@/hooks/use-media-gallery-filters"
+import { useMediaFolders } from "@/hooks/use-media-folders"
 import { MediaGalleryFilters } from "@/components/MediaGallery/media-gallery-filters"
-import { hasActiveFilters } from "@/lib/media-gallery-filters"
+import { filterMediaByFolder, hasActiveFilters } from "@/lib/media-gallery-filters"
 import type { Media } from "@/types/media-gallery"
 
 export interface MediaItem {
@@ -39,6 +44,7 @@ export interface MediaItem {
   width?: number
   height?: number
   type?: string
+  folder?: string
 }
 
 function toMediaItem(media: Media): MediaItem {
@@ -53,6 +59,7 @@ function toMediaItem(media: Media): MediaItem {
     width: media.width,
     height: media.height,
     type: media.type,
+    folder: media.folder,
   }
 }
 
@@ -181,6 +188,23 @@ export default function MediaLibraryDialog({
   const { media: mediaItems, isLoading, refetch, removeMedia } = useMediaGallery(siteId, { enabled: isOpen })
   const { usageIndex } = useMediaGalleryUsage(siteId, { enabled: isOpen })
   const {
+    folders,
+    isLoading: foldersLoading,
+    selectedFolder,
+    setSelectedFolder,
+    uploadFolderPath,
+    createFolder,
+    renameFolder,
+    deleteFolder,
+    refetch: refetchFolders,
+  } = useMediaFolders(siteId, { enabled: isOpen })
+
+  const folderScopedMedia = useMemo(
+    () => filterMediaByFolder(mediaItems, selectedFolder),
+    [mediaItems, selectedFolder],
+  )
+
+  const {
     filters,
     updateFilters,
     clearFilters,
@@ -188,7 +212,7 @@ export default function MediaLibraryDialog({
     availableMonths,
     articleOptions,
     categoryOptions,
-  } = useMediaGalleryFilters(mediaItems, usageIndex)
+  } = useMediaGalleryFilters(folderScopedMedia, usageIndex)
 
   const filteredMediaItems = filteredMedia.map(toMediaItem)
 
@@ -246,6 +270,7 @@ export default function MediaLibraryDialog({
     setActiveTab("library")
     toast.success("Upload successful!")
     refetch()
+    refetchFolders()
   }
 
   const handleSubmit = () => {
@@ -304,7 +329,7 @@ export default function MediaLibraryDialog({
               </TabsList>
               <CldUploadButton
                 options={{
-                  folder: `${siteId}/uploads/`,
+                  folder: `${uploadFolderPath}/`,
                   cropping: true,
                   clientAllowedFormats: ["png", "gif", "jpeg", "webp"],
                   maxFileSize: 5 * 1024 * 1024,
@@ -335,39 +360,62 @@ export default function MediaLibraryDialog({
                 articleOptions={articleOptions}
                 categoryOptions={categoryOptions}
                 resultCount={filteredMediaItems.length}
-                totalCount={mediaItems.length}
+                totalCount={folderScopedMedia.length}
               />
-              <ScrollArea className="flex-1 min-h-0">
-                {isLoading ? (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 p-1">
-                    {[...Array(12)].map((_, i) => (
-                      <Skeleton key={i} className="aspect-square rounded-lg" />
-                    ))}
-                  </div>
-                ) : filteredMediaItems.length === 0 ? (
-                  <div className="text-center py-10">
-                    <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
-                    <p className="text-muted-foreground">
-                      {filtersActive ? "No media matches your filters." : "No media found."}
-                    </p>
-                    {filtersActive && (
-                      <p className="text-xs text-muted-foreground mt-1">Try adjusting your filters.</p>
-                    )}
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 p-1">
-                    {filteredMediaItems.map((media) => (
-                      <MediaItemCard
-                        key={media.id}
-                        media={media}
-                        isSelected={selectedItems.some((item) => item.id === media.id)}
-                        onSelect={() => handleSelectMedia(media)}
-                        onDelete={() => handleDeleteClick(media)}
-                      />
-                    ))}
-                  </div>
-                )}
-              </ScrollArea>
+              <MediaFolderBreadcrumbs
+                siteId={siteId}
+                selectedFolder={selectedFolder}
+                onSelect={setSelectedFolder}
+              />
+              <div className="flex flex-1 min-h-0 overflow-hidden rounded-md border">
+                <MediaFolderTree
+                  siteId={siteId}
+                  folders={folders}
+                  selectedFolder={selectedFolder}
+                  onSelect={setSelectedFolder}
+                  onCreate={createFolder}
+                  onRename={renameFolder}
+                  onDelete={deleteFolder}
+                  isLoading={foldersLoading}
+                  compact
+                  className="w-36 sm:w-44 shrink-0 border-r-0"
+                />
+                <ScrollArea className="flex-1 min-h-0">
+                  {isLoading ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 p-3">
+                      {[...Array(12)].map((_, i) => (
+                        <Skeleton key={i} className="aspect-square rounded-lg" />
+                      ))}
+                    </div>
+                  ) : filteredMediaItems.length === 0 ? (
+                    <div className="text-center py-10 px-4">
+                      <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
+                      <p className="text-muted-foreground">
+                        {filtersActive
+                          ? "No media matches your filters."
+                          : selectedFolder !== "all"
+                            ? "This folder is empty."
+                            : "No media found."}
+                      </p>
+                      {filtersActive && (
+                        <p className="text-xs text-muted-foreground mt-1">Try adjusting your filters.</p>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 p-3">
+                      {filteredMediaItems.map((media) => (
+                        <MediaItemCard
+                          key={media.id}
+                          media={media}
+                          isSelected={selectedItems.some((item) => item.id === media.id)}
+                          onSelect={() => handleSelectMedia(media)}
+                          onDelete={() => handleDeleteClick(media)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </ScrollArea>
+              </div>
             </TabsContent>
           </Tabs>
           <DialogFooter className="p-6 pt-4 border-t shrink-0">
